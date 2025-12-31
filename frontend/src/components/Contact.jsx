@@ -105,7 +105,7 @@ const Contact = () => {
                   <div>
                     <h4 className="font-bold text-black mb-1" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>Email</h4>
                     <p className="text-gray-600" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                      <a href="mailto:swdmarshall@gmail.com" className="hover:text-red-600 transition-colors">swdmarshall@gmail.com</a>
+                      <a href="mailto:inbox@twofungis.ca" className="hover:text-red-600 transition-colors">inbox@twofungis.ca</a>
                     </p>
                   </div>
                 </div>
