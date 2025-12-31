@@ -48,7 +48,10 @@ const About = () => {
                 Our Story
               </h3>
               <p className="text-gray-700 mb-4 leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                Established in 2017, Two Fungis Ltd has built a reputation for delivering exceptional interior finishing services across diverse project types. Our expertise spans from intimate residential spaces to expansive high-rise commercial developments.
+                Established in 2017, Two Fungis Ltd brings over 25 years of hands-on expertise to every project. Our founder, Scott Marshall, has built a distinguished career in millwork, finishing carpentry, cabinet installation, and flooring, delivering exceptional craftsmanship across diverse project types.
+              </p>
+              <p className="text-gray-700 mb-4 leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+                With a quarter-century of experience, we've mastered the art of precision finishing. From intimate residential spaces to expansive high-rise commercial developments, our depth of knowledge ensures every detail is executed to perfection.
               </p>
               <p className="text-gray-700 mb-4 leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                 After a brief hiatus to explore other ventures, we're returning stronger than ever with renewed commitment to excellence. With our $5 million liability insurance in place, we're ready to secure large-scale contracts throughout Coastal B.C and Vancouver Island.
