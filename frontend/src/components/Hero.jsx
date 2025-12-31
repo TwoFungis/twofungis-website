@@ -12,19 +12,30 @@ const Hero = () => {
 
   return (
     <section id="home" className="relative min-h-screen flex items-center justify-center bg-black overflow-hidden">
-      {/* Hero Image with Logo */}
-      <div className="absolute inset-0">
-        <img
-          src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/3hzaqj34_1606875705391.png"
-          alt="Two Fungis Ltd"
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-black/40"></div>
+      {/* Honeycomb Pattern Background */}
+      <div className="absolute inset-0 opacity-5">
+        <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="hexagons" x="0" y="0" width="56" height="100" patternUnits="userSpaceOnUse">
+              <polygon points="28,0 56,15 56,45 28,60 0,45 0,15" fill="none" stroke="white" strokeWidth="1"/>
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#hexagons)" />
+        </svg>
       </div>
 
       {/* Content */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
         <div className="max-w-4xl mx-auto">
+          {/* Logo Image Above Title */}
+          <div className="mb-8 flex justify-center">
+            <img
+              src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/3hzaqj34_1606875705391.png"
+              alt="Two Fungis Ltd"
+              className="h-48 md:h-56 w-auto drop-shadow-2xl"
+            />
+          </div>
+          
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-6 animate-fade-in" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
             Premium Interior <span className="text-red-600">Finishing</span> Excellence
           </h1>
