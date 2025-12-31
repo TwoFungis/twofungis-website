@@ -17,7 +17,7 @@ const Footer = () => {
                 className="h-16 w-auto mb-4"
               />
               <p className="text-gray-400 mb-4" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                Premium interior finishing services for residential, commercial, and high-rise projects across the Okanagan region.
+                Premium interior finishing services for residential, commercial, and high-rise projects across Coastal B.C and Vancouver Island.
               </p>
               <div className="inline-flex items-center gap-2 bg-green-600/20 border border-green-600/50 px-4 py-2 rounded-full">
                 <div className="w-2 h-2 bg-green-500 rounded-full"></div>
