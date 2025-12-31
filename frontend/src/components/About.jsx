@@ -59,8 +59,8 @@ const About = () => {
             </div>
             <div className="relative">
               <img
-                src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/xy0jgjk8_IMG_20191217_163428.jpg"
-                alt="Interior finishing work"
+                src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/d422l0sp_20211103_163344.jpg"
+                alt="Custom kitchen cabinetry and millwork"
                 className="rounded-lg shadow-2xl w-full h-auto object-cover"
               />
               <div className="absolute -bottom-6 -left-6 bg-red-600 text-white p-6 rounded-lg shadow-xl">
