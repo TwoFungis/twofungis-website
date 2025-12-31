@@ -60,11 +60,6 @@ const Portfolio = () => {
       category: 'Residential'
     },
     {
-      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/pynvzdye_IMG_20210223_223943_967.jpg',
-      title: 'Modern Kitchen Renovation',
-      category: 'Residential'
-    },
-    {
       image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/xcihx4pi_20220128_182318.jpg',
       title: 'Custom Kitchen Design & Installation',
       category: 'Residential'
@@ -80,9 +75,9 @@ const Portfolio = () => {
       category: 'Residential'
     },
     {
-      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/3hzaqj34_1606875705391.png',
-      title: 'Two Fungis Ltd - Premium Craftsmanship',
-      category: 'Our Brand'
+      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/pynvzdye_IMG_20210223_223943_967.jpg',
+      title: 'Modern Kitchen Renovation',
+      category: 'Residential'
     }
   ];
 
