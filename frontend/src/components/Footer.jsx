@@ -12,7 +12,7 @@ const Footer = () => {
             {/* Company Info */}
             <div>
               <img
-                src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/efo0ecjz_IMG_20210122_223109_150.jpg"
+                src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/pvfl90hz_IMG_20210212_094210_567.jpg"
                 alt="Two Fungis Ltd"
                 className="h-20 w-auto mb-4"
               />
