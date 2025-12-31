@@ -27,6 +27,14 @@ const Hero = () => {
       {/* Content */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
         <div className="max-w-4xl mx-auto">
+          {/* Large Logo Display */}
+          <div className="mb-8 flex justify-center">
+            <img
+              src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/e41zwh5k_1606875705391.png"
+              alt="Two Fungis Ltd"
+              className="h-48 md:h-64 w-auto drop-shadow-2xl"
+            />
+          </div>
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-6 animate-fade-in" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
             Premium Interior <span className="text-red-600">Finishing</span> Excellence
           </h1>
