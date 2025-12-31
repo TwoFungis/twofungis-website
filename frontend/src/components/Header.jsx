@@ -33,7 +33,7 @@ const Header = () => {
           {/* Logo */}
           <div className="flex-shrink-0">
             <img
-              src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/efo0ecjz_IMG_20210122_223109_150.jpg"
+              src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/pvfl90hz_IMG_20210212_094210_567.jpg"
               alt="Two Fungis Ltd"
               className="h-28 md:h-32 w-auto cursor-pointer"
               onClick={() => scrollToSection('home')}
