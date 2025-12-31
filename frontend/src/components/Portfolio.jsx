@@ -23,6 +23,31 @@ const Portfolio = () => {
       image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/qd4ch2yy_IMG_20190920_102445.jpg',
       title: 'Interior Railing Work',
       category: 'Multi-Unit'
+    },
+    {
+      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/oce3ehrv_20211103_163344.jpg',
+      title: 'Custom Millwork & Cabinetry',
+      category: 'Residential'
+    },
+    {
+      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/mme4t8iz_20211023_172224.jpg',
+      title: 'Kitchen Cabinet Installation',
+      category: 'Residential'
+    },
+    {
+      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/v2glu48u_IMG_20200403_134102.jpg',
+      title: 'Floating Staircase Construction',
+      category: 'Multi-Unit'
+    },
+    {
+      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/5od2mhbp_IMG_20200403_115211.jpg',
+      title: 'Custom Feature Wall',
+      category: 'Commercial'
+    },
+    {
+      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/f44juoiy_IMG_20200312_154654.jpg',
+      title: 'Interior Door Installation',
+      category: 'Residential'
     }
   ];
 
