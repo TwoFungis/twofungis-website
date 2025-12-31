@@ -14,7 +14,7 @@ const Footer = () => {
               <img
                 src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/lpeiqs4k_Screenshot_20200227_085449_com.android.gallery3d.jpg"
                 alt="Two Fungis Ltd"
-                className="h-12 w-auto mb-4"
+                className="h-16 w-auto mb-4"
               />
               <p className="text-gray-400 mb-4" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                 Premium interior finishing services for residential, commercial, and high-rise projects across the Okanagan region.
