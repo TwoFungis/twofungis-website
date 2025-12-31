@@ -81,7 +81,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <h4 className="font-bold text-black mb-1" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>Service Area</h4>
-                    <p className="text-gray-600" style={{ fontFamily: 'Open Sans, sans-serif' }}>Okanagan Region, British Columbia</p>
+                    <p className="text-gray-600" style={{ fontFamily: 'Open Sans, sans-serif' }}>Coastal B.C and Vancouver Island</p>
                   </div>
                 </div>
                 
