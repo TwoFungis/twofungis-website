@@ -87,6 +87,14 @@ const Portfolio = () => {
                       alt={project.title}
                       className="w-full h-80 object-cover transition-transform duration-500 group-hover:scale-110"
                     />
+                    {/* Watermark */}
+                    <div className="absolute bottom-2 right-2 opacity-30 group-hover:opacity-50 transition-opacity">
+                      <img
+                        src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/pvfl90hz_IMG_20210212_094210_567.jpg"
+                        alt="Two Fungis Ltd"
+                        className="h-8 w-auto"
+                      />
+                    </div>
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       <div className="absolute bottom-0 left-0 right-0 p-6">
                         <span className="inline-block px-3 py-1 bg-red-600 text-white text-sm font-semibold rounded-full mb-3">
