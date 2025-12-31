@@ -65,6 +65,11 @@ const Portfolio = () => {
       category: 'Residential'
     },
     {
+      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/xcihx4pi_20220128_182318.jpg',
+      title: 'Custom Kitchen Design & Installation',
+      category: 'Residential'
+    },
+    {
       image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/qd4ch2yy_IMG_20190920_102445.jpg',
       title: 'Interior Railing Work',
       category: 'Multi-Unit'
@@ -73,6 +78,11 @@ const Portfolio = () => {
       image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/f44juoiy_IMG_20200312_154654.jpg',
       title: 'Interior Door Installation',
       category: 'Residential'
+    },
+    {
+      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/3hzaqj34_1606875705391.png',
+      title: 'Two Fungis Ltd - Premium Craftsmanship',
+      category: 'Our Brand'
     }
   ];
 
