@@ -10,38 +10,8 @@ const Portfolio = () => {
       category: 'Residential'
     },
     {
-      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/j7f9wan6_IMG_20191217_163614.jpg',
-      title: 'Custom Wood Staircase',
-      category: 'Residential'
-    },
-    {
-      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/w5ytwuxa_IMG_20191217_163454.jpg',
-      title: 'Staircase Detail & Craftsmanship',
-      category: 'Residential'
-    },
-    {
-      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/w08mfqcc_IMG_20191219_205008.jpg',
-      title: 'Modern Stair Installation',
-      category: 'Commercial'
-    },
-    {
-      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/qd4ch2yy_IMG_20190920_102445.jpg',
-      title: 'Interior Railing Work',
-      category: 'Multi-Unit'
-    },
-    {
       image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/oce3ehrv_20211103_163344.jpg',
       title: 'Custom Millwork & Cabinetry',
-      category: 'Residential'
-    },
-    {
-      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/fu9jwkgc_20211011_153642.jpg',
-      title: 'White Kitchen Cabinet Installation',
-      category: 'Residential'
-    },
-    {
-      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/mme4t8iz_20211023_172224.jpg',
-      title: 'Kitchen Cabinet Installation',
       category: 'Residential'
     },
     {
@@ -50,9 +20,9 @@ const Portfolio = () => {
       category: 'Multi-Unit'
     },
     {
-      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/5od2mhbp_IMG_20200403_115211.jpg',
-      title: 'Custom Feature Wall',
-      category: 'Commercial'
+      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/mme4t8iz_20211023_172224.jpg',
+      title: 'Kitchen Cabinet Installation',
+      category: 'Residential'
     },
     {
       image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/futuvp4y_IMG_20200211_140913.jpg',
@@ -60,8 +30,33 @@ const Portfolio = () => {
       category: 'Commercial'
     },
     {
-      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/f44juoiy_IMG_20200312_154654.jpg',
-      title: 'Interior Door Installation',
+      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/j7f9wan6_IMG_20191217_163614.jpg',
+      title: 'Custom Wood Staircase',
+      category: 'Residential'
+    },
+    {
+      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/fu9jwkgc_20211011_153642.jpg',
+      title: 'White Kitchen Cabinet Installation',
+      category: 'Residential'
+    },
+    {
+      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/w08mfqcc_IMG_20191219_205008.jpg',
+      title: 'Modern Stair Installation',
+      category: 'Commercial'
+    },
+    {
+      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/n3k3qxu3_20220128_182344.jpg',
+      title: 'Modern Bathroom Vanity & Vessel Sinks',
+      category: 'Residential'
+    },
+    {
+      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/5od2mhbp_IMG_20200403_115211.jpg',
+      title: 'Custom Feature Wall',
+      category: 'Commercial'
+    },
+    {
+      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/w5ytwuxa_IMG_20191217_163454.jpg',
+      title: 'Staircase Detail & Craftsmanship',
       category: 'Residential'
     },
     {
@@ -70,8 +65,13 @@ const Portfolio = () => {
       category: 'Residential'
     },
     {
-      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/rb68pa70_20220117_210242.jpg',
-      title: 'Modern Bathroom Vanity Installation',
+      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/qd4ch2yy_IMG_20190920_102445.jpg',
+      title: 'Interior Railing Work',
+      category: 'Multi-Unit'
+    },
+    {
+      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/f44juoiy_IMG_20200312_154654.jpg',
+      title: 'Interior Door Installation',
       category: 'Residential'
     }
   ];
