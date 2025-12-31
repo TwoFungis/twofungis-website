@@ -4,6 +4,7 @@ import Hero from '../components/Hero';
 import About from '../components/About';
 import Services from '../components/Services';
 import Portfolio from '../components/Portfolio';
+import ServiceAreas from '../components/ServiceAreas';
 import WhyChooseUs from '../components/WhyChooseUs';
 import Contact from '../components/Contact';
 import Footer from '../components/Footer';
@@ -16,6 +17,7 @@ const Home = () => {
       <About />
       <Services />
       <Portfolio />
+      <ServiceAreas />
       <WhyChooseUs />
       <Contact />
       <Footer />
