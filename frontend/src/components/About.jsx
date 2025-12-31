@@ -60,7 +60,7 @@ const About = () => {
                 After a brief hiatus to explore other ventures, we're returning stronger than ever with renewed commitment to excellence. With our $5 million liability insurance in place, we're ready to secure large-scale contracts throughout Coastal B.C and Vancouver Island.
               </p>
               <p className="text-gray-700 leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                Our dedication to precision craftsmanship, innovative solutions, and client satisfaction sets us apart in the competitive world of interior finishing.
+                Together, Scott and Beau lead a team dedicated to precision craftsmanship and innovative solutions. From intimate residential spaces to expansive high-rise commercial developments, our combined expertise ensures every detail is executed to perfection.
               </p>
             </div>
             <div className="relative">
