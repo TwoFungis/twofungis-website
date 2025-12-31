@@ -71,7 +71,7 @@ const Contact = () => {
                 Contact Information
               </h3>
               <p className="text-gray-600 mb-8" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                Reach out to discuss your interior finishing needs. We service the entire Okanagan region and are ready to bring your project to life.
+                Reach out to discuss your interior finishing needs. We service Coastal B.C and Vancouver Island regions and are ready to bring your project to life.
               </p>
               
               <div className="space-y-6">
