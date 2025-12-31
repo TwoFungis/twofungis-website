@@ -53,21 +53,6 @@ const Portfolio = () => {
       image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/pynvzdye_IMG_20210223_223943_967.jpg',
       title: 'Modern Kitchen Renovation',
       category: 'Residential'
-    },
-    {
-      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/a35uhqwz_IMG_20210212_094210_567.jpg',
-      title: 'Commercial Millwork Project',
-      category: 'Commercial'
-    },
-    {
-      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/h7s9v15f_IMG_20200212_154509.jpg',
-      title: 'Custom Cabinetry Design',
-      category: 'Residential'
-    },
-    {
-      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/il4np4sa_Screenshot_20200513_130224.jpg',
-      title: 'Precision Finishing Work',
-      category: 'Multi-Unit'
     }
   ];
 
