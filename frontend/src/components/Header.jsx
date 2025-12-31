@@ -35,7 +35,8 @@ const Header = () => {
             <img
               src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/lpeiqs4k_Screenshot_20200227_085449_com.android.gallery3d.jpg"
               alt="Two Fungis Ltd"
-              className="h-12 w-auto"
+              className="h-16 w-auto cursor-pointer"
+              onClick={() => scrollToSection('home')}
             />
           </div>
 
