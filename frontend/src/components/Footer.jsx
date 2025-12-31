@@ -12,9 +12,9 @@ const Footer = () => {
             {/* Company Info */}
             <div>
               <img
-                src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/lpeiqs4k_Screenshot_20200227_085449_com.android.gallery3d.jpg"
+                src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/efo0ecjz_IMG_20210122_223109_150.jpg"
                 alt="Two Fungis Ltd"
-                className="h-16 w-auto mb-4"
+                className="h-20 w-auto mb-4"
               />
               <p className="text-gray-400 mb-4" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                 Premium interior finishing services for residential, commercial, and high-rise projects across Coastal B.C and Vancouver Island.
