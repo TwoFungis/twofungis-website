@@ -15,6 +15,11 @@ const Portfolio = () => {
       category: 'Residential'
     },
     {
+      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/w5ytwuxa_IMG_20191217_163454.jpg',
+      title: 'Staircase Detail & Craftsmanship',
+      category: 'Residential'
+    },
+    {
       image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/w08mfqcc_IMG_20191219_205008.jpg',
       title: 'Modern Stair Installation',
       category: 'Commercial'
@@ -27,6 +32,11 @@ const Portfolio = () => {
     {
       image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/oce3ehrv_20211103_163344.jpg',
       title: 'Custom Millwork & Cabinetry',
+      category: 'Residential'
+    },
+    {
+      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/fu9jwkgc_20211011_153642.jpg',
+      title: 'White Kitchen Cabinet Installation',
       category: 'Residential'
     },
     {
@@ -45,6 +55,11 @@ const Portfolio = () => {
       category: 'Commercial'
     },
     {
+      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/futuvp4y_IMG_20200211_140913.jpg',
+      title: 'Diagonal Wood Feature Wall',
+      category: 'Commercial'
+    },
+    {
       image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/f44juoiy_IMG_20200312_154654.jpg',
       title: 'Interior Door Installation',
       category: 'Residential'
@@ -52,6 +67,11 @@ const Portfolio = () => {
     {
       image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/pynvzdye_IMG_20210223_223943_967.jpg',
       title: 'Modern Kitchen Renovation',
+      category: 'Residential'
+    },
+    {
+      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/rb68pa70_20220117_210242.jpg',
+      title: 'Modern Bathroom Vanity Installation',
       category: 'Residential'
     }
   ];
