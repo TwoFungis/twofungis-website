@@ -48,10 +48,13 @@ const About = () => {
                 Our Story
               </h3>
               <p className="text-gray-700 mb-4 leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                Established in 2017, Two Fungis Ltd brings over 25 years of hands-on expertise to every project. Our founder, Scott Marshall, has built a distinguished career in millwork, finishing carpentry, cabinet installation, and flooring, delivering exceptional craftsmanship across diverse project types.
+                Established in 2017, Two Fungis Ltd brings over 25 years of combined hands-on expertise to every project. Founded by Scott Marshall and Beau Suprun, our company represents the perfect union of experience and precision craftsmanship.
               </p>
               <p className="text-gray-700 mb-4 leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                With a quarter-century of experience, we've mastered the art of precision finishing. From intimate residential spaces to expansive high-rise commercial developments, our depth of knowledge ensures every detail is executed to perfection.
+                Scott Marshall has built a distinguished career spanning 25 years in millwork, finishing carpentry, cabinet installation, and flooring. His expertise ensures exceptional craftsmanship across all project types.
+              </p>
+              <p className="text-gray-700 mb-4 leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+                Beau Suprun, master craftsman and machinist, brings an exceptional eye for detail and perfection that is second to none in the finishing world. His meticulous approach guarantees flawless execution on every project.
               </p>
               <p className="text-gray-700 mb-4 leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                 After a brief hiatus to explore other ventures, we're returning stronger than ever with renewed commitment to excellence. With our $5 million liability insurance in place, we're ready to secure large-scale contracts throughout Coastal B.C and Vancouver Island.
