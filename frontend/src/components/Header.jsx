@@ -30,18 +30,8 @@ const Header = () => {
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
-          {/* Logo */}
-          <div className="flex-shrink-0">
-            <img
-              src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/pvfl90hz_IMG_20210212_094210_567.jpg"
-              alt="Two Fungis Ltd"
-              className="h-28 md:h-32 w-auto cursor-pointer"
-              onClick={() => scrollToSection('home')}
-            />
-          </div>
-
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden md:flex items-center space-x-8 mx-auto">
             <button
               onClick={() => scrollToSection('home')}
               className="text-white hover:text-red-600 transition-colors duration-200 font-medium"
