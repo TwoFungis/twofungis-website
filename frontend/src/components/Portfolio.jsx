@@ -69,7 +69,7 @@ const Portfolio = () => {
           </div>
 
           {/* Gallery Grid */}
-          <div className="grid sm:grid-cols-2 gap-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {projects.map((project, index) => (
               <Dialog key={index}>
                 <DialogTrigger asChild>
