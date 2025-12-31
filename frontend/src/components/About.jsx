@@ -37,7 +37,7 @@ const About = () => {
             </h2>
             <div className="w-24 h-1 bg-red-600 mx-auto mb-6"></div>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-              We are a premier interior finishing company serving the Okanagan region, specializing in residential, commercial millwork, multi-unit residential, and high-rise commercial projects.
+              We are a premier interior finishing company serving Coastal B.C and Vancouver Island regions, specializing in residential, commercial millwork, multi-unit residential, and high-rise commercial projects.
             </p>
           </div>
 
