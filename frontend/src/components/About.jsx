@@ -17,12 +17,12 @@ const About = () => {
     {
       icon: TrendingUp,
       title: 'Master Craftsmanship',
-      description: 'Specialized in cabinet install, flooring, and precision finishing'
+      description: 'Precision finishing, cabinet install, flooring, and machinist expertise'
     },
     {
       icon: Users,
-      title: 'Expert Leadership',
-      description: 'Led by Scott Marshall with unparalleled industry expertise'
+      title: 'Expert Founders',
+      description: 'Led by Scott Marshall & Beau Suprun - unparalleled industry expertise'
     }
   ];
 
