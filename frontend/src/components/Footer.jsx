@@ -53,7 +53,7 @@ const Footer = () => {
               <ul className="space-y-3" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                 <li className="flex items-start">
                   <MapPin className="text-red-600 mr-2 flex-shrink-0 mt-1" size={18} />
-                  <span className="text-gray-400">Okanagan Region, BC</span>
+                  <span className="text-gray-400">Coastal B.C and Vancouver Island</span>
                 </li>
                 <li className="flex items-start">
                   <Phone className="text-red-600 mr-2 flex-shrink-0 mt-1" size={18} />
