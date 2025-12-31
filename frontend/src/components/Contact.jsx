@@ -91,7 +91,10 @@ const Contact = () => {
                   </div>
                   <div>
                     <h4 className="font-bold text-black mb-1" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>Phone</h4>
-                    <p className="text-gray-600" style={{ fontFamily: 'Open Sans, sans-serif' }}>Contact us for phone details</p>
+                    <p className="text-gray-600" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+                      <a href="tel:778-268-4920" className="hover:text-red-600 transition-colors">778-268-4920</a>
+                    </p>
+                    <p className="text-gray-500 text-sm mt-1">Scott Marshall</p>
                   </div>
                 </div>
                 
@@ -101,7 +104,9 @@ const Contact = () => {
                   </div>
                   <div>
                     <h4 className="font-bold text-black mb-1" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>Email</h4>
-                    <p className="text-gray-600" style={{ fontFamily: 'Open Sans, sans-serif' }}>info@twofungis.com</p>
+                    <p className="text-gray-600" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+                      <a href="mailto:swdmarshall@gmail.com" className="hover:text-red-600 transition-colors">swdmarshall@gmail.com</a>
+                    </p>
                   </div>
                 </div>
               </div>
