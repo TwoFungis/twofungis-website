@@ -6,8 +6,8 @@ const About = () => {
   const highlights = [
     {
       icon: Award,
-      title: 'Since 2017',
-      description: 'Years of excellence in interior finishing'
+      title: '25+ Years Experience',
+      description: 'Over two decades of hands-on expertise in millwork and finishing carpentry'
     },
     {
       icon: Shield,
@@ -16,13 +16,13 @@ const About = () => {
     },
     {
       icon: TrendingUp,
-      title: 'Premium Quality',
-      description: 'Uncompromising standards on every project'
+      title: 'Master Craftsmanship',
+      description: 'Specialized in cabinet install, flooring, and precision finishing'
     },
     {
       icon: Users,
-      title: 'Expert Team',
-      description: 'Skilled professionals dedicated to excellence'
+      title: 'Expert Leadership',
+      description: 'Led by Scott Marshall with unparalleled industry expertise'
     }
   ];
 
