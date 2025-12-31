@@ -51,7 +51,7 @@ const About = () => {
                 Established in 2017, Two Fungis Ltd has built a reputation for delivering exceptional interior finishing services across diverse project types. Our expertise spans from intimate residential spaces to expansive high-rise commercial developments.
               </p>
               <p className="text-gray-700 mb-4 leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                After a brief hiatus to explore other ventures, we're returning stronger than ever with renewed commitment to excellence. With our $5 million liability insurance in place, we're ready to secure large-scale contracts throughout the Okanagan area.
+                After a brief hiatus to explore other ventures, we're returning stronger than ever with renewed commitment to excellence. With our $5 million liability insurance in place, we're ready to secure large-scale contracts throughout Coastal B.C and Vancouver Island.
               </p>
               <p className="text-gray-700 leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                 Our dedication to precision craftsmanship, innovative solutions, and client satisfaction sets us apart in the competitive world of interior finishing.
