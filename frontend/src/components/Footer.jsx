@@ -70,7 +70,7 @@ const Footer = () => {
           {/* Bottom Bar */}
           <div className="border-t border-gray-800 pt-8 text-center">
             <p className="text-gray-400" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-              © {currentYear} Two Fungis Ltd. All rights reserved. | Serving the Okanagan Region since 2017
+              © {currentYear} Two Fungis Ltd. All rights reserved. | Serving Coastal B.C and Vancouver Island since 2017
             </p>
           </div>
         </div>
