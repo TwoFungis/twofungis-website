@@ -54,7 +54,7 @@ const About = () => {
                 Scott Marshall has built a distinguished career spanning 25 years in millwork, finishing carpentry, cabinet installation, and flooring. His expertise ensures exceptional craftsmanship across all project types.
               </p>
               <p className="text-gray-700 mb-4 leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                Beau Suprun, master craftsman and machinist, brings an exceptional eye for detail and perfection that is second to none in the finishing world. His meticulous approach guarantees flawless execution on every project.
+                Beau Suprun, master craftsman, exceptional carpenter, and machinist, brings an unparalleled eye for detail and perfection that is second to none in the finishing world. With extensive experience in multi-unit finishing management and installation, his meticulous approach guarantees flawless execution on every project.
               </p>
               <p className="text-gray-700 mb-4 leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                 After a brief hiatus to explore other ventures, we're returning stronger than ever with renewed commitment to excellence. With our $5 million liability insurance in place, we're ready to secure large-scale contracts throughout Coastal B.C and Vancouver Island.
