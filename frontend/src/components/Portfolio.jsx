@@ -25,6 +25,11 @@ const Portfolio = () => {
       category: 'Residential'
     },
     {
+      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/bzus3wmb_Messenger_creation_36C70082-8A8C-4DDB-AD6E-ECD1C9EA46D2.jpeg',
+      title: 'Custom Wall Paneling & Trim Work',
+      category: 'Residential'
+    },
+    {
       image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/futuvp4y_IMG_20200211_140913.jpg',
       title: 'Diagonal Wood Feature Wall',
       category: 'Commercial'
@@ -32,6 +37,11 @@ const Portfolio = () => {
     {
       image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/j7f9wan6_IMG_20191217_163614.jpg',
       title: 'Custom Wood Staircase',
+      category: 'Residential'
+    },
+    {
+      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/38llggo5_Messenger_creation_93E07220-5F16-45F6-A018-C089F70AADD0.jpeg',
+      title: 'Coffered Ceiling with Crown Molding',
       category: 'Residential'
     },
     {
@@ -45,6 +55,11 @@ const Portfolio = () => {
       category: 'Commercial'
     },
     {
+      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/04skro1o_Messenger_creation_A9C50B15-98C6-4DCE-BE37-88B3200992E0.jpeg',
+      title: 'Wooden Staircase Railing Detail',
+      category: 'Residential'
+    },
+    {
       image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/n3k3qxu3_20220128_182344.jpg',
       title: 'Modern Bathroom Vanity & Vessel Sinks',
       category: 'Residential'
@@ -55,9 +70,19 @@ const Portfolio = () => {
       category: 'Commercial'
     },
     {
+      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/m2uclkhb_Messenger_creation_373AE9DE-1CB6-47BB-9D91-B5F2182586E7.jpeg',
+      title: 'Coffered Ceiling Craftsmanship',
+      category: 'Residential'
+    },
+    {
       image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/w5ytwuxa_IMG_20191217_163454.jpg',
       title: 'Staircase Detail & Craftsmanship',
       category: 'Residential'
+    },
+    {
+      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/im4qkioh_Messenger_creation_564A7F58-5188-444E-9369-A57636159BF8.jpeg',
+      title: 'Two-Tone Wood Staircase',
+      category: 'Multi-Unit'
     },
     {
       image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/xcihx4pi_20220128_182318.jpg',
