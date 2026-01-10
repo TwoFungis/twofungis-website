@@ -37,7 +37,7 @@ const Hero = () => {
           </div>
           
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-6 animate-fade-in" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
-            Premium Interior <span className="text-red-600">Finishing</span> Excellence
+            Premium Interior <span className="text-red-600">Finishing & Carpentry</span>
           </h1>
           <p className="text-xl sm:text-2xl text-gray-300 mb-8 max-w-2xl mx-auto" style={{ fontFamily: 'Open Sans, sans-serif' }}>
             Specializing in high end residential & commercial finishing, including high-rise & multi-family projects across Coastal B.C and Vancouver Island regions since 2017
