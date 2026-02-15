@@ -15,7 +15,7 @@ const Hero = () => {
       {/* Content */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
         <div className="max-w-4xl mx-auto">
-          {/* Logo Image Above Title - 50% larger */}
+          {/* Logo Image Above Title */}
           <div className="mb-8 flex justify-center">
             <img
               src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png"
@@ -28,18 +28,27 @@ const Hero = () => {
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-6 animate-fade-in" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
             Premium Interior <span className="text-red-600">Finishing & Carpentry</span>
           </h1>
-          <p className="text-xl sm:text-2xl text-gray-200 mb-8 max-w-2xl mx-auto" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-            Specializing in high end residential & commercial finishing, including high-rise & multi-family projects across Coastal B.C and Vancouver Island regions since 2017
+          <p className="text-xl sm:text-2xl text-gray-200 mb-6 max-w-3xl mx-auto" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+            A trusted finishing partner for residential, commercial, multi-family & high-rise projects across Coastal BC, Vancouver Island & the Okanagan.
           </p>
+          
+          {/* Positioning Paragraph */}
+          <p className="text-base text-gray-400 mb-8 max-w-2xl mx-auto leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+            We provide structured finishing crews, sequenced installations, and dependable schedule execution. 
+            With proven site coordination experience and rigorous quality control systems, 
+            Two Fungis delivers finishing packages that align with your project timelines.
+          </p>
+
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button
-              onClick={() => scrollToSection('contact')}
+              onClick={() => scrollToSection('partner')}
               className="text-white px-8 py-6 text-lg font-semibold transition-all duration-200 hover:scale-105"
-              style={{ backgroundColor: '#228B22', hover: { backgroundColor: '#1e7b1e' } }}
+              style={{ backgroundColor: '#228B22' }}
               onMouseEnter={(e) => e.target.style.backgroundColor = '#1e7b1e'}
               onMouseLeave={(e) => e.target.style.backgroundColor = '#228B22'}
+              data-testid="partner-cta-btn"
             >
-              Request a Quote
+              Partner With Us
               <ChevronRight className="ml-2" size={20} />
             </Button>
             <Button
@@ -49,15 +58,22 @@ const Hero = () => {
               style={{ borderColor: '#228B22', borderWidth: '2px' }}
               onMouseEnter={(e) => { e.target.style.backgroundColor = '#228B22'; e.target.style.color = 'black'; }}
               onMouseLeave={(e) => { e.target.style.backgroundColor = 'transparent'; e.target.style.color = 'white'; }}
+              data-testid="view-work-btn"
             >
               View Our Work
             </Button>
           </div>
           
-          {/* Trust Badge */}
-          <div className="mt-12 inline-flex items-center gap-2 px-6 py-3 rounded-full" style={{ backgroundColor: 'rgba(34, 139, 34, 0.2)', borderColor: 'rgba(34, 139, 34, 0.5)', borderWidth: '1px', borderStyle: 'solid' }}>
-            <div className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: '#228B22' }}></div>
-            <span className="font-medium" style={{ color: '#32CD32' }}>$5M Liability Insurance</span>
+          {/* Trust Badges */}
+          <div className="mt-12 flex flex-wrap justify-center gap-4">
+            <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full" style={{ backgroundColor: 'rgba(34, 139, 34, 0.2)', border: '1px solid rgba(34, 139, 34, 0.5)' }}>
+              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#228B22' }}></div>
+              <span className="font-medium text-sm" style={{ color: '#32CD32' }}>$5M Liability Insurance</span>
+            </div>
+            <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full" style={{ backgroundColor: 'rgba(34, 139, 34, 0.2)', border: '1px solid rgba(34, 139, 34, 0.5)' }}>
+              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#228B22' }}></div>
+              <span className="font-medium text-sm" style={{ color: '#32CD32' }}>WorkSafe Compliant</span>
+            </div>
           </div>
         </div>
       </div>
