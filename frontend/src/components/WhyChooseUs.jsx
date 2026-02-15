@@ -61,7 +61,7 @@ const WhyChooseUs = () => {
           <div className="bg-black rounded-xl p-12">
             <div className="grid sm:grid-cols-3 gap-8 text-center">
               <div>
-                <p className="text-5xl font-bold text-green-500 mb-2" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>25+</p>
+                <p className="text-5xl font-bold mb-2" style={{ fontFamily: 'Bebas Neue, sans-serif', color: '#228B22' }}>25+</p>
                 <p className="text-white text-lg" style={{ fontFamily: 'Open Sans, sans-serif' }}>Years Experience</p>
               </div>
               <div>
@@ -69,7 +69,7 @@ const WhyChooseUs = () => {
                 <p className="text-white text-lg" style={{ fontFamily: 'Open Sans, sans-serif' }}>Liability Insurance</p>
               </div>
               <div>
-                <p className="text-5xl font-bold text-green-500 mb-2" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>100%</p>
+                <p className="text-5xl font-bold mb-2" style={{ fontFamily: 'Bebas Neue, sans-serif', color: '#228B22' }}>100%</p>
                 <p className="text-white text-lg" style={{ fontFamily: 'Open Sans, sans-serif' }}>Quality Guarantee</p>
               </div>
             </div>
