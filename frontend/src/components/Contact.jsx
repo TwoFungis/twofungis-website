@@ -53,8 +53,8 @@ const Contact = () => {
                 </a>
               </div>
 
-              {/* GREEN insurance box */}
-              <div className="text-white p-6 rounded-lg mb-8" style={{ backgroundColor: '#228B22' }}>
+              {/* RED insurance box */}
+              <div className="bg-red-600 text-white p-6 rounded-lg mb-8">
                 <p className="text-lg font-semibold mb-2" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
                   $5 Million Liability Insurance
                 </p>
