@@ -52,7 +52,7 @@ const Services = () => {
               return (
                 <Card
                   key={index}
-                  className="p-8 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 bg-gray-900 border-l-4 border-red-600"
+                  className="p-8 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 bg-black border-l-4 border-red-600"
                 >
                   <div className="w-16 h-16 rounded-lg flex items-center justify-center mb-6" style={{ backgroundColor: '#228B22' }}>
                     <IconComponent className="text-white" size={32} />

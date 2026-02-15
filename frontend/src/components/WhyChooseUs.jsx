@@ -58,7 +58,7 @@ const WhyChooseUs = () => {
           </div>
 
           {/* Stats Section */}
-          <div className="bg-gray-900 rounded-xl p-12 border border-gray-800">
+          <div className="bg-black rounded-xl p-12 border border-red-600/30">
             <div className="grid sm:grid-cols-3 gap-8 text-center">
               <div>
                 <p className="text-5xl font-bold mb-2" style={{ fontFamily: 'Bebas Neue, sans-serif', color: '#228B22' }}>25+</p>

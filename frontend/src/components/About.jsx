@@ -81,7 +81,7 @@ const About = () => {
             {highlights.map((item, index) => {
               const IconComponent = item.icon;
               return (
-                <Card key={index} className="p-6 hover:shadow-xl transition-shadow duration-300 border-t-4 border-red-600 bg-gray-900">
+                <Card key={index} className="p-6 hover:shadow-xl transition-shadow duration-300 border-t-4 border-red-600 bg-black border border-red-600/30">
                   <div className="w-14 h-14 rounded-full flex items-center justify-center mb-4" style={{ backgroundColor: 'rgba(34, 139, 34, 0.2)' }}>
                     <IconComponent style={{ color: '#228B22' }} size={28} />
                   </div>
