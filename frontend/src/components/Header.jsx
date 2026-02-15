@@ -44,37 +44,50 @@ const Header = () => {
           <nav className="hidden md:flex items-center space-x-8">
             <button
               onClick={() => scrollToSection('home')}
-              className="text-white hover:text-green-500 transition-colors duration-200 font-medium"
+              className="text-white transition-colors duration-200 font-medium"
+              onMouseEnter={(e) => e.target.style.color='#228B22'}
+              onMouseLeave={(e) => e.target.style.color='white'}
             >
               Home
             </button>
             <button
               onClick={() => scrollToSection('about')}
-              className="text-white hover:text-green-500 transition-colors duration-200 font-medium"
+              className="text-white transition-colors duration-200 font-medium"
+              onMouseEnter={(e) => e.target.style.color='#228B22'}
+              onMouseLeave={(e) => e.target.style.color='white'}
             >
               About
             </button>
             <button
               onClick={() => scrollToSection('services')}
-              className="text-white hover:text-green-500 transition-colors duration-200 font-medium"
+              className="text-white transition-colors duration-200 font-medium"
+              onMouseEnter={(e) => e.target.style.color='#228B22'}
+              onMouseLeave={(e) => e.target.style.color='white'}
             >
               Services
             </button>
             <button
               onClick={() => scrollToSection('portfolio')}
-              className="text-white hover:text-green-500 transition-colors duration-200 font-medium"
+              className="text-white transition-colors duration-200 font-medium"
+              onMouseEnter={(e) => e.target.style.color='#228B22'}
+              onMouseLeave={(e) => e.target.style.color='white'}
             >
               Portfolio
             </button>
             <button
               onClick={() => scrollToSection('contact')}
-              className="text-white hover:text-green-500 transition-colors duration-200 font-medium"
+              className="text-white transition-colors duration-200 font-medium"
+              onMouseEnter={(e) => e.target.style.color='#228B22'}
+              onMouseLeave={(e) => e.target.style.color='white'}
             >
               Contact
             </button>
             <Button
               onClick={() => scrollToSection('contact')}
-              className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 transition-colors duration-200"
+              className="text-white px-6 py-2 transition-colors duration-200"
+              style={{ backgroundColor: '#228B22' }}
+              onMouseEnter={(e) => e.target.style.backgroundColor='#1e7b1e'}
+              onMouseLeave={(e) => e.target.style.backgroundColor='#228B22'}
             >
               Get a Quote
             </Button>
