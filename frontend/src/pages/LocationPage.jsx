@@ -39,7 +39,7 @@ const LocationPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-white">
       <Header />
       
       {/* Location Hero */}
