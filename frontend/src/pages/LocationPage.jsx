@@ -43,7 +43,16 @@ const LocationPage = () => {
       <Header />
       
       {/* Location Hero */}
-      <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden pt-20 bg-black">
+      <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden pt-20">
+        {/* Background Image */}
+        <div className="absolute inset-0">
+          <img
+            src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/iqx1ya1d_FotoFlexer_Photo.jpg"
+            alt="Two Fungis Background"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-black/70"></div>
+        </div>
 
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
@@ -52,8 +61,7 @@ const LocationPage = () => {
               <img
                 src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png"
                 alt="Two Fungis Ltd"
-                className="h-72 md:h-84 w-auto drop-shadow-2xl"
-                style={{ height: 'clamp(18rem, 25vw, 21rem)' }}
+                className="h-32 md:h-40 w-auto drop-shadow-2xl"
               />
             </div>
             
@@ -70,15 +78,15 @@ const LocationPage = () => {
 
             <div className="flex flex-wrap gap-3 justify-center mb-8 text-gray-400">
               <span className="flex items-center gap-2">
-                <CheckCircle2 size={20} style={{ color: '#228B22' }} />
+                <CheckCircle2 size={20} className="text-green-500" />
                 25+ Years Experience
               </span>
               <span className="flex items-center gap-2">
-                <CheckCircle2 size={20} style={{ color: '#228B22' }} />
+                <CheckCircle2 size={20} className="text-green-500" />
                 $5M Insured
               </span>
               <span className="flex items-center gap-2">
-                <CheckCircle2 size={20} style={{ color: '#228B22' }} />
+                <CheckCircle2 size={20} className="text-green-500" />
                 Local Experts
               </span>
             </div>
@@ -86,20 +94,14 @@ const LocationPage = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
                 onClick={() => scrollToSection('contact')}
-                className="text-white px-8 py-6 text-lg font-semibold"
-                style={{ backgroundColor: '#228B22' }}
-                onMouseEnter={(e) => e.target.style.backgroundColor='#1e7b1e'}
-                onMouseLeave={(e) => e.target.style.backgroundColor='#228B22'}
+                className="bg-red-600 hover:bg-red-700 text-white px-8 py-6 text-lg font-semibold"
               >
                 Get a Free Quote in {location.city}
               </Button>
               <Button
                 onClick={() => scrollToSection('portfolio')}
                 variant="outline"
-                className="text-white px-8 py-6 text-lg font-semibold"
-                style={{ borderColor: '#228B22', borderWidth: '2px' }}
-                onMouseEnter={(e) => { e.target.style.backgroundColor = '#228B22'; e.target.style.color = 'black'; }}
-                onMouseLeave={(e) => { e.target.style.backgroundColor = 'transparent'; e.target.style.color = 'white'; }}
+                className="border-2 border-white text-white hover:bg-white hover:text-black px-8 py-6 text-lg font-semibold"
               >
                 View Our Work
               </Button>
@@ -127,37 +129,37 @@ const LocationPage = () => {
               
               <ul className="space-y-3 mb-8">
                 <li className="flex items-start">
-                  <CheckCircle2 style={{ color: '#228B22' }} className="mr-3 flex-shrink-0 mt-1" size={20} />
+                  <CheckCircle2 className="text-red-600 mr-3 flex-shrink-0 mt-1" size={20} />
                   <span className="text-gray-700" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                     <strong>Residential Interior Finishing:</strong> Custom millwork, trim installation, and finishing carpentry for homes
                   </span>
                 </li>
                 <li className="flex items-start">
-                  <CheckCircle2 style={{ color: '#228B22' }} className="mr-3 flex-shrink-0 mt-1" size={20} />
+                  <CheckCircle2 className="text-red-600 mr-3 flex-shrink-0 mt-1" size={20} />
                   <span className="text-gray-700" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                     <strong>Commercial Millwork:</strong> Professional-grade solutions for offices, retail spaces, and commercial buildings
                   </span>
                 </li>
                 <li className="flex items-start">
-                  <CheckCircle2 style={{ color: '#228B22' }} className="mr-3 flex-shrink-0 mt-1" size={20} />
+                  <CheckCircle2 className="text-red-600 mr-3 flex-shrink-0 mt-1" size={20} />
                   <span className="text-gray-700" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                     <strong>Multi-Unit Finishing:</strong> Expert management and installation for apartment buildings and condominiums
                   </span>
                 </li>
                 <li className="flex items-start">
-                  <CheckCircle2 style={{ color: '#228B22' }} className="mr-3 flex-shrink-0 mt-1" size={20} />
+                  <CheckCircle2 className="text-red-600 mr-3 flex-shrink-0 mt-1" size={20} />
                   <span className="text-gray-700" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                     <strong>Cabinet Installation:</strong> Precision cabinet installation for kitchens, bathrooms, and custom spaces
                   </span>
                 </li>
                 <li className="flex items-start">
-                  <CheckCircle2 style={{ color: '#228B22' }} className="mr-3 flex-shrink-0 mt-1" size={20} />
+                  <CheckCircle2 className="text-red-600 mr-3 flex-shrink-0 mt-1" size={20} />
                   <span className="text-gray-700" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                     <strong>Flooring Installation:</strong> Expert hardwood, laminate, and engineered flooring services
                   </span>
                 </li>
                 <li className="flex items-start">
-                  <CheckCircle2 style={{ color: '#228B22' }} className="mr-3 flex-shrink-0 mt-1" size={20} />
+                  <CheckCircle2 className="text-red-600 mr-3 flex-shrink-0 mt-1" size={20} />
                   <span className="text-gray-700" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                     <strong>High-Rise Projects:</strong> Specialized finishing for high-rise commercial and residential buildings
                   </span>
@@ -196,11 +198,11 @@ const LocationPage = () => {
                   Contact us today for a free consultation and quote. We're fully insured with $5 million liability coverage and ready to bring your vision to life.
                 </p>
                 <div className="flex flex-wrap gap-4">
-                  <a href="tel:778-268-4920" className="flex items-center font-semibold" style={{ color: '#228B22' }} onMouseEnter={(e) => e.target.style.color='#1e7b1e'} onMouseLeave={(e) => e.target.style.color='#228B22'}>
+                  <a href="tel:778-268-4920" className="flex items-center text-red-600 hover:text-red-700 font-semibold">
                     <Phone size={20} className="mr-2" />
                     778-268-4920
                   </a>
-                  <a href="mailto:inbox@twofungis.ca" className="flex items-center font-semibold" style={{ color: '#228B22' }} onMouseEnter={(e) => e.target.style.color='#1e7b1e'} onMouseLeave={(e) => e.target.style.color='#228B22'}>
+                  <a href="mailto:inbox@twofungis.ca" className="flex items-center text-red-600 hover:text-red-700 font-semibold">
                     <Mail size={20} className="mr-2" />
                     inbox@twofungis.ca
                   </a>
