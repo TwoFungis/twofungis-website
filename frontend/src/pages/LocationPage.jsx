@@ -39,20 +39,11 @@ const LocationPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-black">
       <Header />
       
       {/* Location Hero */}
-      <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden pt-20">
-        {/* Background Image */}
-        <div className="absolute inset-0">
-          <img
-            src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/iqx1ya1d_FotoFlexer_Photo.jpg"
-            alt="Two Fungis Background"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-black/70"></div>
-        </div>
+      <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden pt-20 bg-black">
 
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
