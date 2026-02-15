@@ -188,7 +188,7 @@ const LocationPage = () => {
                 </>
               )}
 
-              <div className="bg-gray-900 p-6 rounded-lg mt-8 border border-gray-800">
+              <div className="bg-black p-6 rounded-lg mt-8 border border-red-600/30">
                 <h3 className="text-xl font-bold text-white mb-3" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
                   Ready to Start Your Project in {location.city}?
                 </h3>
