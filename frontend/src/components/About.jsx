@@ -69,7 +69,7 @@ const About = () => {
                 alt="Custom kitchen cabinetry and millwork"
                 className="rounded-lg shadow-2xl w-full h-auto object-cover"
               />
-              <div className="absolute -bottom-6 -left-6 bg-green-500 text-white p-6 rounded-lg shadow-xl">
+              <div className="absolute -bottom-6 -left-6 text-white p-6 rounded-lg shadow-xl" style={{ backgroundColor: '#228B22' }}>
                 <p className="text-4xl font-bold" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>25+</p>
                 <p className="text-sm" style={{ fontFamily: 'Open Sans, sans-serif' }}>Years Experience</p>
               </div>
