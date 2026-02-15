@@ -4,13 +4,25 @@ import Home from './pages/Home';
 import LocationPage from './pages/LocationPage';
 import './App.css';
 
-// Scroll to top on route change
+// Scroll to top on route change, or to hash if present
 function ScrollToTop() {
-  const { pathname } = useLocation();
+  const { pathname, hash } = useLocation();
   
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
+    // If there's a hash, scroll to that element
+    if (hash) {
+      // Small delay to ensure the page has loaded
+      setTimeout(() => {
+        const element = document.getElementById(hash.substring(1));
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    } else {
+      // No hash, scroll to top
+      window.scrollTo(0, 0);
+    }
+  }, [pathname, hash]);
   
   return null;
 }
