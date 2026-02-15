@@ -195,11 +195,11 @@ const LocationPage = () => {
                   Contact us today for a free consultation and quote. We're fully insured with $5 million liability coverage and ready to bring your vision to life.
                 </p>
                 <div className="flex flex-wrap gap-4">
-                  <a href="tel:778-268-4920" className="flex items-center text-red-600 hover:text-red-700 font-semibold">
+                  <a href="tel:778-268-4920" className="flex items-center font-semibold" style={{ color: '#228B22' }}>
                     <Phone size={20} className="mr-2" />
                     778-268-4920
                   </a>
-                  <a href="mailto:inbox@twofungis.ca" className="flex items-center text-red-600 hover:text-red-700 font-semibold">
+                  <a href="mailto:inbox@twofungis.ca" className="flex items-center font-semibold" style={{ color: '#228B22' }}>
                     <Mail size={20} className="mr-2" />
                     inbox@twofungis.ca
                   </a>
