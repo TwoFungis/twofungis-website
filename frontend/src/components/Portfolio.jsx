@@ -140,7 +140,7 @@ const Portfolio = () => {
                     {/* Watermark - MORE VISIBLE */}
                     <div className="absolute bottom-2 right-2 opacity-60 group-hover:opacity-80 transition-opacity">
                       <img
-                        src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/hc3jy69c_ChatGPT%20Image%20Feb%2014%2C%202026%2C%2007_40_22%20PM.png"
+                        src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png"
                         alt="Two Fungis Ltd"
                         className="h-8 w-auto"
                       />
