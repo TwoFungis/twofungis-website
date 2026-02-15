@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Header from '../components/Header';
 import Hero from '../components/Hero';
-import About from '../components/About';
-import Services from '../components/Services';
+import Capabilities from '../components/Capabilities';
 import Portfolio from '../components/Portfolio';
-import ServiceAreas from '../components/ServiceAreas';
-import WhyChooseUs from '../components/WhyChooseUs';
-import Contact from '../components/Contact';
+import WhyBuildersChooseUs from '../components/WhyBuildersChooseUs';
+import RegionalCoverage from '../components/RegionalCoverage';
+import PartnerWithUs from '../components/PartnerWithUs';
 import Footer from '../components/Footer';
 
 const Home = () => {
@@ -14,12 +13,11 @@ const Home = () => {
     <div className="min-h-screen bg-white">
       <Header />
       <Hero />
-      <About />
-      <Services />
+      <Capabilities />
       <Portfolio />
-      <ServiceAreas />
-      <WhyChooseUs />
-      <Contact />
+      <WhyBuildersChooseUs />
+      <RegionalCoverage />
+      <PartnerWithUs />
       <Footer />
     </div>
   );
