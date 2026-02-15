@@ -54,8 +54,8 @@ const Services = () => {
                   key={index}
                   className="p-8 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 bg-white border-l-4 border-red-600"
                 >
-                  <div className="bg-black w-16 h-16 rounded-lg flex items-center justify-center mb-6">
-                    <IconComponent className="text-red-600" size={32} />
+                  <div className="bg-green-500 w-16 h-16 rounded-lg flex items-center justify-center mb-6">
+                    <IconComponent className="text-white" size={32} />
                   </div>
                   <h3 className="text-2xl font-bold text-black mb-4" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
                     {service.title}
@@ -66,7 +66,7 @@ const Services = () => {
                   <ul className="space-y-2">
                     {service.features.map((feature, idx) => (
                       <li key={idx} className="flex items-center text-gray-700">
-                        <div className="w-1.5 h-1.5 bg-red-600 rounded-full mr-3"></div>
+                        <div className="w-1.5 h-1.5 bg-green-500 rounded-full mr-3"></div>
                         <span style={{ fontFamily: 'Open Sans, sans-serif' }}>{feature}</span>
                       </li>
                     ))}

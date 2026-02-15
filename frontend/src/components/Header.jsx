@@ -74,7 +74,7 @@ const Header = () => {
             </button>
             <Button
               onClick={() => scrollToSection('contact')}
-              className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 transition-colors duration-200"
+              className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 transition-colors duration-200"
             >
               Get a Quote
             </Button>
@@ -125,7 +125,7 @@ const Header = () => {
               </button>
               <Button
                 onClick={() => scrollToSection('contact')}
-                className="bg-red-600 hover:bg-red-700 text-white w-full"
+                className="bg-green-500 hover:bg-green-600 text-white w-full"
               >
                 Get a Quote
               </Button>

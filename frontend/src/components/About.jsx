@@ -35,7 +35,7 @@ const About = () => {
             <h2 className="text-4xl sm:text-5xl font-bold text-black mb-4" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
               About <span className="text-red-600">Two Fungis Ltd</span>
             </h2>
-            <div className="w-24 h-1 bg-gradient-to-r from-red-600 via-green-500 to-black mx-auto mb-6"></div>
+            <div className="w-24 h-1 bg-red-600 mx-auto mb-6"></div>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto" style={{ fontFamily: 'Open Sans, sans-serif' }}>
               We are a premier interior finishing company serving Coastal B.C and Vancouver Island regions, specializing in residential, commercial millwork, multi-unit residential, and high-rise commercial projects.
             </p>
@@ -69,7 +69,7 @@ const About = () => {
                 alt="Custom kitchen cabinetry and millwork"
                 className="rounded-lg shadow-2xl w-full h-auto object-cover"
               />
-              <div className="absolute -bottom-6 -left-6 bg-gradient-to-br from-red-600 to-green-500 text-white p-6 rounded-lg shadow-xl">
+              <div className="absolute -bottom-6 -left-6 bg-green-500 text-white p-6 rounded-lg shadow-xl">
                 <p className="text-4xl font-bold" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>25+</p>
                 <p className="text-sm" style={{ fontFamily: 'Open Sans, sans-serif' }}>Years Experience</p>
               </div>
@@ -81,7 +81,7 @@ const About = () => {
             {highlights.map((item, index) => {
               const IconComponent = item.icon;
               return (
-                <Card key={index} className="p-6 hover:shadow-xl transition-shadow duration-300 border-t-4 border-green-500">
+                <Card key={index} className="p-6 hover:shadow-xl transition-shadow duration-300 border-t-4 border-red-600">
                   <div className="bg-green-500/10 w-14 h-14 rounded-full flex items-center justify-center mb-4">
                     <IconComponent className="text-green-600" size={28} />
                   </div>
