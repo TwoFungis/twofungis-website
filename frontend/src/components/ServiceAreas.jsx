@@ -20,11 +20,11 @@ const ServiceAreas = () => {
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="text-center mb-16">
-            <h2 className="text-4xl sm:text-5xl font-bold text-white mb-4" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
+            <h2 className="text-4xl sm:text-5xl font-bold text-black mb-4" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
               Service <span className="text-red-600">Areas</span>
             </h2>
             <div className="w-24 h-1 bg-red-600 mx-auto mb-6"></div>
-            <p className="text-lg text-gray-300 max-w-2xl mx-auto" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto" style={{ fontFamily: 'Open Sans, sans-serif' }}>
               Proudly serving communities across Coastal BC, Vancouver Island, and the Okanagan Valley
             </p>
           </div>
@@ -32,7 +32,7 @@ const ServiceAreas = () => {
           {/* Locations by Region */}
           {Object.entries(groupedLocations).map(([region, regionLocations]) => (
             <div key={region} className="mb-12">
-              <h3 className="text-3xl font-bold text-white mb-6 flex items-center" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
+              <h3 className="text-3xl font-bold text-black mb-6 flex items-center" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
                 <MapPin className="text-red-600 mr-3" size={32} />
                 {region}
               </h3>
@@ -40,11 +40,11 @@ const ServiceAreas = () => {
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {regionLocations.map((location) => (
                   <Link key={location.slug} to={`/locations/${location.slug}`}>
-                    <Card className="p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-black border-l-4 border-red-600 h-full">
-                      <h4 className="text-2xl font-bold text-white mb-3" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
+                    <Card className="p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-white border-l-4 border-red-600 h-full">
+                      <h4 className="text-2xl font-bold text-black mb-3" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
                         {location.city}
                       </h4>
-                      <p className="text-gray-400 mb-4 text-sm" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+                      <p className="text-gray-600 mb-4 text-sm" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                         {location.description.substring(0, 100)}...
                       </p>
                       <div className="flex items-center font-semibold" style={{ color: '#228B22' }}>
