@@ -52,16 +52,16 @@ const Footer = () => {
               <h3 className="text-xl font-bold mb-4" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>Contact Us</h3>
               <ul className="space-y-3" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                 <li className="flex items-start">
-                  <MapPin className="text-green-500 mr-2 flex-shrink-0 mt-1" size={18} />
+                  <MapPin style={{ color: '#228B22' }} className="mr-2 flex-shrink-0 mt-1" size={18} />
                   <span className="text-gray-400">Coastal B.C and Vancouver Island</span>
                 </li>
                 <li className="flex items-start">
                   <Phone className="text-red-600 mr-2 flex-shrink-0 mt-1" size={18} />
-                  <a href="tel:778-268-4920" className="text-gray-400 hover:text-green-500 transition-colors">778-268-4920</a>
+                  <a href="tel:778-268-4920" className="text-gray-400 transition-colors" onMouseEnter={(e) => e.target.style.color='#228B22'} onMouseLeave={(e) => e.target.style.color='#9ca3af'}>778-268-4920</a>
                 </li>
                 <li className="flex items-start">
                   <Mail className="text-red-600 mr-2 flex-shrink-0 mt-1" size={18} />
-                  <a href="mailto:inbox@twofungis.ca" className="text-gray-400 hover:text-green-500 transition-colors">inbox@twofungis.ca</a>
+                  <a href="mailto:inbox@twofungis.ca" className="text-gray-400 transition-colors" onMouseEnter={(e) => e.target.style.color='#228B22'} onMouseLeave={(e) => e.target.style.color='#9ca3af'}>inbox@twofungis.ca</a>
                 </li>
               </ul>
             </div>
