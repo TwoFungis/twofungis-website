@@ -7,7 +7,7 @@ const About = () => {
     {
       icon: Award,
       title: '15+ Years Experience',
-      description: 'Over two decades of hands-on expertise in millwork and finishing carpentry'
+      description: 'Over 15 years of hands-on expertise in millwork and finishing carpentry'
     },
     {
       icon: Shield,
