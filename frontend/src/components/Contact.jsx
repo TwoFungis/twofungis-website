@@ -20,7 +20,7 @@ const Contact = () => {
 
           <div className="max-w-4xl mx-auto">
             {/* Main Contact Card */}
-            <div className="bg-gray-900 p-12 rounded-xl shadow-2xl text-center mb-12 border border-gray-800">
+            <div className="bg-black p-12 rounded-xl shadow-2xl text-center mb-12 border border-red-600/30">
               <h3 className="text-3xl font-bold text-white mb-8" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
                 Contact Two Fungis Ltd
               </h3>
@@ -29,7 +29,7 @@ const Contact = () => {
                 {/* Phone */}
                 <a 
                   href="tel:778-268-4920"
-                  className="flex flex-col items-center p-6 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors group"
+                  className="flex flex-col items-center p-6 bg-black rounded-lg border border-red-600/30 hover:border-red-600 transition-colors group"
                 >
                   <div className="p-4 rounded-full mb-4 group-hover:scale-110 transition-transform" style={{ backgroundColor: '#228B22' }}>
                     <Phone className="text-white" size={32} />
@@ -42,7 +42,7 @@ const Contact = () => {
                 {/* Email */}
                 <a 
                   href="mailto:inbox@twofungis.ca"
-                  className="flex flex-col items-center p-6 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors group"
+                  className="flex flex-col items-center p-6 bg-black rounded-lg border border-red-600/30 hover:border-red-600 transition-colors group"
                 >
                   <div className="p-4 rounded-full mb-4 group-hover:scale-110 transition-transform" style={{ backgroundColor: '#228B22' }}>
                     <Mail className="text-white" size={32} />
