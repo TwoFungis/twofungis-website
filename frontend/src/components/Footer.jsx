@@ -19,9 +19,9 @@ const Footer = () => {
               <p className="text-gray-400 mb-4" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                 Premium interior finishing services for residential, commercial, and high-rise projects across Coastal B.C and Vancouver Island.
               </p>
-              <div className="inline-flex items-center gap-2 bg-green-500/20 border border-green-500/50 px-4 py-2 rounded-full">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <span className="text-green-400 text-sm font-medium">$5M Insured</span>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full" style={{ backgroundColor: 'rgba(34, 139, 34, 0.2)', border: '1px solid rgba(34, 139, 34, 0.5)' }}>
+                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#228B22' }}></div>
+                <span className="text-sm font-medium" style={{ color: '#32CD32' }}>$5M Insured</span>
               </div>
             </div>
 
