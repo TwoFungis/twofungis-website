@@ -32,11 +32,11 @@ const About = () => {
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="text-center mb-16">
-            <h2 className="text-4xl sm:text-5xl font-bold text-white mb-4" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
+            <h2 className="text-4xl sm:text-5xl font-bold text-black mb-4" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
               About <span className="text-red-600">Two Fungis Ltd</span>
             </h2>
             <div className="w-24 h-1 bg-red-600 mx-auto mb-6"></div>
-            <p className="text-lg text-gray-300 max-w-3xl mx-auto" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto" style={{ fontFamily: 'Open Sans, sans-serif' }}>
               We are a premier interior finishing company serving Coastal B.C and Vancouver Island regions, specializing in residential, commercial millwork, multi-unit residential, and high-rise commercial projects.
             </p>
           </div>
@@ -44,22 +44,22 @@ const About = () => {
           {/* Story */}
           <div className="grid md:grid-cols-2 gap-12 mb-16 items-center">
             <div>
-              <h3 className="text-3xl font-bold text-white mb-6" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
+              <h3 className="text-3xl font-bold text-black mb-6" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
                 Our Story
               </h3>
-              <p className="text-gray-300 mb-4 leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+              <p className="text-gray-700 mb-4 leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                 Established in 2017, Two Fungis Ltd brings over 25 years of combined hands-on expertise to every project. Founded by Scott Marshall and Beau Suprun, our company represents the perfect union of experience and precision craftsmanship.
               </p>
-              <p className="text-gray-300 mb-4 leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+              <p className="text-gray-700 mb-4 leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                 Scott Marshall has built a distinguished career spanning 25 years in millwork, finishing carpentry, cabinet installation, and flooring. His expertise ensures exceptional craftsmanship across all project types.
               </p>
-              <p className="text-gray-300 mb-4 leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+              <p className="text-gray-700 mb-4 leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                 Beau Suprun, master craftsman, exceptional carpenter, and machinist, brings an unparalleled eye for detail and perfection that is second to none in the finishing world. With extensive experience in multi-unit finishing management and installation, his meticulous approach guarantees flawless execution on every project.
               </p>
-              <p className="text-gray-300 mb-4 leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+              <p className="text-gray-700 mb-4 leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                 With our $5 million liability insurance and proven track record, we continue to secure large-scale contracts throughout Coastal B.C and Vancouver Island. Our commitment to excellence and professional service has made us a trusted partner for projects of all sizes.
               </p>
-              <p className="text-gray-300 leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+              <p className="text-gray-700 leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                 Together, Scott and Beau lead a team dedicated to precision craftsmanship and innovative solutions. From intimate residential spaces to expansive high-rise commercial developments, our combined expertise ensures every detail is executed to perfection.
               </p>
             </div>
