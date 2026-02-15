@@ -69,7 +69,7 @@ const About = () => {
                 alt="Custom kitchen cabinetry and millwork"
                 className="rounded-lg shadow-2xl w-full h-auto object-cover"
               />
-              <div className="absolute -bottom-6 -left-6 text-white p-6 rounded-lg shadow-xl" style={{ backgroundColor: '#228B22' }}>
+              <div className="absolute -bottom-6 -left-6 bg-green-500 text-white p-6 rounded-lg shadow-xl">
                 <p className="text-4xl font-bold" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>25+</p>
                 <p className="text-sm" style={{ fontFamily: 'Open Sans, sans-serif' }}>Years Experience</p>
               </div>
@@ -81,9 +81,9 @@ const About = () => {
             {highlights.map((item, index) => {
               const IconComponent = item.icon;
               return (
-                <Card key={index} className="p-6 hover:shadow-xl transition-shadow duration-300 border-t-4 border-red-600 bg-white">
-                  <div className="w-14 h-14 rounded-full flex items-center justify-center mb-4" style={{ backgroundColor: 'rgba(34, 139, 34, 0.1)' }}>
-                    <IconComponent style={{ color: '#228B22' }} size={28} />
+                <Card key={index} className="p-6 hover:shadow-xl transition-shadow duration-300 border-t-4 border-red-600">
+                  <div className="bg-green-500/10 w-14 h-14 rounded-full flex items-center justify-center mb-4">
+                    <IconComponent className="text-green-600" size={28} />
                   </div>
                   <h4 className="text-xl font-bold text-black mb-2" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
                     {item.title}

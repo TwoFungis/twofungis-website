@@ -29,9 +29,9 @@ const Contact = () => {
                 {/* Phone */}
                 <a 
                   href="tel:778-268-4920"
-                  className="flex flex-col items-center p-6 bg-gray-50 rounded-lg hover:bg-green-50 transition-colors group"
+                  className="flex flex-col items-center p-6 bg-gray-50 rounded-lg hover:bg-red-50 transition-colors group"
                 >
-                  <div className="p-4 rounded-full mb-4 group-hover:scale-110 transition-transform" style={{ backgroundColor: '#228B22' }}>
+                  <div className="bg-red-600 p-4 rounded-full mb-4 group-hover:scale-110 transition-transform">
                     <Phone className="text-white" size={32} />
                   </div>
                   <h4 className="font-bold text-black mb-2 text-xl" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>Call Us</h4>
@@ -42,9 +42,9 @@ const Contact = () => {
                 {/* Email */}
                 <a 
                   href="mailto:inbox@twofungis.ca"
-                  className="flex flex-col items-center p-6 bg-gray-50 rounded-lg hover:bg-green-50 transition-colors group"
+                  className="flex flex-col items-center p-6 bg-gray-50 rounded-lg hover:bg-red-50 transition-colors group"
                 >
-                  <div className="p-4 rounded-full mb-4 group-hover:scale-110 transition-transform" style={{ backgroundColor: '#228B22' }}>
+                  <div className="bg-red-600 p-4 rounded-full mb-4 group-hover:scale-110 transition-transform">
                     <Mail className="text-white" size={32} />
                   </div>
                   <h4 className="font-bold text-black mb-2 text-xl" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>Email Us</h4>
@@ -53,7 +53,7 @@ const Contact = () => {
                 </a>
               </div>
 
-              <div className="text-white p-6 rounded-lg mb-8" style={{ backgroundColor: '#228B22' }}>
+              <div className="bg-red-600 text-white p-6 rounded-lg mb-8">
                 <p className="text-lg font-semibold mb-2" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
                   $5 Million Liability Insurance
                 </p>
@@ -66,7 +66,7 @@ const Contact = () => {
             {/* Additional Info Grid */}
             <div className="grid md:grid-cols-3 gap-6">
               <div className="bg-white p-6 rounded-lg shadow-lg text-center">
-                <MapPin style={{ color: '#228B22' }} className="mx-auto mb-3" size={32} />
+                <MapPin className="text-red-600 mx-auto mb-3" size={32} />
                 <h4 className="font-bold text-black mb-2" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>Service Area</h4>
                 <p className="text-gray-600 text-sm" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                   Coastal B.C and Vancouver Island
@@ -74,7 +74,7 @@ const Contact = () => {
               </div>
 
               <div className="bg-white p-6 rounded-lg shadow-lg text-center">
-                <div className="text-3xl font-bold mb-2" style={{ fontFamily: 'Bebas Neue, sans-serif', color: '#228B22' }}>25+</div>
+                <div className="text-red-600 text-3xl font-bold mb-2" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>25+</div>
                 <h4 className="font-bold text-black mb-2" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>Years Experience</h4>
                 <p className="text-gray-600 text-sm" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                   Expert craftsmanship since 1999
@@ -82,7 +82,7 @@ const Contact = () => {
               </div>
 
               <div className="bg-white p-6 rounded-lg shadow-lg text-center">
-                <div className="text-3xl font-bold mb-2" style={{ fontFamily: 'Bebas Neue, sans-serif', color: '#228B22' }}>24hr</div>
+                <div className="text-red-600 text-3xl font-bold mb-2" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>24hr</div>
                 <h4 className="font-bold text-black mb-2" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>Response Time</h4>
                 <p className="text-gray-600 text-sm" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                   Quick replies to all inquiries

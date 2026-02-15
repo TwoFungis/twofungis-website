@@ -43,7 +43,7 @@ const WhyChooseUs = () => {
               const IconComponent = reason.icon;
               return (
                 <div key={index} className="text-center">
-                  <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 hover:scale-110 transition-transform duration-300" style={{ backgroundColor: '#228B22' }}>
+                  <div className="bg-green-500 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 hover:scale-110 transition-transform duration-300">
                     <IconComponent className="text-white" size={36} />
                   </div>
                   <h3 className="text-xl font-bold text-black mb-3" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
@@ -61,7 +61,7 @@ const WhyChooseUs = () => {
           <div className="bg-black rounded-xl p-12">
             <div className="grid sm:grid-cols-3 gap-8 text-center">
               <div>
-                <p className="text-5xl font-bold mb-2" style={{ fontFamily: 'Bebas Neue, sans-serif', color: '#228B22' }}>25+</p>
+                <p className="text-5xl font-bold text-green-500 mb-2" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>25+</p>
                 <p className="text-white text-lg" style={{ fontFamily: 'Open Sans, sans-serif' }}>Years Experience</p>
               </div>
               <div>
@@ -69,7 +69,7 @@ const WhyChooseUs = () => {
                 <p className="text-white text-lg" style={{ fontFamily: 'Open Sans, sans-serif' }}>Liability Insurance</p>
               </div>
               <div>
-                <p className="text-5xl font-bold mb-2" style={{ fontFamily: 'Bebas Neue, sans-serif', color: '#228B22' }}>100%</p>
+                <p className="text-5xl font-bold text-green-500 mb-2" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>100%</p>
                 <p className="text-white text-lg" style={{ fontFamily: 'Open Sans, sans-serif' }}>Quality Guarantee</p>
               </div>
             </div>
