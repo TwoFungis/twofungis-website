@@ -48,7 +48,7 @@ const Footer = () => {
                   <a href="/#coverage" className="text-gray-400 transition-colors" onMouseEnter={(e) => e.target.style.color='#228B22'} onMouseLeave={(e) => e.target.style.color='#9ca3af'}>Regional Coverage</a>
                 </li>
                 <li>
-                  <a href="/#partner" className="text-gray-400 transition-colors" onMouseEnter={(e) => e.target.style.color='#228B22'} onMouseLeave={(e) => e.target.style.color='#9ca3af'}>Partner With Us</a>
+                  <a href="/#estimating" className="text-gray-400 transition-colors" onMouseEnter={(e) => e.target.style.color='#228B22'} onMouseLeave={(e) => e.target.style.color='#9ca3af'}>Request Estimating</a>
                 </li>
               </ul>
             </div>
