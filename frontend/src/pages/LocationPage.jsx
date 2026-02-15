@@ -109,77 +109,77 @@ const LocationPage = () => {
       </section>
 
       {/* Location-Specific Content */}
-      <section className="py-16 bg-black">
+      <section className="py-16 bg-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
+            <h2 className="text-3xl sm:text-4xl font-bold text-black mb-6" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
               Premier Interior Finishing Services in {location.city}, {location.region}
             </h2>
             
             <div className="prose prose-lg max-w-none">
-              <p className="text-gray-300 leading-relaxed mb-4" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+              <p className="text-gray-700 leading-relaxed mb-4" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                 Two Fungis Ltd is proud to serve {location.city} and surrounding areas in {location.region}. With over 25 years of combined experience, our founders Scott Marshall and Beau Suprun bring unparalleled expertise in interior finishing, commercial millwork, and precision carpentry to every project.
               </p>
               
-              <h3 className="text-2xl font-bold text-white mb-4 mt-8" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
+              <h3 className="text-2xl font-bold text-black mb-4 mt-8" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
                 Our Services in {location.city}
               </h3>
               
               <ul className="space-y-3 mb-8">
                 <li className="flex items-start">
                   <CheckCircle2 style={{ color: '#228B22' }} className="mr-3 flex-shrink-0 mt-1" size={20} />
-                  <span className="text-gray-300" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                    <strong className="text-white">Residential Interior Finishing:</strong> Custom millwork, trim installation, and finishing carpentry for homes
+                  <span className="text-gray-700" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+                    <strong>Residential Interior Finishing:</strong> Custom millwork, trim installation, and finishing carpentry for homes
                   </span>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle2 style={{ color: '#228B22' }} className="mr-3 flex-shrink-0 mt-1" size={20} />
-                  <span className="text-gray-300" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                    <strong className="text-white">Commercial Millwork:</strong> Professional-grade solutions for offices, retail spaces, and commercial buildings
+                  <span className="text-gray-700" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+                    <strong>Commercial Millwork:</strong> Professional-grade solutions for offices, retail spaces, and commercial buildings
                   </span>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle2 style={{ color: '#228B22' }} className="mr-3 flex-shrink-0 mt-1" size={20} />
-                  <span className="text-gray-300" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                    <strong className="text-white">Multi-Unit Finishing:</strong> Expert management and installation for apartment buildings and condominiums
+                  <span className="text-gray-700" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+                    <strong>Multi-Unit Finishing:</strong> Expert management and installation for apartment buildings and condominiums
                   </span>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle2 style={{ color: '#228B22' }} className="mr-3 flex-shrink-0 mt-1" size={20} />
-                  <span className="text-gray-300" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                    <strong className="text-white">Cabinet Installation:</strong> Precision cabinet installation for kitchens, bathrooms, and custom spaces
+                  <span className="text-gray-700" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+                    <strong>Cabinet Installation:</strong> Precision cabinet installation for kitchens, bathrooms, and custom spaces
                   </span>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle2 style={{ color: '#228B22' }} className="mr-3 flex-shrink-0 mt-1" size={20} />
-                  <span className="text-gray-300" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                    <strong className="text-white">Flooring Installation:</strong> Expert hardwood, laminate, and engineered flooring services
+                  <span className="text-gray-700" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+                    <strong>Flooring Installation:</strong> Expert hardwood, laminate, and engineered flooring services
                   </span>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle2 style={{ color: '#228B22' }} className="mr-3 flex-shrink-0 mt-1" size={20} />
-                  <span className="text-gray-300" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                    <strong className="text-white">High-Rise Projects:</strong> Specialized finishing for high-rise commercial and residential buildings
+                  <span className="text-gray-700" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+                    <strong>High-Rise Projects:</strong> Specialized finishing for high-rise commercial and residential buildings
                   </span>
                 </li>
               </ul>
 
-              <h3 className="text-2xl font-bold text-white mb-4 mt-8" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
+              <h3 className="text-2xl font-bold text-black mb-4 mt-8" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
                 Why Choose Two Fungis Ltd in {location.city}?
               </h3>
               
-              <p className="text-gray-300 leading-relaxed mb-4" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+              <p className="text-gray-700 leading-relaxed mb-4" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                 We're not just contractors – we're craftsmen who take pride in every detail. Our team brings together Scott Marshall's 25 years of hands-on experience in millwork and finishing carpentry, and Beau Suprun's exceptional eye for detail as a master craftsman and machinist. This combination of experience and precision ensures your project in {location.city} exceeds expectations.
               </p>
 
               {location.keyProjects && location.keyProjects.length > 0 && (
                 <>
-                  <h3 className="text-2xl font-bold text-white mb-4 mt-8" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
+                  <h3 className="text-2xl font-bold text-black mb-4 mt-8" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
                     Project Types We Serve in {location.city}
                   </h3>
                   <ul className="space-y-2 mb-8">
                     {location.keyProjects.map((project, index) => (
-                      <li key={index} className="flex items-center text-gray-300">
+                      <li key={index} className="flex items-center text-gray-700">
                         <div className="w-2 h-2 bg-red-600 rounded-full mr-3"></div>
                         <span style={{ fontFamily: 'Open Sans, sans-serif' }}>{project}</span>
                       </li>
@@ -188,11 +188,11 @@ const LocationPage = () => {
                 </>
               )}
 
-              <div className="bg-black p-6 rounded-lg mt-8 border border-red-600/30">
-                <h3 className="text-xl font-bold text-white mb-3" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
+              <div className="bg-gray-50 p-6 rounded-lg mt-8">
+                <h3 className="text-xl font-bold text-black mb-3" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
                   Ready to Start Your Project in {location.city}?
                 </h3>
-                <p className="text-gray-300 mb-4" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+                <p className="text-gray-700 mb-4" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                   Contact us today for a free consultation and quote. We're fully insured with $5 million liability coverage and ready to bring your vision to life.
                 </p>
                 <div className="flex flex-wrap gap-4">
