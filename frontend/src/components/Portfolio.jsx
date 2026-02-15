@@ -100,9 +100,9 @@ const Portfolio = () => {
       category: 'Residential'
     },
     {
-      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/pynvzdye_IMG_20210223_223943_967.jpg',
-      title: 'Modern Kitchen Renovation',
-      category: 'Residential'
+      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/hc3jy69c_ChatGPT%20Image%20Feb%2014%2C%202026%2C%2007_40_22%20PM.png',
+      title: 'Two Fungis Ltd - Premium Craftsmanship',
+      category: 'Our Brand'
     }
   ];
 
@@ -137,8 +137,8 @@ const Portfolio = () => {
                       alt={project.title}
                       className="w-full h-80 object-cover transition-transform duration-500 group-hover:scale-110"
                     />
-                    {/* Watermark */}
-                    <div className="absolute bottom-2 right-2 opacity-30 group-hover:opacity-50 transition-opacity">
+                    {/* Watermark - MORE VISIBLE */}
+                    <div className="absolute bottom-2 right-2 opacity-60 group-hover:opacity-80 transition-opacity">
                       <img
                         src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/hc3jy69c_ChatGPT%20Image%20Feb%2014%2C%202026%2C%2007_40_22%20PM.png"
                         alt="Two Fungis Ltd"

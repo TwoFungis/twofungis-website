@@ -11,17 +11,15 @@ const Hero = () => {
   };
 
   return (
-    <section id="home" className="relative min-h-screen flex items-center justify-center bg-black overflow-hidden">
-      {/* Honeycomb Pattern Background */}
-      <div className="absolute inset-0 opacity-5">
-        <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <pattern id="hexagons" x="0" y="0" width="56" height="100" patternUnits="userSpaceOnUse">
-              <polygon points="28,0 56,15 56,45 28,60 0,45 0,15" fill="none" stroke="white" strokeWidth="1"/>
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#hexagons)" />
-        </svg>
+    <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      {/* Background Image */}
+      <div className="absolute inset-0">
+        <img
+          src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/iqx1ya1d_FotoFlexer_Photo.jpg"
+          alt="Two Fungis Background"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-black/60"></div>
       </div>
 
       {/* Content */}
@@ -39,7 +37,7 @@ const Hero = () => {
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-6 animate-fade-in" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
             Premium Interior <span className="text-red-600">Finishing & Carpentry</span>
           </h1>
-          <p className="text-xl sm:text-2xl text-gray-300 mb-8 max-w-2xl mx-auto" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+          <p className="text-xl sm:text-2xl text-gray-200 mb-8 max-w-2xl mx-auto" style={{ fontFamily: 'Open Sans, sans-serif' }}>
             Specializing in high end residential & commercial finishing, including high-rise & multi-family projects across Coastal B.C and Vancouver Island regions since 2017
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
