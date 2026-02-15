@@ -9,19 +9,19 @@ const Contact = () => {
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="text-center mb-16">
-            <h2 className="text-4xl sm:text-5xl font-bold text-white mb-4" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
+            <h2 className="text-4xl sm:text-5xl font-bold text-black mb-4" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
               Get in <span className="text-red-600">Touch</span>
             </h2>
             <div className="w-24 h-1 bg-red-600 mx-auto mb-6"></div>
-            <p className="text-lg text-gray-300 max-w-2xl mx-auto" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto" style={{ fontFamily: 'Open Sans, sans-serif' }}>
               Ready to start your project? Contact us for a free consultation and quote
             </p>
           </div>
 
           <div className="max-w-4xl mx-auto">
             {/* Main Contact Card */}
-            <div className="bg-black p-12 rounded-xl shadow-2xl text-center mb-12 border border-red-600/30">
-              <h3 className="text-3xl font-bold text-white mb-8" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
+            <div className="bg-white p-12 rounded-xl shadow-2xl text-center mb-12">
+              <h3 className="text-3xl font-bold text-black mb-8" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
                 Contact Two Fungis Ltd
               </h3>
               
@@ -29,20 +29,20 @@ const Contact = () => {
                 {/* Phone */}
                 <a 
                   href="tel:778-268-4920"
-                  className="flex flex-col items-center p-6 bg-black rounded-lg border border-red-600/30 hover:border-red-600 transition-colors group"
+                  className="flex flex-col items-center p-6 bg-gray-50 rounded-lg hover:bg-green-50 transition-colors group"
                 >
                   <div className="p-4 rounded-full mb-4 group-hover:scale-110 transition-transform" style={{ backgroundColor: '#228B22' }}>
                     <Phone className="text-white" size={32} />
                   </div>
-                  <h4 className="font-bold text-white mb-2 text-xl" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>Call Us</h4>
+                  <h4 className="font-bold text-black mb-2 text-xl" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>Call Us</h4>
                   <p className="text-2xl font-bold text-red-600 mb-1">778-268-4920</p>
-                  <p className="text-gray-400 text-sm">Scott Marshall</p>
+                  <p className="text-gray-500 text-sm">Scott Marshall</p>
                 </a>
 
                 {/* Email */}
                 <a 
                   href="mailto:inbox@twofungis.ca"
-                  className="flex flex-col items-center p-6 bg-black rounded-lg border border-red-600/30 hover:border-red-600 transition-colors group"
+                  className="flex flex-col items-center p-6 bg-gray-50 rounded-lg hover:bg-green-50 transition-colors group"
                 >
                   <div className="p-4 rounded-full mb-4 group-hover:scale-110 transition-transform" style={{ backgroundColor: '#228B22' }}>
                     <Mail className="text-white" size={32} />
