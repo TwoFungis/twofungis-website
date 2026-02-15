@@ -53,14 +53,14 @@ const Header = () => {
               src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png"
               alt="Two Fungis Ltd"
               className="h-20 md:h-24 w-auto cursor-pointer"
-              onClick={() => scrollToSection('home')}
+              onClick={() => navigateToSection('home')}
             />
           </div>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             <button
-              onClick={() => scrollToSection('home')}
+              onClick={() => navigateToSection('home')}
               className="text-white transition-colors duration-200 font-medium"
               onMouseEnter={(e) => e.target.style.color='#228B22'}
               onMouseLeave={(e) => e.target.style.color='white'}
@@ -68,7 +68,7 @@ const Header = () => {
               Home
             </button>
             <button
-              onClick={() => scrollToSection('about')}
+              onClick={() => navigateToSection('about')}
               className="text-white transition-colors duration-200 font-medium"
               onMouseEnter={(e) => e.target.style.color='#228B22'}
               onMouseLeave={(e) => e.target.style.color='white'}
@@ -76,7 +76,7 @@ const Header = () => {
               About
             </button>
             <button
-              onClick={() => scrollToSection('services')}
+              onClick={() => navigateToSection('services')}
               className="text-white transition-colors duration-200 font-medium"
               onMouseEnter={(e) => e.target.style.color='#228B22'}
               onMouseLeave={(e) => e.target.style.color='white'}
@@ -84,7 +84,7 @@ const Header = () => {
               Services
             </button>
             <button
-              onClick={() => scrollToSection('portfolio')}
+              onClick={() => navigateToSection('portfolio')}
               className="text-white transition-colors duration-200 font-medium"
               onMouseEnter={(e) => e.target.style.color='#228B22'}
               onMouseLeave={(e) => e.target.style.color='white'}
@@ -92,7 +92,7 @@ const Header = () => {
               Portfolio
             </button>
             <button
-              onClick={() => scrollToSection('contact')}
+              onClick={() => navigateToSection('contact')}
               className="text-white transition-colors duration-200 font-medium"
               onMouseEnter={(e) => e.target.style.color='#228B22'}
               onMouseLeave={(e) => e.target.style.color='white'}
@@ -100,7 +100,7 @@ const Header = () => {
               Contact
             </button>
             <Button
-              onClick={() => scrollToSection('contact')}
+              onClick={() => navigateToSection('contact')}
               className="text-white px-6 py-2 transition-colors duration-200"
               style={{ backgroundColor: '#228B22' }}
               onMouseEnter={(e) => e.target.style.backgroundColor='#1e7b1e'}
@@ -126,7 +126,7 @@ const Header = () => {
           <div className="md:hidden bg-black/95 backdrop-blur-sm">
             <nav className="flex flex-col space-y-4 py-6">
               <button
-                onClick={() => scrollToSection('home')}
+                onClick={() => navigateToSection('home')}
                 className="text-white transition-colors duration-200 font-medium text-left"
                 onMouseEnter={(e) => e.target.style.color='#228B22'}
                 onMouseLeave={(e) => e.target.style.color='white'}
@@ -134,7 +134,7 @@ const Header = () => {
                 Home
               </button>
               <button
-                onClick={() => scrollToSection('about')}
+                onClick={() => navigateToSection('about')}
                 className="text-white transition-colors duration-200 font-medium text-left"
                 onMouseEnter={(e) => e.target.style.color='#228B22'}
                 onMouseLeave={(e) => e.target.style.color='white'}
@@ -142,7 +142,7 @@ const Header = () => {
                 About
               </button>
               <button
-                onClick={() => scrollToSection('services')}
+                onClick={() => navigateToSection('services')}
                 className="text-white transition-colors duration-200 font-medium text-left"
                 onMouseEnter={(e) => e.target.style.color='#228B22'}
                 onMouseLeave={(e) => e.target.style.color='white'}
@@ -150,7 +150,7 @@ const Header = () => {
                 Services
               </button>
               <button
-                onClick={() => scrollToSection('portfolio')}
+                onClick={() => navigateToSection('portfolio')}
                 className="text-white transition-colors duration-200 font-medium text-left"
                 onMouseEnter={(e) => e.target.style.color='#228B22'}
                 onMouseLeave={(e) => e.target.style.color='white'}
@@ -158,7 +158,7 @@ const Header = () => {
                 Portfolio
               </button>
               <button
-                onClick={() => scrollToSection('contact')}
+                onClick={() => navigateToSection('contact')}
                 className="text-white transition-colors duration-200 font-medium text-left"
                 onMouseEnter={(e) => e.target.style.color='#228B22'}
                 onMouseLeave={(e) => e.target.style.color='white'}
@@ -166,7 +166,7 @@ const Header = () => {
                 Contact
               </button>
               <Button
-                onClick={() => scrollToSection('contact')}
+                onClick={() => navigateToSection('contact')}
                 className="text-white w-full"
                 style={{ backgroundColor: '#228B22' }}
                 onMouseEnter={(e) => e.target.style.backgroundColor='#1e7b1e'}
