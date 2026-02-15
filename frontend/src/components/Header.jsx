@@ -30,10 +30,10 @@ const Header = () => {
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-24">
-          {/* Logo - LARGER */}
+          {/* Logo */}
           <div className="flex-shrink-0">
             <img
-              src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/hc3jy69c_ChatGPT%20Image%20Feb%2014%2C%202026%2C%2007_40_22%20PM.png"
+              src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png"
               alt="Two Fungis Ltd"
               className="h-20 md:h-24 w-auto cursor-pointer"
               onClick={() => scrollToSection('home')}
@@ -44,31 +44,31 @@ const Header = () => {
           <nav className="hidden md:flex items-center space-x-8">
             <button
               onClick={() => scrollToSection('home')}
-              className="text-white hover:text-red-600 transition-colors duration-200 font-medium"
+              className="text-white hover:text-green-500 transition-colors duration-200 font-medium"
             >
               Home
             </button>
             <button
               onClick={() => scrollToSection('about')}
-              className="text-white hover:text-red-600 transition-colors duration-200 font-medium"
+              className="text-white hover:text-green-500 transition-colors duration-200 font-medium"
             >
               About
             </button>
             <button
               onClick={() => scrollToSection('services')}
-              className="text-white hover:text-red-600 transition-colors duration-200 font-medium"
+              className="text-white hover:text-green-500 transition-colors duration-200 font-medium"
             >
               Services
             </button>
             <button
               onClick={() => scrollToSection('portfolio')}
-              className="text-white hover:text-red-600 transition-colors duration-200 font-medium"
+              className="text-white hover:text-green-500 transition-colors duration-200 font-medium"
             >
               Portfolio
             </button>
             <button
               onClick={() => scrollToSection('contact')}
-              className="text-white hover:text-red-600 transition-colors duration-200 font-medium"
+              className="text-white hover:text-green-500 transition-colors duration-200 font-medium"
             >
               Contact
             </button>
@@ -83,7 +83,7 @@ const Header = () => {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden text-white hover:text-red-600 transition-colors"
+            className="md:hidden text-white hover:text-green-500 transition-colors"
           >
             {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -95,31 +95,31 @@ const Header = () => {
             <nav className="flex flex-col space-y-4 py-6">
               <button
                 onClick={() => scrollToSection('home')}
-                className="text-white hover:text-red-600 transition-colors duration-200 font-medium text-left"
+                className="text-white hover:text-green-500 transition-colors duration-200 font-medium text-left"
               >
                 Home
               </button>
               <button
                 onClick={() => scrollToSection('about')}
-                className="text-white hover:text-red-600 transition-colors duration-200 font-medium text-left"
+                className="text-white hover:text-green-500 transition-colors duration-200 font-medium text-left"
               >
                 About
               </button>
               <button
                 onClick={() => scrollToSection('services')}
-                className="text-white hover:text-red-600 transition-colors duration-200 font-medium text-left"
+                className="text-white hover:text-green-500 transition-colors duration-200 font-medium text-left"
               >
                 Services
               </button>
               <button
                 onClick={() => scrollToSection('portfolio')}
-                className="text-white hover:text-red-600 transition-colors duration-200 font-medium text-left"
+                className="text-white hover:text-green-500 transition-colors duration-200 font-medium text-left"
               >
                 Portfolio
               </button>
               <button
                 onClick={() => scrollToSection('contact')}
-                className="text-white hover:text-red-600 transition-colors duration-200 font-medium text-left"
+                className="text-white hover:text-green-500 transition-colors duration-200 font-medium text-left"
               >
                 Contact
               </button>

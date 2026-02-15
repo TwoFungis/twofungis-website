@@ -28,7 +28,7 @@ const Hero = () => {
           {/* Logo Image Above Title */}
           <div className="mb-8 flex justify-center">
             <img
-              src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/hc3jy69c_ChatGPT%20Image%20Feb%2014%2C%202026%2C%2007_40_22%20PM.png"
+              src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png"
               alt="Two Fungis Ltd"
               className="h-48 md:h-56 w-auto drop-shadow-2xl"
             />
@@ -51,14 +51,14 @@ const Hero = () => {
             <Button
               onClick={() => scrollToSection('portfolio')}
               variant="outline"
-              className="border-2 border-white text-white hover:bg-white hover:text-black px-8 py-6 text-lg font-semibold transition-all duration-200"
+              className="border-2 border-green-500 text-white hover:bg-green-500 hover:text-black px-8 py-6 text-lg font-semibold transition-all duration-200"
             >
               View Our Work
             </Button>
           </div>
           
           {/* Trust Badge */}
-          <div className="mt-12 inline-flex items-center gap-2 bg-green-600/20 border border-green-600/50 px-6 py-3 rounded-full">
+          <div className="mt-12 inline-flex items-center gap-2 bg-green-500/20 border border-green-500/50 px-6 py-3 rounded-full">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
             <span className="text-green-400 font-medium">$5M Liability Insurance</span>
           </div>
@@ -68,7 +68,7 @@ const Hero = () => {
       {/* Scroll Indicator */}
       <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
         <div className="w-6 h-10 border-2 border-white/30 rounded-full flex items-start justify-center p-2">
-          <div className="w-1 h-3 bg-red-600 rounded-full"></div>
+          <div className="w-1 h-3 bg-green-500 rounded-full"></div>
         </div>
       </div>
     </section>
