@@ -43,25 +43,16 @@ const LocationPage = () => {
       <Header />
       
       {/* Location Hero */}
-      <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden pt-20">
-        {/* Background Image */}
-        <div className="absolute inset-0">
-          <img
-            src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/iqx1ya1d_FotoFlexer_Photo.jpg"
-            alt="Two Fungis Background"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-black/70"></div>
-        </div>
-
+      <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden pt-20 bg-black">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
-            {/* Logo */}
+            {/* Logo - Larger to match homepage */}
             <div className="mb-6 flex justify-center">
               <img
                 src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png"
                 alt="Two Fungis Ltd"
-                className="h-32 md:h-40 w-auto drop-shadow-2xl"
+                className="h-72 md:h-84 w-auto drop-shadow-2xl"
+                style={{ height: 'clamp(18rem, 25vw, 21rem)' }}
               />
             </div>
             
@@ -78,15 +69,15 @@ const LocationPage = () => {
 
             <div className="flex flex-wrap gap-3 justify-center mb-8 text-gray-400">
               <span className="flex items-center gap-2">
-                <CheckCircle2 size={20} className="text-green-500" />
+                <CheckCircle2 size={20} style={{ color: '#228B22' }} />
                 25+ Years Experience
               </span>
               <span className="flex items-center gap-2">
-                <CheckCircle2 size={20} className="text-green-500" />
+                <CheckCircle2 size={20} style={{ color: '#228B22' }} />
                 $5M Insured
               </span>
               <span className="flex items-center gap-2">
-                <CheckCircle2 size={20} className="text-green-500" />
+                <CheckCircle2 size={20} style={{ color: '#228B22' }} />
                 Local Experts
               </span>
             </div>
@@ -94,14 +85,20 @@ const LocationPage = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
                 onClick={() => scrollToSection('contact')}
-                className="bg-red-600 hover:bg-red-700 text-white px-8 py-6 text-lg font-semibold"
+                className="text-white px-8 py-6 text-lg font-semibold"
+                style={{ backgroundColor: '#228B22' }}
+                onMouseEnter={(e) => e.target.style.backgroundColor='#1e7b1e'}
+                onMouseLeave={(e) => e.target.style.backgroundColor='#228B22'}
               >
                 Get a Free Quote in {location.city}
               </Button>
               <Button
                 onClick={() => scrollToSection('portfolio')}
                 variant="outline"
-                className="border-2 border-white text-white hover:bg-white hover:text-black px-8 py-6 text-lg font-semibold"
+                className="text-white px-8 py-6 text-lg font-semibold"
+                style={{ borderColor: '#228B22', borderWidth: '2px' }}
+                onMouseEnter={(e) => { e.target.style.backgroundColor = '#228B22'; e.target.style.color = 'black'; }}
+                onMouseLeave={(e) => { e.target.style.backgroundColor = 'transparent'; e.target.style.color = 'white'; }}
               >
                 View Our Work
               </Button>
