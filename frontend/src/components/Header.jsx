@@ -23,11 +23,11 @@ const Header = () => {
 
   const regionOrder = [
     'Okanagan Valley',
-    'Thompson-Okanagan',
-    'Thompson-Nicola',
-    'Fraser Valley',
     'Coastal BC',
-    'Vancouver Island'
+    'Vancouver Island',
+    'Fraser Valley',
+    'Thompson-Okanagan',
+    'Thompson-Nicola'
   ];
 
   useEffect(() => {
@@ -126,28 +126,31 @@ const Header = () => {
               </button>
               
               {isLocationsOpen && (
-                <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 bg-black/95 backdrop-blur-sm rounded-lg shadow-xl border border-gray-800 py-4 min-w-[600px] max-h-[70vh] overflow-y-auto">
-                  <div className="grid grid-cols-3 gap-4 px-4">
+                <div className="absolute top-full right-0 mt-2 bg-black/95 backdrop-blur-sm rounded-lg shadow-xl border border-gray-800 p-4 w-[480px]">
+                  <div className="grid grid-cols-2 gap-x-6 gap-y-3">
                     {regionOrder.map((region) => (
                       groupedLocations[region] && (
-                        <div key={region}>
-                          <h4 className="text-red-600 font-bold text-sm mb-2 px-2" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
+                        <div key={region} className="mb-2">
+                          <h4 className="text-red-600 font-bold text-xs mb-1.5 uppercase tracking-wide" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
                             {region}
                           </h4>
-                          <ul className="space-y-1">
-                            {groupedLocations[region].map((loc) => (
-                              <li key={loc.slug}>
+                          <div className="flex flex-wrap gap-x-3 gap-y-0.5">
+                            {groupedLocations[region].map((loc, idx) => (
+                              <React.Fragment key={loc.slug}>
                                 <Link
                                   to={`/locations/${loc.slug}`}
-                                  className="block px-2 py-1 text-gray-300 hover:text-white hover:bg-gray-800 rounded text-sm transition-colors"
+                                  className="text-gray-300 hover:text-white text-sm transition-colors"
                                   onClick={() => setIsLocationsOpen(false)}
                                   style={{ fontFamily: 'Open Sans, sans-serif' }}
                                 >
                                   {loc.city}
                                 </Link>
-                              </li>
+                                {idx < groupedLocations[region].length - 1 && (
+                                  <span className="text-gray-600">·</span>
+                                )}
+                              </React.Fragment>
                             ))}
-                          </ul>
+                          </div>
                         </div>
                       )
                     ))}
@@ -206,14 +209,14 @@ const Header = () => {
                 </p>
                 {regionOrder.map((region) => (
                   groupedLocations[region] && (
-                    <div key={region} className="mb-4">
-                      <p className="text-gray-400 text-sm font-semibold mb-2">{region}</p>
+                    <div key={region} className="mb-3">
+                      <p className="text-gray-400 text-xs font-semibold mb-1 uppercase">{region}</p>
                       <div className="flex flex-wrap gap-2">
                         {groupedLocations[region].map((loc) => (
                           <Link
                             key={loc.slug}
                             to={`/locations/${loc.slug}`}
-                            className="text-gray-300 text-sm hover:text-white px-2 py-1 bg-gray-800 rounded"
+                            className="text-gray-300 text-sm hover:text-white"
                             onClick={() => setIsMobileMenuOpen(false)}
                           >
                             {loc.city}
