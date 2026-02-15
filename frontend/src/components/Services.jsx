@@ -36,11 +36,11 @@ const Services = () => {
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="text-center mb-16">
-            <h2 className="text-4xl sm:text-5xl font-bold text-white mb-4" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
+            <h2 className="text-4xl sm:text-5xl font-bold text-black mb-4" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
               Our <span className="text-red-600">Services</span>
             </h2>
             <div className="w-24 h-1 bg-red-600 mx-auto mb-6"></div>
-            <p className="text-lg text-gray-300 max-w-2xl mx-auto" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto" style={{ fontFamily: 'Open Sans, sans-serif' }}>
               Comprehensive interior finishing solutions tailored to your project needs
             </p>
           </div>
@@ -52,20 +52,20 @@ const Services = () => {
               return (
                 <Card
                   key={index}
-                  className="p-8 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 bg-black border-l-4 border-red-600"
+                  className="p-8 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 bg-white border-l-4 border-red-600"
                 >
                   <div className="w-16 h-16 rounded-lg flex items-center justify-center mb-6" style={{ backgroundColor: '#228B22' }}>
                     <IconComponent className="text-white" size={32} />
                   </div>
-                  <h3 className="text-2xl font-bold text-white mb-4" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
+                  <h3 className="text-2xl font-bold text-black mb-4" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
                     {service.title}
                   </h3>
-                  <p className="text-gray-400 mb-6 leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+                  <p className="text-gray-600 mb-6 leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                     {service.description}
                   </p>
                   <ul className="space-y-2">
                     {service.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-center text-gray-300">
+                      <li key={idx} className="flex items-center text-gray-700">
                       <div className="w-1.5 h-1.5 rounded-full mr-3" style={{ backgroundColor: '#228B22' }}></div>
                         <span style={{ fontFamily: 'Open Sans, sans-serif' }}>{feature}</span>
                       </li>
