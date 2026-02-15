@@ -30,7 +30,7 @@ const Hero = () => {
           {/* Logo Image Above Title */}
           <div className="mb-8 flex justify-center">
             <img
-              src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/3hzaqj34_1606875705391.png"
+              src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/hc3jy69c_ChatGPT%20Image%20Feb%2014%2C%202026%2C%2007_40_22%20PM.png"
               alt="Two Fungis Ltd"
               className="h-48 md:h-56 w-auto drop-shadow-2xl"
             />
