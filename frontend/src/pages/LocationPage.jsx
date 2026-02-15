@@ -43,17 +43,15 @@ const LocationPage = () => {
       <Header />
       
       {/* Location Hero */}
-      <section className="relative min-h-[60vh] flex items-center justify-center bg-black overflow-hidden pt-20">
-        {/* Honeycomb Pattern Background */}
-        <div className="absolute inset-0 opacity-5">
-          <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <pattern id="hexagons" x="0" y="0" width="56" height="100" patternUnits="userSpaceOnUse">
-                <polygon points="28,0 56,15 56,45 28,60 0,45 0,15" fill="none" stroke="white" strokeWidth="1"/>
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#hexagons)" />
-          </svg>
+      <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden pt-20">
+        {/* Background Image */}
+        <div className="absolute inset-0">
+          <img
+            src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/iqx1ya1d_FotoFlexer_Photo.jpg"
+            alt="Two Fungis Background"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-black/70"></div>
         </div>
 
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -61,7 +59,7 @@ const LocationPage = () => {
             {/* Logo */}
             <div className="mb-6 flex justify-center">
               <img
-                src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/3hzaqj34_1606875705391.png"
+                src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/hc3jy69c_ChatGPT%20Image%20Feb%2014%2C%202026%2C%2007_40_22%20PM.png"
                 alt="Two Fungis Ltd"
                 className="h-32 md:h-40 w-auto drop-shadow-2xl"
               />
