@@ -6,15 +6,15 @@ import { locations } from '../data/locations';
 
 const ServiceAreas = () => {
   const regions = [
-    'Coastal BC',
-    'Vancouver Island',
     'Okanagan Valley',
-    'Fraser Valley',
     'Thompson-Okanagan',
-    'Thompson-Nicola'
+    'Thompson-Nicola',
+    'Fraser Valley',
+    'Coastal BC',
+    'Vancouver Island'
   ];
 
-  const [activeRegion, setActiveRegion] = useState('Coastal BC');
+  const [activeRegion, setActiveRegion] = useState('Okanagan Valley');
 
   // Group locations by region
   const groupedLocations = locations.reduce((acc, location) => {
