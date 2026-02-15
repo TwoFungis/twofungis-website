@@ -54,7 +54,7 @@ const Services = () => {
                   key={index}
                   className="p-8 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 bg-white border-l-4 border-red-600"
                 >
-                  <div className="bg-green-500 w-16 h-16 rounded-lg flex items-center justify-center mb-6">
+                  <div className="w-16 h-16 rounded-lg flex items-center justify-center mb-6" style={{ backgroundColor: '#228B22' }}>
                     <IconComponent className="text-white" size={32} />
                   </div>
                   <h3 className="text-2xl font-bold text-black mb-4" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
