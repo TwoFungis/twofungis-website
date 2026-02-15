@@ -31,10 +31,12 @@ Build a professional portfolio website for Two Fungis Ltd., a construction compa
 - [x] Cross-page navigation (Header/Footer links work from all pages)
 
 ## Recent Changes
-- **Dec 2025**: Fixed navigation links to work from landing pages
+- **Feb 2026**: Fixed navigation links to work from landing pages
   - Header.jsx: Added useNavigate/useLocation for cross-page navigation
   - Footer.jsx: Updated quicklinks to use absolute paths (/#section)
   - App.js: Enhanced ScrollToTop to handle hash scrolling
+  - Added root netlify.toml with correct base directory setting
+  - Fixed deployment to push to `master` branch (Netlify's configured branch)
 
 ## Backlog / Future Tasks
 - [ ] Clean up unused /backend directory (optional)
