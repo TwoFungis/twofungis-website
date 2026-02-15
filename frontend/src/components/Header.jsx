@@ -267,11 +267,11 @@ const Header = () => {
               </div>
 
               <Button
-                onClick={() => navigateToSection('partner')}
+                onClick={() => navigateToSection('estimating')}
                 className="text-white w-full mt-4"
                 style={{ backgroundColor: '#228B22' }}
               >
-                Partner With Us
+                Request Estimating
               </Button>
             </nav>
           </div>
