@@ -20,9 +20,7 @@ const Header = () => {
   const navigateToSection = (id) => {
     setIsMobileMenuOpen(false);
     
-    // Check if we're on the homepage
     if (location.pathname === '/') {
-      // We're on homepage, just scroll to the section
       const element = document.getElementById(id);
       if (element) {
         element.scrollIntoView({ behavior: 'smooth' });
@@ -30,7 +28,6 @@ const Header = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     } else {
-      // We're on a different page, navigate to homepage with hash
       if (id === 'home') {
         navigate('/');
       } else {
@@ -68,20 +65,12 @@ const Header = () => {
               Home
             </button>
             <button
-              onClick={() => navigateToSection('about')}
+              onClick={() => navigateToSection('capabilities')}
               className="text-white transition-colors duration-200 font-medium"
               onMouseEnter={(e) => e.target.style.color='#228B22'}
               onMouseLeave={(e) => e.target.style.color='white'}
             >
-              About
-            </button>
-            <button
-              onClick={() => navigateToSection('services')}
-              className="text-white transition-colors duration-200 font-medium"
-              onMouseEnter={(e) => e.target.style.color='#228B22'}
-              onMouseLeave={(e) => e.target.style.color='white'}
-            >
-              Services
+              Capabilities
             </button>
             <button
               onClick={() => navigateToSection('portfolio')}
@@ -92,21 +81,21 @@ const Header = () => {
               Portfolio
             </button>
             <button
-              onClick={() => navigateToSection('contact')}
+              onClick={() => navigateToSection('coverage')}
               className="text-white transition-colors duration-200 font-medium"
               onMouseEnter={(e) => e.target.style.color='#228B22'}
               onMouseLeave={(e) => e.target.style.color='white'}
             >
-              Contact
+              Coverage
             </button>
             <Button
-              onClick={() => navigateToSection('contact')}
+              onClick={() => navigateToSection('partner')}
               className="text-white px-6 py-2 transition-colors duration-200"
               style={{ backgroundColor: '#228B22' }}
               onMouseEnter={(e) => e.target.style.backgroundColor='#1e7b1e'}
               onMouseLeave={(e) => e.target.style.backgroundColor='#228B22'}
             >
-              Get a Quote
+              Partner With Us
             </Button>
           </nav>
 
@@ -134,20 +123,12 @@ const Header = () => {
                 Home
               </button>
               <button
-                onClick={() => navigateToSection('about')}
+                onClick={() => navigateToSection('capabilities')}
                 className="text-white transition-colors duration-200 font-medium text-left"
                 onMouseEnter={(e) => e.target.style.color='#228B22'}
                 onMouseLeave={(e) => e.target.style.color='white'}
               >
-                About
-              </button>
-              <button
-                onClick={() => navigateToSection('services')}
-                className="text-white transition-colors duration-200 font-medium text-left"
-                onMouseEnter={(e) => e.target.style.color='#228B22'}
-                onMouseLeave={(e) => e.target.style.color='white'}
-              >
-                Services
+                Capabilities
               </button>
               <button
                 onClick={() => navigateToSection('portfolio')}
@@ -158,21 +139,21 @@ const Header = () => {
                 Portfolio
               </button>
               <button
-                onClick={() => navigateToSection('contact')}
+                onClick={() => navigateToSection('coverage')}
                 className="text-white transition-colors duration-200 font-medium text-left"
                 onMouseEnter={(e) => e.target.style.color='#228B22'}
                 onMouseLeave={(e) => e.target.style.color='white'}
               >
-                Contact
+                Coverage
               </button>
               <Button
-                onClick={() => navigateToSection('contact')}
+                onClick={() => navigateToSection('partner')}
                 className="text-white w-full"
                 style={{ backgroundColor: '#228B22' }}
                 onMouseEnter={(e) => e.target.style.backgroundColor='#1e7b1e'}
                 onMouseLeave={(e) => e.target.style.backgroundColor='#228B22'}
               >
-                Get a Quote
+                Partner With Us
               </Button>
             </nav>
           </div>
