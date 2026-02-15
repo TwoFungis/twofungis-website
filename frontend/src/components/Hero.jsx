@@ -43,7 +43,7 @@ const Hero = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button
               onClick={() => scrollToSection('contact')}
-              className="bg-red-600 hover:bg-red-700 text-white px-8 py-6 text-lg font-semibold transition-all duration-200 hover:scale-105"
+              className="bg-green-500 hover:bg-green-600 text-white px-8 py-6 text-lg font-semibold transition-all duration-200 hover:scale-105"
             >
               Request a Quote
               <ChevronRight className="ml-2" size={20} />
