@@ -126,37 +126,37 @@ const LocationPage = () => {
               
               <ul className="space-y-3 mb-8">
                 <li className="flex items-start">
-                  <CheckCircle2 className="text-red-600 mr-3 flex-shrink-0 mt-1" size={20} />
+                  <CheckCircle2 style={{ color: '#228B22' }} className="mr-3 flex-shrink-0 mt-1" size={20} />
                   <span className="text-gray-700" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                     <strong>Residential Interior Finishing:</strong> Custom millwork, trim installation, and finishing carpentry for homes
                   </span>
                 </li>
                 <li className="flex items-start">
-                  <CheckCircle2 className="text-red-600 mr-3 flex-shrink-0 mt-1" size={20} />
+                  <CheckCircle2 style={{ color: '#228B22' }} className="mr-3 flex-shrink-0 mt-1" size={20} />
                   <span className="text-gray-700" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                     <strong>Commercial Millwork:</strong> Professional-grade solutions for offices, retail spaces, and commercial buildings
                   </span>
                 </li>
                 <li className="flex items-start">
-                  <CheckCircle2 className="text-red-600 mr-3 flex-shrink-0 mt-1" size={20} />
+                  <CheckCircle2 style={{ color: '#228B22' }} className="mr-3 flex-shrink-0 mt-1" size={20} />
                   <span className="text-gray-700" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                     <strong>Multi-Unit Finishing:</strong> Expert management and installation for apartment buildings and condominiums
                   </span>
                 </li>
                 <li className="flex items-start">
-                  <CheckCircle2 className="text-red-600 mr-3 flex-shrink-0 mt-1" size={20} />
+                  <CheckCircle2 style={{ color: '#228B22' }} className="mr-3 flex-shrink-0 mt-1" size={20} />
                   <span className="text-gray-700" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                     <strong>Cabinet Installation:</strong> Precision cabinet installation for kitchens, bathrooms, and custom spaces
                   </span>
                 </li>
                 <li className="flex items-start">
-                  <CheckCircle2 className="text-red-600 mr-3 flex-shrink-0 mt-1" size={20} />
+                  <CheckCircle2 style={{ color: '#228B22' }} className="mr-3 flex-shrink-0 mt-1" size={20} />
                   <span className="text-gray-700" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                     <strong>Flooring Installation:</strong> Expert hardwood, laminate, and engineered flooring services
                   </span>
                 </li>
                 <li className="flex items-start">
-                  <CheckCircle2 className="text-red-600 mr-3 flex-shrink-0 mt-1" size={20} />
+                  <CheckCircle2 style={{ color: '#228B22' }} className="mr-3 flex-shrink-0 mt-1" size={20} />
                   <span className="text-gray-700" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                     <strong>High-Rise Projects:</strong> Specialized finishing for high-rise commercial and residential buildings
                   </span>
