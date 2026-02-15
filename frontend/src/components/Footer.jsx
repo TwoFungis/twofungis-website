@@ -30,19 +30,19 @@ const Footer = () => {
               <h3 className="text-xl font-bold mb-4" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>Quick Links</h3>
               <ul className="space-y-2" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                 <li>
-                  <a href="#home" className="text-gray-400 hover:text-green-500 transition-colors">Home</a>
+                  <a href="#home" className="text-gray-400 transition-colors" style={{ ':hover': { color: '#228B22' } }} onMouseEnter={(e) => e.target.style.color='#228B22'} onMouseLeave={(e) => e.target.style.color='#9ca3af'}>Home</a>
                 </li>
                 <li>
-                  <a href="#about" className="text-gray-400 hover:text-green-500 transition-colors">About Us</a>
+                  <a href="#about" className="text-gray-400 transition-colors" onMouseEnter={(e) => e.target.style.color='#228B22'} onMouseLeave={(e) => e.target.style.color='#9ca3af'}>About Us</a>
                 </li>
                 <li>
-                  <a href="#services" className="text-gray-400 hover:text-green-500 transition-colors">Services</a>
+                  <a href="#services" className="text-gray-400 transition-colors" onMouseEnter={(e) => e.target.style.color='#228B22'} onMouseLeave={(e) => e.target.style.color='#9ca3af'}>Services</a>
                 </li>
                 <li>
-                  <a href="#portfolio" className="text-gray-400 hover:text-green-500 transition-colors">Portfolio</a>
+                  <a href="#portfolio" className="text-gray-400 transition-colors" onMouseEnter={(e) => e.target.style.color='#228B22'} onMouseLeave={(e) => e.target.style.color='#9ca3af'}>Portfolio</a>
                 </li>
                 <li>
-                  <a href="#contact" className="text-gray-400 hover:text-green-500 transition-colors">Contact</a>
+                  <a href="#contact" className="text-gray-400 transition-colors" onMouseEnter={(e) => e.target.style.color='#228B22'} onMouseLeave={(e) => e.target.style.color='#9ca3af'}>Contact</a>
                 </li>
               </ul>
             </div>
