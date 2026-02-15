@@ -47,7 +47,7 @@ const ServiceAreas = () => {
                       <p className="text-gray-600 mb-4 text-sm" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                         {location.description.substring(0, 100)}...
                       </p>
-                      <div className="flex items-center text-red-600 font-semibold hover:text-red-700">
+                      <div className="flex items-center font-semibold" style={{ color: '#228B22' }}>
                         <span style={{ fontFamily: 'Open Sans, sans-serif' }}>Learn More</span>
                         <ArrowRight size={18} className="ml-2" />
                       </div>
