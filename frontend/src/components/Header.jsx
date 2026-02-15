@@ -200,13 +200,13 @@ const Header = () => {
             </div>
 
             <Button
-              onClick={() => navigateToSection('partner')}
+              onClick={() => navigateToSection('estimating')}
               className="text-white px-6 py-2 transition-colors duration-200"
               style={{ backgroundColor: '#228B22' }}
               onMouseEnter={(e) => e.target.style.backgroundColor='#1e7b1e'}
               onMouseLeave={(e) => e.target.style.backgroundColor='#228B22'}
             >
-              Partner With Us
+              Request Estimating
             </Button>
           </nav>
 
