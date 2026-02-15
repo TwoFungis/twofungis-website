@@ -11,26 +11,17 @@ const Hero = () => {
   };
 
   return (
-    <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Background Image */}
-      <div className="absolute inset-0">
-        <img
-          src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/iqx1ya1d_FotoFlexer_Photo.jpg"
-          alt="Two Fungis Background"
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-black/60"></div>
-      </div>
-
+    <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black">
       {/* Content */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
         <div className="max-w-4xl mx-auto">
-          {/* Logo Image Above Title */}
+          {/* Logo Image Above Title - 50% larger */}
           <div className="mb-8 flex justify-center">
             <img
               src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png"
               alt="Two Fungis Ltd"
-              className="h-48 md:h-56 w-auto drop-shadow-2xl"
+              className="h-72 md:h-84 w-auto drop-shadow-2xl"
+              style={{ height: 'clamp(18rem, 25vw, 21rem)' }}
             />
           </div>
           
@@ -43,7 +34,10 @@ const Hero = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button
               onClick={() => scrollToSection('contact')}
-              className="bg-green-500 hover:bg-green-600 text-white px-8 py-6 text-lg font-semibold transition-all duration-200 hover:scale-105"
+              className="text-white px-8 py-6 text-lg font-semibold transition-all duration-200 hover:scale-105"
+              style={{ backgroundColor: '#228B22', hover: { backgroundColor: '#1e7b1e' } }}
+              onMouseEnter={(e) => e.target.style.backgroundColor = '#1e7b1e'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = '#228B22'}
             >
               Request a Quote
               <ChevronRight className="ml-2" size={20} />
@@ -51,16 +45,19 @@ const Hero = () => {
             <Button
               onClick={() => scrollToSection('portfolio')}
               variant="outline"
-              className="border-2 border-green-500 text-white hover:bg-green-500 hover:text-black px-8 py-6 text-lg font-semibold transition-all duration-200"
+              className="text-white px-8 py-6 text-lg font-semibold transition-all duration-200"
+              style={{ borderColor: '#228B22', borderWidth: '2px' }}
+              onMouseEnter={(e) => { e.target.style.backgroundColor = '#228B22'; e.target.style.color = 'black'; }}
+              onMouseLeave={(e) => { e.target.style.backgroundColor = 'transparent'; e.target.style.color = 'white'; }}
             >
               View Our Work
             </Button>
           </div>
           
           {/* Trust Badge */}
-          <div className="mt-12 inline-flex items-center gap-2 bg-green-500/20 border border-green-500/50 px-6 py-3 rounded-full">
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-            <span className="text-green-400 font-medium">$5M Liability Insurance</span>
+          <div className="mt-12 inline-flex items-center gap-2 px-6 py-3 rounded-full" style={{ backgroundColor: 'rgba(34, 139, 34, 0.2)', borderColor: 'rgba(34, 139, 34, 0.5)', borderWidth: '1px', borderStyle: 'solid' }}>
+            <div className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: '#228B22' }}></div>
+            <span className="font-medium" style={{ color: '#32CD32' }}>$5M Liability Insurance</span>
           </div>
         </div>
       </div>
@@ -68,7 +65,7 @@ const Hero = () => {
       {/* Scroll Indicator */}
       <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
         <div className="w-6 h-10 border-2 border-white/30 rounded-full flex items-start justify-center p-2">
-          <div className="w-1 h-3 bg-green-500 rounded-full"></div>
+          <div className="w-1 h-3 rounded-full" style={{ backgroundColor: '#228B22' }}></div>
         </div>
       </div>
     </section>
