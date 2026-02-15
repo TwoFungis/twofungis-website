@@ -126,34 +126,74 @@ const Header = () => {
               </button>
               
               {isLocationsOpen && (
-                <div className="absolute top-full right-0 mt-2 bg-black/95 backdrop-blur-sm rounded-lg shadow-xl border border-gray-800 p-4 w-[480px]">
-                  <div className="grid grid-cols-2 gap-x-6 gap-y-3">
-                    {regionOrder.map((region) => (
-                      groupedLocations[region] && (
-                        <div key={region} className="mb-2">
-                          <h4 className="text-red-600 font-bold text-xs mb-1.5 uppercase tracking-wide" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
-                            {region}
-                          </h4>
-                          <div className="flex flex-wrap gap-x-3 gap-y-0.5">
-                            {groupedLocations[region].map((loc, idx) => (
-                              <React.Fragment key={loc.slug}>
-                                <Link
-                                  to={`/locations/${loc.slug}`}
-                                  className="text-gray-300 hover:text-white text-sm transition-colors"
-                                  onClick={() => setIsLocationsOpen(false)}
-                                  style={{ fontFamily: 'Open Sans, sans-serif' }}
-                                >
-                                  {loc.city}
-                                </Link>
-                                {idx < groupedLocations[region].length - 1 && (
-                                  <span className="text-gray-600">·</span>
-                                )}
-                              </React.Fragment>
+                <div className="absolute top-full right-0 mt-2 bg-black/95 backdrop-blur-sm rounded-lg shadow-xl border border-gray-800 py-3 w-[520px]">
+                  <div className="flex">
+                    {/* Column 1 */}
+                    <div className="flex-1 px-4 border-r border-gray-800">
+                      {['Okanagan Valley', 'Fraser Valley'].map((region) => (
+                        groupedLocations[region] && (
+                          <div key={region} className="mb-3">
+                            <h4 className="text-red-600 font-bold text-xs uppercase tracking-wide mb-1" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
+                              {region}
+                            </h4>
+                            {groupedLocations[region].map((loc) => (
+                              <Link
+                                key={loc.slug}
+                                to={`/locations/${loc.slug}`}
+                                className="block text-gray-300 hover:text-white text-sm py-0.5 transition-colors"
+                                onClick={() => setIsLocationsOpen(false)}
+                              >
+                                {loc.city}
+                              </Link>
                             ))}
                           </div>
-                        </div>
-                      )
-                    ))}
+                        )
+                      ))}
+                    </div>
+                    {/* Column 2 */}
+                    <div className="flex-1 px-4 border-r border-gray-800">
+                      {['Coastal BC', 'Thompson-Okanagan'].map((region) => (
+                        groupedLocations[region] && (
+                          <div key={region} className="mb-3">
+                            <h4 className="text-red-600 font-bold text-xs uppercase tracking-wide mb-1" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
+                              {region}
+                            </h4>
+                            {groupedLocations[region].map((loc) => (
+                              <Link
+                                key={loc.slug}
+                                to={`/locations/${loc.slug}`}
+                                className="block text-gray-300 hover:text-white text-sm py-0.5 transition-colors"
+                                onClick={() => setIsLocationsOpen(false)}
+                              >
+                                {loc.city}
+                              </Link>
+                            ))}
+                          </div>
+                        )
+                      ))}
+                    </div>
+                    {/* Column 3 */}
+                    <div className="flex-1 px-4">
+                      {['Vancouver Island', 'Thompson-Nicola'].map((region) => (
+                        groupedLocations[region] && (
+                          <div key={region} className="mb-3">
+                            <h4 className="text-red-600 font-bold text-xs uppercase tracking-wide mb-1" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
+                              {region}
+                            </h4>
+                            {groupedLocations[region].map((loc) => (
+                              <Link
+                                key={loc.slug}
+                                to={`/locations/${loc.slug}`}
+                                className="block text-gray-300 hover:text-white text-sm py-0.5 transition-colors"
+                                onClick={() => setIsLocationsOpen(false)}
+                              >
+                                {loc.city}
+                              </Link>
+                            ))}
+                          </div>
+                        )
+                      ))}
+                    </div>
                   </div>
                 </div>
               )}
@@ -210,19 +250,17 @@ const Header = () => {
                 {regionOrder.map((region) => (
                   groupedLocations[region] && (
                     <div key={region} className="mb-3">
-                      <p className="text-gray-400 text-xs font-semibold mb-1 uppercase">{region}</p>
-                      <div className="flex flex-wrap gap-2">
-                        {groupedLocations[region].map((loc) => (
-                          <Link
-                            key={loc.slug}
-                            to={`/locations/${loc.slug}`}
-                            className="text-gray-300 text-sm hover:text-white"
-                            onClick={() => setIsMobileMenuOpen(false)}
-                          >
-                            {loc.city}
-                          </Link>
-                        ))}
-                      </div>
+                      <p className="text-gray-500 text-xs font-semibold mb-1 uppercase">{region}</p>
+                      {groupedLocations[region].map((loc) => (
+                        <Link
+                          key={loc.slug}
+                          to={`/locations/${loc.slug}`}
+                          className="block text-gray-300 text-sm py-0.5 hover:text-white"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                          {loc.city}
+                        </Link>
+                      ))}
                     </div>
                   )
                 ))}
