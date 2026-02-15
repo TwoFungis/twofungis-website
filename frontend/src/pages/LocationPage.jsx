@@ -69,15 +69,15 @@ const LocationPage = () => {
 
             <div className="flex flex-wrap gap-3 justify-center mb-8 text-gray-400">
               <span className="flex items-center gap-2">
-                <CheckCircle2 size={20} className="text-green-500" />
+                <CheckCircle2 size={20} style={{ color: '#228B22' }} />
                 25+ Years Experience
               </span>
               <span className="flex items-center gap-2">
-                <CheckCircle2 size={20} className="text-green-500" />
+                <CheckCircle2 size={20} style={{ color: '#228B22' }} />
                 $5M Insured
               </span>
               <span className="flex items-center gap-2">
-                <CheckCircle2 size={20} className="text-green-500" />
+                <CheckCircle2 size={20} style={{ color: '#228B22' }} />
                 Local Experts
               </span>
             </div>
@@ -85,14 +85,20 @@ const LocationPage = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
                 onClick={() => scrollToSection('contact')}
-                className="bg-red-600 hover:bg-red-700 text-white px-8 py-6 text-lg font-semibold"
+                className="text-white px-8 py-6 text-lg font-semibold"
+                style={{ backgroundColor: '#228B22' }}
+                onMouseEnter={(e) => e.target.style.backgroundColor='#1e7b1e'}
+                onMouseLeave={(e) => e.target.style.backgroundColor='#228B22'}
               >
                 Get a Free Quote in {location.city}
               </Button>
               <Button
                 onClick={() => scrollToSection('portfolio')}
                 variant="outline"
-                className="border-2 border-white text-white hover:bg-white hover:text-black px-8 py-6 text-lg font-semibold"
+                className="text-white px-8 py-6 text-lg font-semibold"
+                style={{ borderColor: '#228B22', borderWidth: '2px' }}
+                onMouseEnter={(e) => { e.target.style.backgroundColor = '#228B22'; e.target.style.color = 'black'; }}
+                onMouseLeave={(e) => { e.target.style.backgroundColor = 'transparent'; e.target.style.color = 'white'; }}
               >
                 View Our Work
               </Button>
