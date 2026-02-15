@@ -31,7 +31,7 @@ const WhyChooseUs = () => {
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="text-center mb-16">
-            <h2 className="text-4xl sm:text-5xl font-bold text-white mb-4" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
+            <h2 className="text-4xl sm:text-5xl font-bold text-black mb-4" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
               Why Choose <span className="text-red-600">Two Fungis Ltd</span>
             </h2>
             <div className="w-24 h-1 bg-red-600 mx-auto mb-6"></div>
@@ -46,10 +46,10 @@ const WhyChooseUs = () => {
                   <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 hover:scale-110 transition-transform duration-300" style={{ backgroundColor: '#228B22' }}>
                     <IconComponent className="text-white" size={36} />
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-3" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
+                  <h3 className="text-xl font-bold text-black mb-3" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
                     {reason.title}
                   </h3>
-                  <p className="text-gray-400" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+                  <p className="text-gray-600" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                     {reason.description}
                   </p>
                 </div>
@@ -58,7 +58,7 @@ const WhyChooseUs = () => {
           </div>
 
           {/* Stats Section */}
-          <div className="bg-black rounded-xl p-12 border border-red-600/30">
+          <div className="bg-black rounded-xl p-12">
             <div className="grid sm:grid-cols-3 gap-8 text-center">
               <div>
                 <p className="text-5xl font-bold mb-2" style={{ fontFamily: 'Bebas Neue, sans-serif', color: '#228B22' }}>25+</p>
