@@ -43,7 +43,7 @@ const WhyChooseUs = () => {
               const IconComponent = reason.icon;
               return (
                 <div key={index} className="text-center">
-                  <div className="bg-green-500 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 hover:scale-110 transition-transform duration-300">
+                  <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 hover:scale-110 transition-transform duration-300" style={{ backgroundColor: '#228B22' }}>
                     <IconComponent className="text-white" size={36} />
                   </div>
                   <h3 className="text-xl font-bold text-black mb-3" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
