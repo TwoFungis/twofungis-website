@@ -100,7 +100,7 @@ const Portfolio = () => {
       category: 'Residential'
     },
     {
-      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/hc3jy69c_ChatGPT%20Image%20Feb%2014%2C%202026%2C%2007_40_22%20PM.png',
+      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png',
       title: 'Two Fungis Ltd - Premium Craftsmanship',
       category: 'Our Brand'
     }
