@@ -52,7 +52,8 @@ const LocationPage = () => {
               <img
                 src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png"
                 alt="Two Fungis Ltd"
-                className="h-32 md:h-40 w-auto drop-shadow-2xl"
+                className="h-72 md:h-84 w-auto drop-shadow-2xl"
+                style={{ height: 'clamp(18rem, 25vw, 21rem)' }}
               />
             </div>
             
