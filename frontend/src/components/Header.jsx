@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { Button } from './ui/button';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -14,11 +17,25 @@ const Header = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const scrollToSection = (id) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-      setIsMobileMenuOpen(false);
+  const navigateToSection = (id) => {
+    setIsMobileMenuOpen(false);
+    
+    // Check if we're on the homepage
+    if (location.pathname === '/') {
+      // We're on homepage, just scroll to the section
+      const element = document.getElementById(id);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      } else if (id === 'home') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    } else {
+      // We're on a different page, navigate to homepage with hash
+      if (id === 'home') {
+        navigate('/');
+      } else {
+        navigate(`/#${id}`);
+      }
     }
   };
 
