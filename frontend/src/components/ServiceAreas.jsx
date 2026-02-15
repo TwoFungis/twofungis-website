@@ -40,7 +40,7 @@ const ServiceAreas = () => {
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {regionLocations.map((location) => (
                   <Link key={location.slug} to={`/locations/${location.slug}`}>
-                    <Card className="p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-gray-900 border-l-4 border-red-600 h-full">
+                    <Card className="p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-black border-l-4 border-red-600 h-full">
                       <h4 className="text-2xl font-bold text-white mb-3" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
                         {location.city}
                       </h4>
