@@ -12,7 +12,8 @@ const SignUpPage = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
-  const { signUp, loading } = useAuthStore();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { signUp } = useAuthStore();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -29,11 +30,20 @@ const SignUpPage = () => {
       return;
     }
 
-    const { error } = await signUp(email, password);
-    if (error) {
-      setError(error.message);
-    } else {
-      setSuccess(true);
+    setIsSubmitting(true);
+    
+    try {
+      const result = await signUp(email, password);
+      if (result?.error) {
+        setError(result.error.message || 'Failed to create account');
+      } else {
+        setSuccess(true);
+      }
+    } catch (err) {
+      console.error('Signup error:', err);
+      setError(err.message || 'An unexpected error occurred');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -133,11 +143,11 @@ const SignUpPage = () => {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={isSubmitting}
               className="w-full bg-steel-500 hover:bg-steel-600 disabled:opacity-50 disabled:cursor-not-allowed text-white py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
               data-testid="signup-submit-btn"
             >
-              {loading ? (
+              {isSubmitting ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
                 <>
