@@ -150,6 +150,31 @@ The simplified schema was applied via `/app/APPLY_THIS_SCHEMA.sql` (consolidated
   - Milestones tab ✅
   - Tab navigation ✅
   - Client review page route ✅
+  - Signup → Onboarding → Dashboard flow ✅ VERIFIED
+  - Database schema applied and working ✅
+
+---
+
+## P1 Upcoming Tasks
+
+1. **Implement "Live Demo" Mode** - Allow prospective users to explore the app with mock data without signup
+2. **Make ROI Calculator Interactive** - Add input fields so users can enter their own project values
+3. **Add actual demo video** - Record or embed a 2-min product walkthrough
+
+## P2 Future Tasks (Per Marketplace Vision)
+
+### Phase 3: Customer & Marketplace Foundation
+- Customer-facing accounts and project views
+- Job posting and bidding system for contractors
+
+### Phase 4: AI Visualization & Advanced Features
+- AI-powered "See your renovation" tool (Gemini Nano Banana)
+- Advanced analytics and reporting
+
+### Phase 5: Additional Enhancements
+- Mobile PWA Support
+- Contractor verification system
+- Payment escrow for milestones
 
 ---
 
