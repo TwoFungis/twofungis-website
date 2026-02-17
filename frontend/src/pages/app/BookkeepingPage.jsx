@@ -489,7 +489,10 @@ const BookkeepingPage = () => {
               <h3 className="text-lg font-semibold text-white mb-1">Tax Summary - {selectedYear}</h3>
               <p className="text-gray-400 text-sm">Ready for your accountant</p>
             </div>
-            <button className="bg-steel-500 hover:bg-steel-600 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2">
+            <button 
+              onClick={handleExportPDF}
+              className="bg-steel-500 hover:bg-steel-600 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+            >
               <Download className="w-4 h-4" />
               Download Report
             </button>
