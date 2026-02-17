@@ -143,7 +143,7 @@ POST /api/webhook/stripe              - Stripe webhook handler
 
 ### Frontend (.env)
 ```
-REACT_APP_BACKEND_URL=https://trade-build.preview.emergentagent.com
+REACT_APP_BACKEND_URL=https://contractor-app-demo.preview.emergentagent.com
 REACT_APP_SUPABASE_URL=https://ubhdmytfuzbabtnegxrd.supabase.co
 REACT_APP_SUPABASE_ANON_KEY=[configured]
 ```
