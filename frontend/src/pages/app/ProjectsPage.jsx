@@ -75,6 +75,15 @@ const ProjectsPage = () => {
     setError(null);
     
     try {
+      // Ensure we have a valid session before saving
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        const { error: refreshError } = await supabase.auth.refreshSession();
+        if (refreshError) {
+          throw new Error('Session expired. Please refresh the page and try again.');
+        }
+      }
+
       const { error: insertError } = await supabase.from('projects').insert({
         user_id: user.id,
         name: formData.name,
@@ -92,6 +101,8 @@ const ProjectsPage = () => {
       if (insertError) {
         if (insertError.code === '42P01') {
           setError('Database tables not yet created. Please run the SQL schema in Supabase.');
+        } else if (insertError.message?.includes('JWT') || insertError.code === 'PGRST301') {
+          throw new Error('Session expired. Please refresh the page and try again.');
         } else {
           throw insertError;
         }
@@ -102,7 +113,10 @@ const ProjectsPage = () => {
       }
     } catch (err) {
       console.error('Error creating project:', err);
-      setError('Failed to create project: ' + (err.message || ''));
+      const errorMessage = err.name === 'AbortError'
+        ? 'Request was interrupted. Please try again.'
+        : err.message || 'Failed to create project';
+      setError('Failed to create project: ' + errorMessage);
     }
   };
 
