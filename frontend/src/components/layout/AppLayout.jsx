@@ -81,6 +81,20 @@ const AppLayout = () => {
         </nav>
 
         <div className="p-4 border-t border-charcoal-700">
+          <NavLink
+            to="/app/profile"
+            className={({ isActive }) =>
+              `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors mb-2 ${
+                isActive
+                  ? 'bg-steel-500/20 text-steel-400'
+                  : 'text-gray-400 hover:text-white hover:bg-charcoal-700'
+              }`
+            }
+            data-testid="nav-profile"
+          >
+            <User className="w-5 h-5" />
+            <span className="font-medium">My Profile</span>
+          </NavLink>
           <div className="bg-charcoal-700 rounded-lg p-4 mb-4">
             <p className="text-sm text-gray-400 truncate">{profile?.company_name || 'My Company'}</p>
             <p className="text-xs text-gray-500 capitalize">{profile?.subscription_tier || 'Pro'} Plan</p>
