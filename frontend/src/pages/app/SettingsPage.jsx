@@ -1,16 +1,134 @@
-import React from 'react';
-import { Settings as SettingsIcon, User, CreditCard, Bell, Shield, Building2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { Settings as SettingsIcon, User, CreditCard, Bell, Shield, Check, Loader2, Crown } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 
+const API_URL = process.env.REACT_APP_BACKEND_URL;
+
 const SettingsPage = () => {
-  const { profile, user } = useAuthStore();
+  const { profile, user, updateProfile } = useAuthStore();
+  const [searchParams] = useSearchParams();
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [paymentMessage, setPaymentMessage] = useState(null);
+  const [isUpgrading, setIsUpgrading] = useState(false);
+
+  // Check for payment return from Stripe
+  useEffect(() => {
+    const sessionId = searchParams.get('session_id');
+    const paymentStatus = searchParams.get('payment');
+    
+    if (sessionId && paymentStatus === 'success') {
+      pollPaymentStatus(sessionId);
+    } else if (paymentStatus === 'cancelled') {
+      setPaymentMessage({ type: 'warning', text: 'Payment was cancelled. You can try again anytime.' });
+    }
+  }, [searchParams]);
+
+  const pollPaymentStatus = async (sessionId, attempts = 0) => {
+    const maxAttempts = 5;
+    const pollInterval = 2000;
+
+    if (attempts >= maxAttempts) {
+      setPaymentMessage({ type: 'warning', text: 'Payment verification timed out. Please check your email for confirmation.' });
+      setIsProcessingPayment(false);
+      return;
+    }
+
+    setIsProcessingPayment(true);
+
+    try {
+      const response = await fetch(`${API_URL}/api/subscription/status/${sessionId}`);
+      if (!response.ok) throw new Error('Failed to check payment status');
+      
+      const data = await response.json();
+      
+      if (data.payment_status === 'paid') {
+        setPaymentMessage({ type: 'success', text: `Payment successful! You are now on the ${data.plan_type?.toUpperCase()} plan.` });
+        setIsProcessingPayment(false);
+        // Update local profile state
+        if (updateProfile && data.plan_type) {
+          await updateProfile({ subscription_tier: data.plan_type });
+        }
+        // Clear URL params
+        window.history.replaceState({}, '', '/app/settings');
+        return;
+      } else if (data.status === 'expired') {
+        setPaymentMessage({ type: 'error', text: 'Payment session expired. Please try again.' });
+        setIsProcessingPayment(false);
+        return;
+      }
+      
+      // Continue polling
+      setTimeout(() => pollPaymentStatus(sessionId, attempts + 1), pollInterval);
+    } catch (error) {
+      console.error('Error checking payment status:', error);
+      setPaymentMessage({ type: 'error', text: 'Error checking payment status. Please contact support.' });
+      setIsProcessingPayment(false);
+    }
+  };
+
+  const handleUpgrade = async (planType) => {
+    setIsUpgrading(true);
+    setPaymentMessage(null);
+
+    try {
+      const response = await fetch(`${API_URL}/api/subscription/checkout`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          plan_type: planType,
+          origin_url: window.location.origin,
+          user_id: user?.id,
+          email: user?.email
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Failed to create checkout session');
+      }
+
+      const data = await response.json();
+      
+      // Redirect to Stripe Checkout
+      if (data.checkout_url) {
+        window.location.href = data.checkout_url;
+      } else {
+        throw new Error('No checkout URL received');
+      }
+    } catch (error) {
+      console.error('Error initiating payment:', error);
+      setPaymentMessage({ type: 'error', text: error.message });
+      setIsUpgrading(false);
+    }
+  };
+
+  const currentPlan = profile?.subscription_tier || 'trial';
 
   return (
     <div className="space-y-6" data-testid="settings-page">
       <div>
         <h1 className="text-2xl lg:text-3xl font-bold text-white">Settings</h1>
-        <p className="text-gray-400">Manage your account and preferences</p>
+        <p className="text-gray-400">Manage your account and subscription</p>
       </div>
+
+      {/* Payment Status Messages */}
+      {paymentMessage && (
+        <div className={`p-4 rounded-lg ${
+          paymentMessage.type === 'success' ? 'bg-success/20 border border-success/50 text-success' :
+          paymentMessage.type === 'error' ? 'bg-risk/20 border border-risk/50 text-risk' :
+          'bg-warning/20 border border-warning/50 text-warning'
+        }`}>
+          {paymentMessage.text}
+        </div>
+      )}
+
+      {isProcessingPayment && (
+        <div className="flex items-center gap-3 p-4 bg-steel-500/20 border border-steel-500/50 rounded-lg text-steel-400">
+          <Loader2 className="w-5 h-5 animate-spin" />
+          <span>Verifying your payment...</span>
+        </div>
+      )}
 
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Profile Section */}
@@ -57,26 +175,95 @@ const SettingsPage = () => {
             </div>
           </div>
 
+          {/* Subscription Section */}
           <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6">
             <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-6">
               <CreditCard className="w-5 h-5 text-steel-400" />
               Subscription & Billing
             </h2>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-charcoal-700 rounded-lg">
-                <div>
-                  <p className="text-white font-medium capitalize">{profile?.subscription_tier || 'Pro'} Plan</p>
-                  <p className="text-gray-400 text-sm">
-                    {profile?.subscription_tier === 'elite' ? '$59/month' : '$39/month'}
-                  </p>
-                </div>
-                <button className="bg-steel-500 hover:bg-steel-600 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
-                  {profile?.subscription_tier === 'elite' ? 'Manage' : 'Upgrade'}
-                </button>
+            
+            {/* Current Plan */}
+            <div className="mb-6">
+              <p className="text-gray-400 text-sm mb-2">Current Plan</p>
+              <div className="flex items-center gap-3">
+                <span className={`text-xl font-bold capitalize ${
+                  currentPlan === 'elite' ? 'text-steel-400' : 
+                  currentPlan === 'pro' ? 'text-success' : 'text-warning'
+                }`}>
+                  {currentPlan}
+                </span>
+                {currentPlan === 'elite' && <Crown className="w-5 h-5 text-warning" />}
               </div>
-              <button className="text-gray-400 hover:text-white text-sm transition-colors">
-                View billing history
-              </button>
+            </div>
+
+            {/* Plan Cards */}
+            <div className="grid md:grid-cols-2 gap-4">
+              {/* Pro Plan */}
+              <div className={`rounded-xl p-6 border ${
+                currentPlan === 'pro' ? 'bg-success/10 border-success/50' : 'bg-charcoal-700 border-charcoal-600'
+              }`}>
+                <h3 className="text-lg font-bold text-white mb-1">Pro</h3>
+                <p className="text-2xl font-bold text-white mb-4">$39<span className="text-sm text-gray-400">/mo</span></p>
+                <ul className="space-y-2 mb-4 text-sm">
+                  {['Unlimited Projects', 'Quote Builder + PDF', 'Change Order Manager', 'Labor Cost Engine', 'Production Logs'].map((f, i) => (
+                    <li key={i} className="flex items-center gap-2 text-gray-300">
+                      <Check className="w-4 h-4 text-success" />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                {currentPlan === 'pro' ? (
+                  <span className="block w-full text-center py-2 rounded-lg bg-success/20 text-success font-medium">
+                    Current Plan
+                  </span>
+                ) : currentPlan === 'elite' ? (
+                  <span className="block w-full text-center py-2 rounded-lg bg-charcoal-600 text-gray-400 font-medium">
+                    Downgrade not available
+                  </span>
+                ) : (
+                  <button
+                    onClick={() => handleUpgrade('pro')}
+                    disabled={isUpgrading}
+                    className="w-full bg-steel-500 hover:bg-steel-600 disabled:opacity-50 text-white py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+                    data-testid="upgrade-pro-btn"
+                  >
+                    {isUpgrading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Upgrade to Pro'}
+                  </button>
+                )}
+              </div>
+
+              {/* Elite Plan */}
+              <div className={`rounded-xl p-6 border-2 ${
+                currentPlan === 'elite' ? 'bg-steel-500/10 border-steel-500' : 'bg-charcoal-700 border-steel-500/50'
+              }`}>
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="text-lg font-bold text-white">Elite</h3>
+                  <Crown className="w-4 h-4 text-warning" />
+                </div>
+                <p className="text-2xl font-bold text-white mb-4">$59<span className="text-sm text-gray-400">/mo</span></p>
+                <ul className="space-y-2 mb-4 text-sm">
+                  {['Everything in Pro', 'Advanced Reports & KPIs', 'Production Analytics', 'Priority Support', 'Early Feature Access'].map((f, i) => (
+                    <li key={i} className="flex items-center gap-2 text-gray-300">
+                      <Check className="w-4 h-4 text-steel-400" />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                {currentPlan === 'elite' ? (
+                  <span className="block w-full text-center py-2 rounded-lg bg-steel-500/20 text-steel-400 font-medium">
+                    Current Plan
+                  </span>
+                ) : (
+                  <button
+                    onClick={() => handleUpgrade('elite')}
+                    disabled={isUpgrading}
+                    className="w-full bg-steel-500 hover:bg-steel-600 disabled:opacity-50 text-white py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+                    data-testid="upgrade-elite-btn"
+                  >
+                    {isUpgrading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Upgrade to Elite'}
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
