@@ -43,7 +43,7 @@ const customSignIn = async (email, password) => {
     if (response.data.access_token && response.data.refresh_token) {
       try {
         // Manually store tokens in localStorage for Supabase to pick up
-        setSessionTokens(response.data.access_token, response.data.refresh_token);
+        setSessionTokens(response.data.access_token, response.data.refresh_token, response.data.user);
         
         // Also try to set session directly (with timeout)
         const setSessionPromise = supabase.auth.setSession({
