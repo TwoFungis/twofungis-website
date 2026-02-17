@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './store/authStore';
 
@@ -54,9 +54,12 @@ const ProtectedRoute = ({ children, eliteOnly = false }) => {
 
 function App() {
   const { initialize, initialized } = useAuthStore();
+  const initRef = useRef(false);
 
   useEffect(() => {
-    if (!initialized) {
+    // Prevent double initialization in React StrictMode
+    if (!initRef.current && !initialized) {
+      initRef.current = true;
       initialize();
     }
   }, [initialize, initialized]);
