@@ -34,6 +34,7 @@ const AppLayout = () => {
     { path: '/app/labor', icon: Users, label: 'Labor' },
     { path: '/app/change-orders', icon: FileText, label: 'Change Orders' },
     { path: '/app/production', icon: ClipboardList, label: 'Production' },
+    { path: '/app/bookkeeping', icon: Receipt, label: 'Bookkeeping' },
     { path: '/app/reports', icon: BarChart3, label: 'Reports', elite: true },
     { path: '/app/settings', icon: Settings, label: 'Settings' },
   ];
