@@ -184,17 +184,18 @@ export const useAuthStore = create((set, get) => ({
         return { error: { message: errorMsg } };
       }
       
-      // Set the session if we got tokens back
+      // Set the session if we got tokens back - MUST await this
       if (response.data.access_token && response.data.refresh_token) {
-        // Set the session without awaiting to avoid blocking
-        supabase.auth.setSession({
-          access_token: response.data.access_token,
-          refresh_token: response.data.refresh_token,
-        }).then(() => {
-          console.log('Session set successfully');
-        }).catch(err => {
-          console.error('Error setting session:', err);
-        });
+        try {
+          await supabase.auth.setSession({
+            access_token: response.data.access_token,
+            refresh_token: response.data.refresh_token,
+          });
+          console.log('Signup session set successfully');
+        } catch (err) {
+          console.error('Error setting signup session:', err);
+          // Continue anyway - the session data is valid
+        }
         
         // Return with user data from response
         set({ loading: false });
