@@ -166,68 +166,50 @@ export const useAuthStore = create((set, get) => ({
 
   signUp: async (email, password) => {
     set({ loading: true });
-    const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
-    const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
     
     try {
-      // Use XMLHttpRequest to avoid body stream issues
-      const response = await new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', `${supabaseUrl}/auth/v1/signup`);
-        xhr.setRequestHeader('apikey', supabaseAnonKey);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        
-        xhr.onload = () => {
-          try {
-            const data = JSON.parse(xhr.responseText);
-            resolve({ status: xhr.status, ok: xhr.status >= 200 && xhr.status < 300, data });
-          } catch (e) {
-            reject(new Error('Failed to parse response'));
-          }
-        };
-        
-        xhr.onerror = () => reject(new Error('Network error'));
-        xhr.send(JSON.stringify({ email: email.trim().toLowerCase(), password }));
+      // Use the Supabase SDK directly for signup
+      const { data, error } = await supabase.auth.signUp({
+        email: email.trim().toLowerCase(),
+        password
       });
       
-      if (!response.ok) {
-        set({ loading: false });
-        const errorMsg = response.data.msg || response.data.error_description || 'Signup failed';
-        return { error: { message: errorMsg } };
-      }
-      
-      // Set the session if we got tokens back
-      if (response.data.access_token && response.data.refresh_token) {
-        try {
-          // Manually store tokens in localStorage for Supabase to pick up
-          setSessionTokens(response.data.access_token, response.data.refresh_token, response.data.user);
-          
-          // Also try to set session directly (with timeout)
-          const setSessionPromise = supabase.auth.setSession({
-            access_token: response.data.access_token,
-            refresh_token: response.data.refresh_token,
+      if (error) {
+        // Handle body stream error - still might have worked
+        if (error.message.includes('body stream')) {
+          console.warn('Body stream error during signup, checking if user was created...');
+          // Try to sign in instead
+          const signInResult = await supabase.auth.signInWithPassword({
+            email: email.trim().toLowerCase(),
+            password
           });
-          
-          const timeoutPromise = new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Session set timeout')), 3000)
-          );
-          
-          await Promise.race([setSessionPromise, timeoutPromise]).catch(err => {
-            console.warn('Session set warning:', err.message);
-          });
-          
-          console.log('Signup session set successfully');
-        } catch (err) {
-          console.warn('Error setting signup session:', err);
+          if (!signInResult.error && signInResult.data?.user) {
+            set({ user: signInResult.data.user, loading: false });
+            return { error: null, data: signInResult.data };
+          }
         }
-        
-        // Return with user data from response
-        set({ user: response.data.user, loading: false });
-        return { error: null, data: { user: response.data.user, session: response.data } };
+        set({ loading: false });
+        return { error };
       }
       
+      if (data?.user) {
+        set({ user: data.user, loading: false });
+      } else {
+        set({ loading: false });
+      }
+      
+      return { error: null, data };
+    } catch (err) {
+      console.error('SignUp error:', err);
+      // Handle body stream error in catch
+      if (err.message && err.message.includes('body stream')) {
+        set({ loading: false });
+        return { error: { message: 'Account may have been created. Please try signing in.' } };
+      }
       set({ loading: false });
-      return { error: null, data: response.data };
+      return { error: { message: err.message || 'Signup failed' } };
+    }
+  },
     } catch (err) {
       console.error('SignUp error:', err);
       set({ loading: false });
