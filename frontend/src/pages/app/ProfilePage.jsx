@@ -4,7 +4,7 @@ import ContractorProfile from '../../components/profile/ContractorProfile';
 import { useAuthStore } from '../../store/authStore';
 
 const ProfilePage = () => {
-  const { profile } = useAuthStore();
+  const { profile, user } = useAuthStore();
   const [activeTab, setActiveTab] = useState('profile');
 
   return (
