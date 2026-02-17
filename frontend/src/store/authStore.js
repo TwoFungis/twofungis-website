@@ -209,12 +209,18 @@ export const useAuthStore = create((set, get) => ({
         .single();
 
       if (error && error.code !== 'PGRST116') {
-        console.error('Error fetching profile:', error);
+        // Ignore "body stream already read" errors during fetch
+        if (!error.message?.includes('body stream')) {
+          console.error('Error fetching profile:', error);
+        }
       }
 
       set({ profile: data || null });
     } catch (err) {
-      console.error('FetchProfile error:', err);
+      // Ignore body stream errors
+      if (!err.message?.includes('body stream')) {
+        console.error('FetchProfile error:', err);
+      }
       set({ profile: null });
     }
   },
