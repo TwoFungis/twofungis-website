@@ -405,7 +405,7 @@ const EstimatingPage = () => {
       {isModalOpen && (
         <>
           <div className="fixed inset-0 bg-black/50 z-40" onClick={() => setIsModalOpen(false)} />
-          <div className="fixed inset-4 lg:inset-y-4 lg:left-1/2 lg:-translate-x-1/2 lg:w-full lg:max-w-4xl bg-charcoal-800 rounded-2xl border border-charcoal-700 z-50 flex flex-col overflow-hidden">
+          <div className="fixed inset-4 lg:inset-y-4 lg:left-1/2 lg:-translate-x-1/2 lg:w-full lg:max-w-4xl bg-charcoal-800 rounded-2xl border border-charcoal-700 z-50 flex flex-col overflow-hidden" data-testid="quote-builder-modal">
             {/* Modal Header */}
             <div className="flex items-center justify-between p-4 lg:p-6 border-b border-charcoal-700">
               <h2 className="text-xl font-bold text-white">New Quote</h2>
@@ -470,6 +470,7 @@ const EstimatingPage = () => {
                     type="button"
                     onClick={addLine}
                     className="text-steel-400 hover:text-steel-300 text-sm flex items-center gap-1"
+                    data-testid="add-line-btn"
                   >
                     <Plus className="w-4 h-4" />
                     Add Line
@@ -587,6 +588,7 @@ const EstimatingPage = () => {
                 type="button"
                 onClick={generatePDF}
                 className="flex-1 bg-charcoal-600 hover:bg-charcoal-500 text-white py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+                data-testid="export-pdf-btn"
               >
                 <Download className="w-5 h-5" />
                 Export PDF
@@ -596,6 +598,7 @@ const EstimatingPage = () => {
                 onClick={handleSaveQuote}
                 disabled={isSaving || !quoteForm.quote_name}
                 className="flex-1 bg-steel-500 hover:bg-steel-600 disabled:opacity-50 text-white py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+                data-testid="save-quote-btn"
               >
                 {isSaving ? (
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
