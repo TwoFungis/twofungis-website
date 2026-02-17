@@ -211,11 +211,12 @@ export const useAuthStore = create((set, get) => ({
 
   signInWithMagicLink: async (email) => {
     set({ loading: true });
+    const redirectUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
     try {
       const { error } = await supabase.auth.signInWithOtp({ 
         email,
         options: {
-          emailRedirectTo: `${window.location.origin}/app/dashboard`
+          emailRedirectTo: `${redirectUrl}/app/dashboard`
         }
       });
       set({ loading: false });
