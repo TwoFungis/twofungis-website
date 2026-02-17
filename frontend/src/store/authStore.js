@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { supabase } from '../lib/supabase';
+import { supabase, setSessionTokens } from '../lib/supabase';
 
 // Prevent duplicate initialization in React StrictMode
 let isInitializing = false;
