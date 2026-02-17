@@ -14,7 +14,8 @@ import {
   Menu,
   X,
   FileSpreadsheet,
-  Crown
+  Crown,
+  User
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { Logo, LogoIcon } from '../ui/Logo';
