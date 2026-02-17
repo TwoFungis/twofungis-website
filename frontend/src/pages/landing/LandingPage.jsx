@@ -379,7 +379,7 @@ const LandingPage = () => {
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${IMAGES.cta})` }}
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-charcoal-900 via-charcoal-900/95 to-charcoal-900"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-charcoal-900/85 via-charcoal-900/80 to-charcoal-900/85"></div>
         </div>
         
         <div className="relative max-w-4xl mx-auto text-center">
