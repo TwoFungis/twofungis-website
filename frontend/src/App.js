@@ -74,6 +74,7 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/terms" element={<TermsPage />} />
+        <Route path="/client/review/:token" element={<ClientReviewPage />} />
         
         {/* Auth Routes */}
         <Route path="/login" element={<LoginPage />} />
