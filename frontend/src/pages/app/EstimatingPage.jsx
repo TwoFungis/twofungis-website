@@ -391,9 +391,22 @@ const EstimatingPage = () => {
                   <h3 className="text-lg font-semibold text-white">{quote.quote_name}</h3>
                   <p className="text-gray-400 text-sm">{quote.client_gc || 'No client'}</p>
                 </div>
-                <div className="text-right">
+                <div className="text-right flex flex-col items-end gap-2">
                   <p className="text-xl font-bold text-white">{formatCurrency(quote.total)}</p>
                   <p className="text-gray-500 text-sm">{new Date(quote.created_at).toLocaleDateString()}</p>
+                  <button
+                    onClick={() => downloadQuotePDF(quote, {
+                      company_name: profile?.company_name || 'TradeOS',
+                      phone: profile?.phone || '',
+                      email: user?.email || '',
+                      address: profile?.region || ''
+                    })}
+                    className="mt-2 flex items-center gap-1 text-steel-400 hover:text-steel-300 text-sm font-medium transition-colors"
+                    data-testid={`download-quote-${quote.id}`}
+                  >
+                    <Download className="w-4 h-4" />
+                    Download PDF
+                  </button>
                 </div>
               </div>
             </div>
