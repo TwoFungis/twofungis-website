@@ -27,6 +27,7 @@ import ProductionPage from './pages/app/ProductionPage';
 import ReportsPage from './pages/app/ReportsPage';
 import SettingsPage from './pages/app/SettingsPage';
 import ProfilePage from './pages/app/ProfilePage';
+import BookkeepingPage from './pages/app/BookkeepingPage';
 
 // Layout
 import AppLayout from './components/layout/AppLayout';
