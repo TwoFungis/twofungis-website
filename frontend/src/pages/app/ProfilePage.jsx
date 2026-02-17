@@ -69,8 +69,8 @@ const ProfilePage = () => {
             {/* Account Type */}
             <div>
               <label className="block text-sm font-medium text-gray-400 mb-2">Account Type</label>
-              <span className="inline-flex items-center px-3 py-1 bg-steel-500/20 text-steel-400 rounded-full text-sm">
-                {profile?.user_role === 'contractor' ? 'Contractor' : 'Customer'}
+              <span className="inline-flex items-center px-3 py-1 bg-steel-500/20 text-steel-400 rounded-full text-sm capitalize">
+                {profile?.user_role || 'Contractor'}
               </span>
             </div>
 
