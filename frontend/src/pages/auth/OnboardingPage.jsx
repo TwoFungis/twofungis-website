@@ -74,18 +74,26 @@ const OnboardingPage = () => {
     }
     
     setIsSubmitting(true);
+    setError('');
+    
     try {
       const result = await updateProfile({
         ...formData,
         onboarding_completed: true
       });
       if (result?.error) {
-        setError(result.error.message || 'Failed to save profile');
+        // More user-friendly error handling
+        if (result.error.message?.includes('Session expired') || result.error.message?.includes('authenticated')) {
+          setError('Your session has expired. Please refresh the page and try again.');
+        } else {
+          setError(result.error.message || 'Failed to save profile');
+        }
       } else {
         navigate('/app/dashboard');
       }
     } catch (err) {
-      setError(err.message || 'Something went wrong');
+      console.error('Onboarding error:', err);
+      setError(err.message || 'Something went wrong. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
