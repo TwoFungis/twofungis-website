@@ -390,8 +390,57 @@ const ProjectDetailPage = () => {
         </div>
       </div>
 
-      {/* Two Column Layout */}
-      <div className="grid lg:grid-cols-2 gap-6">
+      {/* Tab Navigation */}
+      <div className="flex gap-1 bg-charcoal-800 p-1 rounded-xl border border-charcoal-700">
+        <button
+          onClick={() => setActiveTab('overview')}
+          className={`flex-1 py-2.5 px-4 rounded-lg font-medium text-sm transition-colors flex items-center justify-center gap-2 ${
+            activeTab === 'overview' 
+              ? 'bg-steel-500 text-white' 
+              : 'text-gray-400 hover:text-white hover:bg-charcoal-700'
+          }`}
+          data-testid="tab-overview"
+        >
+          <ClipboardList className="w-4 h-4" />
+          Overview
+        </button>
+        <button
+          onClick={() => setActiveTab('milestones')}
+          className={`flex-1 py-2.5 px-4 rounded-lg font-medium text-sm transition-colors flex items-center justify-center gap-2 ${
+            activeTab === 'milestones' 
+              ? 'bg-steel-500 text-white' 
+              : 'text-gray-400 hover:text-white hover:bg-charcoal-700'
+          }`}
+          data-testid="tab-milestones"
+        >
+          <Target className="w-4 h-4" />
+          Milestones
+        </button>
+        <button
+          onClick={() => setActiveTab('activity')}
+          className={`flex-1 py-2.5 px-4 rounded-lg font-medium text-sm transition-colors flex items-center justify-center gap-2 ${
+            activeTab === 'activity' 
+              ? 'bg-steel-500 text-white' 
+              : 'text-gray-400 hover:text-white hover:bg-charcoal-700'
+          }`}
+          data-testid="tab-activity"
+        >
+          <Activity className="w-4 h-4" />
+          Activity
+        </button>
+      </div>
+
+      {/* Tab Content */}
+      {activeTab === 'milestones' && (
+        <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6">
+          <ProjectMilestones project={project} onMilestoneChange={fetchProject} />
+        </div>
+      )}
+
+      {activeTab === 'overview' && (
+        <>
+          {/* Two Column Layout */}
+          <div className="grid lg:grid-cols-2 gap-6">
         {/* Change Orders */}
         <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6">
           <div className="flex items-center justify-between mb-4">
