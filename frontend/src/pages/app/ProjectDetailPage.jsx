@@ -50,6 +50,8 @@ const ProjectDetailPage = () => {
     notes: ''
   });
 
+  const [activeTab, setActiveTab] = useState('overview');
+
   const fetchProject = useCallback(async () => {
     if (!user || !id) return;
     
