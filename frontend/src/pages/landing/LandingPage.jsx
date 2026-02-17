@@ -342,6 +342,151 @@ const LandingPage = () => {
         </div>
       </section>
 
+      {/* ROI Calculator */}
+      <section className="py-24 px-4 bg-charcoal-800">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-16">
+            <span className="inline-block px-4 py-1.5 bg-success/20 text-success rounded-full text-sm font-medium mb-4">
+              ROI CALCULATOR
+            </span>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
+              See Your Potential Savings
+            </h2>
+            <p className="text-gray-400 max-w-2xl mx-auto text-lg">
+              Most contractors recover their subscription cost in the first week through better change order tracking alone.
+            </p>
+          </div>
+          
+          <div className="bg-charcoal-700/50 backdrop-blur-sm rounded-3xl p-8 lg:p-12 border border-charcoal-600/50">
+            <div className="grid lg:grid-cols-2 gap-12">
+              <div>
+                <h3 className="text-xl font-semibold text-white mb-6">Your Numbers</h3>
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-sm text-gray-400 mb-2">Average project value</label>
+                    <div className="flex items-center bg-charcoal-600/50 rounded-lg border border-charcoal-500/50 px-4 py-3">
+                      <span className="text-gray-500 mr-2">$</span>
+                      <span className="text-2xl font-bold text-white">150,000</span>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-400 mb-2">Projects per year</label>
+                    <div className="flex items-center bg-charcoal-600/50 rounded-lg border border-charcoal-500/50 px-4 py-3">
+                      <span className="text-2xl font-bold text-white">8</span>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-400 mb-2">Average margin slippage</label>
+                    <div className="flex items-center bg-charcoal-600/50 rounded-lg border border-charcoal-500/50 px-4 py-3">
+                      <span className="text-2xl font-bold text-warning">3%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-gradient-to-br from-steel-500/20 to-steel-500/5 rounded-2xl p-8 border border-steel-500/30">
+                <h3 className="text-xl font-semibold text-white mb-6">Your Potential Recovery</h3>
+                <div className="space-y-6">
+                  <div>
+                    <p className="text-gray-400 text-sm mb-1">Annual revenue at risk</p>
+                    <p className="text-3xl font-bold text-white">$36,000</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-400 text-sm mb-1">Potential margin recovery with TradeOS</p>
+                    <p className="text-4xl font-bold text-success">$18,000 - $27,000</p>
+                    <p className="text-gray-500 text-sm mt-1">50-75% of leaked margin</p>
+                  </div>
+                  <div className="pt-4 border-t border-charcoal-600/50">
+                    <p className="text-gray-400 text-sm mb-1">TradeOS cost (Elite plan)</p>
+                    <p className="text-xl font-bold text-white">$708/year</p>
+                    <p className="text-success text-sm mt-2 font-medium">ROI: 25x - 38x return</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Video Demo Section */}
+      <section className="py-24 px-4">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <span className="inline-block px-4 py-1.5 bg-steel-500/20 text-steel-400 rounded-full text-sm font-medium mb-4">
+              SEE IT IN ACTION
+            </span>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
+              Watch How TradeOS Works
+            </h2>
+            <p className="text-gray-400 max-w-2xl mx-auto text-lg">
+              A 2-minute walkthrough of the features that help contractors protect their margins.
+            </p>
+          </div>
+          
+          <div className="relative aspect-video bg-charcoal-800 rounded-2xl overflow-hidden border border-charcoal-700 group cursor-pointer" data-testid="video-demo-placeholder">
+            <div 
+              className="absolute inset-0 bg-cover bg-center"
+              style={{ backgroundImage: `url(${IMAGES.cta})` }}
+            >
+              <div className="absolute inset-0 bg-charcoal-900/70"></div>
+            </div>
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <div className="w-20 h-20 bg-steel-500 rounded-full flex items-center justify-center mb-4 group-hover:bg-steel-400 transition-colors shadow-xl shadow-steel-500/30">
+                <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              </div>
+              <p className="text-white font-medium text-lg">Watch Demo Video</p>
+              <p className="text-gray-400 text-sm mt-1">2 min • No signup required</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Case Studies Preview */}
+      <section className="py-24 px-4 bg-charcoal-800/50">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <span className="inline-block px-4 py-1.5 bg-steel-500/20 text-steel-400 rounded-full text-sm font-medium mb-4">
+              SUCCESS STORIES
+            </span>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
+              Real Results from Real Contractors
+            </h2>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              { 
+                metric: '+12%', 
+                label: 'Margin Increase', 
+                company: 'Precision Finishing Co.',
+                quote: 'We recovered $47,000 in the first year just from better change order tracking.'
+              },
+              { 
+                metric: '3hrs', 
+                label: 'Saved Per Quote', 
+                company: 'Summit Electrical',
+                quote: 'Our estimating time dropped from 4 hours to under 1 hour per job.'
+              },
+              { 
+                metric: '$0', 
+                label: 'Unpaid Extras', 
+                company: 'BuildRight General',
+                quote: 'We used to lose 2-3 change orders per job. Now every extra gets billed.'
+              },
+            ].map((story, i) => (
+              <div key={i} className="bg-charcoal-700/50 backdrop-blur-sm rounded-2xl p-8 border border-charcoal-600/50 hover:border-steel-500/30 transition-colors">
+                <div className="text-5xl font-bold text-steel-400 mb-2">{story.metric}</div>
+                <div className="text-white font-semibold mb-4">{story.label}</div>
+                <p className="text-gray-400 text-sm mb-4 leading-relaxed">"{story.quote}"</p>
+                <p className="text-gray-500 text-sm">— {story.company}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* FAQ */}
       <section id="faq" className="py-24 px-4 bg-charcoal-800">
         <div className="max-w-3xl mx-auto">
