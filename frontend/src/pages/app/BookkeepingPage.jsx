@@ -161,6 +161,54 @@ const BookkeepingPage = () => {
     }
   };
 
+  const handleManualExpenseSubmit = async (expenseData) => {
+    setShowManualForm(false);
+    
+    try {
+      const newExpense = {
+        user_id: user.id,
+        ...expenseData,
+        fiscal_year: selectedYear,
+        fiscal_quarter: Math.ceil((new Date(expenseData.receipt_date || Date.now()).getMonth() + 1) / 3),
+        status: 'pending'
+      };
+
+      const { error } = await supabase
+        .from('expenses')
+        .insert(newExpense);
+
+      if (error) {
+        setExpenses(prev => [{ ...newExpense, id: Date.now() }, ...prev]);
+      } else {
+        fetchExpenses();
+      }
+    } catch (err) {
+      console.error('Error saving expense:', err);
+      setExpenses(prev => [{ ...expenseData, id: Date.now() }, ...prev]);
+    }
+  };
+
+  const handleBulkUploadComplete = async (extractedExpenses) => {
+    setShowBulkUpload(false);
+    
+    for (const expense of extractedExpenses) {
+      await handleExpenseExtracted(expense);
+    }
+  };
+
+  const handleExportPDF = () => {
+    if (expenses.length === 0) {
+      alert('No expenses to export');
+      return;
+    }
+    
+    generateExpenseReportPDF(expenses, {
+      companyName: profile?.company_name || 'TradeOS',
+      fiscalYear: selectedYear,
+      userName: profile?.name || 'Contractor'
+    });
+  };
+
   const formatCurrency = (value) => {
     return new Intl.NumberFormat('en-CA', { 
       style: 'currency', 
