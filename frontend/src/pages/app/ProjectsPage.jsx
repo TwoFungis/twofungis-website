@@ -29,7 +29,7 @@ const ProjectsPage = () => {
     notes: ''
   });
 
-  const fetchProjects = async () => {
+  const fetchProjects = React.useCallback(async () => {
     if (!user) return;
     
     setLoading(true);
@@ -45,7 +45,11 @@ const ProjectsPage = () => {
       setProjects(data || []);
     }
     setLoading(false);
-  };
+  }, [user]);
+
+  React.useEffect(() => {
+    fetchProjects();
+  }, [fetchProjects]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
