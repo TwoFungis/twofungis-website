@@ -18,11 +18,16 @@ import {
   Eye,
   Sparkles,
   HardDrive,
-  AlertCircle
+  AlertCircle,
+  Files
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuthStore } from '../../store/authStore';
 import ReceiptScanner from '../../components/bookkeeping/ReceiptScanner';
+import ManualExpenseForm from '../../components/bookkeeping/ManualExpenseForm';
+import BulkReceiptUpload from '../../components/bookkeeping/BulkReceiptUpload';
+import DocumentVault from '../../components/bookkeeping/DocumentVault';
+import { generateExpenseReportPDF } from '../../utils/expenseReportGenerator';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -45,10 +50,12 @@ const EXPENSE_CATEGORIES = [
 
 const BookkeepingPage = () => {
   const { user, profile } = useAuthStore();
+  const [activeTab, setActiveTab] = useState('expenses'); // 'expenses' or 'documents'
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showScanner, setShowScanner] = useState(false);
-  const [showAddExpense, setShowAddExpense] = useState(false);
+  const [showManualForm, setShowManualForm] = useState(false);
+  const [showBulkUpload, setShowBulkUpload] = useState(false);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
