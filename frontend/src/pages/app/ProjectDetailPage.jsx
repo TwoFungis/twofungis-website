@@ -128,6 +128,15 @@ const ProjectDetailPage = () => {
     setError(null);
     
     try {
+      // Ensure we have a valid session before saving
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        const { error: refreshError } = await supabase.auth.refreshSession();
+        if (refreshError) {
+          throw new Error('Session expired. Please refresh the page and try again.');
+        }
+      }
+
       const { error: updateError } = await supabase
         .from('projects')
         .update({
@@ -146,13 +155,21 @@ const ProjectDetailPage = () => {
         .eq('id', id)
         .eq('user_id', user.id);
 
-      if (updateError) throw updateError;
+      if (updateError) {
+        if (updateError.message?.includes('JWT') || updateError.code === 'PGRST301') {
+          throw new Error('Session expired. Please refresh the page and try again.');
+        }
+        throw updateError;
+      }
       
       setIsEditing(false);
       fetchProject();
     } catch (err) {
       console.error('Error updating project:', err);
-      setError('Failed to update project: ' + (err.message || ''));
+      const errorMessage = err.name === 'AbortError'
+        ? 'Request was interrupted. Please try again.'
+        : err.message || 'Failed to update project';
+      setError('Failed to update project: ' + errorMessage);
     } finally {
       setIsSaving(false);
     }
