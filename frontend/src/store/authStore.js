@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase';
 // Prevent duplicate initialization in React StrictMode
 let isInitializing = false;
 let authSubscription = null;
+let isUpdatingProfile = false; // Lock to prevent concurrent profile updates
 
 // Helper to wait for session to be ready
 const waitForSession = async (maxAttempts = 5, delayMs = 500) => {
@@ -229,6 +230,17 @@ export const useAuthStore = create((set, get) => ({
     const { user, profile } = get();
     if (!user) return { error: { message: 'Not authenticated' } };
 
+    // Prevent concurrent updates
+    if (isUpdatingProfile) {
+      console.log('Profile update already in progress, waiting...');
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      if (isUpdatingProfile) {
+        return { error: { message: 'Please wait for the current operation to complete.' } };
+      }
+    }
+
+    isUpdatingProfile = true;
+
     try {
       // Ensure we have a valid session first
       const { data: { session } } = await supabase.auth.getSession();
@@ -239,69 +251,52 @@ export const useAuthStore = create((set, get) => ({
         const { error: refreshError } = await supabase.auth.refreshSession();
         if (refreshError) {
           console.warn('Session refresh failed:', refreshError);
+          isUpdatingProfile = false;
           return { error: { message: 'Session expired. Please refresh the page.' } };
         }
+        // Wait a moment for session to propagate
+        await new Promise(resolve => setTimeout(resolve, 300));
       }
 
-      // Perform the database operation with explicit error handling
+      // Perform the database operation
       let dbError = null;
       
-      try {
-        if (profile) {
-          const result = await supabase
-            .from('users_profile')
-            .update(profileData)
-            .eq('user_id', user.id);
-          dbError = result.error;
-        } else {
-          const result = await supabase
-            .from('users_profile')
-            .insert({ user_id: user.id, ...profileData });
-          dbError = result.error;
-        }
-      } catch (dbErr) {
-        // Handle "body stream already read" error
-        if (dbErr.message?.includes('body stream already read')) {
-          console.warn('Body stream error - retrying operation');
-          // Wait a moment and retry
-          await new Promise(resolve => setTimeout(resolve, 500));
-          try {
-            if (profile) {
-              const retryResult = await supabase
-                .from('users_profile')
-                .update(profileData)
-                .eq('user_id', user.id);
-              dbError = retryResult.error;
-            } else {
-              const retryResult = await supabase
-                .from('users_profile')
-                .insert({ user_id: user.id, ...profileData });
-              dbError = retryResult.error;
-            }
-          } catch (retryErr) {
-            dbError = { message: 'Connection error. Please try again.' };
-          }
-        } else {
-          dbError = { message: dbErr.message || 'Database operation failed' };
-        }
+      if (profile) {
+        const result = await supabase
+          .from('users_profile')
+          .update(profileData)
+          .eq('user_id', user.id);
+        dbError = result.error;
+      } else {
+        const result = await supabase
+          .from('users_profile')
+          .insert({ user_id: user.id, ...profileData });
+        dbError = result.error;
       }
 
       if (dbError) {
         console.error('Profile operation error:', dbError);
+        isUpdatingProfile = false;
         // Handle specific error types
         if (dbError.message?.includes('JWT') || dbError.code === 'PGRST301') {
           return { error: { message: 'Session expired. Please refresh the page.' } };
         }
+        if (dbError.message?.includes('body stream')) {
+          return { error: { message: 'Connection error. Please try again.' } };
+        }
         return { error: { message: dbError.message || 'Failed to update profile' } };
       }
 
-      // Refresh profile data
+      // Refresh profile data with a small delay
+      await new Promise(resolve => setTimeout(resolve, 200));
       await get().fetchProfile();
+      isUpdatingProfile = false;
       return { error: null };
     } catch (err) {
       console.error('UpdateProfile error:', err);
+      isUpdatingProfile = false;
       // Handle body stream error at top level too
-      if (err.message?.includes('body stream already read')) {
+      if (err.message?.includes('body stream')) {
         return { error: { message: 'Connection error. Please try again.' } };
       }
       return { error: { message: err.message || 'Failed to update profile' } };
