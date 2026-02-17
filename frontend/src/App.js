@@ -107,6 +107,7 @@ function App() {
           } />
           <Route path="settings" element={<SettingsPage />} />
           <Route path="profile" element={<ProfilePage />} />
+          <Route path="bookkeeping" element={<BookkeepingPage />} />
         </Route>
 
         {/* Catch all */}
