@@ -112,6 +112,16 @@ const EstimatingPage = () => {
     setError(null);
 
     try {
+      // Ensure we have a valid session before saving
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        // Try to refresh the session
+        const { error: refreshError } = await supabase.auth.refreshSession();
+        if (refreshError) {
+          throw new Error('Session expired. Please refresh the page and try again.');
+        }
+      }
+
       // Generate quote number
       const quoteNumber = `Q-${Date.now().toString(36).toUpperCase()}`;
       
@@ -141,6 +151,8 @@ const EstimatingPage = () => {
       if (quoteError) {
         if (quoteError.code === '42P01') {
           setError('Database tables not yet created. Please run the SQL schema in Supabase.');
+        } else if (quoteError.message?.includes('JWT') || quoteError.code === 'PGRST301') {
+          throw new Error('Session expired. Please refresh the page and try again.');
         } else {
           throw quoteError;
         }
@@ -183,7 +195,11 @@ const EstimatingPage = () => {
 
     } catch (err) {
       console.error('Error saving quote:', err);
-      setError('Failed to save quote: ' + (err.message || ''));
+      // Handle abort errors gracefully
+      const errorMessage = err.name === 'AbortError' 
+        ? 'Request was interrupted. Please try again.'
+        : err.message || 'Failed to save quote';
+      setError('Failed to save quote: ' + errorMessage);
     } finally {
       setIsSaving(false);
     }
