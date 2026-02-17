@@ -5,6 +5,49 @@ import { supabase } from '../lib/supabase';
 let isInitializing = false;
 let authSubscription = null;
 
+// Custom sign-in function that bypasses SDK body stream issues
+const customSignIn = async (email, password) => {
+  const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
+  const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
+  
+  try {
+    const response = await fetch(`${supabaseUrl}/auth/v1/token?grant_type=password`, {
+      method: 'POST',
+      headers: {
+        'apikey': supabaseAnonKey,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    });
+    
+    const data = await response.json();
+    
+    if (!response.ok) {
+      return { 
+        data: null, 
+        error: { message: data.msg || data.error_description || 'Login failed' } 
+      };
+    }
+    
+    // Set the session manually in Supabase client
+    if (data.access_token && data.refresh_token) {
+      await supabase.auth.setSession({
+        access_token: data.access_token,
+        refresh_token: data.refresh_token,
+      });
+      
+      // Get the user from the session
+      const { data: sessionData } = await supabase.auth.getSession();
+      return { data: { user: sessionData.session?.user, session: sessionData.session }, error: null };
+    }
+    
+    return { data: null, error: { message: 'Failed to establish session' } };
+  } catch (err) {
+    console.error('Custom signIn error:', err);
+    return { data: null, error: { message: err.message || 'Login failed' } };
+  }
+};
+
 export const useAuthStore = create((set, get) => ({
   user: null,
   profile: null,
@@ -64,23 +107,20 @@ export const useAuthStore = create((set, get) => ({
   signIn: async (email, password) => {
     set({ loading: true });
     try {
-      const response = await supabase.auth.signInWithPassword({ 
-        email: email.trim().toLowerCase(), 
-        password 
-      });
+      // Use custom sign-in to avoid body stream issues
+      const { data, error } = await customSignIn(email.trim().toLowerCase(), password);
       
-      // Handle both error object and data response
-      if (response.error) {
+      if (error) {
         set({ loading: false });
-        // Map Supabase error codes to user-friendly messages
-        const errorMessage = response.error.message === 'Invalid login credentials' 
+        // Map error messages to user-friendly versions
+        const errorMessage = error.message.includes('Invalid login credentials')
           ? 'Invalid email or password. Please check your credentials and try again.'
-          : response.error.message || 'Login failed';
+          : error.message;
         return { error: { message: errorMessage } };
       }
       
-      if (response.data?.user) {
-        set({ user: response.data.user });
+      if (data?.user) {
+        set({ user: data.user });
         await get().fetchProfile();
       }
       
@@ -89,10 +129,6 @@ export const useAuthStore = create((set, get) => ({
     } catch (err) {
       console.error('SignIn error:', err);
       set({ loading: false });
-      // Handle "body stream already read" error - this usually means invalid credentials
-      if (err.message && err.message.includes('body stream already read')) {
-        return { error: { message: 'Invalid email or password. Please check your credentials and try again.' } };
-      }
       return { error: { message: err.message || 'Login failed. Please try again.' } };
     }
   },
