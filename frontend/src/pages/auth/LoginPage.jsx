@@ -9,27 +9,36 @@ const LoginPage = () => {
   const [useMagicLink, setUseMagicLink] = useState(false);
   const [error, setError] = useState('');
   const [magicLinkSent, setMagicLinkSent] = useState(false);
-  const { signIn, signInWithMagicLink, loading } = useAuthStore();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { signIn, signInWithMagicLink } = useAuthStore();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setIsSubmitting(true);
 
-    if (useMagicLink) {
-      const { error } = await signInWithMagicLink(email);
-      if (error) {
-        setError(error.message);
+    try {
+      if (useMagicLink) {
+        const result = await signInWithMagicLink(email);
+        if (result?.error) {
+          setError(result.error.message || 'Failed to send magic link');
+        } else {
+          setMagicLinkSent(true);
+        }
       } else {
-        setMagicLinkSent(true);
+        const result = await signIn(email, password);
+        if (result?.error) {
+          setError(result.error.message || 'Invalid email or password');
+        } else {
+          navigate('/app/dashboard');
+        }
       }
-    } else {
-      const { error } = await signIn(email, password);
-      if (error) {
-        setError(error.message);
-      } else {
-        navigate('/app/dashboard');
-      }
+    } catch (err) {
+      console.error('Login error:', err);
+      setError(err.message || 'An unexpected error occurred');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -112,11 +121,11 @@ const LoginPage = () => {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={isSubmitting}
               className="w-full bg-steel-500 hover:bg-steel-600 disabled:opacity-50 disabled:cursor-not-allowed text-white py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
               data-testid="login-submit-btn"
             >
-              {loading ? (
+              {isSubmitting ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
                 <>
