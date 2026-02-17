@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Building2, Mail, Lock, ArrowRight, Check } from 'lucide-react';
+import { Mail, Lock, ArrowRight, Check } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
+import { LogoLink } from '../../components/ui/Logo';
 
 const SignUpPage = () => {
   const [searchParams] = useSearchParams();
@@ -54,15 +55,15 @@ const SignUpPage = () => {
           <div className="w-16 h-16 bg-success/20 rounded-full flex items-center justify-center mx-auto mb-6">
             <Check className="w-8 h-8 text-success" />
           </div>
-          <h2 className="text-2xl font-bold text-white mb-4">Check Your Email</h2>
+          <h2 className="text-2xl font-bold text-white mb-4">Account Created!</h2>
           <p className="text-gray-400 mb-6">
-            We sent a confirmation link to <strong className="text-white">{email}</strong>. Click the link to activate your account.
+            Your account has been created successfully. You can now sign in.
           </p>
           <Link 
             to="/login"
-            className="text-steel-400 hover:text-steel-300 transition-colors"
+            className="inline-block bg-steel-500 hover:bg-steel-600 text-white px-6 py-3 rounded-lg font-medium transition-colors"
           >
-            Back to Login
+            Sign In Now
           </Link>
         </div>
       </div>
@@ -72,12 +73,9 @@ const SignUpPage = () => {
   return (
     <div className="min-h-screen bg-charcoal-900 flex items-center justify-center px-4 py-12">
       <div className="max-w-md w-full">
-        <Link to="/" className="flex items-center gap-2 justify-center mb-8">
-          <div className="w-10 h-10 bg-steel-500 rounded-lg flex items-center justify-center">
-            <Building2 className="w-6 h-6 text-white" />
-          </div>
-          <span className="text-2xl font-bold text-white">TradeOS<span className="text-steel-400">™</span></span>
-        </Link>
+        <div className="flex justify-center mb-8">
+          <LogoLink size="lg" showText={false} />
+        </div>
 
         <div className="bg-charcoal-800 rounded-2xl p-8 border border-charcoal-700" data-testid="signup-form">
           <h2 className="text-2xl font-bold text-white mb-2 text-center">Start Your Free Trial</h2>

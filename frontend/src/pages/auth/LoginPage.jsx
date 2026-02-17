@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Building2, Mail, Lock, ArrowRight } from 'lucide-react';
+import { Mail, Lock, ArrowRight } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
+import { LogoLink } from '../../components/ui/Logo';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -67,12 +68,9 @@ const LoginPage = () => {
   return (
     <div className="min-h-screen bg-charcoal-900 flex items-center justify-center px-4">
       <div className="max-w-md w-full">
-        <Link to="/" className="flex items-center gap-2 justify-center mb-8">
-          <div className="w-10 h-10 bg-steel-500 rounded-lg flex items-center justify-center">
-            <Building2 className="w-6 h-6 text-white" />
-          </div>
-          <span className="text-2xl font-bold text-white">TradeOS<span className="text-steel-400">™</span></span>
-        </Link>
+        <div className="flex justify-center mb-8">
+          <LogoLink size="lg" showText={false} />
+        </div>
 
         <div className="bg-charcoal-800 rounded-2xl p-8 border border-charcoal-700" data-testid="login-form">
           <h2 className="text-2xl font-bold text-white mb-2 text-center">Welcome Back</h2>

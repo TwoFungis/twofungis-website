@@ -11,6 +11,7 @@ import {
   Users,
   Building2
 } from 'lucide-react';
+import { Logo, LogoLink } from '../../components/ui/Logo';
 
 const LandingPage = () => {
   return (
@@ -19,12 +20,7 @@ const LandingPage = () => {
       <header className="fixed top-0 left-0 right-0 z-50 bg-charcoal-900/95 backdrop-blur-sm border-b border-charcoal-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-steel-500 rounded-lg flex items-center justify-center">
-                <Building2 className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-bold text-white">TradeOS<span className="text-steel-400">™</span></span>
-            </div>
+            <LogoLink size="sm" showText={false} />
             <nav className="hidden md:flex items-center gap-8">
               <a href="#features" className="text-gray-400 hover:text-white transition-colors">Features</a>
               <a href="#pricing" className="text-gray-400 hover:text-white transition-colors">Pricing</a>
@@ -49,14 +45,16 @@ const LandingPage = () => {
       </header>
 
       {/* Hero */}
-      <section className="pt-32 pb-20 px-4">
+      <section className="pt-28 pb-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
-            TradeOS<span className="text-steel-400">™</span>
-          </h1>
-          <p className="text-2xl sm:text-3xl text-steel-400 font-semibold mb-8">
-            Built for Builders.
-          </p>
+          {/* Logo centered */}
+          <div className="flex justify-center mb-8">
+            <img 
+              src="/logo.png" 
+              alt="TradeOS - Built for Builders" 
+              className="h-32 sm:h-40 lg:h-48 w-auto"
+            />
+          </div>
           <p className="text-lg sm:text-xl text-gray-400 mb-12 max-w-2xl mx-auto">
             The contractor operating system that helps trades, subs, and small GCs know their margin, control change orders, and run profitable projects.
           </p>
@@ -290,12 +288,7 @@ const LandingPage = () => {
       <footer className="py-12 px-4 border-t border-charcoal-700">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-steel-500 rounded-lg flex items-center justify-center">
-                <Building2 className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-bold text-white">TradeOS<span className="text-steel-400">™</span></span>
-            </div>
+            <Logo size="sm" showText={false} />
             <div className="flex items-center gap-6 text-gray-400 text-sm">
               <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
               <Link to="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
