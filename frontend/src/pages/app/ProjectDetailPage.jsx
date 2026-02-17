@@ -15,10 +15,12 @@ import {
   MapPin,
   Building,
   Plus,
-  Activity
+  Activity,
+  Target
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuthStore } from '../../store/authStore';
+import ProjectMilestones from '../../components/milestones/ProjectMilestones';
 
 const ProjectDetailPage = () => {
   const { id } = useParams();
