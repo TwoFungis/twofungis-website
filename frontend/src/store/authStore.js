@@ -20,7 +20,25 @@ const customSignIn = async (email, password) => {
       body: JSON.stringify({ email, password }),
     });
     
-    const data = await response.json();
+    // Clone the response to avoid body stream issues
+    const responseClone = response.clone();
+    let data;
+    
+    try {
+      data = await responseClone.json();
+    } catch (parseError) {
+      // If clone fails, try original response
+      try {
+        data = await response.json();
+      } catch (e) {
+        // If both fail, return generic error
+        console.error('Response parse error:', e);
+        return { 
+          data: null, 
+          error: { message: response.ok ? 'Failed to parse response' : 'Invalid email or password' } 
+        };
+      }
+    }
     
     if (!response.ok) {
       return { 
@@ -44,6 +62,10 @@ const customSignIn = async (email, password) => {
     return { data: null, error: { message: 'Failed to establish session' } };
   } catch (err) {
     console.error('Custom signIn error:', err);
+    // Handle body stream error specifically
+    if (err.message && err.message.includes('body stream already read')) {
+      return { data: null, error: { message: 'Invalid email or password. Please check your credentials.' } };
+    }
     return { data: null, error: { message: err.message || 'Login failed' } };
   }
 };
