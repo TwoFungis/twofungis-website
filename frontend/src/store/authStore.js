@@ -64,18 +64,23 @@ export const useAuthStore = create((set, get) => ({
   signIn: async (email, password) => {
     set({ loading: true });
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({ 
+      const response = await supabase.auth.signInWithPassword({ 
         email: email.trim().toLowerCase(), 
         password 
       });
       
-      if (error) {
+      // Handle both error object and data response
+      if (response.error) {
         set({ loading: false });
-        return { error };
+        // Map Supabase error codes to user-friendly messages
+        const errorMessage = response.error.message === 'Invalid login credentials' 
+          ? 'Invalid email or password. Please check your credentials and try again.'
+          : response.error.message || 'Login failed';
+        return { error: { message: errorMessage } };
       }
       
-      if (data?.user) {
-        set({ user: data.user });
+      if (response.data?.user) {
+        set({ user: response.data.user });
         await get().fetchProfile();
       }
       
@@ -84,7 +89,11 @@ export const useAuthStore = create((set, get) => ({
     } catch (err) {
       console.error('SignIn error:', err);
       set({ loading: false });
-      return { error: { message: err.message || 'Login failed' } };
+      // Handle "body stream already read" error - this usually means invalid credentials
+      if (err.message && err.message.includes('body stream already read')) {
+        return { error: { message: 'Invalid email or password. Please check your credentials and try again.' } };
+      }
+      return { error: { message: err.message || 'Login failed. Please try again.' } };
     }
   },
 
