@@ -290,11 +290,18 @@ export const useAuthStore = create((set, get) => ({
     if (!user) return { error: { message: 'Not authenticated' } };
 
     try {
-      // First verify we have a valid session
+      // Try to get session, but don't fail if it's not available
+      // The RLS will verify the token anyway
       const { data: sessionData } = await supabase.auth.getSession();
+      
       if (!sessionData?.session) {
-        console.error('No valid session for profile update');
-        return { error: { message: 'Session expired. Please log in again.' } };
+        // Try to refresh the session
+        console.log('No session found, attempting refresh...');
+        const { error: refreshError } = await supabase.auth.refreshSession();
+        if (refreshError) {
+          console.warn('Session refresh failed:', refreshError);
+          // Continue anyway - the stored token might still work
+        }
       }
 
       if (profile) {
