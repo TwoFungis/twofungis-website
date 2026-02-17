@@ -206,121 +206,32 @@ const EstimatingPage = () => {
   };
 
   const generatePDF = () => {
-    const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.getWidth();
-    
-    // Header
-    doc.setFillColor(13, 13, 13);
-    doc.rect(0, 0, pageWidth, 40, 'F');
-    
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(24);
-    doc.setFont('helvetica', 'bold');
-    doc.text('QUOTE', 20, 25);
-    
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'normal');
-    doc.text(profile?.company_name || 'Your Company', pageWidth - 20, 15, { align: 'right' });
-    doc.text(profile?.phone || '', pageWidth - 20, 22, { align: 'right' });
-    doc.text(profile?.region || '', pageWidth - 20, 29, { align: 'right' });
-    
-    // Quote info
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(11);
-    let y = 55;
-    
-    doc.setFont('helvetica', 'bold');
-    doc.text('Quote Name:', 20, y);
-    doc.setFont('helvetica', 'normal');
-    doc.text(quoteForm.quote_name || 'Untitled Quote', 60, y);
-    
-    y += 8;
-    doc.setFont('helvetica', 'bold');
-    doc.text('Client:', 20, y);
-    doc.setFont('helvetica', 'normal');
-    doc.text(quoteForm.client_gc || 'N/A', 60, y);
-    
-    y += 8;
-    doc.setFont('helvetica', 'bold');
-    doc.text('Date:', 20, y);
-    doc.setFont('helvetica', 'normal');
-    doc.text(new Date().toLocaleDateString(), 60, y);
-    
-    // Line items header
-    y += 15;
-    doc.setFillColor(90, 143, 184);
-    doc.rect(20, y - 5, pageWidth - 40, 10, 'F');
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Item', 25, y + 2);
-    doc.text('Qty', 100, y + 2);
-    doc.text('Unit', 120, y + 2);
-    doc.text('Price', 145, y + 2);
-    doc.text('Total', 175, y + 2);
-    
-    // Line items
-    doc.setTextColor(0, 0, 0);
-    doc.setFont('helvetica', 'normal');
-    y += 12;
-    
-    quoteLines.forEach((line) => {
-      if (line.scope_item) {
-        doc.text(line.scope_item.substring(0, 40), 25, y);
-        doc.text(String(line.qty), 100, y);
-        doc.text(line.unit, 120, y);
-        doc.text(`$${(line.unit_price || 0).toFixed(2)}`, 145, y);
-        doc.text(`$${(line.line_total || 0).toFixed(2)}`, 175, y);
-        y += 8;
-      }
-    });
-    
-    // Totals
-    y += 10;
-    doc.setDrawColor(200, 200, 200);
-    doc.line(120, y - 5, pageWidth - 20, y - 5);
-    
-    doc.setFont('helvetica', 'normal');
-    doc.text('Subtotal:', 130, y);
-    doc.text(`$${subtotal.toFixed(2)}`, 175, y);
-    
-    y += 8;
-    doc.text(`Markup (${quoteForm.profit_target_pct}%):`, 130, y);
-    doc.text(`$${markupAmount.toFixed(2)}`, 175, y);
-    
-    y += 10;
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(12);
-    doc.text('TOTAL:', 130, y);
-    doc.text(`$${total.toFixed(2)}`, 175, y);
-    
-    // Terms
-    if (quoteForm.terms) {
-      y += 20;
-      doc.setFontSize(9);
-      doc.setFont('helvetica', 'bold');
-      doc.text('Terms & Conditions:', 20, y);
-      doc.setFont('helvetica', 'normal');
-      y += 6;
-      const terms = quoteForm.terms.split('\n');
-      terms.forEach(term => {
-        doc.text(term, 20, y);
-        y += 5;
-      });
-    }
-    
-    // Exclusions
-    if (quoteForm.exclusions) {
-      y += 10;
-      doc.setFont('helvetica', 'bold');
-      doc.text('Exclusions:', 20, y);
-      doc.setFont('helvetica', 'normal');
-      y += 6;
-      doc.text(quoteForm.exclusions, 20, y);
-    }
-    
-    // Save
-    doc.save(`Quote_${quoteForm.quote_name || 'Untitled'}_${new Date().toISOString().split('T')[0]}.pdf`);
+    // Build quote object from form data
+    const quoteData = {
+      quote_number: `Q-${Date.now().toString(36).toUpperCase()}`,
+      quote_name: quoteForm.quote_name,
+      client_gc: quoteForm.client_gc,
+      client_email: quoteForm.client_email,
+      region: quoteForm.region,
+      profit_target_pct: quoteForm.profit_target_pct,
+      subtotal: subtotal,
+      markup_amount: markupAmount,
+      total: total,
+      terms: quoteForm.terms,
+      exclusions: quoteForm.exclusions,
+      status: 'draft',
+      created_at: new Date().toISOString(),
+      lines: quoteLines.filter(line => line.scope_item)
+    };
+
+    const companyInfo = {
+      company_name: profile?.company_name || 'TradeOS',
+      phone: profile?.phone || '',
+      email: user?.email || '',
+      address: profile?.region || ''
+    };
+
+    downloadQuotePDF(quoteData, companyInfo);
   };
 
   const formatCurrency = (value) => {
