@@ -237,20 +237,47 @@ export const useAuthStore = create((set, get) => ({
         }
       }
 
-      // Perform the database operation
+      // Perform the database operation with explicit error handling
       let dbError = null;
       
-      if (profile) {
-        const { error } = await supabase
-          .from('users_profile')
-          .update(profileData)
-          .eq('user_id', user.id);
-        dbError = error;
-      } else {
-        const { error } = await supabase
-          .from('users_profile')
-          .insert({ user_id: user.id, ...profileData });
-        dbError = error;
+      try {
+        if (profile) {
+          const result = await supabase
+            .from('users_profile')
+            .update(profileData)
+            .eq('user_id', user.id);
+          dbError = result.error;
+        } else {
+          const result = await supabase
+            .from('users_profile')
+            .insert({ user_id: user.id, ...profileData });
+          dbError = result.error;
+        }
+      } catch (dbErr) {
+        // Handle "body stream already read" error
+        if (dbErr.message?.includes('body stream already read')) {
+          console.warn('Body stream error - retrying operation');
+          // Wait a moment and retry
+          await new Promise(resolve => setTimeout(resolve, 500));
+          try {
+            if (profile) {
+              const retryResult = await supabase
+                .from('users_profile')
+                .update(profileData)
+                .eq('user_id', user.id);
+              dbError = retryResult.error;
+            } else {
+              const retryResult = await supabase
+                .from('users_profile')
+                .insert({ user_id: user.id, ...profileData });
+              dbError = retryResult.error;
+            }
+          } catch (retryErr) {
+            dbError = { message: 'Connection error. Please try again.' };
+          }
+        } else {
+          dbError = { message: dbErr.message || 'Database operation failed' };
+        }
       }
 
       if (dbError) {
@@ -267,6 +294,10 @@ export const useAuthStore = create((set, get) => ({
       return { error: null };
     } catch (err) {
       console.error('UpdateProfile error:', err);
+      // Handle body stream error at top level too
+      if (err.message?.includes('body stream already read')) {
+        return { error: { message: 'Connection error. Please try again.' } };
+      }
       return { error: { message: err.message || 'Failed to update profile' } };
     }
   },
