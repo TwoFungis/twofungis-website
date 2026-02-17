@@ -39,13 +39,16 @@ Contractors need a purpose-built operating system to manage their business opera
 ### ✅ Phase 2.5: Bookkeeping & Tax Management (NEW)
 - [x] **Bookkeeping Page** - New page at `/app/bookkeeping` for expense tracking
 - [x] **AI Receipt Scanner** - GPT-4 Vision powered OCR to extract vendor, amounts, tax, category
+- [x] **Manual Expense Form** - Add expenses without scanning
+- [x] **Bulk Receipt Upload** - Upload and scan multiple receipts at once
+- [x] **Document Vault** - Store invoices, contracts, quotes, and other business documents
+- [x] **PDF Report Export** - Generate tax-ready expense reports
+- [x] **Tax Savings Advisor** - Recommended tax set-aside %, quarterly payment calculator, deduction tips
 - [x] **Expense Categories** - 14 categories (Materials, Labor, Equipment, Vehicle, Tools, etc.)
-- [x] **Tax Support** - Canadian (HST/GST/PST) and US (Sales Tax) formats
+- [x] **Tax Support** - Canadian (HST/GST/PST, CPP) and US (Sales Tax, Self-Employment Tax)
 - [x] **Storage Limits** - By subscription: Trial (100MB), Pro (500MB), Elite (2GB)
 - [x] **Fiscal Year Tracking** - Track expenses by year and quarter
-- [x] **Tax Summary** - Year-end summary with deductible amounts
-- [x] **Database Schema** - New `expenses` table with full expense data model
-- [x] **Backend API** - `/api/bookkeeping/scan-receipt`, `/api/bookkeeping/categories`
+- [x] **Database Schema** - `expenses` and `documents` tables
 
 ### ✅ Phase 1: Milestone Approval Engine (NEW)
 - [x] **Milestones Tab in Project Detail** - New tabbed interface (Overview, Milestones, Activity)
