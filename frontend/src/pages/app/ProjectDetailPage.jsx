@@ -538,10 +538,111 @@ const ProjectDetailPage = () => {
       </div>
 
       {/* Notes */}
-      {project.notes && (
+      {activeTab === 'overview' && project.notes && (
         <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6">
           <h3 className="font-semibold text-white mb-3">Notes</h3>
           <p className="text-gray-400 whitespace-pre-wrap">{project.notes}</p>
+        </div>
+      )}
+        </>
+      )}
+
+      {activeTab === 'activity' && (
+        <div className="grid lg:grid-cols-2 gap-6">
+          {/* Change Orders */}
+          <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-semibold text-white flex items-center gap-2">
+                <FileText className="w-5 h-5 text-steel-400" />
+                Recent Change Orders
+              </h3>
+              <Link 
+                to={`/app/change-orders?project=${id}`}
+                className="text-steel-400 hover:text-steel-300 text-sm font-medium"
+              >
+                View All
+              </Link>
+            </div>
+            {changeOrders.length === 0 ? (
+              <div className="text-center py-8">
+                <FileText className="w-10 h-10 text-gray-600 mx-auto mb-3" />
+                <p className="text-gray-400 text-sm mb-3">No change orders yet</p>
+                <Link 
+                  to={`/app/change-orders?new=true&project=${id}`}
+                  className="inline-flex items-center gap-2 text-steel-400 hover:text-steel-300 text-sm font-medium"
+                >
+                  <Plus className="w-4 h-4" />
+                  Create Change Order
+                </Link>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {changeOrders.map((co) => (
+                  <div key={co.id} className="flex items-center justify-between p-3 bg-charcoal-700/50 rounded-lg">
+                    <div>
+                      <p className="text-white font-medium">{co.co_number}</p>
+                      <p className="text-gray-400 text-sm truncate max-w-[200px]">{co.description}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-white font-medium">{formatCurrency(co.total_value)}</p>
+                      <span className={`text-xs px-2 py-0.5 rounded ${
+                        co.status === 'approved' ? 'bg-success/20 text-success' :
+                        co.status === 'paid' ? 'bg-steel-500/20 text-steel-400' :
+                        co.status === 'rejected' ? 'bg-risk/20 text-risk' :
+                        'bg-warning/20 text-warning'
+                      }`}>
+                        {co.status}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Production Logs */}
+          <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-semibold text-white flex items-center gap-2">
+                <Activity className="w-5 h-5 text-steel-400" />
+                Recent Production Logs
+              </h3>
+              <Link 
+                to={`/app/production?project=${id}`}
+                className="text-steel-400 hover:text-steel-300 text-sm font-medium"
+              >
+                View All
+              </Link>
+            </div>
+            {productionLogs.length === 0 ? (
+              <div className="text-center py-8">
+                <Activity className="w-10 h-10 text-gray-600 mx-auto mb-3" />
+                <p className="text-gray-400 text-sm mb-3">No production logs yet</p>
+                <Link 
+                  to={`/app/production?new=true&project=${id}`}
+                  className="inline-flex items-center gap-2 text-steel-400 hover:text-steel-300 text-sm font-medium"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Production Log
+                </Link>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {productionLogs.map((log) => (
+                  <div key={log.id} className="flex items-center justify-between p-3 bg-charcoal-700/50 rounded-lg">
+                    <div>
+                      <p className="text-white font-medium">{formatDate(log.log_date)}</p>
+                      <p className="text-gray-400 text-sm">{log.crew_count} crew • {log.hours_worked}h</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-white font-medium">{log.units_installed} {log.unit_type}</p>
+                      <p className="text-gray-400 text-sm truncate max-w-[150px]">{log.scope_completed}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       )}
 
