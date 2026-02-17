@@ -7,6 +7,21 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
-    detectSessionInUrl: true
+    detectSessionInUrl: true,
+    storageKey: 'tradeos-auth-token',
+    storage: window.localStorage
   }
 });
+
+// Helper to manually set session tokens in localStorage
+export const setSessionTokens = (accessToken, refreshToken) => {
+  const storageKey = `sb-${supabaseUrl.split('//')[1].split('.')[0]}-auth-token`;
+  const sessionData = {
+    access_token: accessToken,
+    refresh_token: refreshToken,
+    token_type: 'bearer',
+    expires_in: 3600,
+    expires_at: Math.floor(Date.now() / 1000) + 3600
+  };
+  localStorage.setItem(storageKey, JSON.stringify(sessionData));
+};
