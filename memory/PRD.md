@@ -106,3 +106,45 @@ Contractors need a purpose-built operating system to manage their business opera
   - Navigation ✅
   - Quick Add dropdown ✅
   - Sign out ✅
+
+
+---
+
+## What's Not Yet Implemented
+
+### P1 - Core Features
+- [ ] Change Orders CRUD with Supabase (currently mock data)
+- [ ] Production Logs CRUD with Supabase (currently mock data)
+- [ ] Scope Library management
+- [ ] Labor Profile save/load
+- [ ] Change Order PDF export
+
+### P2 - Elite Features
+- [ ] Reports module with Recharts visualizations
+- [ ] KPI calculations from real data
+- [ ] Monthly performance summaries
+- [ ] Overrun warning system
+
+### P3 - Polish
+- [ ] User profile editing in Settings
+- [ ] Password reset flow
+- [ ] Email verification
+- [ ] Notification preferences
+- [ ] Data export functionality
+
+---
+
+## Files of Reference
+- `/app/backend/server.py` - FastAPI with Stripe
+- `/app/frontend/src/App.js` - Main router
+- `/app/frontend/src/store/authStore.js` - Auth state with session handling (key file for auth fixes)
+- `/app/frontend/src/pages/app/EstimatingPage.jsx` - Quote Builder
+- `/app/frontend/src/pages/app/ProjectsPage.jsx` - Projects CRUD
+- `/app/frontend/src/pages/app/ProjectDetailPage.jsx` - Project detail view/edit
+
+---
+
+## Notes
+- Dashboard, Change Orders, and Production pages show MOCKED demo data by design
+- All data operations (Projects, Quotes) go through Supabase with RLS policies
+- Magic Link emails require correct Site URL in Supabase Auth settings
