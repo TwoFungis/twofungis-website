@@ -5,6 +5,18 @@ import { supabase } from '../lib/supabase';
 let isInitializing = false;
 let authSubscription = null;
 
+// Helper to wait for session to be ready
+const waitForSession = async (maxAttempts = 5, delayMs = 500) => {
+  for (let i = 0; i < maxAttempts; i++) {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.access_token) {
+      return session;
+    }
+    await new Promise(resolve => setTimeout(resolve, delayMs));
+  }
+  return null;
+};
+
 export const useAuthStore = create((set, get) => ({
   user: null,
   profile: null,
@@ -42,11 +54,16 @@ export const useAuthStore = create((set, get) => ({
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('Auth event:', event);
-      if (session?.user) {
-        set({ user: session.user });
-        await get().fetchProfile();
-      } else {
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        if (session?.user) {
+          set({ user: session.user });
+          // Delay profile fetch to ensure session is fully propagated
+          setTimeout(() => get().fetchProfile(), 100);
+        }
+      } else if (event === 'SIGNED_OUT') {
         set({ user: null, profile: null });
+      } else if (session?.user) {
+        set({ user: session.user });
       }
     });
 
