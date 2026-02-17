@@ -64,12 +64,19 @@ export const useAuthStore = create((set, get) => ({
   signIn: async (email, password) => {
     set({ loading: true });
     try {
-      // Use custom sign-in to avoid body stream issues
-      const { data, error } = await customSignIn(email.trim().toLowerCase(), password);
+      // Use the Supabase SDK directly for login
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.trim().toLowerCase(),
+        password
+      });
       
       if (error) {
+        // Handle body stream error
+        if (error.message.includes('body stream')) {
+          set({ loading: false });
+          return { error: { message: 'Invalid email or password' } };
+        }
         set({ loading: false });
-        // Map error messages to user-friendly versions
         const errorMessage = error.message.includes('Invalid login credentials')
           ? 'Invalid email or password. Please check your credentials and try again.'
           : error.message;
@@ -88,6 +95,15 @@ export const useAuthStore = create((set, get) => ({
       
       return { error: null };
     } catch (err) {
+      console.error('SignIn error:', err);
+      set({ loading: false });
+      // Handle body stream error in catch
+      if (err.message && err.message.includes('body stream')) {
+        return { error: { message: 'Invalid email or password' } };
+      }
+      return { error: { message: err.message || 'Login failed. Please try again.' } };
+    }
+  },
       console.error('SignIn error:', err);
       set({ loading: false });
       return { error: { message: err.message || 'Login failed. Please try again.' } };
