@@ -360,6 +360,18 @@ const BookkeepingPage = () => {
         </div>
       </div>
 
+      {/* Tax Advisor */}
+      <TaxAdvisor 
+        totalIncome={0} 
+        totalExpenses={stats.totalExpenses}
+        expensesByCategory={expenses.reduce((acc, e) => {
+          const cat = e.category || 'Other';
+          acc[cat] = (acc[cat] || 0) + (e.total_amount || 0);
+          return acc;
+        }, {})}
+        region="CA"
+      />
+
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
