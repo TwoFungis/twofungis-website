@@ -3,11 +3,16 @@
 ## Product Overview
 **Name:** TradeOS™  
 **Tagline:** Built for Builders  
-**Type:** SaaS Web Application  
-**Target Audience:** Trades, Subcontractors, and Small General Contractors
+**Type:** SaaS Web Application → **Evolving to Renovation Marketplace**  
+**Target Audience:** Trades, Subcontractors, Small GCs, and Homeowners (Customers)
 
 ## Problem Statement
 Contractors need a purpose-built operating system to manage their business operations - from quoting jobs to tracking profitability, managing change orders, and logging daily production. TradeOS provides all these tools in a single, mobile-first platform designed specifically for the construction trades.
+
+**NEW VISION:** TradeOS is evolving into a full renovation marketplace where:
+- **Contractors** showcase skills, build reputation, and bid on jobs
+- **Customers** post renovation projects, visualize results with AI, and hire contractors
+- **Everyone** tracks project progress and milestones in real-time
 
 ## Core Requirements
 
@@ -16,6 +21,7 @@ Contractors need a purpose-built operating system to manage their business opera
 - Dark theme with deep charcoal background (#0d0d0d - #333333)
 - Steel blue accents (#5a8fb8)
 - Status colors: Success (green), Warning (yellow), Risk (red)
+- Milestone status colors: Draft (gray), Submitted (steel blue), Approved (green), Paid (dark green)
 
 ### Tech Stack
 - **Frontend:** React with Tailwind CSS
@@ -23,29 +29,25 @@ Contractors need a purpose-built operating system to manage their business opera
 - **Payments:** Stripe (subscriptions via emergentintegrations)
 - **State Management:** Zustand
 - **PDF Generation:** jsPDF
-
-### Pricing Tiers
-| Feature | Pro ($39/mo) | Elite ($59/mo) |
-|---------|--------------|----------------|
-| Unlimited Projects | ✓ | ✓ |
-| Quote Builder + PDF | ✓ | ✓ |
-| Change Order Manager | ✓ | ✓ |
-| Labor Cost Engine | ✓ | ✓ |
-| Production Logs | ✓ | ✓ |
-| Dashboard Analytics | ✓ | ✓ |
-| Advanced Reports & KPIs | ✗ | ✓ |
-| Production Analytics | ✗ | ✓ |
-| Priority Support | ✗ | ✓ |
+- **AI Visualization:** Gemini Nano Banana (planned for Phase 5)
 
 ---
 
 ## What's Been Implemented (February 17, 2026)
 
+### ✅ Phase 1: Milestone Approval Engine (NEW)
+- [x] **Milestones Tab in Project Detail** - New tabbed interface (Overview, Milestones, Activity)
+- [x] **Milestone CRUD** - Add, edit, delete milestones with auto-calculated values from contract %
+- [x] **Status Workflow** - Draft → Submitted → Approved → Paid with color coding
+- [x] **Client Review System** - Secure shareable links for client approval
+- [x] **Client Approval Page** - Public page at `/client/review/:token`
+- [x] **Dashboard Milestone Widget** - Summary of Total/Pending/Approved/Paid values
+- [x] **Database Schema v2** - New tables: project_milestones, client_approval_tokens, milestone_approval_log
+
 ### ✅ Critical Bug Fixes Completed
-- [x] **AbortError on Quote Save - FIXED** - Added session validation with `waitForSession` helper and `refreshSession` fallback before database operations
-- [x] **"Not authenticated" on Onboarding - FIXED** - Added session validation in `updateProfile` with retry logic for JWT errors
-- [x] Improved `onAuthStateChange` handling for `SIGNED_IN` and `TOKEN_REFRESHED` events
-- [x] Added consistent error handling across all Supabase operations
+- [x] **AbortError on Quote Save - FIXED**
+- [x] **"Not authenticated" on Onboarding - FIXED**
+- [x] Improved session handling across all Supabase operations
 
 ### ✅ Completed Features
 
@@ -54,97 +56,85 @@ Contractors need a purpose-built operating system to manage their business opera
 - [x] Stripe subscription checkout (Pro/Elite plans)
 - [x] Payment status verification endpoint
 - [x] Webhook handler for Stripe events
-- [x] User subscription status endpoint
-- [x] MongoDB for transaction tracking
-
-#### Public Pages
-- [x] Landing Page with hero, features, pricing, testimonials, FAQ
-- [x] Privacy Policy page
-- [x] Terms of Service page
-- [x] Responsive design (mobile + desktop)
 
 #### Authentication (Fully Functional)
 - [x] Login page (email/password + magic link toggle)
 - [x] Signup page with plan selection
-- [x] **Onboarding flow (3-step) - NOW WORKING**
-- [x] Protected route middleware
+- [x] Onboarding flow (3-step)
 - [x] Session persistence and refresh handling
 
-#### App Shell & Navigation
-- [x] App Layout with sidebar navigation
-- [x] Desktop sidebar + Mobile bottom nav
-- [x] Quick Add dropdown (New Quote, Project, CO, Daily Log)
-- [x] User profile display + sign out
-
 #### App Pages (All Functional)
-- [x] Dashboard with stats cards (mock data)
-- [x] **Projects CRUD** - List, Create, View Detail, Edit, Delete
-- [x] **Quote Builder** - Line items, pricing calculation, PDF export, **SAVE NOW WORKS**
-- [x] Labor Cost Calculator (fully functional)
+- [x] Dashboard with stats cards + milestone summary widget
+- [x] **Projects CRUD** with Detail Page (tabs: Overview, Milestones, Activity)
+- [x] **Quote Builder** - Line items, pricing, PDF export
+- [x] Labor Cost Calculator
 - [x] Change Orders page (mock data)
 - [x] Production Logs page (mock data)
 - [x] Reports page (Elite-gated)
-- [x] **Settings with Stripe Upgrade** - Pro/Elite plan upgrade buttons
+- [x] Settings with Stripe Upgrade
 
-#### Database Schema
-- [x] Complete SQL schema at `/app/supabase_schema.sql`
-- [x] Row Level Security (RLS) policies
-- [x] Auto-create user profile trigger
-- [x] Tables: users_profile, projects, change_orders, labor_profiles, scope_library, quotes, quote_lines, production_logs, payment_transactions
+---
+
+## ⚠️ ACTION REQUIRED: Run Database Schema v2
+
+**To enable Milestone features, run the new SQL schema:**
+1. Log into your Supabase dashboard
+2. Go to SQL Editor
+3. Copy contents of `/app/supabase_schema_v2.sql`
+4. Run the SQL script
+5. New tables will be created: project_milestones, client_approval_tokens, milestone_approval_log
+
+---
+
+## Marketplace Roadmap (5 Phases)
+
+### Phase 1: Foundation & Milestone Engine ✅ COMPLETE
+- User roles (contractor/customer)
+- Milestone system with client approval
+- Dashboard updates
+
+### Phase 2: Contractor Hub (NEXT)
+- Contractor profiles (skills, certifications, portfolio)
+- Work history & project showcase
+- Review/rating system
+
+### Phase 3: Customer Side & Job Posting
+- Customer accounts & dashboard
+- Post renovation projects with photos
+- Define scope, budget, timeline
+
+### Phase 4: Marketplace & Bidding
+- Contractors browse available jobs
+- Submit bids with proposals
+- Client reviews & accepts bids
+
+### Phase 5: AI Visualization
+- Customer uploads room photo
+- Select products/materials
+- Gemini Nano Banana generates "after" visualization
 
 ---
 
 ## Testing Status (Feb 17, 2026)
 - **Backend API:** ✅ 100% Pass
-- **Frontend E2E:** ✅ 100% Pass (verified with testing_agent)
-  - Signup flow ✅
-  - Onboarding 3-step wizard ✅
-  - Dashboard ✅
-  - Projects CRUD ✅
-  - Quote Builder (AbortError fix verified) ✅
-  - Labor Calculator ✅
-  - Navigation ✅
-  - Quick Add dropdown ✅
-  - Sign out ✅
-
-
----
-
-## What's Not Yet Implemented
-
-### P1 - Core Features
-- [ ] Change Orders CRUD with Supabase (currently mock data)
-- [ ] Production Logs CRUD with Supabase (currently mock data)
-- [ ] Scope Library management
-- [ ] Labor Profile save/load
-- [ ] Change Order PDF export
-
-### P2 - Elite Features
-- [ ] Reports module with Recharts visualizations
-- [ ] KPI calculations from real data
-- [ ] Monthly performance summaries
-- [ ] Overrun warning system
-
-### P3 - Polish
-- [ ] User profile editing in Settings
-- [ ] Password reset flow
-- [ ] Email verification
-- [ ] Notification preferences
-- [ ] Data export functionality
+- **Frontend E2E:** ✅ 100% Pass
+  - All existing features ✅
+  - Milestones tab ✅
+  - Tab navigation ✅
+  - Client review page route ✅
 
 ---
 
 ## Files of Reference
-- `/app/backend/server.py` - FastAPI with Stripe
-- `/app/frontend/src/App.js` - Main router
-- `/app/frontend/src/store/authStore.js` - Auth state with session handling (key file for auth fixes)
-- `/app/frontend/src/pages/app/EstimatingPage.jsx` - Quote Builder
-- `/app/frontend/src/pages/app/ProjectsPage.jsx` - Projects CRUD
-- `/app/frontend/src/pages/app/ProjectDetailPage.jsx` - Project detail view/edit
+- `/app/frontend/src/pages/app/ProjectDetailPage.jsx` - Project detail with tabs
+- `/app/frontend/src/components/milestones/ProjectMilestones.jsx` - Milestone component
+- `/app/frontend/src/pages/public/ClientReviewPage.jsx` - Client approval page
+- `/app/frontend/src/pages/app/DashboardPage.jsx` - Dashboard with milestone widget
+- `/app/supabase_schema_v2.sql` - New milestone database schema
 
 ---
 
 ## Notes
 - Dashboard, Change Orders, and Production pages show MOCKED demo data by design
-- All data operations (Projects, Quotes) go through Supabase with RLS policies
-- Magic Link emails require correct Site URL in Supabase Auth settings
+- Milestone feature requires running `supabase_schema_v2.sql` first
+- Client review links expire after 90 days by default
