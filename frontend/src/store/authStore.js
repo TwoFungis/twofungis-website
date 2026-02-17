@@ -223,45 +223,63 @@ export const useAuthStore = create((set, get) => ({
     const { user, profile } = get();
     if (!user) return { error: { message: 'Not authenticated' } };
 
-    try {
-      // Try to get session, but don't fail if it's not available
-      // The RLS will verify the token anyway
-      const { data: sessionData } = await supabase.auth.getSession();
-      
-      if (!sessionData?.session) {
-        // Try to refresh the session
-        console.log('No session found, attempting refresh...');
-        const { error: refreshError } = await supabase.auth.refreshSession();
-        if (refreshError) {
-          console.warn('Session refresh failed:', refreshError);
-          // Continue anyway - the stored token might still work
-        }
-      }
-
+    // Helper function to perform the actual database operation
+    const performUpdate = async () => {
       if (profile) {
         const { error } = await supabase
           .from('users_profile')
           .update(profileData)
           .eq('user_id', user.id);
-        if (error) {
-          console.error('Profile update error:', error);
-          throw error;
-        }
+        return error;
       } else {
         const { error } = await supabase
           .from('users_profile')
           .insert({ user_id: user.id, ...profileData });
-        if (error) {
-          console.error('Profile insert error:', error);
-          throw error;
+        return error;
+      }
+    };
+
+    try {
+      // Ensure we have a valid session first
+      let session = await waitForSession(3, 300);
+      
+      if (!session) {
+        // Try to refresh the session
+        console.log('No session found, attempting refresh...');
+        const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+        if (refreshError) {
+          console.warn('Session refresh failed:', refreshError);
+        } else if (refreshData?.session) {
+          session = refreshData.session;
         }
+      }
+
+      // First attempt
+      let dbError = await performUpdate();
+      
+      // If auth error, try refreshing session and retry once
+      if (dbError && (dbError.message?.includes('JWT') || dbError.code === 'PGRST301')) {
+        console.log('Auth error detected, refreshing session and retrying...');
+        const { error: refreshError } = await supabase.auth.refreshSession();
+        if (!refreshError) {
+          dbError = await performUpdate();
+        }
+      }
+
+      if (dbError) {
+        console.error('Profile operation error:', dbError);
+        throw dbError;
       }
 
       await get().fetchProfile();
       return { error: null };
     } catch (err) {
       console.error('UpdateProfile error:', err);
-      return { error: { message: err.message || 'Failed to update profile' } };
+      // Return user-friendly error message
+      const message = err.message?.includes('not authenticated') || err.message?.includes('JWT')
+        ? 'Session expired. Please try again or refresh the page.'
+        : err.message || 'Failed to update profile';
+      return { error: { message } };
     }
   },
 }));
