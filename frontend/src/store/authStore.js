@@ -145,22 +145,49 @@ export const useAuthStore = create((set, get) => ({
 
   signUp: async (email, password) => {
     set({ loading: true });
+    const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
+    const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
+    
     try {
-      const { data, error } = await supabase.auth.signUp({ 
-        email, 
-        password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/app/dashboard`
-        }
+      // Use XMLHttpRequest to avoid body stream issues
+      const response = await new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', `${supabaseUrl}/auth/v1/signup`);
+        xhr.setRequestHeader('apikey', supabaseAnonKey);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        
+        xhr.onload = () => {
+          try {
+            const data = JSON.parse(xhr.responseText);
+            resolve({ status: xhr.status, ok: xhr.status >= 200 && xhr.status < 300, data });
+          } catch (e) {
+            reject(new Error('Failed to parse response'));
+          }
+        };
+        
+        xhr.onerror = () => reject(new Error('Network error'));
+        xhr.send(JSON.stringify({ email: email.trim().toLowerCase(), password }));
       });
       
       set({ loading: false });
       
-      if (error) {
-        return { error };
+      if (!response.ok) {
+        const errorMsg = response.data.msg || response.data.error_description || 'Signup failed';
+        return { error: { message: errorMsg } };
       }
       
-      return { error: null, data };
+      // Set the session if we got tokens back
+      if (response.data.access_token && response.data.refresh_token) {
+        await supabase.auth.setSession({
+          access_token: response.data.access_token,
+          refresh_token: response.data.refresh_token,
+        });
+        
+        const { data: sessionData } = await supabase.auth.getSession();
+        return { error: null, data: { user: sessionData.session?.user, session: sessionData.session } };
+      }
+      
+      return { error: null, data: response.data };
     } catch (err) {
       console.error('SignUp error:', err);
       set({ loading: false });
