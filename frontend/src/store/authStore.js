@@ -134,11 +134,15 @@ export const useAuthStore = create((set, get) => ({
       }
       
       if (data?.user) {
-        set({ user: data.user });
-        await get().fetchProfile();
+        set({ user: data.user, loading: false });
+        // Fetch profile in background
+        get().fetchProfile().catch(err => {
+          console.error('Error fetching profile:', err);
+        });
+      } else {
+        set({ loading: false });
       }
       
-      set({ loading: false });
       return { error: null };
     } catch (err) {
       console.error('SignIn error:', err);
