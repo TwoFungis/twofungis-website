@@ -306,7 +306,7 @@ const LandingPage = () => {
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${IMAGES.testimonials})` }}
         >
-          <div className="absolute inset-0 bg-charcoal-900/98"></div>
+          <div className="absolute inset-0 bg-charcoal-900/88"></div>
         </div>
         
         <div className="relative max-w-6xl mx-auto">
