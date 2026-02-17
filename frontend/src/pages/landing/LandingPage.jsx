@@ -62,7 +62,7 @@ const LandingPage = () => {
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: `url(${IMAGES.hero})` }}
         >
-          <div className="absolute inset-0 bg-gradient-to-b from-charcoal-900 via-charcoal-900/95 to-charcoal-900"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-charcoal-900/80 via-charcoal-900/85 to-charcoal-900"></div>
         </div>
         
         <div className="relative max-w-4xl mx-auto text-center">
