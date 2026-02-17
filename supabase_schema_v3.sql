@@ -233,3 +233,20 @@ WHERE up.user_role = 'contractor';
 
 -- Grant access to the view
 GRANT SELECT ON public_contractor_profiles TO anon, authenticated;
+
+-- =====================================================
+-- 7. ALLOW PUBLIC TO VIEW CONTRACTOR PROFILES
+-- =====================================================
+-- Drop existing restrictive policy if it exists
+DROP POLICY IF EXISTS "Users can view own profile" ON users_profile;
+
+-- Allow users to view their own profile
+CREATE POLICY "Users can view own profile" ON users_profile
+  FOR SELECT USING (auth.uid() = user_id);
+
+-- Allow public to view contractor profiles (for public profile pages)
+CREATE POLICY "Public can view contractor profiles" ON users_profile
+  FOR SELECT USING (
+    user_role = 'contractor' 
+    AND onboarding_completed = true
+  );
