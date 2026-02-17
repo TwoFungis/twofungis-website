@@ -83,18 +83,38 @@ const OnboardingPage = () => {
         onboarding_completed: true
       });
       if (result?.error) {
-        // More user-friendly error handling
-        if (result.error.message?.includes('Session expired') || result.error.message?.includes('authenticated')) {
+        // Handle specific errors with user-friendly messages
+        const errorMsg = result.error.message || '';
+        if (errorMsg.includes('Session expired') || errorMsg.includes('authenticated')) {
           setError('Your session has expired. Please refresh the page and try again.');
+        } else if (errorMsg.includes('body stream') || errorMsg.includes('Connection error')) {
+          // Retry once on connection errors
+          console.log('Connection error, retrying...');
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          const retryResult = await updateProfile({
+            ...formData,
+            user_role: 'contractor',
+            onboarding_completed: true
+          });
+          if (retryResult?.error) {
+            setError('Connection issue. Please check your internet and try again.');
+          } else {
+            navigate('/app/dashboard');
+            return;
+          }
         } else {
-          setError(result.error.message || 'Failed to save profile');
+          setError(errorMsg || 'Failed to save profile');
         }
       } else {
         navigate('/app/dashboard');
       }
     } catch (err) {
       console.error('Onboarding error:', err);
-      setError(err.message || 'Something went wrong. Please try again.');
+      if (err.message?.includes('body stream')) {
+        setError('Connection issue. Please check your internet and try again.');
+      } else {
+        setError(err.message || 'Something went wrong. Please try again.');
+      }
     } finally {
       setIsSubmitting(false);
     }
