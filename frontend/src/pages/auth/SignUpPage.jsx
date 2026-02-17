@@ -38,7 +38,13 @@ const SignUpPage = () => {
       if (result?.error) {
         setError(result.error.message || 'Failed to create account');
       } else {
-        setSuccess(true);
+        // If user data is returned, they're automatically signed in
+        if (result?.data?.user) {
+          // Redirect to onboarding
+          navigate('/onboarding');
+        } else {
+          setSuccess(true);
+        }
       }
     } catch (err) {
       console.error('Signup error:', err);
