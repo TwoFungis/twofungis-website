@@ -226,6 +226,59 @@ const DashboardPage = () => {
           Track your change orders within 48 hours of the work being requested. Projects with quick CO documentation have 3x higher approval rates.
         </p>
       </div>
+
+      {/* Milestone Summary Widget */}
+      {(milestoneStats.total > 0 || milestoneStats.pending > 0) && (
+        <div className="bg-charcoal-800 rounded-xl border border-charcoal-700">
+          <div className="p-4 lg:p-6 border-b border-charcoal-700 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Target className="w-5 h-5 text-steel-400" />
+              <h2 className="text-lg font-semibold text-white">Milestone Summary</h2>
+            </div>
+            <Link to="/app/projects" className="text-steel-400 text-sm hover:text-steel-300">View projects</Link>
+          </div>
+          <div className="p-4 lg:p-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="bg-charcoal-700/50 rounded-lg p-4">
+                <div className="flex items-center gap-2 text-gray-400 mb-2">
+                  <Wallet className="w-4 h-4" />
+                  <span className="text-xs">Total Value</span>
+                </div>
+                <p className="text-xl font-bold text-white">
+                  {new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD', maximumFractionDigits: 0 }).format(milestoneStats.total)}
+                </p>
+              </div>
+              <div className="bg-steel-500/10 rounded-lg p-4 border border-steel-500/30">
+                <div className="flex items-center gap-2 text-steel-400 mb-2">
+                  <Clock className="w-4 h-4" />
+                  <span className="text-xs">Pending Approval</span>
+                </div>
+                <p className="text-xl font-bold text-steel-400">
+                  {new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD', maximumFractionDigits: 0 }).format(milestoneStats.pending)}
+                </p>
+              </div>
+              <div className="bg-success/10 rounded-lg p-4 border border-success/30">
+                <div className="flex items-center gap-2 text-success mb-2">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span className="text-xs">Approved</span>
+                </div>
+                <p className="text-xl font-bold text-success">
+                  {new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD', maximumFractionDigits: 0 }).format(milestoneStats.approved)}
+                </p>
+              </div>
+              <div className="bg-emerald-700/10 rounded-lg p-4 border border-emerald-700/30">
+                <div className="flex items-center gap-2 text-emerald-400 mb-2">
+                  <DollarSign className="w-4 h-4" />
+                  <span className="text-xs">Paid</span>
+                </div>
+                <p className="text-xl font-bold text-emerald-400">
+                  {new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD', maximumFractionDigits: 0 }).format(milestoneStats.paid)}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
