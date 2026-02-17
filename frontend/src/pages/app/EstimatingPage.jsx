@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuthStore } from '../../store/authStore';
-import jsPDF from 'jspdf';
+import { downloadQuotePDF } from '../../utils/pdfGenerator';
 
 const EstimatingPage = () => {
   const { id } = useParams();
