@@ -9,6 +9,7 @@ import TermsPage from './pages/landing/TermsPage';
 
 // Public Pages
 import ClientReviewPage from './pages/public/ClientReviewPage';
+import PublicContractorProfile from './pages/public/PublicContractorProfile';
 
 // Auth Pages
 import LoginPage from './pages/auth/LoginPage';
