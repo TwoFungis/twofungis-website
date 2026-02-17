@@ -54,7 +54,7 @@ const ProfilePage = () => {
             {/* Email */}
             <div>
               <label className="block text-sm font-medium text-gray-400 mb-2">Email Address</label>
-              <p className="text-white">{profile?.email || 'Not set'}</p>
+              <p className="text-white">{user?.email || 'Not set'}</p>
               <p className="text-xs text-gray-500 mt-1">Contact support to change your email</p>
             </div>
 
