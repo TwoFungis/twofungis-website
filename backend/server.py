@@ -326,6 +326,9 @@ async def get_user_subscription(user_id: str):
 # Include the router in the main app
 app.include_router(api_router)
 
+# Include bookkeeping routes under /api
+app.include_router(bookkeeping_router, prefix="/api")
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
