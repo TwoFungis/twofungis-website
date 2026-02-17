@@ -89,24 +89,28 @@ Contractors need a purpose-built operating system to manage their business opera
 
 ## ⚠️ ACTION REQUIRED: Run Database Schema Updates
 
-**The Milestone and Contractor Hub features require additional database columns.**
+**STATUS: ✅ COMPLETED (Feb 17, 2026)**
 
-Run these SQL files in your Supabase SQL Editor (in order):
+The user has successfully applied the consolidated database schema which includes:
+- All columns needed for `users_profile` (bio, skills, certifications, etc.)
+- `project_milestones` table for milestone tracking
+- Support for contractor reviews and badges
 
-1. **`/app/supabase_schema_v2.sql`** - Adds:
-   - `project_milestones` table
-   - `client_approval_tokens` table  
-   - `milestone_approval_log` table
-   - Milestone-related functions
+The simplified schema was applied via `/app/APPLY_THIS_SCHEMA.sql` (consolidated version).
 
-2. **`/app/supabase_schema_v3.sql`** - Adds:
-   - `contractor_reviews` table
-   - `contractor_badges` table
-   - `portfolio_images` table
-   - New columns to `users_profile`: `user_role`, `bio`, `skills`, `certifications`, `years_experience`, `service_areas`, `portfolio_urls`, `rating_avg`, `rating_count`, `verified`, `avatar_url`
-   - Public profile view
+---
 
-**Without running these schemas, you will see "Connection issue" errors during onboarding and profile editing.**
+## Recent Enhancements (Feb 17, 2026)
+
+### ✅ Professional PDF Invoicing
+- Integrated `downloadQuotePDF` from `/app/frontend/src/utils/pdfGenerator.js`
+- Added "Download PDF" button to saved quotes in Estimating page
+- Professional PDF layout with company branding
+
+### ✅ Landing Page Enhancements
+- **ROI Calculator Section** - Shows potential savings ($18K-$27K recovery, 25x-38x ROI)
+- **Video Demo Section** - "Watch How TradeOS Works" placeholder with play button
+- **Success Stories/Case Studies** - 3 cards with real contractor results (+12% margin, 3hrs saved, $0 unpaid extras)
 
 ---
 
