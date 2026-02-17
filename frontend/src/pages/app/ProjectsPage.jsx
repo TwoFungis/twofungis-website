@@ -29,10 +29,6 @@ const ProjectsPage = () => {
     notes: ''
   });
 
-  useEffect(() => {
-    fetchProjects();
-  }, [user]);
-
   const fetchProjects = async () => {
     if (!user) return;
     
