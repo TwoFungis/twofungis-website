@@ -75,14 +75,26 @@ Contractors need a purpose-built operating system to manage their business opera
 
 ---
 
-## ⚠️ ACTION REQUIRED: Run Database Schema v2
+## ⚠️ ACTION REQUIRED: Run Database Schema Updates
 
-**To enable Milestone features, run the new SQL schema:**
-1. Log into your Supabase dashboard
-2. Go to SQL Editor
-3. Copy contents of `/app/supabase_schema_v2.sql`
-4. Run the SQL script
-5. New tables will be created: project_milestones, client_approval_tokens, milestone_approval_log
+**The Milestone and Contractor Hub features require additional database columns.**
+
+Run these SQL files in your Supabase SQL Editor (in order):
+
+1. **`/app/supabase_schema_v2.sql`** - Adds:
+   - `project_milestones` table
+   - `client_approval_tokens` table  
+   - `milestone_approval_log` table
+   - Milestone-related functions
+
+2. **`/app/supabase_schema_v3.sql`** - Adds:
+   - `contractor_reviews` table
+   - `contractor_badges` table
+   - `portfolio_images` table
+   - New columns to `users_profile`: `user_role`, `bio`, `skills`, `certifications`, `years_experience`, `service_areas`, `portfolio_urls`, `rating_avg`, `rating_count`, `verified`, `avatar_url`
+   - Public profile view
+
+**Without running these schemas, you will see "Connection issue" errors during onboarding and profile editing.**
 
 ---
 
