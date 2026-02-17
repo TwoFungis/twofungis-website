@@ -151,12 +151,6 @@ export const useAuthStore = create((set, get) => ({
       return { error: { message: err.message || 'Signup failed' } };
     }
   },
-    } catch (err) {
-      console.error('SignUp error:', err);
-      set({ loading: false });
-      return { error: { message: err.message || 'Signup failed' } };
-    }
-  },
 
   signInWithMagicLink: async (email) => {
     set({ loading: true });
