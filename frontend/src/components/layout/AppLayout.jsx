@@ -15,7 +15,8 @@ import {
   X,
   FileSpreadsheet,
   Crown,
-  User
+  User,
+  Receipt
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { Logo, LogoIcon } from '../ui/Logo';
