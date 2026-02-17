@@ -35,21 +35,26 @@ const SignUpPage = () => {
     
     try {
       const result = await signUp(email, password);
+      console.log('Signup result:', result);
+      
       if (result?.error) {
         setError(result.error.message || 'Failed to create account');
+        setIsSubmitting(false);
       } else {
         // If user data is returned, they're automatically signed in
         if (result?.data?.user) {
+          console.log('User created, redirecting to onboarding');
           // Redirect to onboarding
           navigate('/onboarding');
         } else {
+          console.log('No user data, showing success message');
           setSuccess(true);
+          setIsSubmitting(false);
         }
       }
     } catch (err) {
       console.error('Signup error:', err);
       setError(err.message || 'An unexpected error occurred');
-    } finally {
       setIsSubmitting(false);
     }
   };
