@@ -1,53 +1,183 @@
-# Two Fungis Ltd - Portfolio Website PRD
+# TradeOS - Product Requirements Document
 
-## Original Problem Statement
-Build a professional portfolio website for Two Fungis Ltd., a construction company specializing in interior finishing services. The brand colors are red, black, and white with green accents. The site should be deployed to `twofungis.ca` domain.
+## Product Overview
+**Name:** TradeOS™  
+**Tagline:** Built for Builders  
+**Type:** SaaS Web Application  
+**Target Audience:** Trades, Subcontractors, and Small General Contractors
 
-## User Personas
-- **Primary**: Potential residential/commercial clients looking for interior finishing services in British Columbia
-- **Secondary**: General contractors and developers seeking subcontractors
+## Problem Statement
+Contractors need a purpose-built operating system to manage their business operations - from quoting jobs to tracking profitability, managing change orders, and logging daily production. TradeOS provides all these tools in a single, mobile-first platform designed specifically for the construction trades.
 
 ## Core Requirements
-- Professional portfolio website with brand identity
-- Sections: Hero, About Us, Services, Portfolio, Why Choose Us, Contact, Footer
-- Color palette: Red (#DC2626), Black, White, Green (#228B22)
-- SEO-optimized landing pages for cities in British Columbia
-- Mobile-responsive design
-- Deployed to `twofungis.ca` via Netlify
 
-## Technical Architecture
-- **Frontend**: React with TailwindCSS
-- **Routing**: react-router-dom with hash navigation support
-- **Hosting**: Netlify (auto-deploys from GitHub)
-- **Domain**: twofungis.ca (managed on GoDaddy)
+### Branding & Design
+- Professional, minimal, industrial style
+- Dark theme with deep charcoal background (#0d0d0d - #333333)
+- Steel blue accents (#5a8fb8)
+- Status colors: Success (green), Warning (yellow), Risk (red)
 
-## Implemented Features (as of Dec 2025)
-- [x] Homepage with Hero, About, Services, Portfolio, Why Choose Us, Contact sections
-- [x] 20+ SEO landing pages for BC cities
-- [x] Mobile-responsive design
-- [x] Brand colors and typography
-- [x] $5M insurance badge
-- [x] Scroll-to-top on navigation
-- [x] Cross-page navigation (Header/Footer links work from all pages)
+### Tech Stack
+- **Frontend:** React with Tailwind CSS
+- **Backend:** Supabase (Authentication + PostgreSQL Database with RLS)
+- **Payments:** Stripe (for subscriptions)
+- **State Management:** Zustand
 
-## Recent Changes
-- **Feb 2026**: Fixed navigation links to work from landing pages
-  - Header.jsx: Added useNavigate/useLocation for cross-page navigation
-  - Footer.jsx: Updated quicklinks to use absolute paths (/#section)
-  - App.js: Enhanced ScrollToTop to handle hash scrolling
-  - Added root netlify.toml with correct base directory setting
-  - Fixed deployment to push to `master` branch (Netlify's configured branch)
+### Pricing Tiers
+| Feature | Pro ($39/mo) | Elite ($59/mo) |
+|---------|--------------|----------------|
+| Unlimited Projects | ✓ | ✓ |
+| Quote Builder + PDF | ✓ | ✓ |
+| Change Order Manager | ✓ | ✓ |
+| Labor Cost Engine | ✓ | ✓ |
+| Production Logs | ✓ | ✓ |
+| Dashboard Analytics | ✓ | ✓ |
+| Advanced Reports & KPIs | ✗ | ✓ |
+| Production Analytics | ✗ | ✓ |
+| Priority Support | ✗ | ✓ |
 
-## Backlog / Future Tasks
-- [ ] Clean up unused /backend directory (optional)
-- [ ] Code cleanup for redundant TailwindCSS classes (optional)
+### 7-Day Free Trial
+- No credit card required
+- Full access to selected plan features
+- Coupon support for early adopters via Stripe
 
-## Deployment Workflow
-1. Make changes locally
-2. Push to GitHub (TwoFungis/twofungis-website)
-3. Netlify auto-deploys to twofungis.ca
+---
 
-## Credentials
-- GitHub: TwoFungis
-- Domain: twofungis.ca (GoDaddy)
-- Hosting: Netlify
+## What's Been Implemented (January 2026)
+
+### ✅ Completed Features
+
+#### Public Pages
+- [x] Landing Page with hero, features, pricing, testimonials, FAQ
+- [x] Privacy Policy page
+- [x] Terms of Service page
+- [x] Responsive design (mobile + desktop)
+
+#### Authentication (UI)
+- [x] Login page (email/password + magic link toggle)
+- [x] Signup page with plan selection
+- [x] Onboarding flow (3-step: name/company → trade → region)
+- [x] Protected route middleware
+- [x] Supabase client configuration
+
+#### App Shell & Navigation
+- [x] App Layout with sidebar navigation
+- [x] Desktop sidebar with all navigation items
+- [x] Mobile bottom nav + hamburger menu
+- [x] Quick Add dropdown for common actions
+- [x] User profile display + sign out
+
+#### App Pages (UI with Mock Data)
+- [x] Dashboard with stats cards and project overview
+- [x] Projects page with list view and create modal
+- [x] Project Detail page (placeholder)
+- [x] Estimating page (placeholder with feature preview)
+- [x] Labor Cost Engine (fully functional calculator)
+- [x] Change Orders page with status tracking
+- [x] Production Logs page with daily log tracking
+- [x] Reports page (gated for Elite users)
+- [x] Settings page (profile, subscription, security)
+
+### 🔧 Configuration
+- [x] Supabase credentials configured in .env
+- [x] Tailwind CSS with custom TradeOS color palette
+- [x] Zustand auth store with Supabase integration
+
+---
+
+## What's Not Yet Implemented
+
+### P0 - Critical (Blocks Real Usage)
+- [ ] Supabase database tables creation (users_profile, projects, change_orders, etc.)
+- [ ] Row Level Security (RLS) policies
+- [ ] Stripe subscription integration
+- [ ] Email verification flow
+- [ ] Password reset flow
+
+### P1 - Core Features
+- [ ] Projects CRUD with Supabase
+- [ ] Quote Builder with PDF export
+- [ ] Change Order Manager with PDF export
+- [ ] Production Log data persistence
+- [ ] Labor Profile save/load
+- [ ] Scope Library management
+- [ ] Billing page for subscription management
+
+### P2 - Elite Features
+- [ ] Reports module with charts (Recharts integration)
+- [ ] KPI calculations
+- [ ] Monthly performance summaries
+- [ ] Overrun warning system
+- [ ] Production analytics
+
+### P3 - Polish
+- [ ] Onboarding data persistence
+- [ ] User profile editing
+- [ ] Notification preferences
+- [ ] Two-factor authentication
+- [ ] Data export functionality
+
+---
+
+## Database Schema (Pending Supabase Setup)
+
+```sql
+-- users_profile
+CREATE TABLE users_profile (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id),
+  name TEXT,
+  company_name TEXT,
+  trade_type TEXT,
+  region TEXT,
+  phone TEXT,
+  onboarding_completed BOOLEAN DEFAULT false,
+  subscription_tier TEXT DEFAULT 'pro',
+  stripe_customer_id TEXT,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- projects
+CREATE TABLE projects (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id),
+  name TEXT NOT NULL,
+  client_gc TEXT,
+  region TEXT,
+  contract_value NUMERIC DEFAULT 0,
+  approved_cos NUMERIC DEFAULT 0,
+  cost_to_date NUMERIC DEFAULT 0,
+  percent_complete INTEGER DEFAULT 0,
+  forecast_margin NUMERIC DEFAULT 20,
+  risk_flag TEXT DEFAULT 'green',
+  notes TEXT,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- change_orders, labor_profiles, scope_library, quotes, quote_lines, production_logs...
+```
+
+---
+
+## Environment Variables
+
+### Frontend (.env)
+```
+REACT_APP_BACKEND_URL=https://trade-build.preview.emergentagent.com
+REACT_APP_SUPABASE_URL=https://ubhdmytfuzbabtnegxrd.supabase.co
+REACT_APP_SUPABASE_ANON_KEY=[configured]
+```
+
+---
+
+## Testing Status
+- Frontend UI: ✅ 100% Pass
+- Authentication: ⏳ Pending (Supabase tables needed)
+- Data persistence: ⏳ Pending
+
+## Files of Reference
+- `/app/frontend/src/App.js` - Main router
+- `/app/frontend/src/store/authStore.js` - Auth state
+- `/app/frontend/src/lib/supabase.js` - Supabase client
+- `/app/frontend/src/pages/` - All page components
+- `/app/frontend/src/components/layout/AppLayout.jsx` - App shell
