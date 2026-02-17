@@ -17,7 +17,61 @@ import { useAuthStore } from '../../store/authStore';
 import { supabase } from '../../lib/supabase';
 
 const DashboardPage = () => {
-  const { profile } = useAuthStore();
+  const { profile, user } = useAuthStore();
+  const [milestoneStats, setMilestoneStats] = useState({
+    total: 0,
+    pending: 0,
+    approved: 0,
+    paid: 0
+  });
+  const [realProjects, setRealProjects] = useState([]);
+  const [loadingMilestones, setLoadingMilestones] = useState(true);
+
+  useEffect(() => {
+    const fetchMilestoneStats = async () => {
+      if (!user) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('project_milestones')
+          .select('milestone_value, status')
+          .eq('user_id', user.id);
+
+        if (!error && data) {
+          const stats = data.reduce((acc, m) => ({
+            total: acc.total + (parseFloat(m.milestone_value) || 0),
+            pending: acc.pending + (m.status === 'submitted' ? parseFloat(m.milestone_value) || 0 : 0),
+            approved: acc.approved + (m.status === 'approved' ? parseFloat(m.milestone_value) || 0 : 0),
+            paid: acc.paid + (m.status === 'paid' ? parseFloat(m.milestone_value) || 0 : 0)
+          }), { total: 0, pending: 0, approved: 0, paid: 0 });
+          setMilestoneStats(stats);
+        }
+      } catch (err) {
+        console.error('Error fetching milestone stats:', err);
+      }
+      
+      // Fetch real projects
+      try {
+        const { data: projectsData } = await supabase
+          .from('projects')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('status', 'active')
+          .order('created_at', { ascending: false })
+          .limit(4);
+        
+        if (projectsData) {
+          setRealProjects(projectsData);
+        }
+      } catch (err) {
+        console.error('Error fetching projects:', err);
+      }
+      
+      setLoadingMilestones(false);
+    };
+
+    fetchMilestoneStats();
+  }, [user]);
 
   // Mock data for demonstration
   const stats = [
