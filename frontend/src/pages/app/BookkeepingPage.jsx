@@ -514,12 +514,30 @@ const BookkeepingPage = () => {
           </div>
         </div>
       )}
+        </>
+      )}
 
       {/* Receipt Scanner Modal */}
       {showScanner && (
         <ReceiptScanner 
           onExpenseExtracted={handleExpenseExtracted}
           onClose={() => setShowScanner(false)}
+        />
+      )}
+
+      {/* Manual Expense Form Modal */}
+      {showManualForm && (
+        <ManualExpenseForm 
+          onSubmit={handleManualExpenseSubmit}
+          onClose={() => setShowManualForm(false)}
+        />
+      )}
+
+      {/* Bulk Upload Modal */}
+      {showBulkUpload && (
+        <BulkReceiptUpload 
+          onComplete={handleBulkUploadComplete}
+          onClose={() => setShowBulkUpload(false)}
         />
       )}
     </div>
