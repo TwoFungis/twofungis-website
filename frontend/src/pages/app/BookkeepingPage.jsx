@@ -235,7 +235,7 @@ const BookkeepingPage = () => {
           <h1 className="text-2xl lg:text-3xl font-bold text-white">Bookkeeping</h1>
           <p className="text-gray-400">Track expenses, scan receipts, and prepare for tax season</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 flex-wrap">
           <button
             onClick={() => setShowScanner(true)}
             className="bg-steel-500 hover:bg-steel-600 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
@@ -245,7 +245,59 @@ const BookkeepingPage = () => {
             Scan Receipt
           </button>
           <button
-            onClick={() => setShowAddExpense(true)}
+            onClick={() => setShowBulkUpload(true)}
+            className="bg-charcoal-700 hover:bg-charcoal-600 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+            data-testid="bulk-upload-btn"
+          >
+            <Files className="w-5 h-5" />
+            Bulk Upload
+          </button>
+          <button
+            onClick={() => setShowManualForm(true)}
+            className="bg-charcoal-700 hover:bg-charcoal-600 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+            data-testid="add-manual-btn"
+          >
+            <Plus className="w-5 h-5" />
+            Add Manual
+          </button>
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex gap-1 bg-charcoal-800 rounded-lg p-1 w-fit">
+        <button
+          onClick={() => setActiveTab('expenses')}
+          className={`px-4 py-2 rounded-md font-medium transition-colors flex items-center gap-2 ${
+            activeTab === 'expenses' 
+              ? 'bg-steel-500 text-white' 
+              : 'text-gray-400 hover:text-white'
+          }`}
+        >
+          <Receipt className="w-4 h-4" />
+          Expenses
+        </button>
+        <button
+          onClick={() => setActiveTab('documents')}
+          className={`px-4 py-2 rounded-md font-medium transition-colors flex items-center gap-2 ${
+            activeTab === 'documents' 
+              ? 'bg-steel-500 text-white' 
+              : 'text-gray-400 hover:text-white'
+          }`}
+        >
+          <FolderOpen className="w-4 h-4" />
+          Document Vault
+        </button>
+      </div>
+
+      {/* Document Vault Tab */}
+      {activeTab === 'documents' && (
+        <DocumentVault userId={user?.id} />
+      )}
+
+      {/* Expenses Tab */}
+      {activeTab === 'expenses' && (
+        <>
+          {/* Storage Info */}
             className="bg-charcoal-700 hover:bg-charcoal-600 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
           >
             <Plus className="w-5 h-5" />
