@@ -169,24 +169,30 @@ export const useAuthStore = create((set, get) => ({
         xhr.send(JSON.stringify({ email: email.trim().toLowerCase(), password }));
       });
       
-      set({ loading: false });
-      
       if (!response.ok) {
+        set({ loading: false });
         const errorMsg = response.data.msg || response.data.error_description || 'Signup failed';
         return { error: { message: errorMsg } };
       }
       
       // Set the session if we got tokens back
       if (response.data.access_token && response.data.refresh_token) {
-        await supabase.auth.setSession({
+        // Set the session without awaiting to avoid blocking
+        supabase.auth.setSession({
           access_token: response.data.access_token,
           refresh_token: response.data.refresh_token,
+        }).then(() => {
+          console.log('Session set successfully');
+        }).catch(err => {
+          console.error('Error setting session:', err);
         });
         
-        const { data: sessionData } = await supabase.auth.getSession();
-        return { error: null, data: { user: sessionData.session?.user, session: sessionData.session } };
+        // Return with user data from response
+        set({ loading: false });
+        return { error: null, data: { user: response.data.user, session: response.data } };
       }
       
+      set({ loading: false });
       return { error: null, data: response.data };
     } catch (err) {
       console.error('SignUp error:', err);
