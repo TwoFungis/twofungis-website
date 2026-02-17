@@ -29,6 +29,7 @@ Contractors need a purpose-built operating system to manage their business opera
 - **Payments:** Stripe (subscriptions via emergentintegrations)
 - **State Management:** Zustand
 - **PDF Generation:** jsPDF
+- **AI Receipt Scanning:** GPT-4 Vision (via Emergent LLM key)
 - **AI Visualization:** Gemini Nano Banana (planned for Phase 5)
 
 ---
