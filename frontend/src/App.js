@@ -7,6 +7,9 @@ import LandingPage from './pages/landing/LandingPage';
 import PrivacyPage from './pages/landing/PrivacyPage';
 import TermsPage from './pages/landing/TermsPage';
 
+// Public Pages
+import ClientReviewPage from './pages/public/ClientReviewPage';
+
 // Auth Pages
 import LoginPage from './pages/auth/LoginPage';
 import SignUpPage from './pages/auth/SignUpPage';
