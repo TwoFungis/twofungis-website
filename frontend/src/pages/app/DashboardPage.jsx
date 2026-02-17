@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { 
   TrendingUp, 
   FolderKanban, 
@@ -6,9 +7,14 @@ import {
   AlertTriangle,
   DollarSign,
   ArrowUpRight,
-  ArrowDownRight
+  ArrowDownRight,
+  Target,
+  CheckCircle2,
+  Clock,
+  Wallet
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
+import { supabase } from '../../lib/supabase';
 
 const DashboardPage = () => {
   const { profile } = useAuthStore();
