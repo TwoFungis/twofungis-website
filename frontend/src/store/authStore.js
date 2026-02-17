@@ -1,6 +1,10 @@
 import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
 
+// Prevent duplicate initialization in React StrictMode
+let isInitializing = false;
+let authSubscription = null;
+
 export const useAuthStore = create((set, get) => ({
   user: null,
   profile: null,
@@ -8,6 +12,12 @@ export const useAuthStore = create((set, get) => ({
   initialized: false,
 
   initialize: async () => {
+    // Prevent duplicate initialization
+    if (isInitializing || get().initialized) {
+      return;
+    }
+    isInitializing = true;
+
     try {
       const { data: { session }, error } = await supabase.auth.getSession();
       if (error) {
@@ -21,6 +31,12 @@ export const useAuthStore = create((set, get) => ({
       console.error('Auth initialization error:', error);
     } finally {
       set({ loading: false, initialized: true });
+      isInitializing = false;
+    }
+
+    // Clean up existing subscription before creating new one
+    if (authSubscription) {
+      authSubscription.unsubscribe();
     }
 
     // Listen for auth changes
@@ -34,9 +50,14 @@ export const useAuthStore = create((set, get) => ({
       }
     });
 
+    authSubscription = subscription;
+
     // Return cleanup function
     return () => {
-      subscription?.unsubscribe();
+      if (authSubscription) {
+        authSubscription.unsubscribe();
+        authSubscription = null;
+      }
     };
   },
 
@@ -44,7 +65,7 @@ export const useAuthStore = create((set, get) => ({
     set({ loading: true });
     try {
       const { data, error } = await supabase.auth.signInWithPassword({ 
-        email, 
+        email: email.trim().toLowerCase(), 
         password 
       });
       
