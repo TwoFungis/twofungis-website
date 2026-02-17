@@ -14,13 +14,13 @@ import {
 } from 'lucide-react';
 import { Logo, LogoLink } from '../../components/ui/Logo';
 
-// Background images - Professional construction imagery
+// Background images - High resolution professional construction imagery
 const IMAGES = {
-  hero: 'https://customer-assets.emergentagent.com/job_a1f6d561-54ac-4bcc-bc40-125db753bb76/artifacts/hxw9loph_download.jpg', // Hardhat & handshake
-  features: 'https://customer-assets.emergentagent.com/job_a1f6d561-54ac-4bcc-bc40-125db753bb76/artifacts/gbtzud36_images%20%285%29.jpg', // Wood framing with sun
-  pricing: 'https://customer-assets.emergentagent.com/job_a1f6d561-54ac-4bcc-bc40-125db753bb76/artifacts/xyykd9dt_images%20%282%29.jpg', // Building under construction with crane
-  cta: 'https://customer-assets.emergentagent.com/job_a1f6d561-54ac-4bcc-bc40-125db753bb76/artifacts/ylasd6tj_istockphoto-170961867-612x612.jpg', // Two workers discussing
-  testimonials: 'https://customer-assets.emergentagent.com/job_a1f6d561-54ac-4bcc-bc40-125db753bb76/artifacts/zhomofq8_images.jpg' // Contractor with blueprints
+  hero: 'https://customer-assets.emergentagent.com/job_a1f6d561-54ac-4bcc-bc40-125db753bb76/artifacts/s7loht5o_istockphoto-1494480364-612x612.jpg', // Yellow hardhat on desk
+  features: 'https://customer-assets.emergentagent.com/job_a1f6d561-54ac-4bcc-bc40-125db753bb76/artifacts/oi2sq5qa_iStock-911225858-2048x1365.jpg', // Wood framing with sun (high res)
+  pricing: 'https://customer-assets.emergentagent.com/job_a1f6d561-54ac-4bcc-bc40-125db753bb76/artifacts/us5n0ifu_stock-photo-construction-site-with-crane-and-building.jpg', // Building with crane
+  cta: 'https://customer-assets.emergentagent.com/job_a1f6d561-54ac-4bcc-bc40-125db753bb76/artifacts/vgvhz8qu_istockphoto-170961867-612x612.jpg', // Two workers discussing
+  testimonials: 'https://customer-assets.emergentagent.com/job_a1f6d561-54ac-4bcc-bc40-125db753bb76/artifacts/7u5cy79m_istockphoto-1420678520-612x612.jpg' // Construction cranes at sunset
 };
 
 const LandingPage = () => {
