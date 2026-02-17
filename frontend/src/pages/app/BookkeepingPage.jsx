@@ -298,34 +298,25 @@ const BookkeepingPage = () => {
       {activeTab === 'expenses' && (
         <>
           {/* Storage Info */}
-            className="bg-charcoal-700 hover:bg-charcoal-600 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
-          >
-            <Plus className="w-5 h-5" />
-            Add Manual
-          </button>
-        </div>
-      </div>
-
-      {/* Storage Info */}
-      {storageInfo && (
-        <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-4">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2 text-gray-400 text-sm">
-              <HardDrive className="w-4 h-4" />
-              <span>Storage: {storageInfo.used_display} / {storageInfo.limit_display}</span>
+          {storageInfo && (
+            <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-4">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2 text-gray-400 text-sm">
+                  <HardDrive className="w-4 h-4" />
+                  <span>Storage: {storageInfo.used_display} / {storageInfo.limit_display}</span>
+                </div>
+                <span className="text-xs text-gray-500 capitalize">{storageInfo.tier} Plan</span>
+              </div>
+              <div className="h-2 bg-charcoal-700 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-steel-500 rounded-full transition-all"
+                  style={{ width: `${Math.min(storageInfo.percent_used, 100)}%` }}
+                />
+              </div>
             </div>
-            <span className="text-xs text-gray-500 capitalize">{storageInfo.tier} Plan</span>
-          </div>
-          <div className="h-2 bg-charcoal-700 rounded-full overflow-hidden">
-            <div 
-              className="h-full bg-steel-500 rounded-full transition-all"
-              style={{ width: `${Math.min(storageInfo.percent_used, 100)}%` }}
-            />
-          </div>
-        </div>
-      )}
+          )}
 
-      {/* Stats Cards */}
+          {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-4">
           <div className="flex items-center gap-3 mb-2">
