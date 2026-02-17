@@ -266,17 +266,30 @@ export const useAuthStore = create((set, get) => ({
     if (!user) return { error: { message: 'Not authenticated' } };
 
     try {
+      // First verify we have a valid session
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData?.session) {
+        console.error('No valid session for profile update');
+        return { error: { message: 'Session expired. Please log in again.' } };
+      }
+
       if (profile) {
         const { error } = await supabase
           .from('users_profile')
           .update(profileData)
           .eq('user_id', user.id);
-        if (error) throw error;
+        if (error) {
+          console.error('Profile update error:', error);
+          throw error;
+        }
       } else {
         const { error } = await supabase
           .from('users_profile')
           .insert({ user_id: user.id, ...profileData });
-        if (error) throw error;
+        if (error) {
+          console.error('Profile insert error:', error);
+          throw error;
+        }
       }
 
       await get().fetchProfile();
