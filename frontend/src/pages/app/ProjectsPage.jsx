@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { 
   Plus, 
@@ -6,8 +6,9 @@ import {
   Filter,
   MoreVertical,
   FolderKanban,
-  TrendingUp,
-  X
+  X,
+  Trash2,
+  Edit
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuthStore } from '../../store/authStore';
@@ -19,6 +20,8 @@ const ProjectsPage = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [error, setError] = useState(null);
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
   const { user } = useAuthStore();
 
   const [formData, setFormData] = useState({
@@ -29,25 +32,39 @@ const ProjectsPage = () => {
     notes: ''
   });
 
-  const fetchProjects = React.useCallback(async () => {
+  const fetchProjects = useCallback(async () => {
     if (!user) return;
     
     setLoading(true);
-    const { data, error } = await supabase
-      .from('projects')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false });
+    setError(null);
+    
+    try {
+      const { data, error: fetchError } = await supabase
+        .from('projects')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
 
-    if (error) {
-      console.error('Error fetching projects:', error);
-    } else {
-      setProjects(data || []);
+      if (fetchError) {
+        // Check if it's a "table doesn't exist" error
+        if (fetchError.code === '42P01' || fetchError.message.includes('does not exist')) {
+          setError('Database tables not yet created. Please run the SQL schema in Supabase.');
+          setProjects([]);
+        } else {
+          throw fetchError;
+        }
+      } else {
+        setProjects(data || []);
+      }
+    } catch (err) {
+      console.error('Error fetching projects:', err);
+      setError('Failed to load projects. ' + (err.message || ''));
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [user]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     fetchProjects();
   }, [fetchProjects]);
 
@@ -55,26 +72,57 @@ const ProjectsPage = () => {
     e.preventDefault();
     if (!user) return;
 
-    const { error } = await supabase.from('projects').insert({
-      user_id: user.id,
-      name: formData.name,
-      client_gc: formData.client_gc,
-      region: formData.region,
-      contract_value: parseFloat(formData.contract_value) || 0,
-      notes: formData.notes,
-      approved_cos: 0,
-      cost_to_date: 0,
-      percent_complete: 0,
-      forecast_margin: 20,
-      risk_flag: 'green'
-    });
+    setError(null);
+    
+    try {
+      const { error: insertError } = await supabase.from('projects').insert({
+        user_id: user.id,
+        name: formData.name,
+        client_gc: formData.client_gc,
+        region: formData.region,
+        contract_value: parseFloat(formData.contract_value) || 0,
+        notes: formData.notes,
+        approved_cos: 0,
+        cost_to_date: 0,
+        percent_complete: 0,
+        forecast_margin: 20,
+        risk_flag: 'green'
+      });
 
-    if (error) {
-      console.error('Error creating project:', error);
-    } else {
-      setFormData({ name: '', client_gc: '', region: '', contract_value: '', notes: '' });
-      setIsModalOpen(false);
+      if (insertError) {
+        if (insertError.code === '42P01') {
+          setError('Database tables not yet created. Please run the SQL schema in Supabase.');
+        } else {
+          throw insertError;
+        }
+      } else {
+        setFormData({ name: '', client_gc: '', region: '', contract_value: '', notes: '' });
+        setIsModalOpen(false);
+        fetchProjects();
+      }
+    } catch (err) {
+      console.error('Error creating project:', err);
+      setError('Failed to create project: ' + (err.message || ''));
+    }
+  };
+
+  const handleDelete = async (projectId) => {
+    if (!user) return;
+    
+    try {
+      const { error: deleteError } = await supabase
+        .from('projects')
+        .delete()
+        .eq('id', projectId)
+        .eq('user_id', user.id);
+
+      if (deleteError) throw deleteError;
+      
+      setDeleteConfirm(null);
       fetchProjects();
+    } catch (err) {
+      console.error('Error deleting project:', err);
+      setError('Failed to delete project: ' + (err.message || ''));
     }
   };
 
@@ -93,7 +141,7 @@ const ProjectsPage = () => {
   };
 
   const formatCurrency = (value) => {
-    return new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD', maximumFractionDigits: 0 }).format(value);
+    return new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD', maximumFractionDigits: 0 }).format(value || 0);
   };
 
   return (
@@ -113,6 +161,13 @@ const ProjectsPage = () => {
           New Project
         </button>
       </div>
+
+      {/* Error Message */}
+      {error && (
+        <div className="bg-risk/20 border border-risk/50 text-risk p-4 rounded-lg">
+          {error}
+        </div>
+      )}
 
       {/* Search & Filter */}
       <div className="flex gap-4">
@@ -153,14 +208,13 @@ const ProjectsPage = () => {
       ) : (
         <div className="grid gap-4">
           {filteredProjects.map((project) => (
-            <Link
+            <div
               key={project.id}
-              to={`/app/projects/${project.id}`}
-              className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-4 lg:p-6 hover:border-charcoal-600 transition-colors block"
+              className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-4 lg:p-6 hover:border-charcoal-600 transition-colors"
               data-testid={`project-card-${project.id}`}
             >
               <div className="flex items-start justify-between">
-                <div className="flex-1 min-w-0">
+                <Link to={`/app/projects/${project.id}`} className="flex-1 min-w-0">
                   <div className="flex items-center gap-3 mb-2">
                     <h3 className="text-lg font-semibold text-white truncate">{project.name}</h3>
                     <div className={`w-3 h-3 rounded-full ${getRiskColor(project.risk_flag)}`} />
@@ -178,22 +232,51 @@ const ProjectsPage = () => {
                     </div>
                     <div>
                       <p className="text-gray-500">% Complete</p>
-                      <p className="text-white font-medium">{project.percent_complete}%</p>
+                      <p className="text-white font-medium">{project.percent_complete || 0}%</p>
                     </div>
                     <div>
                       <p className="text-gray-500">Forecast Margin</p>
-                      <p className={`font-medium ${project.forecast_margin >= 15 ? 'text-success' : project.forecast_margin >= 10 ? 'text-warning' : 'text-risk'}`}>
-                        {project.forecast_margin}%
+                      <p className={`font-medium ${(project.forecast_margin || 0) >= 15 ? 'text-success' : (project.forecast_margin || 0) >= 10 ? 'text-warning' : 'text-risk'}`}>
+                        {project.forecast_margin || 0}%
                       </p>
                     </div>
                   </div>
+                </Link>
+                
+                {/* Actions Menu */}
+                <div className="relative ml-4">
+                  <button 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setDeleteConfirm(deleteConfirm === project.id ? null : project.id);
+                    }}
+                    className="text-gray-500 hover:text-white p-2 rounded-lg hover:bg-charcoal-700 transition-colors"
+                  >
+                    <MoreVertical className="w-5 h-5" />
+                  </button>
+                  
+                  {deleteConfirm === project.id && (
+                    <>
+                      <div className="fixed inset-0 z-40" onClick={() => setDeleteConfirm(null)} />
+                      <div className="absolute right-0 mt-2 w-48 bg-charcoal-800 rounded-lg shadow-xl border border-charcoal-700 py-2 z-50">
+                        <Link
+                          to={`/app/projects/${project.id}`}
+                          className="flex items-center gap-3 w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-charcoal-700 transition-colors"
+                        >
+                          <Edit className="w-4 h-4" />
+                          Edit Project
+                        </Link>
+                        <button
+                          onClick={() => handleDelete(project.id)}
+                          className="flex items-center gap-3 w-full px-4 py-2 text-risk hover:bg-risk/10 transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                          Delete Project
+                        </button>
+                      </div>
+                    </>
+                  )}
                 </div>
-                <button 
-                  onClick={(e) => e.preventDefault()}
-                  className="text-gray-500 hover:text-white p-2 rounded-lg hover:bg-charcoal-700 transition-colors"
-                >
-                  <MoreVertical className="w-5 h-5" />
-                </button>
               </div>
               
               {/* Progress Bar */}
@@ -201,11 +284,11 @@ const ProjectsPage = () => {
                 <div className="h-2 bg-charcoal-700 rounded-full overflow-hidden">
                   <div 
                     className="h-full bg-steel-500 rounded-full transition-all"
-                    style={{ width: `${project.percent_complete}%` }}
+                    style={{ width: `${project.percent_complete || 0}%` }}
                   />
                 </div>
               </div>
-            </Link>
+            </div>
           ))}
         </div>
       )}
