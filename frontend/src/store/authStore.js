@@ -39,16 +39,26 @@ const customSignIn = async (email, password) => {
       };
     }
     
-    // Set the session manually in Supabase client - MUST await this
+    // Set the session manually in Supabase client - with timeout
     if (response.data.access_token && response.data.refresh_token) {
       try {
-        await supabase.auth.setSession({
+        // Set session with a timeout
+        const setSessionPromise = supabase.auth.setSession({
           access_token: response.data.access_token,
           refresh_token: response.data.refresh_token,
         });
+        
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Session set timeout')), 5000)
+        );
+        
+        await Promise.race([setSessionPromise, timeoutPromise]).catch(err => {
+          console.warn('Login session set warning:', err.message);
+        });
+        
         console.log('Login session set successfully');
       } catch (err) {
-        console.error('Error setting login session:', err);
+        console.warn('Error setting login session:', err);
         // Continue anyway - the session data is valid
       }
       
