@@ -18,6 +18,9 @@ from emergentintegrations.payments.stripe.checkout import (
     CheckoutSessionRequest
 )
 
+# Import bookkeeping routes
+from routes.bookkeeping import router as bookkeeping_router
+
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env', override=False)
 
