@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { 
-  Building2, 
   LayoutDashboard, 
   FolderKanban, 
   Calculator, 
@@ -18,6 +17,7 @@ import {
   Crown
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
+import { Logo, LogoIcon } from '../ui/Logo';
 
 const AppLayout = () => {
   const { profile, signOut } = useAuthStore();
@@ -52,13 +52,8 @@ const AppLayout = () => {
     <div className="min-h-screen bg-charcoal-900 flex">
       {/* Desktop Sidebar */}
       <aside className="hidden lg:flex flex-col w-64 bg-charcoal-800 border-r border-charcoal-700" data-testid="desktop-sidebar">
-        <div className="p-6 border-b border-charcoal-700">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-steel-500 rounded-lg flex items-center justify-center">
-              <Building2 className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-xl font-bold text-white">TradeOS<span className="text-steel-400">™</span></span>
-          </div>
+        <div className="p-4 border-b border-charcoal-700">
+          <Logo size="sm" showText={false} />
         </div>
 
         <nav className="flex-1 p-4 space-y-1">
@@ -112,11 +107,8 @@ const AppLayout = () => {
             <Menu className="w-6 h-6" />
           </button>
 
-          <div className="lg:hidden flex items-center gap-2">
-            <div className="w-8 h-8 bg-steel-500 rounded-lg flex items-center justify-center">
-              <Building2 className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-lg font-bold text-white">TradeOS</span>
+          <div className="lg:hidden">
+            <LogoIcon size="md" />
           </div>
 
           <div className="relative">
@@ -184,13 +176,8 @@ const AppLayout = () => {
             onClick={() => setMobileMenuOpen(false)} 
           />
           <aside className="fixed inset-y-0 left-0 w-72 bg-charcoal-800 z-50 lg:hidden flex flex-col">
-            <div className="p-6 border-b border-charcoal-700 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-steel-500 rounded-lg flex items-center justify-center">
-                  <Building2 className="w-5 h-5 text-white" />
-                </div>
-                <span className="text-xl font-bold text-white">TradeOS</span>
-              </div>
+            <div className="p-4 border-b border-charcoal-700 flex items-center justify-between">
+              <Logo size="sm" showText={false} />
               <button onClick={() => setMobileMenuOpen(false)} className="text-gray-400">
                 <X className="w-6 h-6" />
               </button>

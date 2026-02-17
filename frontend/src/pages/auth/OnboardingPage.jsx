@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Building2, ArrowRight, ArrowLeft, Check, User, Briefcase, MapPin } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Check, User, Briefcase, MapPin } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
+import { Logo } from '../../components/ui/Logo';
 
 const OnboardingPage = () => {
   const [step, setStep] = useState(1);
@@ -13,7 +14,8 @@ const OnboardingPage = () => {
     phone: ''
   });
   const [error, setError] = useState('');
-  const { updateProfile, loading } = useAuthStore();
+  const { updateProfile } = useAuthStore();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
   const tradeTypes = [
@@ -71,26 +73,29 @@ const OnboardingPage = () => {
       return;
     }
     
+    setIsSubmitting(true);
     try {
-      await updateProfile({
+      const result = await updateProfile({
         ...formData,
-        onboarding_completed: true,
-        subscription_tier: 'pro'
+        onboarding_completed: true
       });
-      navigate('/app/dashboard');
+      if (result?.error) {
+        setError(result.error.message || 'Failed to save profile');
+      } else {
+        navigate('/app/dashboard');
+      }
     } catch (err) {
       setError(err.message || 'Something went wrong');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <div className="min-h-screen bg-charcoal-900 flex items-center justify-center px-4 py-12">
       <div className="max-w-lg w-full">
-        <div className="flex items-center gap-2 justify-center mb-8">
-          <div className="w-10 h-10 bg-steel-500 rounded-lg flex items-center justify-center">
-            <Building2 className="w-6 h-6 text-white" />
-          </div>
-          <span className="text-2xl font-bold text-white">TradeOS<span className="text-steel-400">™</span></span>
+        <div className="flex justify-center mb-8">
+          <Logo size="lg" showText={false} />
         </div>
 
         {/* Progress Indicator */}
@@ -251,11 +256,11 @@ const OnboardingPage = () => {
             ) : (
               <button
                 onClick={handleComplete}
-                disabled={loading}
+                disabled={isSubmitting}
                 className="flex-1 bg-steel-500 hover:bg-steel-600 disabled:opacity-50 text-white py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
                 data-testid="onboarding-complete-btn"
               >
-                {loading ? (
+                {isSubmitting ? (
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 ) : (
                   <>
