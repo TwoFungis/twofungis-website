@@ -194,17 +194,20 @@ export const useAuthStore = create((set, get) => ({
         return { error: { message: errorMsg } };
       }
       
-      // Set the session if we got tokens back - with timeout to avoid blocking
+      // Set the session if we got tokens back
       if (response.data.access_token && response.data.refresh_token) {
         try {
-          // Set session with a timeout
+          // Manually store tokens in localStorage for Supabase to pick up
+          setSessionTokens(response.data.access_token, response.data.refresh_token);
+          
+          // Also try to set session directly (with timeout)
           const setSessionPromise = supabase.auth.setSession({
             access_token: response.data.access_token,
             refresh_token: response.data.refresh_token,
           });
           
           const timeoutPromise = new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Session set timeout')), 5000)
+            setTimeout(() => reject(new Error('Session set timeout')), 3000)
           );
           
           await Promise.race([setSessionPromise, timeoutPromise]).catch(err => {
@@ -214,11 +217,10 @@ export const useAuthStore = create((set, get) => ({
           console.log('Signup session set successfully');
         } catch (err) {
           console.warn('Error setting signup session:', err);
-          // Continue anyway - the session data is valid
         }
         
         // Return with user data from response
-        set({ loading: false });
+        set({ user: response.data.user, loading: false });
         return { error: null, data: { user: response.data.user, session: response.data } };
       }
       
