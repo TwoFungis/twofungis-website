@@ -77,6 +77,7 @@ function App() {
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/terms" element={<TermsPage />} />
         <Route path="/client/review/:token" element={<ClientReviewPage />} />
+        <Route path="/contractor/:contractorId" element={<PublicContractorProfile />} />
         
         {/* Auth Routes */}
         <Route path="/login" element={<LoginPage />} />
