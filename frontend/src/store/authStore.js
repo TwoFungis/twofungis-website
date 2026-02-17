@@ -41,14 +41,18 @@ const customSignIn = async (email, password) => {
     
     // Set the session manually in Supabase client
     if (response.data.access_token && response.data.refresh_token) {
-      await supabase.auth.setSession({
+      // Set the session without awaiting to avoid blocking
+      supabase.auth.setSession({
         access_token: response.data.access_token,
         refresh_token: response.data.refresh_token,
+      }).then(() => {
+        console.log('Login session set successfully');
+      }).catch(err => {
+        console.error('Error setting login session:', err);
       });
       
-      // Get the user from the session
-      const { data: sessionData } = await supabase.auth.getSession();
-      return { data: { user: sessionData.session?.user, session: sessionData.session }, error: null };
+      // Return with user data from the response
+      return { data: { user: response.data.user, session: response.data }, error: null };
     }
     
     return { data: null, error: { message: 'Failed to establish session' } };
