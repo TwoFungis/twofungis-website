@@ -1,79 +1,9 @@
 import { create } from 'zustand';
-import { supabase, setSessionTokens } from '../lib/supabase';
+import { supabase } from '../lib/supabase';
 
 // Prevent duplicate initialization in React StrictMode
 let isInitializing = false;
 let authSubscription = null;
-
-// Custom sign-in function that bypasses SDK body stream issues
-const customSignIn = async (email, password) => {
-  const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
-  const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
-  
-  try {
-    // Use XMLHttpRequest to avoid body stream issues with fetch
-    const response = await new Promise((resolve, reject) => {
-      const xhr = new XMLHttpRequest();
-      xhr.open('POST', `${supabaseUrl}/auth/v1/token?grant_type=password`);
-      xhr.setRequestHeader('apikey', supabaseAnonKey);
-      xhr.setRequestHeader('Content-Type', 'application/json');
-      
-      xhr.onload = () => {
-        try {
-          const data = JSON.parse(xhr.responseText);
-          resolve({ status: xhr.status, ok: xhr.status >= 200 && xhr.status < 300, data });
-        } catch (e) {
-          reject(new Error('Failed to parse response'));
-        }
-      };
-      
-      xhr.onerror = () => reject(new Error('Network error'));
-      xhr.send(JSON.stringify({ email, password }));
-    });
-    
-    if (!response.ok) {
-      const errorMsg = response.data.msg || response.data.error_description || 'Login failed';
-      return { 
-        data: null, 
-        error: { message: errorMsg.includes('Invalid login credentials') ? 'Invalid email or password' : errorMsg } 
-      };
-    }
-    
-    // Set the session manually in Supabase client
-    if (response.data.access_token && response.data.refresh_token) {
-      try {
-        // Manually store tokens in localStorage for Supabase to pick up
-        setSessionTokens(response.data.access_token, response.data.refresh_token, response.data.user);
-        
-        // Also try to set session directly (with timeout)
-        const setSessionPromise = supabase.auth.setSession({
-          access_token: response.data.access_token,
-          refresh_token: response.data.refresh_token,
-        });
-        
-        const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Session set timeout')), 3000)
-        );
-        
-        await Promise.race([setSessionPromise, timeoutPromise]).catch(err => {
-          console.warn('Login session set warning:', err.message);
-        });
-        
-        console.log('Login session set successfully');
-      } catch (err) {
-        console.warn('Error setting login session:', err);
-      }
-      
-      // Return with user data from the response
-      return { data: { user: response.data.user, session: response.data }, error: null };
-    }
-    
-    return { data: null, error: { message: 'Failed to establish session' } };
-  } catch (err) {
-    console.error('Custom signIn error:', err);
-    return { data: null, error: { message: err.message || 'Login failed' } };
-  }
-};
 
 export const useAuthStore = create((set, get) => ({
   user: null,
