@@ -1,43 +1,106 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
-import Home from './pages/Home';
-import LocationPage from './pages/LocationPage';
-import './App.css';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useAuthStore } from './store/authStore';
 
-// Scroll to top on route change, or to hash if present
-function ScrollToTop() {
-  const { pathname, hash } = useLocation();
-  
-  useEffect(() => {
-    // If there's a hash, scroll to that element
-    if (hash) {
-      // Small delay to ensure the page has loaded
-      setTimeout(() => {
-        const element = document.getElementById(hash.substring(1));
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 100);
-    } else {
-      // No hash, scroll to top
-      window.scrollTo(0, 0);
-    }
-  }, [pathname, hash]);
-  
-  return null;
-}
+// Landing Pages
+import LandingPage from './pages/landing/LandingPage';
+import PrivacyPage from './pages/landing/PrivacyPage';
+import TermsPage from './pages/landing/TermsPage';
+
+// Auth Pages
+import LoginPage from './pages/auth/LoginPage';
+import SignUpPage from './pages/auth/SignUpPage';
+import OnboardingPage from './pages/auth/OnboardingPage';
+
+// App Pages
+import DashboardPage from './pages/app/DashboardPage';
+import ProjectsPage from './pages/app/ProjectsPage';
+import ProjectDetailPage from './pages/app/ProjectDetailPage';
+import EstimatingPage from './pages/app/EstimatingPage';
+import LaborPage from './pages/app/LaborPage';
+import ChangeOrdersPage from './pages/app/ChangeOrdersPage';
+import ProductionPage from './pages/app/ProductionPage';
+import ReportsPage from './pages/app/ReportsPage';
+import SettingsPage from './pages/app/SettingsPage';
+
+// Layout
+import AppLayout from './components/layout/AppLayout';
+
+const ProtectedRoute = ({ children, eliteOnly = false }) => {
+  const { user, profile, loading, initialized } = useAuthStore();
+
+  if (!initialized || loading) {
+    return (
+      <div className="min-h-screen bg-charcoal-900 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-steel-500"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (user && profile && !profile.onboarding_completed) {
+    return <Navigate to="/onboarding" replace />;
+  }
+
+  if (eliteOnly && profile?.subscription_tier !== 'elite') {
+    return <Navigate to="/app/dashboard" replace />;
+  }
+
+  return <>{children}</>;
+};
 
 function App() {
+  const { initialize, initialized } = useAuthStore();
+
+  useEffect(() => {
+    if (!initialized) {
+      initialize();
+    }
+  }, [initialize, initialized]);
+
   return (
-    <div className="App">
-      <BrowserRouter>
-        <ScrollToTop />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/locations/:city" element={<LocationPage />} />
-        </Routes>
-      </BrowserRouter>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/terms" element={<TermsPage />} />
+        
+        {/* Auth Routes */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignUpPage />} />
+        <Route path="/onboarding" element={<OnboardingPage />} />
+        
+        {/* App Routes */}
+        <Route path="/app" element={
+          <ProtectedRoute>
+            <AppLayout />
+          </ProtectedRoute>
+        }>
+          <Route index element={<Navigate to="/app/dashboard" replace />} />
+          <Route path="dashboard" element={<DashboardPage />} />
+          <Route path="projects" element={<ProjectsPage />} />
+          <Route path="projects/:id" element={<ProjectDetailPage />} />
+          <Route path="estimating" element={<EstimatingPage />} />
+          <Route path="estimating/:id" element={<EstimatingPage />} />
+          <Route path="labor" element={<LaborPage />} />
+          <Route path="change-orders" element={<ChangeOrdersPage />} />
+          <Route path="production" element={<ProductionPage />} />
+          <Route path="reports" element={
+            <ProtectedRoute eliteOnly>
+              <ReportsPage />
+            </ProtectedRoute>
+          } />
+          <Route path="settings" element={<SettingsPage />} />
+        </Route>
+
+        {/* Catch all */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
