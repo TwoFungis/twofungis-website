@@ -79,6 +79,7 @@ const OnboardingPage = () => {
     try {
       const result = await updateProfile({
         ...formData,
+        user_role: 'contractor', // Set user as contractor
         onboarding_completed: true
       });
       if (result?.error) {
