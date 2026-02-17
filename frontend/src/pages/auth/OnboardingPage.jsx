@@ -88,20 +88,10 @@ const OnboardingPage = () => {
         if (errorMsg.includes('Session expired') || errorMsg.includes('authenticated')) {
           setError('Your session has expired. Please refresh the page and try again.');
         } else if (errorMsg.includes('body stream') || errorMsg.includes('Connection error')) {
-          // Retry once on connection errors
-          console.log('Connection error, retrying...');
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          const retryResult = await updateProfile({
-            ...formData,
-            user_role: 'contractor',
-            onboarding_completed: true
-          });
-          if (retryResult?.error) {
-            setError('Connection issue. Please check your internet and try again.');
-          } else {
-            navigate('/app/dashboard');
-            return;
-          }
+          // Check if this might be a database setup issue
+          setError('Database connection issue. Please ensure the database schema has been set up correctly in Supabase.');
+        } else if (errorMsg.includes('400') || errorMsg.includes('Bad Request')) {
+          setError('Database schema may need to be updated. Please run the SQL migrations in Supabase.');
         } else {
           setError(errorMsg || 'Failed to save profile');
         }
@@ -110,8 +100,8 @@ const OnboardingPage = () => {
       }
     } catch (err) {
       console.error('Onboarding error:', err);
-      if (err.message?.includes('body stream')) {
-        setError('Connection issue. Please check your internet and try again.');
+      if (err.message?.includes('body stream') || err.message?.includes('400')) {
+        setError('Database connection issue. Please check Supabase configuration.');
       } else {
         setError(err.message || 'Something went wrong. Please try again.');
       }
