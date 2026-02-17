@@ -26,6 +26,7 @@ import ChangeOrdersPage from './pages/app/ChangeOrdersPage';
 import ProductionPage from './pages/app/ProductionPage';
 import ReportsPage from './pages/app/ReportsPage';
 import SettingsPage from './pages/app/SettingsPage';
+import ProfilePage from './pages/app/ProfilePage';
 
 // Layout
 import AppLayout from './components/layout/AppLayout';
