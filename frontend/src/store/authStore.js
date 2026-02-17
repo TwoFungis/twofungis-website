@@ -104,11 +104,6 @@ export const useAuthStore = create((set, get) => ({
       return { error: { message: err.message || 'Login failed. Please try again.' } };
     }
   },
-      console.error('SignIn error:', err);
-      set({ loading: false });
-      return { error: { message: err.message || 'Login failed. Please try again.' } };
-    }
-  },
 
   signUp: async (email, password) => {
     set({ loading: true });
