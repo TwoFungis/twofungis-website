@@ -14,13 +14,13 @@ import {
 } from 'lucide-react';
 import { Logo, LogoLink } from '../../components/ui/Logo';
 
-// Background images
+// Background images - Professional construction imagery
 const IMAGES = {
-  hero: 'https://images.unsplash.com/photo-1763405739542-02991ab5416c?auto=format&fit=crop&w=1920&q=80',
-  features: 'https://images.unsplash.com/photo-1761064038938-3519ed8a2a40?auto=format&fit=crop&w=1920&q=80',
-  pricing: 'https://images.unsplash.com/photo-1760272139443-9c73a59ca850?auto=format&fit=crop&w=1920&q=80',
-  cta: 'https://images.unsplash.com/photo-1760267081163-520f5bbb676a?auto=format&fit=crop&w=1920&q=80',
-  testimonials: 'https://images.unsplash.com/photo-1590880795696-20c7dfadacde?auto=format&fit=crop&w=1920&q=80'
+  hero: 'https://customer-assets.emergentagent.com/job_a1f6d561-54ac-4bcc-bc40-125db753bb76/artifacts/hxw9loph_download.jpg', // Hardhat & handshake
+  features: 'https://customer-assets.emergentagent.com/job_a1f6d561-54ac-4bcc-bc40-125db753bb76/artifacts/gbtzud36_images%20%285%29.jpg', // Wood framing with sun
+  pricing: 'https://customer-assets.emergentagent.com/job_a1f6d561-54ac-4bcc-bc40-125db753bb76/artifacts/xyykd9dt_images%20%282%29.jpg', // Building under construction with crane
+  cta: 'https://customer-assets.emergentagent.com/job_a1f6d561-54ac-4bcc-bc40-125db753bb76/artifacts/ylasd6tj_istockphoto-170961867-612x612.jpg', // Two workers discussing
+  testimonials: 'https://customer-assets.emergentagent.com/job_a1f6d561-54ac-4bcc-bc40-125db753bb76/artifacts/zhomofq8_images.jpg' // Contractor with blueprints
 };
 
 const LandingPage = () => {
