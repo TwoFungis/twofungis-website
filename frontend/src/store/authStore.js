@@ -11,47 +11,39 @@ const customSignIn = async (email, password) => {
   const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
   
   try {
-    const response = await fetch(`${supabaseUrl}/auth/v1/token?grant_type=password`, {
-      method: 'POST',
-      headers: {
-        'apikey': supabaseAnonKey,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password }),
+    // Use XMLHttpRequest to avoid body stream issues with fetch
+    const response = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', `${supabaseUrl}/auth/v1/token?grant_type=password`);
+      xhr.setRequestHeader('apikey', supabaseAnonKey);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      
+      xhr.onload = () => {
+        try {
+          const data = JSON.parse(xhr.responseText);
+          resolve({ status: xhr.status, ok: xhr.status >= 200 && xhr.status < 300, data });
+        } catch (e) {
+          reject(new Error('Failed to parse response'));
+        }
+      };
+      
+      xhr.onerror = () => reject(new Error('Network error'));
+      xhr.send(JSON.stringify({ email, password }));
     });
     
-    // Clone the response to avoid body stream issues
-    const responseClone = response.clone();
-    let data;
-    
-    try {
-      data = await responseClone.json();
-    } catch (parseError) {
-      // If clone fails, try original response
-      try {
-        data = await response.json();
-      } catch (e) {
-        // If both fail, return generic error
-        console.error('Response parse error:', e);
-        return { 
-          data: null, 
-          error: { message: response.ok ? 'Failed to parse response' : 'Invalid email or password' } 
-        };
-      }
-    }
-    
     if (!response.ok) {
+      const errorMsg = response.data.msg || response.data.error_description || 'Login failed';
       return { 
         data: null, 
-        error: { message: data.msg || data.error_description || 'Login failed' } 
+        error: { message: errorMsg.includes('Invalid login credentials') ? 'Invalid email or password' : errorMsg } 
       };
     }
     
     // Set the session manually in Supabase client
-    if (data.access_token && data.refresh_token) {
+    if (response.data.access_token && response.data.refresh_token) {
       await supabase.auth.setSession({
-        access_token: data.access_token,
-        refresh_token: data.refresh_token,
+        access_token: response.data.access_token,
+        refresh_token: response.data.refresh_token,
       });
       
       // Get the user from the session
@@ -62,10 +54,6 @@ const customSignIn = async (email, password) => {
     return { data: null, error: { message: 'Failed to establish session' } };
   } catch (err) {
     console.error('Custom signIn error:', err);
-    // Handle body stream error specifically
-    if (err.message && err.message.includes('body stream already read')) {
-      return { data: null, error: { message: 'Invalid email or password. Please check your credentials.' } };
-    }
     return { data: null, error: { message: err.message || 'Login failed' } };
   }
 };
