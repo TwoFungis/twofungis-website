@@ -27,6 +27,7 @@ import ReceiptScanner from '../../components/bookkeeping/ReceiptScanner';
 import ManualExpenseForm from '../../components/bookkeeping/ManualExpenseForm';
 import BulkReceiptUpload from '../../components/bookkeeping/BulkReceiptUpload';
 import DocumentVault from '../../components/bookkeeping/DocumentVault';
+import TaxAdvisor from '../../components/bookkeeping/TaxAdvisor';
 import { generateExpenseReportPDF } from '../../utils/expenseReportGenerator';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
