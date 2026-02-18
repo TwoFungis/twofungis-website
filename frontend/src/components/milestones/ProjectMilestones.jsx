@@ -31,7 +31,7 @@ const statusConfig = {
 };
 
 const ProjectMilestones = ({ project, onMilestoneChange }) => {
-  const { user } = useAuthStore();
+  const { user, profile } = useAuthStore();
   const [milestones, setMilestones] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
