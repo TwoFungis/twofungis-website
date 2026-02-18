@@ -97,6 +97,7 @@ function App() {
           <Route path="invoices" element={<InvoicesPage />} />
           <Route path="expenses" element={<ExpensesPage />} />
           <Route path="documents" element={<DocumentsPage />} />
+          <Route path="tax-summary" element={<TaxSummaryPage />} />
           <Route path="reports" element={<ReportsPage />} />
           <Route path="settings" element={<SettingsPage />} />
           <Route path="profile" element={<ProfilePage />} />
