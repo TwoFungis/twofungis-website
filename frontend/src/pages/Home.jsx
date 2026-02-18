@@ -8,10 +8,12 @@ import ServiceAreas from '../components/ServiceAreas';
 import WhyChooseUs from '../components/WhyChooseUs';
 import Contact from '../components/Contact';
 import Footer from '../components/Footer';
+import TradeOSBanner from '../components/TradeOSBanner';
 
 const Home = () => {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white pt-[52px]">
+      <TradeOSBanner />
       <Header />
       <Hero />
       <About />

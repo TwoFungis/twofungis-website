@@ -6,6 +6,7 @@ import Services from '../components/Services';
 import Portfolio from '../components/Portfolio';
 import Contact from '../components/Contact';
 import Footer from '../components/Footer';
+import TradeOSBanner from '../components/TradeOSBanner';
 import { Button } from '../components/ui/button';
 import { MapPin, Phone, Mail, CheckCircle2 } from 'lucide-react';
 
