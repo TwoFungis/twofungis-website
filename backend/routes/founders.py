@@ -104,12 +104,12 @@ async def activate_founder(user_id: str, request: Request):
             if user_email not in [e.lower() for e in FOUNDER_EMAILS]:
                 raise HTTPException(status_code=403, detail="Not a founder email")
             
-            # Update the user's subscription to founding_lifetime
+            # Update the user's subscription to lifetime (elite access)
             update_response = await client.patch(
                 f"{SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}",
                 headers=await get_supabase_headers(),
                 json={
-                    "subscription_tier": "founding_lifetime",
+                    "subscription_tier": "lifetime",
                     "subscription_status": "active"
                 }
             )
