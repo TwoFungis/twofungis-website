@@ -28,40 +28,9 @@ mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
-# Stripe configuration
-STRIPE_API_KEY = os.environ.get('STRIPE_API_KEY', 'your_stripe_api_key_here')
-
 # Supabase configuration for direct DB access
 SUPABASE_URL = os.environ.get('SUPABASE_URL', '')
 SUPABASE_SERVICE_KEY = os.environ.get('SUPABASE_SERVICE_KEY', '')
-
-# Subscription pricing (in CAD)
-SUBSCRIPTION_PLANS = {
-    "pro": {
-        "name": "Pro Plan",
-        "amount": 39.00,
-        "currency": "cad",
-        "mode": "subscription",
-        "features": ["Unlimited Projects", "Quote Builder", "Change Order Manager", "Labor Cost Engine", "Production Logs"]
-    },
-    "elite": {
-        "name": "Elite Plan", 
-        "amount": 59.00,
-        "currency": "cad",
-        "mode": "subscription",
-        "features": ["Everything in Pro", "Advanced Reports", "KPI Dashboard", "Production Analytics", "Priority Support"]
-    },
-    "lifetime_elite": {
-        "name": "Founding Lifetime (Elite)",
-        "amount": 599.00,
-        "currency": "cad",
-        "mode": "payment",  # One-time payment
-        "region_lock": "CA",
-        "max_seats": 100,
-        "stripe_price_id": os.environ.get('STRIPE_LIFETIME_PRICE_ID', 'price_lifetime_elite'),
-        "features": ["Everything in Elite", "Lifetime Access", "No Monthly Fees", "Founding Member Badge", "Priority Support Forever"]
-    }
-}
 
 # Create the main app without a prefix
 app = FastAPI()
