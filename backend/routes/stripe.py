@@ -822,3 +822,81 @@ async def get_user_billing(user_id: str):
         "stripe_subscription_id": profile.get("stripe_subscription_id") if not is_lifetime else None,
         "trial_ends_at": profile.get("trial_ends_at")
     }
+
+
+# =============================================================================
+# FOUNDERS ENDPOINTS
+# =============================================================================
+
+INITIAL_FOUNDERS = [
+    "info@twofungis.ca",
+    "swdmarshall@gmail.com", 
+    "carpenterbeau@hotmail.com"
+]
+
+@router.get("/founders")
+async def get_founders():
+    """Get list of lifetime founders and remaining spots"""
+    
+    lifetime_status = await get_lifetime_seats()
+    
+    # Get founders from database
+    founders_list = []
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                f"{SUPABASE_URL}/rest/v1/users_profile?plan_type=eq.LIFETIME_ELITE&select=id,full_name,company_name,created_at",
+                headers=await get_supabase_headers()
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                for i, founder in enumerate(data):
+                    founders_list.append({
+                        "number": i + 1,
+                        "name": founder.get("full_name") or founder.get("company_name") or "Founding Member",
+                        "joined": founder.get("created_at")
+                    })
+    except Exception as e:
+        logger.error(f"Error fetching founders: {e}")
+    
+    # Initial founders count
+    initial_count = len(INITIAL_FOUNDERS)
+    
+    return {
+        "total_spots": 100,
+        "initial_founders": initial_count,
+        "seats_sold": lifetime_status.seats_sold,
+        "remaining": max(0, 97 - lifetime_status.seats_sold),  # 97 remaining after 3 initial founders
+        "founders": founders_list,
+        "initial_founder_emails": INITIAL_FOUNDERS
+    }
+
+
+@router.post("/check-founder")
+async def check_if_founder(request: Request):
+    """Check if a specific email is a founder"""
+    body = await request.json()
+    email = body.get("email", "").lower()
+    
+    # Check initial founders
+    if email in [e.lower() for e in INITIAL_FOUNDERS]:
+        return {"is_founder": True, "founder_number": INITIAL_FOUNDERS.index(email.lower()) + 1, "type": "initial"}
+    
+    # Check database founders
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                f"{SUPABASE_URL}/rest/v1/users_profile?email=eq.{email}&plan_type=eq.LIFETIME_ELITE&select=id",
+                headers=await get_supabase_headers()
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data and len(data) > 0:
+                    return {"is_founder": True, "type": "purchased"}
+    except Exception as e:
+        logger.error(f"Error checking founder status: {e}")
+    
+    return {"is_founder": False}
+
