@@ -297,32 +297,40 @@ const ExpensesPage = () => {
 };
 
 // New Expense Modal Component
-const NewExpenseModal = ({ onClose, onSuccess, user }) => {
+const NewExpenseModal = ({ onClose, onSuccess }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     description: '',
-    category: 'materials',
+    category: 'Materials',
     amount: '',
     project_name: '',
     expense_date: new Date().toISOString().split('T')[0],
-    notes: ''
+    vendor: '',
+    notes: '',
+    business_personal: 'Business'
   });
+
+  const getAuthHeaders = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    return {
+      'Authorization': `Bearer ${session?.access_token}`,
+      'Content-Type': 'application/json'
+    };
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.description || !formData.amount) {
-      alert('Please fill in required fields');
+      toast.error('Please fill in required fields');
       return;
     }
 
     setIsSubmitting(true);
     try {
+      const headers = await getAuthHeaders();
       const response = await fetch(`${API_URL}/api/expenses`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${user?.access_token}`,
-          'Content-Type': 'application/json'
-        },
+        headers,
         body: JSON.stringify({
           ...formData,
           amount: parseFloat(formData.amount)
@@ -330,13 +338,15 @@ const NewExpenseModal = ({ onClose, onSuccess, user }) => {
       });
 
       if (response.ok) {
+        toast.success('Expense added successfully');
         onSuccess();
       } else {
-        alert('Failed to create expense');
+        const error = await response.json();
+        toast.error(error.detail || 'Failed to create expense');
       }
     } catch (error) {
       console.error('Error creating expense:', error);
-      alert('Error creating expense');
+      toast.error('Error creating expense');
     } finally {
       setIsSubmitting(false);
     }
