@@ -195,6 +195,7 @@
 ## Version History
 | Date | Version | Changes |
 |------|---------|---------|
+| Feb 18, 2026 | 2.7 | **P0 Bug Fixes**: Fixed ExpensesPage runtime error (CATEGORIES case sensitivity), fixed expense/invoice creation auth, fixed text visibility across all pages |
 | Feb 18, 2026 | 2.6 | **Phase 2 & 3**: Enhanced Expenses (14 categories + deductibility), Tax Summary Page |
 | Feb 18, 2026 | 2.5 | Light background theme, Materials System Phase 1 |
 | Feb 18, 2026 | 2.4 | Beta Trial Strategy |
