@@ -306,9 +306,15 @@ const DashboardPage = () => {
             <p className="text-xs text-gray-500 mt-1">{formatCurrency(totalExpenses)} in expenses</p>
           </div>
 
-          <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-5">
+          <div className={`rounded-xl border p-5 ${
+            totalReceivables > 0 
+              ? 'bg-gradient-to-br from-charcoal-800 to-slate-400/10 border-slate-400/30' 
+              : 'bg-charcoal-800 border-charcoal-700'
+          }`}>
             <p className="text-xs text-gray-500 uppercase tracking-wide mb-2">Outstanding Receivables</p>
-            <p className="text-2xl lg:text-3xl font-bold text-steel-400">{formatCurrency(totalReceivables)}</p>
+            <p className={`text-2xl lg:text-3xl font-bold ${totalReceivables > 0 ? 'text-slate-200' : 'text-gray-500'}`}>
+              {formatCurrency(totalReceivables)}
+            </p>
             <p className="text-xs text-gray-500 mt-1">{outstandingInvoices.length} invoice{outstandingInvoices.length !== 1 ? 's' : ''}</p>
           </div>
 
