@@ -434,7 +434,7 @@ const DashboardPage = () => {
                 </div>
                 <Link 
                   to="/app/settings"
-                  className="bg-slate-400/20 hover:bg-slate-400/30 text-slate-200 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
+                  className="bg-steel-500 hover:bg-steel-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
                 >
                   Upgrade →
                 </Link>
