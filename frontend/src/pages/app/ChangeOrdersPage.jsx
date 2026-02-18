@@ -74,7 +74,7 @@ const ChangeOrdersPage = () => {
     try {
       const { data } = await supabase
         .from('projects')
-        .select('id, name')
+        .select('id, name, contract_value, forecast_margin')
         .eq('user_id', user.id)
         .eq('status', 'active')
         .order('name');
