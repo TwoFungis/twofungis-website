@@ -1,51 +1,72 @@
-# Two Fungis Ltd - Portfolio Website PRD
+# Two Fungis Ltd - Portfolio Website
 
 ## Original Problem Statement
-Build a professional portfolio website for Two Fungis Ltd., a construction company specializing in interior finishing services. The brand colors are red, black, and white with green accents. The site should be deployed to `twofungis.ca` domain.
+Build a professional portfolio website for "Two Fungis Ltd.", a construction company specializing in interior finishing and carpentry. Brand colors are red, black, white, and grass green (#228B22). The website needs SEO-optimized landing pages for various cities in British Columbia and deployment to `twofungis.ca`.
 
 ## User Personas
-- **Primary**: Potential residential/commercial clients looking for interior finishing services in British Columbia
-- **Secondary**: General contractors and developers seeking subcontractors
+- **Potential Clients:** Homeowners and commercial property managers looking for interior finishing services
+- **Contractors/Partners:** Other trades looking to collaborate
 
 ## Core Requirements
-- Professional portfolio website with brand identity
-- Sections: Hero, About Us, Services, Portfolio, Why Choose Us, Contact, Footer
-- Color palette: Red (#DC2626), Black, White, Green (#228B22)
-- SEO-optimized landing pages for cities in British Columbia
-- Mobile-responsive design
-- Deployed to `twofungis.ca` via Netlify
+1. Professional portfolio website with sections: Hero, About, Services, Portfolio, Why Choose Us, Contact, Footer
+2. Color Palette: Red (#DC2626), Black, White, Grass Green (#228B22)
+3. SEO-optimized landing pages for BC cities
+4. TradeOS promotional banner on all pages
+5. Proper navigation from landing pages back to homepage sections
+6. Scroll-to-top on page navigation
+7. Deployed to `twofungis.ca` via Netlify
+
+## What's Been Implemented
+
+### December 2025
+- **TradeOS Banner Update:** Redesigned banner with brand colors
+  - Silver metallic gradient background
+  - TradeOS shield logo
+  - "Built for Builders" tagline in brand blue (#5DADE2)
+  - Blue CTA button
+  - Fixed positioning at top of all pages
+  - Header adjusted to sit below banner
+
+### Previous Sessions
+- Complete portfolio website with all sections
+- SEO landing pages for BC cities (Victoria, Vancouver, etc.)
+- Navigation fixes (header/footer links work from all pages)
+- Scroll-to-top functionality
+- Color scheme implementation (black hero, grass green accents, red highlights)
+- GitHub + Netlify CI/CD deployment
 
 ## Technical Architecture
-- **Frontend**: React with TailwindCSS
-- **Routing**: react-router-dom with hash navigation support
-- **Hosting**: Netlify (auto-deploys from GitHub)
-- **Domain**: twofungis.ca (managed on GoDaddy)
+```
+/app/frontend/
+├── src/
+│   ├── components/
+│   │   ├── TradeOSBanner.jsx  # Promotional banner
+│   │   ├── Header.jsx         # Fixed header
+│   │   ├── Hero.jsx           # Main hero section
+│   │   ├── About.jsx
+│   │   ├── Services.jsx
+│   │   ├── Portfolio.jsx
+│   │   ├── Contact.jsx
+│   │   ├── Footer.jsx
+│   │   └── ui/               # Shadcn components
+│   ├── pages/
+│   │   ├── Home.jsx
+│   │   └── LocationPage.jsx
+│   ├── data/
+│   │   └── locations.js      # SEO landing page data
+│   └── App.js
+├── public/
+│   └── tradeos-logo.png      # TradeOS shield logo
+└── package.json
+```
 
-## Implemented Features (as of Dec 2025)
-- [x] Homepage with Hero, About, Services, Portfolio, Why Choose Us, Contact sections
-- [x] 20+ SEO landing pages for BC cities
-- [x] Mobile-responsive design
-- [x] Brand colors and typography
-- [x] $5M insurance badge
-- [x] Scroll-to-top on navigation
-- [x] Cross-page navigation (Header/Footer links work from all pages)
-
-## Recent Changes
-- **Dec 2025**: Fixed navigation links to work from landing pages
-  - Header.jsx: Added useNavigate/useLocation for cross-page navigation
-  - Footer.jsx: Updated quicklinks to use absolute paths (/#section)
-  - App.js: Enhanced ScrollToTop to handle hash scrolling
+## Deployment
+- **Repository:** https://github.com/TwoFungis/twofungis-website.git
+- **Hosting:** Netlify (auto-deploy from main branch)
+- **Domain:** twofungis.ca (managed via GoDaddy DNS)
 
 ## Backlog / Future Tasks
-- [ ] Clean up unused /backend directory (optional)
-- [ ] Code cleanup for redundant TailwindCSS classes (optional)
-
-## Deployment Workflow
-1. Make changes locally
-2. Push to GitHub (TwoFungis/twofungis-website)
-3. Netlify auto-deploys to twofungis.ca
-
-## Credentials
-- GitHub: TwoFungis
-- Domain: twofungis.ca (GoDaddy)
-- Hosting: Netlify
+- [ ] Remove obsolete /backend directory
+- [ ] Consolidate hardcoded colors into tailwind.config.js
+- [ ] Add more SEO landing pages for additional cities
+- [ ] Performance optimization (image compression, lazy loading)
