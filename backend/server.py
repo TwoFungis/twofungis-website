@@ -111,6 +111,21 @@ class PaymentStatusResponse(BaseModel):
     plan_type: Optional[str] = None
 
 
+# Lifetime Plan Models
+class LifetimeSeatsResponse(BaseModel):
+    seats_remaining: int
+    is_available: bool
+    region_lock: str
+    max_seats: int = 100
+
+
+class LifetimeCheckoutRequest(BaseModel):
+    origin_url: str
+    user_id: str
+    email: str
+    country: str  # User's country from profile
+
+
 # Basic API routes
 @api_router.get("/")
 async def root():
