@@ -1,82 +1,98 @@
 <analysis>**original_problem_statement:**
-The user has mandated a significant strategic pivot for the application, TradeOS. All Marketplace functionality is to be removed entirely. The application will be refocused as a pure Contractor Operating System, centered on financial control, project management, and profitability.
+The user has mandated a strategic refinement of TradeOS, focusing on lean usability and financial discipline, akin to a hybrid of Jobber and QuickBooks. This is a structural refinement, not feature expansion.
 
 **PRODUCT REQUIREMENTS (New Direction):**
 
-1.  **REMOVE MARKETPLACE:**
-    *   Remove the public  route and all related frontend UI (links, toggles, verification pages).
-    *   Remove backend marketplace routes and database tables (, , , ).
-    *   Keep the internal user profile for billing and account purposes only.
+1.  **DASHBOARD RESTRUCTURE:**
+    *   Simplify into three zones:
+        *   **A) Execution:** Active Projects, Upcoming Milestones, Pending Change Orders.
+        *   **B) Financial Control:** Total Contract Value, Forecast Profit, Outstanding Receivables, Overdue Invoices.
+        *   **C) Alerts:** Past Due Invoices, Trial Expiring, Low Margin Warning (< target %, should be a selectable dropdown).
+    *   Remove all clutter and small, irrelevant widgets.
 
-2.  **NAVIGATION CLEANUP:**
-    *   The main application navigation must be simplified to only include: Dashboard, Projects, Estimates, Change Orders, Milestones, Invoices, Expenses, Document Vault, Reports, and Settings.
+2.  **PROJECT PAGE RESTRUCTURE:**
+    *   **Top Section:** A clear Financial Health Panel showing: Original Contract, Approved CO Total, Total Revenue, Total Expenses, Total Labor, Forecast Gross Profit, Forecast Margin %.
+    *   **Below:** A tabbed interface for: Overview, Milestones, Invoices, Change Orders, Expenses, Documents, Activity Log.
 
-3.  **CORE FUNCTION HARDENING:**
-    *   **Invoicing:** Implement invoice creation from milestones/change orders, auto-incrementing numbers, status tracking (Draft, Sent, Paid, Overdue), and a receivables widget.
-    *   **Milestones:** Create a status workflow (Draft → Submitted → Approved → Invoiced → Paid) and lock edits post-invoicing.
-    *   **Project Control Panel:** Add a Financial Health panel to the dashboard displaying key project metrics (contract value, expenses, profit, margin).
-    *   **Expense & Tax:** Improve expense categorization and add tax summary views.
-    *   **Reporting:** Create a reports page for profit/revenue/expense summaries with PDF export functionality.
+3.  **INVOICE HARDENING:**
+    *   Invoices must include: auto-numbering (e.g., ), linked project reference, linked milestone.
+    *   Implement a status workflow: Draft → Sent → Paid → Overdue.
+    *   Implement payment due date logic and automatic overdue calculation.
+    *   Add a global Receivables Report page.
 
-4.  **UI & POSITIONING UPDATE:**
-    *   Refocus UI language on Control, Clarity, Execution, and Margin.
-    *   Standardize the color scheme to charcoal and steel blue.
-    *   Update the landing page with the new headline: TradeOS™ – Built for Builders and subheadline: Know your margin. Control your projects. Get paid faster.
-    *   Highlight new core features: Margin Intelligence, Milestone Discipline, Change Order Control, Invoice & Receivables Tracking, and Tax-Ready Bookkeeping.
+4.  **REPORTING SECTION:**
+    *   Create a Reports page with: Profit by Project, Revenue by Month, Expense by Category, Labor Cost Summary, Outstanding Invoices, Margin Trend.
+    *   Enable PDF or CSV export.
+
+5.  **TAX & EXPENSE IMPROVEMENT:**
+    *   Add a monthly summary panel showing: Total Revenue, Total Expenses, Estimated Tax Owing (with a selectable dropdown for percentage), Recommended Set-Aside %.
+    *   Add a quarterly summary projection.
+
+6.  **UI POLISH & PERFORMANCE:**
+    *   Remove decorative elements, increase whitespace, use larger fonts for financial metrics.
+    *   Adhere to the color system: Charcoal (base), Steel Blue (primary), Green (positive), Amber (caution), Red (risk).
+    *   Ensure no marketplace or community language remains.
+    *   Optimize performance through lazy loading, optimized queries, and ensuring a flawless mobile layout.
 
 **User's preferred language**: English
 
 **what currently exists?**
-A major refactoring is underway to align with the user's new strategic direction. All frontend UI related to the marketplace has been removed, including links from the main navigation, landing page, and settings page. The backend API routes for the marketplace have been detached from the main server file. The landing page has been completely redesigned with the new branding and messaging. New, empty placeholder pages for the core business functions (Milestones, Invoices, Expenses, Document Vault) have been created and wired into the new, simplified navigation.
+The application has undergone a major strategic pivot, removing all Marketplace functionality. Core backend services for invoices, milestones, and expenses have been built, and the corresponding database tables were created via user-executed SQL migrations. Frontend pages for these features were implemented, and several bugs (missing modals, incorrect subscription checks) were fixed.
+
+Most recently, the agent began a major UI/UX refinement based on new user requirements. The Dashboard and Project Detail pages have been completely rewritten with new layouts focusing on financial clarity and execution tracking. The backend has not yet been updated to supply data to these new UI components.
 
 **Last working item**:
--   **Last item agent was working:** The agent had just completed the first phase of the pivot: removing marketplace UI, creating the new landing page, and implementing the simplified navigation. The work was verified with screenshots showing the new UI. The agent was about to begin work on the backend and functionality for the new core features.
+-   **Last item agent was working:** Implementing the Project Page Restructure as per the new product requirements. The agent rewrote the file  to include a new Financial Health Panel at the top and a new tabbed layout for project details.
 -   **Status:** IN PROGRESS
--   **Agent Testing Done:** Y (Manual testing via screenshots for the UI/nav removal)
+-   **Agent Testing Done:** N
 -   **Which testing method agent to use?** both
 -   **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
-The previous issue list is now obsolete due to the strategic pivot. The primary issue is the incomplete state of the application during this major refactoring.
+-   **Issue 1: (P0) Test and Validate UI Restructure:** The  and  have been completely rewritten. They need to be tested to ensure they render correctly and are connected to backend data sources.
+    -   **Attempted fixes:** None. This is a new implementation.
+    -   **Next debug checklist:**
+        1.  Start the application and navigate to the Dashboard and a Project Detail page.
+        2.  Verify the new layouts match the user's PRD.
+        3.  Check browser console for any rendering errors.
+        4.  Inspect network tab to see what API calls are being made or are failing.
+        5.  Update the components to fetch data from the appropriate backend APIs.
+    -   **Why fix this issue and what will be achieved with the fix?** This will complete the first phase of the user's new refinement plan and provide the foundational UI for subsequent feature hardening.
+    -   **Status:** NOT STARTED
+    -   **Is recurring issue?** N
+    -   **Should Test frontend/backend/both after fix?** both
 
 **In progress Task List**:
--   **Task 1: Complete Strategic Refocus of TradeOS (P0)**
-    -   **Where to resume:** Begin the backend implementation. The next logical step is to create database migration scripts to drop all the now-obsolete marketplace-related tables (, , , ).
-    -   **What will be achieved with this?** The application will be transformed from a marketplace-hybrid into a focused SaaS tool for contractors, aligning with the new product requirements.
+-   **Task 1: Complete TradeOS Hybrid Refinement (P0)**
+    -   **Where to resume:** The agent has just rewritten the  and . The immediate next step is to test these pages, connect them to backend data, and then proceed to the next item in the user's refinement plan: Invoice Hardening.
+    -   **What will be achieved with this?** The application will be aligned with the user's new vision of a lean, financially-focused operating system for contractors.
     -   **Status:** IN PROGRESS
     -   **Should Test frontend/backend/both after fix?** both
     -   **Blocked on something:** No.
 
 **Upcoming and Future Tasks**
 -   **Upcoming Tasks:**
-    -   **(P0) Database Cleanup:** Create and run migration scripts to drop all marketplace-related tables.
-    -   **(P0) Core Feature: Invoicing System:**
-        -   Design and implement the necessary database schema (tables for invoices, line items).
-        -   Build backend APIs for creating, updating, and tracking invoices.
-        -   Develop the frontend UI on the  page to manage invoices.
-    -   **(P1) Core Feature: Milestone Management:**
-        -   Design and implement the database schema for project milestones.
-        -   Build backend APIs for the milestone status workflow.
-        -   Develop the frontend UI on the  page.
-
+    -   **(P0) Invoice Hardening:** Implement auto-numbering, status workflows (Draft, Sent, Paid, Overdue), and due date logic as per the new PRD. Create a global Receivables Report page.
+    -   **(P1) Reporting Section:** Build out the new Reports page with specified reports (Profit by Project, Revenue by Month, etc.) and PDF/CSV export functionality.
+    -   **(P1) Tax & Expense Improvement:** Add the monthly/quarterly tax summary panels. Implement the user-requested dropdowns for setting tax and margin percentages.
 -   **Future Tasks:**
-    -   **(P1) Dashboard Financial Health Panel:** Implement the high-level financial summary widget.
-    -   **(P1) Reporting Engine:** Build the backend and frontend for the reports page, including PDF export.
-    -   **(P2) Expense & Tax Features:** Enhance the existing expense tracking and add tax summary views.
-    -   **(P2) Complete Settings Page:** Implement the non-functional Edit Profile, Security, and Delete Account sections.
-    -   **(P2) Full Code Cleanup:** Perform a final pass to remove any remaining orphaned files, routes, or code related to the old marketplace feature.
+    -   **(P2) UI Polish:** Conduct a full pass to increase whitespace, standardize fonts for financial metrics, and ensure adherence to the color scheme.
+    -   **(P2) Speed & Performance:** Lazy load components, optimize dashboard queries, and verify mobile responsiveness.
+    -   **(P2) Complete Settings Page:** While improved, sections like Delete Account still need backend logic.
 
 **Completed work in this session**
--   **Marketplace V2 (Now Obsolete):** Fully implemented a complex marketplace with clickable contractor cards, a detail modal view, job posting, and service listing capabilities. This work has since been removed.
--   **Strategic Pivot - Phase 1 (UI Removal):**
-    -   Completely redesigned and implemented a new  with updated branding and messaging.
-    -   Removed all marketplace references and links from  (sidebar navigation) and .
-    -   Detached marketplace API routes from the backend .
-    -   Created placeholder pages for all new core features as defined in the new product requirements.
+-   **Marketplace Removal:** All frontend UI and backend API routes related to the marketplace were removed. The database tables were dropped via migration script.
+-   **Core Backend Implementation:** Created backend APIs and database schemas for Invoices, Milestones, and Expenses.
+-   **Bug Fixes:**
+    -   Resolved issues with non-functioning Add Expense and Upload Document buttons by adding the missing modal components.
+    -   Fixed the Reports page access issue for lifetime members by correcting the subscription tier check.
+-   **Database Schema Management:** Successfully guided the user through running multiple SQL migrations and reloading the Supabase schema cache to resolve table/column creation issues.
+-   **Recently completed:**
+    -   **Dashboard Restructure:** Rewrote  with a new 3-zone layout.
+    -   **Project Page Restructure:** Rewrote  with a new Financial Health Panel and tabbed navigation.
 
 **Earlier issues found/mentioned but not fixed**
--   **Magic Link SITE CANT BE REACHED error:** A low-priority issue, likely due to a misconfiguration in the user's Supabase project settings, remains pending.
--   **Incomplete Settings Page Functionality:** While the UI has been simplified, core actions like Edit Profile and Delete Account are still not implemented.
+-   **Magic Link SITE CANT BE REACHED error:** A low-priority issue, likely due to a misconfiguration in the user's Supabase project settings, remains pending from the initial handoff.
 
 **Known issue recurrence from previous fork**
 -   None.
@@ -87,59 +103,75 @@ The previous issue list is now obsolete due to the strategic pivot. The primary 
 **Key Technical Concepts**
 -   **Backend:** FastAPI
 -   **Frontend:** React, TailwindCSS, Zustand
--   **Database:** Supabase (Postgres). A major schema change is in progress.
--   **Payments:** Stripe (Live Mode, Checkout Sessions, Webhooks).
--   **Email:** Resend.
+-   **Database:** Supabase (Postgres)
+-   **Payments:** Stripe
+-   **Email:** Resend
 
 **key DB schema**
--   **Tables to be REMOVED:** , , , . The relevance of  and  should also be reviewed.
--   **Tables to be CREATED:** New schemas are required for invoices, milestones, projects, change orders, and reports.
+-   ****: {id, project_id, name, status, amount, due_date, ...}
+-   ****: {id, project_id, invoice_number, status, amount_due, due_date, ...}
+-   ****: {id, invoice_id, description, quantity, unit_price, ...}
+-   ****: {id, project_id, category, amount, expense_date, ...}
+-   ****: {id, last_invoice_number}
 
 **changes in tech stack**
--    is no longer in use.
+-   None.
 
 **All files of reference**
--   : Completely rewritten for the new product positioning.
--   : Contains the new, simplified sidebar navigation.
--   : Stripped of all marketplace-related settings.
--   : Updated with new application routes and removal of old ones.
--   : Updated to remove the marketplace API routers.
+-   : Recently rewritten.
+-   : Recently rewritten.
+-   : Contains logic for creating, sending, and generating PDFs for invoices.
+-   : Contains CRUD API for expenses.
+-   : Schema for invoices and milestones.
+-   : Schema for expenses.
+-   : Contains the latest product requirements.
 
 **Critical Info for New Agent**
--   **STRATEGIC PIVOT IS THE ONLY PRIORITY:** The user's request to remove the marketplace and refocus on core business tools is a complete change in direction. The message detailing this pivot (from ) is the new Product Requirements Document. All previous plans are obsolete.
--   **IN-PROGRESS REFACTOR:** The application is in a transitional state. The frontend UI has been mostly cleaned up, but the backend and database still contain remnants of the marketplace. The new core features exist only as empty placeholder pages.
--   **NEXT STEPS:** The immediate next task is on the backend: creating and running SQL migration scripts to drop the now-unused marketplace tables. After that, begin building the new core features, starting with the Invoicing system.
+-   **NEW PRD IS THE SOURCE OF TRUTH:** The user's message in  is the current and active Product Requirements Document. All planning and execution must be based on this refinement strategy.
+-   **IMMEDIATE TASK:** The agent just rewrote  and . The immediate next step is to verify these pages render correctly, connect them to backend data, and test their functionality before moving on.
+-   **USER CLARIFICATIONS:** The user specified that the Low Margin Warning and Estimated Tax settings should be implemented as selectable dropdowns.
+-   **DATABASE IS SET:** The user has successfully run all required migrations, including schema fixes and cache reloads. The database is ready for the application logic to be built upon it.
 
 **documents and test reports created in this job**
 -   
 -   
--    (This migration is now obsolete and should be reversed/deleted).
--    (This file is now out of date and needs to be completely rewritten based on the new requirements).
+-   
+-   
+-   
+-   
+-   
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User:** Provides a detailed PRD for a major strategic pivot: remove the marketplace entirely and rebuild the app to focus on core contractor operational tools (invoicing, milestones, financials).
-2.  **Agent:** Asks for clarification on integrating with BIDcentral/PROCOR. This question prompted the user's pivot.
-3.  **User:** Reports several issues with the (now obsolete) marketplace, including a broken Edit Profile button, unclear verification flow, and the app session being lost when navigating to the marketplace. Also provided a new Resend API key.
+1.  **User (185):** Approves the agent's phased plan and confirms the low margin and estimated tax settings should be dropdowns. (Status: Not Implemented)
+2.  **User (182):** Provides a comprehensive new PRD for TradeOS Hybrid Refinement, focusing on dashboard/project restructuring, invoice hardening, and reporting. This is the new primary goal. (Status: In Progress)
+3.  **User (180):** Reports an error running an SQL script provided by the agent. (Status: Resolved)
+4.  **Agent (179):** Informs the user that another SQL fix is needed for a missing column in the milestones table. (Status: Resolved)
+5.  **User (154):** Confirms that the Supabase schema cache has been successfully reloaded. (Status: Completed)
+6.  **Agent (152):** Diagnoses an invoice creation failure as a Supabase schema cache issue and provides the user with the command to fix it. (Status: Resolved)
+7.  **User (141):** Confirms that the main database migrations for invoices and expenses have been completed. (Status: Completed)
+8.  **Agent (135):** Asks the user to run two critical SQL migration scripts. (Status: Completed)
+9.  **User (72):** Reports several critical bugs: non-working add expense and upload document buttons, and incorrect Reports page access for an elite user. Also requests new features like invoice emails and PDFs. (Status: Bugs Resolved, Features Implemented)
+10. **Agent (71):** Attempts to finish the task after tests passed, before being interrupted by user bug reports. (Status: Superseded)
 
 **Project Health Check:**
--   **Broken:** The application is in a planned, intermediate state of refactoring. Many navigation links lead to empty placeholder pages. The database is out of sync with the new application focus.
--   **Mocked:** The new core feature pages (, , etc.) are currently mocked as empty placeholder components.
+-   **Broken:** The primary user-facing pages (Dashboard, Project Detail) have been rewritten but are not yet tested or connected to backend data. They will likely fail to load data correctly until the implementation is completed.
+-   **Mocked:** The new UI components on the dashboard and project pages are essentially mocked until they are wired to live data.
 
 **3rd Party Integrations**
 -   **Supabase:** Auth & Database.
--   **Stripe:** Payments (Live Mode). Requires User API Keys.
--   **Resend:** Email notifications. Requires User API Key (key has been provided and set).
+-   **Stripe:** Payments. Requires User API Keys.
+-   **Resend:** Email notifications. Requires User API Key.
 -   **OpenAI GPT-4 Vision:** Used for AI Receipt Scanning. (Uses Emergent LLM Key).
 
 **Testing status**
--   **Testing agent used after significant changes:** YES (but this was for features that have now been removed).
+-   **Testing agent used after significant changes:** YES. The agent used the testing agent multiple times to validate bug fixes and the initial implementation of the invoicing/expense features.
 -   **Troubleshoot agent used after agent stuck in loop:** NO
 -   **Test files created:** None
--   **Known regressions:** None, as the changes are a deliberate removal of features rather than an accidental break.
+-   **Known regressions:** The newly restructured Dashboard and Project pages are untested and likely non-functional regarding data display.
 
 **Credentials to test flow:**
--   Sign up with a new email to test the standard user flow.
--   The previously granted Lifetime accounts (, etc.) can be used for general login, but their special status may no longer be relevant.
+-   Sign up with a new email to create a standard Trial user.
+-   The user has a lifetime founder account which should have access to Elite features. Use this to test subscription gates. The email is not specified but may need to be requested from the user if testing  logic again.
 
 **What agent forgot to execute**
--   The agent correctly began the massive refactoring task but has not yet addressed the database cleanup (dropping obsolete tables) or begun the backend implementation for the new core features. This is the logical next step.</analysis>
+-   The agent has correctly identified the new PRD as the source of truth but has not yet tested the very last code it wrote ( and ). This testing is the critical next step.</analysis>
