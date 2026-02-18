@@ -245,7 +245,7 @@ const ExpensesPage = () => {
             </thead>
             <tbody className="divide-y divide-charcoal-700">
               {filteredExpenses.map((expense) => {
-                const catConfig = CATEGORIES[expense.category] || CATEGORIES.other;
+                const catConfig = CATEGORIES[expense.category] || CATEGORIES['Other'];
                 
                 return (
                   <tr key={expense.id} className="hover:bg-charcoal-700/30 transition-colors">
