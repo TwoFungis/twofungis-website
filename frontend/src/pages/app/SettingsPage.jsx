@@ -285,6 +285,15 @@ const SettingsPage = () => {
 
   return (
     <div className="space-y-6" data-testid="settings-page">
+      {/* Header with Shield */}
+      <div className="flex items-center gap-4 mb-2">
+        <img src="/shield-icon.png" alt="" className="w-10 h-10 opacity-30 hidden lg:block" />
+        <div>
+          <h1 className="text-2xl font-bold text-charcoal-800">Settings</h1>
+          <p className="text-charcoal-600 text-sm">Manage your account, subscription, and preferences</p>
+        </div>
+      </div>
+
       {/* Payment Messages */}
       {paymentMessage && (
         <div className={`p-4 rounded-lg flex items-center justify-between ${
