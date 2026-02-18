@@ -42,26 +42,25 @@ const ExpensesPage = () => {
     fetchExpenses();
   }, []);
 
+  const getAuthHeaders = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    return {
+      'Authorization': `Bearer ${session?.access_token}`,
+      'Content-Type': 'application/json'
+    };
+  };
+
   const fetchExpenses = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`${API_URL}/api/expenses`, {
-        headers: { 'Authorization': `Bearer ${user?.access_token}` }
-      });
+      const headers = await getAuthHeaders();
+      const response = await fetch(`${API_URL}/api/expenses`, { headers });
       if (response.ok) {
         const data = await response.json();
         setExpenses(data.expenses || []);
       }
     } catch (error) {
       console.error('Error fetching expenses:', error);
-      // Demo data
-      setExpenses([
-        { id: '1', description: 'Lumber for framing', category: 'materials', amount: 2450, project_name: 'Smith Residence', date: '2026-02-15', has_receipt: true },
-        { id: '2', description: 'Electrical supplies', category: 'materials', amount: 890, project_name: 'Johnson Reno', date: '2026-02-14', has_receipt: true },
-        { id: '3', description: 'Fuel for trucks', category: 'fuel', amount: 320, project_name: null, date: '2026-02-13', has_receipt: true },
-        { id: '4', description: 'Plumbing subcontract', category: 'subcontractor', amount: 4500, project_name: 'Commercial Build', date: '2026-02-12', has_receipt: false },
-        { id: '5', description: 'Building permit', category: 'permits', amount: 850, project_name: 'Smith Residence', date: '2026-02-10', has_receipt: true },
-      ]);
     } finally {
       setIsLoading(false);
     }
