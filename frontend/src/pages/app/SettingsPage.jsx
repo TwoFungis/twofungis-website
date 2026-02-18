@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { User, CreditCard, Bell, Shield, Check, Loader2, Crown, FileText, Save, MapPin, X, Sparkles, ExternalLink, Clock } from 'lucide-react';
+import { User, CreditCard, Bell, Shield, ShieldCheck, Check, Loader2, Crown, FileText, Save, MapPin, X, Sparkles, ExternalLink, Clock, Users, Eye, EyeOff } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { supabase } from '../../lib/supabase';
 
@@ -28,12 +28,80 @@ const SettingsPage = () => {
   });
   const [showLifetimeModal, setShowLifetimeModal] = useState(false);
   const [isLoadingPlans, setIsLoadingPlans] = useState(true);
+  
+  // Marketplace state
+  const [marketplaceProfile, setMarketplaceProfile] = useState(null);
+  const [isMarketplaceListed, setIsMarketplaceListed] = useState(false);
+  const [isTogglingMarketplace, setIsTogglingMarketplace] = useState(false);
+  const [verificationStatus, setVerificationStatus] = useState(null);
 
   useEffect(() => {
     if (profile?.default_payment_days) {
       setDefaultPaymentDays(profile.default_payment_days);
     }
   }, [profile]);
+
+  // Fetch marketplace profile
+  useEffect(() => {
+    const fetchMarketplaceProfile = async () => {
+      if (!user?.id) return;
+      try {
+        const response = await fetch(`${API_URL}/api/marketplace/profile/${user.id}`);
+        if (response.ok) {
+          const data = await response.json();
+          setMarketplaceProfile(data.profile);
+          setIsMarketplaceListed(data.profile?.is_listed || false);
+          setVerificationStatus(data.verification);
+        }
+      } catch (error) {
+        console.error('Error fetching marketplace profile:', error);
+      }
+    };
+    
+    fetchMarketplaceProfile();
+  }, [user?.id]);
+
+  const handleToggleMarketplace = async () => {
+    if (!user?.id) return;
+    
+    setIsTogglingMarketplace(true);
+    try {
+      // If no profile exists, create one first
+      if (!marketplaceProfile) {
+        const createResponse = await fetch(`${API_URL}/api/marketplace/profile/${user.id}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            company_name: profile?.company_name,
+            trade: profile?.trade_type,
+            region: profile?.region,
+            is_listed: true
+          })
+        });
+        
+        if (createResponse.ok) {
+          const data = await createResponse.json();
+          setMarketplaceProfile(data.profile);
+          setIsMarketplaceListed(true);
+        }
+      } else {
+        // Toggle existing profile
+        const response = await fetch(`${API_URL}/api/marketplace/profile/${user.id}/toggle-listing`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(!isMarketplaceListed)
+        });
+        
+        if (response.ok) {
+          setIsMarketplaceListed(!isMarketplaceListed);
+        }
+      }
+    } catch (error) {
+      console.error('Error toggling marketplace listing:', error);
+    } finally {
+      setIsTogglingMarketplace(false);
+    }
+  };
 
   useEffect(() => {
     const fetchPlans = async () => {
