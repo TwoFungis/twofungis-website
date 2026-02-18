@@ -15,10 +15,13 @@ import {
   CheckCircle2,
   MessageSquare,
   Calendar,
-  Percent
+  Percent,
+  FileText,
+  Download
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuthStore } from '../../store/authStore';
+import { jsPDF } from 'jspdf';
 
 const statusConfig = {
   draft: { label: 'Draft', color: 'bg-gray-500', textColor: 'text-gray-400', bgLight: 'bg-gray-500/20' },
