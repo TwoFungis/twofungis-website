@@ -21,12 +21,12 @@ TradeOS has pivoted from a marketplace-hybrid model to a **focused Contractor Op
 
 ## What's Been Implemented
 
-### ✅ Strategic Pivot - Phase 1 Complete (Feb 18, 2026)
+### ✅ Strategic Pivot - Complete (Feb 18, 2026)
 - Marketplace functionality removed from navigation and UI
 - New landing page with updated branding and messaging
 - Simplified navigation focusing on core business functions
 
-### ✅ Invoicing System (NEW - Feb 18, 2026)
+### ✅ Invoicing System (Feb 18, 2026)
 | Feature | Status |
 |---------|--------|
 | Invoice creation with line items | ✅ Complete |
@@ -36,17 +36,7 @@ TradeOS has pivoted from a marketplace-hybrid model to a **focused Contractor Op
 | Invoice detail view | ✅ Complete |
 | Mark as paid functionality | ✅ Complete |
 
-**Backend Endpoints:**
-- `GET /api/invoices` - List all invoices with stats
-- `POST /api/invoices` - Create new invoice
-- `GET /api/invoices/{id}` - Get invoice details
-- `PATCH /api/invoices/{id}` - Update draft invoice
-- `POST /api/invoices/{id}/send` - Mark as sent
-- `POST /api/invoices/{id}/mark-paid` - Mark as paid
-- `DELETE /api/invoices/{id}` - Delete draft invoice
-- `GET /api/invoices/stats/receivables` - Aging report
-
-### ✅ Milestone Management (NEW - Feb 18, 2026)
+### ✅ Milestone Management (Feb 18, 2026)
 | Feature | Status |
 |---------|--------|
 | Milestone CRUD operations | ✅ Complete |
@@ -55,26 +45,43 @@ TradeOS has pivoted from a marketplace-hybrid model to a **focused Contractor Op
 | Invoice generation from milestones | ✅ Complete |
 | Milestone statistics | ✅ Complete |
 
-**Backend Endpoints:**
-- `GET /api/milestones` - List all milestones with stats
-- `POST /api/milestones` - Create new milestone
-- `GET /api/milestones/{id}` - Get milestone details
-- `PATCH /api/milestones/{id}` - Update milestone (draft/submitted only)
-- `POST /api/milestones/{id}/status` - Update status with workflow validation
-- `DELETE /api/milestones/{id}` - Delete draft milestone
-- `GET /api/milestones/project/{id}/summary` - Project milestone summary
+### ✅ Dashboard Financial Health Panel (Feb 18, 2026)
+| Feature | Status |
+|---------|--------|
+| Contract Value display | ✅ Complete |
+| Approved COs tracking | ✅ Complete |
+| Total Revenue calculation | ✅ Complete |
+| Gross Profit calculation | ✅ Complete |
+| Average Margin with health indicator | ✅ Complete |
+| Project breakdown with margin bars | ✅ Complete |
+
+### ✅ Reports Page (Elite Feature) (Feb 18, 2026)
+| Feature | Status |
+|---------|--------|
+| Elite gate for non-Elite users | ✅ Complete |
+| Overview tab with KPIs | ✅ Complete |
+| Revenue tab with monthly breakdown | ✅ Complete |
+| Expenses tab with category breakdown | ✅ Complete |
+| Projects tab with performance table | ✅ Complete |
+| Date range filter (Month/Quarter/YTD/All) | ✅ Complete |
+| PDF Export (P&L, Revenue, Projects) | ✅ Complete |
+
+### ✅ Settings Page - Complete (Feb 18, 2026)
+| Feature | Status |
+|---------|--------|
+| Profile viewing & editing | ✅ Complete |
+| Change password | ✅ Complete |
+| Delete account with confirmation | ✅ Complete |
+| Subscription display & upgrade | ✅ Complete |
+| Invoice defaults | ✅ Complete |
+| Notification preferences | ✅ Complete |
 
 ### ✅ Stripe Integration (Live Mode)
 | Plan | Price | Type |
 |------|-------|------|
-| PRO | $39 CAD/mo | Subscription |
-| ELITE | $59 CAD/mo | Subscription |
+| PRO | $49 CAD/mo | Subscription |
+| ELITE | $99 CAD/mo | Subscription |
 | LIFETIME_ELITE | $599 CAD | One-time (100 seats, Canada-only) |
-
-### ✅ Dashboard Financial Pulse
-- Quick stats bar (Receivables, This Month, Pending COs, Overdue)
-- Outstanding payments widget with aging breakdown
-- Project financial health panel
 
 ### ✅ Other Features
 - Change Order management with margin impact
@@ -101,9 +108,6 @@ TradeOS has pivoted from a marketplace-hybrid model to a **focused Contractor Op
 ### Tables to Remove (Optional Cleanup)
 ```sql
 -- Migration file: /app/migrations/005_drop_marketplace_tables.sql
-
--- marketplace_jobs, contractor_services, contractor_connections
--- contractor_inquiries, contractor_profiles_public, contractor_verification
 ```
 
 ---
@@ -120,61 +124,67 @@ TradeOS has pivoted from a marketplace-hybrid model to a **focused Contractor Op
 
 ## Navigation Structure
 ```
-Dashboard      - Financial overview
+Dashboard      - Financial overview with Health Panel
 Projects       - Project management
 Estimates      - Quote builder
 Change Orders  - CO tracking
-Milestones     - Milestone management (NEW)
-Invoices       - Invoice management (NEW)
+Milestones     - Milestone management
+Invoices       - Invoice management
 Expenses       - Expense tracking
 Document Vault - File storage
-Reports        - Business analytics
+Reports        - Business analytics (Elite)
 Settings       - Account & subscription
 ```
 
 ---
 
-## Key Files
-| File | Purpose |
-|------|---------|
-| `/app/backend/routes/invoices.py` | Invoice API endpoints |
-| `/app/backend/routes/milestones.py` | Milestone API endpoints |
-| `/app/frontend/src/pages/app/InvoicesPage.jsx` | Invoice management UI |
-| `/app/frontend/src/pages/app/MilestonesPage.jsx` | Milestone management UI |
-| `/app/migrations/006_invoicing_milestones_schema.sql` | Database schema |
+## API Endpoints
+
+### Invoices API
+- `GET /api/invoices` - List all invoices with stats
+- `POST /api/invoices` - Create new invoice
+- `GET /api/invoices/{id}` - Get invoice details
+- `PATCH /api/invoices/{id}` - Update draft invoice
+- `POST /api/invoices/{id}/send` - Mark as sent
+- `POST /api/invoices/{id}/mark-paid` - Mark as paid
+- `DELETE /api/invoices/{id}` - Delete draft invoice
+- `GET /api/invoices/stats/receivables` - Aging report
+
+### Milestones API
+- `GET /api/milestones` - List all milestones with stats
+- `POST /api/milestones` - Create new milestone
+- `GET /api/milestones/{id}` - Get milestone details
+- `PATCH /api/milestones/{id}` - Update milestone
+- `POST /api/milestones/{id}/status` - Update status with workflow validation
+- `DELETE /api/milestones/{id}` - Delete draft milestone
 
 ---
 
 ## Testing Status
 - ✅ Backend: 100% (28/28 tests passed)
-- ✅ Frontend: All UI elements present and functional
-- ✅ Landing page branding verified
-- ✅ Auth middleware working correctly
+- ✅ Frontend: 100% (All features verified)
+- ✅ Dashboard Financial Health Panel verified
+- ✅ Reports Page Elite gate verified
+- ✅ Settings Page all sections verified
 
 ---
 
-## Pending User Actions
+## User Actions Required
 
 ### Critical - Database Setup
-1. **Run SQL Migration:** Execute `/app/migrations/006_invoicing_milestones_schema.sql` in Supabase SQL Editor
-2. **Optional Cleanup:** Execute `/app/migrations/005_drop_marketplace_tables.sql` to remove marketplace tables
-
-### Configuration
-- Stripe keys configured ✅
-- Resend API key configured ✅
-- Supabase connection configured ✅
+Run SQL migration `/app/migrations/006_invoicing_milestones_schema.sql` in Supabase SQL Editor
 
 ---
 
 ## Backlog (P1)
-- [ ] Dashboard Financial Health Panel - Project-level metrics
-- [ ] Reporting Engine - PDF export functionality
-- [ ] Complete Settings Page (Edit Profile, Security, Delete Account)
+- [ ] Email notifications when invoices sent (integrate with Resend)
+- [ ] Invoice PDF generation and download
+- [ ] Automatic overdue invoice status updates
 
 ## Future Tasks (P2)
-- [ ] Expense & Tax enhancements
 - [ ] Payment reminders automation
-- [ ] Advanced reports with charts
+- [ ] Client portal for invoice viewing
+- [ ] Advanced tax reporting
 - [ ] Final code cleanup (remove orphaned marketplace files)
 
 ---
@@ -187,6 +197,7 @@ Settings       - Account & subscription
 ## Version History
 | Date | Version | Changes |
 |------|---------|---------|
+| Feb 18, 2026 | 2.1 | Dashboard Financial Health Panel, Reports Page with PDF export, Complete Settings Page |
 | Feb 18, 2026 | 2.0 | Strategic pivot, Invoicing & Milestones |
 | Feb 17, 2026 | 1.5 | Marketplace V2 (now removed) |
 | Feb 16, 2026 | 1.0 | Initial Stripe integration |
