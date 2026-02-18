@@ -164,7 +164,7 @@ const DashboardPage = () => {
   return (
     <div className="space-y-6" data-testid="dashboard-page">
       {/* Welcome */}
-      <div>
+      <div className="animate-fade-in-up">
         <h1 className="text-2xl lg:text-3xl font-bold text-white mb-1">
           Welcome back, {profile?.name?.split(' ')[0] || 'Builder'}
         </h1>
@@ -172,10 +172,10 @@ const DashboardPage = () => {
       </div>
 
       {/* QUICK STATS BAR - Financial Pulse */}
-      <div className="bg-gradient-to-r from-charcoal-800 to-charcoal-900 rounded-2xl border border-charcoal-700 p-4 lg:p-6" data-testid="quick-stats-bar">
+      <div className="bg-gradient-to-r from-charcoal-800 to-charcoal-900 rounded-2xl border border-charcoal-700 p-4 lg:p-6 animate-fade-in-up animation-delay-100" data-testid="quick-stats-bar">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8">
           {/* Total Receivables */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 hover-lift">
             <div className="w-12 h-12 rounded-xl bg-success/20 flex items-center justify-center">
               <Receipt className="w-6 h-6 text-success" />
             </div>
@@ -186,7 +186,7 @@ const DashboardPage = () => {
           </div>
 
           {/* This Month Revenue */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 hover-lift">
             <div className="w-12 h-12 rounded-xl bg-steel-500/20 flex items-center justify-center">
               <DollarSign className="w-6 h-6 text-steel-400" />
             </div>
@@ -197,7 +197,7 @@ const DashboardPage = () => {
           </div>
 
           {/* Outstanding COs */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 hover-lift">
             <div className="w-12 h-12 rounded-xl bg-warning/20 flex items-center justify-center">
               <FileText className="w-6 h-6 text-warning" />
             </div>
@@ -208,9 +208,9 @@ const DashboardPage = () => {
           </div>
 
           {/* Overdue Amount */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 hover-lift">
             <div className={`w-12 h-12 rounded-xl ${aging60plus > 0 ? 'bg-risk/20' : 'bg-charcoal-700'} flex items-center justify-center`}>
-              <AlertCircle className={`w-6 h-6 ${aging60plus > 0 ? 'text-risk' : 'text-gray-500'}`} />
+              <AlertCircle className={`w-6 h-6 ${aging60plus > 0 ? 'text-risk animate-pulse-subtle' : 'text-gray-500'}`} />
             </div>
             <div>
               <p className="text-xs text-gray-500 uppercase tracking-wide">Overdue (60+)</p>
@@ -224,7 +224,7 @@ const DashboardPage = () => {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-charcoal-800 rounded-xl p-4 lg:p-5 border border-charcoal-700" data-testid="stat-card-projects">
+        <div className="bg-charcoal-800 rounded-xl p-4 lg:p-5 border border-charcoal-700 card-glow animate-fade-in-up animation-delay-200" data-testid="stat-card-projects">
           <div className="flex items-center justify-between mb-2">
             <div className="w-9 h-9 rounded-lg bg-charcoal-700 flex items-center justify-center text-steel-400">
               <FolderKanban className="w-4 h-4" />
@@ -234,7 +234,7 @@ const DashboardPage = () => {
           <p className="text-xs text-gray-500">Active Projects</p>
         </div>
 
-        <div className="bg-charcoal-800 rounded-xl p-4 lg:p-5 border border-charcoal-700" data-testid="stat-card-value">
+        <div className="bg-charcoal-800 rounded-xl p-4 lg:p-5 border border-charcoal-700 card-glow animate-fade-in-up animation-delay-300" data-testid="stat-card-value">
           <div className="flex items-center justify-between mb-2">
             <div className="w-9 h-9 rounded-lg bg-charcoal-700 flex items-center justify-center text-success">
               <DollarSign className="w-4 h-4" />
@@ -245,7 +245,7 @@ const DashboardPage = () => {
           <p className="text-xs text-gray-500">Contract Value</p>
         </div>
 
-        <div className="bg-charcoal-800 rounded-xl p-4 lg:p-5 border border-charcoal-700" data-testid="stat-card-cos">
+        <div className="bg-charcoal-800 rounded-xl p-4 lg:p-5 border border-charcoal-700 card-glow animate-fade-in-up animation-delay-400" data-testid="stat-card-cos">
           <div className="flex items-center justify-between mb-2">
             <div className="w-9 h-9 rounded-lg bg-charcoal-700 flex items-center justify-center text-warning">
               <FileText className="w-4 h-4" />
@@ -255,7 +255,7 @@ const DashboardPage = () => {
           <p className="text-xs text-gray-500">Pending COs</p>
         </div>
 
-        <div className="bg-charcoal-800 rounded-xl p-4 lg:p-5 border border-charcoal-700" data-testid="stat-card-margin">
+        <div className="bg-charcoal-800 rounded-xl p-4 lg:p-5 border border-charcoal-700 card-glow animate-fade-in-up animation-delay-500" data-testid="stat-card-margin">
           <div className="flex items-center justify-between mb-2">
             <div className="w-9 h-9 rounded-lg bg-charcoal-700 flex items-center justify-center text-steel-400">
               <TrendingUp className="w-4 h-4" />
