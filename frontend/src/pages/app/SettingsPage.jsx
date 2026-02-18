@@ -594,6 +594,54 @@ const SettingsPage = () => {
         </div>
       </div>
 
+      {/* Labor Rate */}
+      <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6" id="labor-rate">
+        <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-4">
+          <DollarSign className="w-5 h-5 text-steel-400" />
+          Labor Rate
+        </h2>
+        
+        <p className="text-gray-400 text-sm mb-4">
+          Set your hourly labor rate for accurate estimate calculations. Include your overhead and desired profit margin.
+        </p>
+        
+        <div className="max-w-xs">
+          <label className="block text-sm font-medium text-gray-400 mb-2">
+            Hourly Rate ($/hr)
+          </label>
+          <div className="flex items-center gap-3">
+            <div className="relative flex-1">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+              <input
+                type="number"
+                value={laborRate}
+                onChange={(e) => setLaborRate(e.target.value)}
+                placeholder="75.00"
+                min="0"
+                step="0.01"
+                className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg pl-8 pr-4 py-2 text-white focus:border-steel-500 focus:outline-none"
+                data-testid="input-labor-rate"
+              />
+            </div>
+            <button
+              onClick={handleSaveLaborRate}
+              disabled={!laborRate}
+              className="bg-steel-500 hover:bg-steel-600 disabled:opacity-50 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+              data-testid="save-labor-rate-btn"
+            >
+              {laborRateSaved ? (
+                <Check className="w-4 h-4" />
+              ) : (
+                <Save className="w-4 h-4" />
+              )}
+            </button>
+          </div>
+          <p className="text-xs text-gray-500 mt-2">
+            Tip: Your fully loaded labor cost should include wages, benefits, insurance, and overhead.
+          </p>
+        </div>
+      </div>
+
       {/* Notifications */}
       <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6">
         <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-4">
