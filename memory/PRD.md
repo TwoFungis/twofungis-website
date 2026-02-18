@@ -151,6 +151,21 @@
 - ✅ Setup Progress Checklist Visibility: 100% (Fixed Feb 18)
 - ✅ Phase 2 Enhanced Expenses UI: 100% (Feb 18)
 - ✅ Quick Add Expense Global Button: 100% (Feb 18)
+- ✅ Founder Accounts: 100% (Feb 18)
+- ✅ Shield Branding App Headers: 100% (Feb 18)
+
+---
+
+## Founder Accounts
+Three founding members have been granted lifetime Elite access:
+1. info@twofungis.ca
+2. swdmarshall@gmail.com
+3. carpenterbeau@hotmail.com
+
+**API Endpoints:**
+- `GET /api/founders/count` - Returns founder count (97/100 remaining)
+- `GET /api/founders/status/{email}` - Check if email is a founder
+- `POST /api/founders/sync-all` - Sync all founder accounts to elite tier
 
 ---
 
