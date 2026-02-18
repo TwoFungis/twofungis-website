@@ -45,18 +45,20 @@ const LandingPage = () => {
                 Start Free Trial
               </Link>
             </nav>
-            <Link 
-              to="/signup" 
-              className="md:hidden bg-steel-500 hover:bg-steel-600 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm"
-            >
-              Start Trial
-            </Link>
-            <Link 
-              to="/auth" 
-              className="md:hidden text-gray-400 hover:text-white transition-colors text-sm font-medium mr-3"
-            >
-              Login
-            </Link>
+            <div className="md:hidden flex items-center gap-2">
+              <Link 
+                to="/auth" 
+                className="text-gray-400 hover:text-white transition-colors text-sm font-medium px-3 py-2"
+              >
+                Login
+              </Link>
+              <Link 
+                to="/signup" 
+                className="bg-steel-500 hover:bg-steel-600 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm"
+              >
+                Start Trial
+              </Link>
+            </div>
           </div>
         </div>
       </header>
