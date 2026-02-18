@@ -268,6 +268,137 @@ const DocumentsPage = () => {
           )}
         </>
       )}
+
+      {/* Upload Modal */}
+      {showUploadModal && (
+        <UploadDocumentModal
+          onClose={() => setShowUploadModal(false)}
+          onSuccess={() => { setShowUploadModal(false); fetchDocuments(); }}
+          user={user}
+        />
+      )}
+    </div>
+  );
+};
+
+// Upload Document Modal Component
+const UploadDocumentModal = ({ onClose, onSuccess, user }) => {
+  const [isUploading, setIsUploading] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [folder, setFolder] = useState('');
+  const fileInputRef = React.useRef(null);
+
+  const handleFileSelect = (e) => {
+    const files = Array.from(e.target.files || []);
+    setSelectedFiles(files);
+  };
+
+  const handleUpload = async () => {
+    if (selectedFiles.length === 0) {
+      alert('Please select files to upload');
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      // For now, just simulate upload since we need Supabase Storage setup
+      // In production, you'd upload to Supabase Storage
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      alert('Upload functionality requires Supabase Storage bucket to be configured. Files would be uploaded to: documents/' + (folder || 'root'));
+      onSuccess();
+    } catch (error) {
+      console.error('Error uploading:', error);
+      alert('Upload failed');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" data-testid="upload-document-modal">
+      <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 w-full max-w-md">
+        <div className="p-6 border-b border-charcoal-700 flex items-center justify-between">
+          <h2 className="text-xl font-bold text-white">Upload Documents</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-white">
+            <span className="text-2xl">&times;</span>
+          </button>
+        </div>
+
+        <div className="p-6 space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-400 mb-1">Folder (optional)</label>
+            <select
+              value={folder}
+              onChange={(e) => setFolder(e.target.value)}
+              className="w-full bg-charcoal-900 border border-charcoal-700 rounded-lg px-4 py-2 text-white focus:border-steel-500 focus:outline-none"
+            >
+              <option value="">Root folder</option>
+              <option value="contracts">Contracts</option>
+              <option value="permits">Permits & Licenses</option>
+              <option value="insurance">Insurance</option>
+              <option value="receipts">Receipts</option>
+            </select>
+          </div>
+
+          <div
+            onClick={() => fileInputRef.current?.click()}
+            className="border-2 border-dashed border-charcoal-600 rounded-xl p-8 text-center cursor-pointer hover:border-steel-500/50 transition-colors"
+          >
+            <input
+              ref={fileInputRef}
+              type="file"
+              multiple
+              onChange={handleFileSelect}
+              className="hidden"
+              accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx"
+            />
+            <Upload className="w-10 h-10 text-gray-500 mx-auto mb-3" />
+            <p className="text-white font-medium">Click to select files</p>
+            <p className="text-gray-500 text-sm mt-1">PDF, Images, Word, Excel</p>
+          </div>
+
+          {selectedFiles.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-sm text-gray-400">{selectedFiles.length} file(s) selected:</p>
+              {selectedFiles.map((file, i) => (
+                <div key={i} className="flex items-center gap-2 bg-charcoal-700 rounded px-3 py-2 text-sm">
+                  <File className="w-4 h-4 text-gray-500" />
+                  <span className="text-white truncate flex-1">{file.name}</span>
+                  <span className="text-gray-500">{(file.size / 1024).toFixed(0)} KB</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="p-6 border-t border-charcoal-700 flex gap-3">
+          <button
+            onClick={onClose}
+            disabled={isUploading}
+            className="flex-1 px-4 py-2 text-gray-400 hover:text-white transition-colors border border-charcoal-600 rounded-lg"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleUpload}
+            disabled={isUploading || selectedFiles.length === 0}
+            className="flex-1 bg-steel-500 hover:bg-steel-600 disabled:opacity-50 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+            data-testid="confirm-upload-btn"
+          >
+            {isUploading ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                Uploading...
+              </>
+            ) : (
+              <>
+                <Upload className="w-4 h-4" />
+                Upload
+              </>
+            )}
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
