@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   Wallet, Plus, Search, Filter, Upload, Receipt, Tag, Calendar,
   TrendingUp, TrendingDown, Calculator, FileText, Camera, MoreVertical,
-  Info, DollarSign, Briefcase, User, X
+  Info, DollarSign, Briefcase, User, X, Trash2, Edit2
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { supabase } from '../../lib/supabase';
