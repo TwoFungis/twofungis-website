@@ -16,7 +16,8 @@ import {
   FileSpreadsheet,
   Crown,
   User,
-  Receipt
+  Receipt,
+  Store
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { Logo, LogoIcon } from '../ui/Logo';
@@ -35,6 +36,7 @@ const AppLayout = () => {
     { path: '/app/change-orders', icon: FileText, label: 'Change Orders' },
     { path: '/app/production', icon: ClipboardList, label: 'Production' },
     { path: '/app/bookkeeping', icon: Receipt, label: 'Bookkeeping' },
+    { path: '/contractors', icon: Store, label: 'Marketplace', external: true },
     { path: '/app/reports', icon: BarChart3, label: 'Reports', elite: true },
     { path: '/app/settings', icon: Settings, label: 'Settings' },
   ];
