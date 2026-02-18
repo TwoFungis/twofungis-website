@@ -390,3 +390,176 @@ async def get_tax_summary(
     except Exception as e:
         logger.error(f"Error getting tax summary: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+
+@router.get("/categories/list")
+async def get_expense_categories():
+    """Get list of expense categories with deductibility info"""
+    return {
+        "categories": [
+            {
+                "value": key,
+                "label": val["label"],
+                "deductibility": val["deductibility"]
+            }
+            for key, val in CATEGORIES.items()
+        ],
+        "disclaimer": "Estimates only — confirm with your accountant."
+    }
+
+
+@router.get("/summary/monthly")
+async def get_monthly_summary(
+    authorization: str = Header(None),
+    year: Optional[int] = None,
+    month: Optional[int] = None
+):
+    """Get monthly expense summary with deductibility breakdown"""
+    user_id = get_user_id_from_token(authorization)
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
+    try:
+        now = datetime.now()
+        target_year = year or now.year
+        target_month = month or now.month
+        
+        # Get expenses for the month
+        params = {
+            "user_id": f"eq.{user_id}",
+            "expense_date": f"gte.{target_year}-{target_month:02d}-01",
+            "select": "*",
+            "order": "expense_date.desc"
+        }
+        
+        # Add end of month filter
+        if target_month == 12:
+            next_month_start = f"{target_year + 1}-01-01"
+        else:
+            next_month_start = f"{target_year}-{target_month + 1:02d}-01"
+        
+        expenses = await supabase_request("GET", "expenses", params=params)
+        
+        if not isinstance(expenses, list):
+            expenses = []
+        
+        # Filter to only this month
+        month_expenses = [
+            e for e in expenses 
+            if e.get('expense_date', '') < next_month_start
+        ]
+        
+        # Calculate summaries
+        total_expenses = sum(e.get('amount', 0) for e in month_expenses)
+        total_tax_paid = sum(e.get('tax_amount', 0) for e in month_expenses)
+        
+        # Calculate deductible amounts
+        total_deductible = 0
+        for e in month_expenses:
+            deduct_pct = e.get('deductibility_pct', 100) or 100
+            if e.get('business_personal') == 'Personal':
+                deduct_pct = 0
+            total_deductible += e.get('amount', 0) * (deduct_pct / 100)
+        
+        # By category breakdown
+        by_category = {}
+        for e in month_expenses:
+            cat = e.get('category', 'Other')
+            if cat not in by_category:
+                by_category[cat] = {"total": 0, "deductible": 0, "count": 0}
+            by_category[cat]["total"] += e.get('amount', 0)
+            by_category[cat]["count"] += 1
+            deduct_pct = e.get('deductibility_pct', 100) or 100
+            if e.get('business_personal') == 'Personal':
+                deduct_pct = 0
+            by_category[cat]["deductible"] += e.get('amount', 0) * (deduct_pct / 100)
+        
+        return {
+            "year": target_year,
+            "month": target_month,
+            "total_expenses": round(total_expenses, 2),
+            "total_deductible": round(total_deductible, 2),
+            "total_tax_paid": round(total_tax_paid, 2),
+            "expense_count": len(month_expenses),
+            "by_category": by_category,
+            "disclaimer": "Estimates only — confirm with your accountant."
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting monthly summary: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/summary/quarterly")
+async def get_quarterly_summary(
+    authorization: str = Header(None),
+    year: Optional[int] = None,
+    quarter: Optional[int] = None
+):
+    """Get quarterly expense summary with tax projection"""
+    user_id = get_user_id_from_token(authorization)
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
+    try:
+        now = datetime.now()
+        target_year = year or now.year
+        target_quarter = quarter or ((now.month - 1) // 3 + 1)
+        
+        # Calculate quarter date range
+        quarter_starts = {1: "01-01", 2: "04-01", 3: "07-01", 4: "10-01"}
+        quarter_ends = {1: "04-01", 2: "07-01", 3: "10-01", 4: f"{target_year + 1}-01-01"}
+        
+        start_date = f"{target_year}-{quarter_starts[target_quarter]}"
+        end_date = quarter_ends[target_quarter] if target_quarter < 4 else f"{target_year + 1}-01-01"
+        if target_quarter < 4:
+            end_date = f"{target_year}-{end_date}"
+        
+        params = {
+            "user_id": f"eq.{user_id}",
+            "expense_date": f"gte.{start_date}",
+            "select": "*"
+        }
+        
+        expenses = await supabase_request("GET", "expenses", params=params)
+        
+        if not isinstance(expenses, list):
+            expenses = []
+        
+        # Filter to only this quarter
+        quarter_expenses = [
+            e for e in expenses 
+            if e.get('expense_date', '') < end_date
+        ]
+        
+        total_expenses = sum(e.get('amount', 0) for e in quarter_expenses)
+        total_tax_paid = sum(e.get('tax_amount', 0) for e in quarter_expenses)
+        
+        total_deductible = 0
+        for e in quarter_expenses:
+            deduct_pct = e.get('deductibility_pct', 100) or 100
+            if e.get('business_personal') == 'Personal':
+                deduct_pct = 0
+            total_deductible += e.get('amount', 0) * (deduct_pct / 100)
+        
+        return {
+            "year": target_year,
+            "quarter": target_quarter,
+            "quarter_label": f"Q{target_quarter} {target_year}",
+            "start_date": start_date,
+            "end_date": end_date,
+            "total_expenses": round(total_expenses, 2),
+            "total_deductible": round(total_deductible, 2),
+            "total_tax_paid": round(total_tax_paid, 2),
+            "expense_count": len(quarter_expenses),
+            "disclaimer": "Estimates only — confirm with your accountant."
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting quarterly summary: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
