@@ -47,7 +47,7 @@ const LandingPage = () => {
             </nav>
             <div className="md:hidden flex items-center gap-2">
               <Link 
-                to="/auth" 
+                to="/login" 
                 className="text-gray-400 hover:text-white transition-colors text-sm font-medium px-3 py-2"
               >
                 Login
