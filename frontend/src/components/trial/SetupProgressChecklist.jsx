@@ -62,7 +62,7 @@ const SetupProgressChecklist = () => {
   const { user, profile } = useAuthStore();
   const [progress, setProgress] = useState({});
   const [loading, setLoading] = useState(true);
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false); // Start minimized
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
