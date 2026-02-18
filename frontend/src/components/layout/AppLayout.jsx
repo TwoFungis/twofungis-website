@@ -57,7 +57,7 @@ const AppLayout = () => {
   };
 
   return (
-    <div className="min-h-screen bg-charcoal-900 flex">
+    <div className="min-h-screen bg-cloud-100 flex">
       {/* Desktop Sidebar */}
       <aside className="hidden lg:flex flex-col w-64 bg-charcoal-800 border-r border-charcoal-700" data-testid="desktop-sidebar">
         <div className="p-4 border-b border-charcoal-700">
