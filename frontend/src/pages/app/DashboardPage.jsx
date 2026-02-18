@@ -390,7 +390,7 @@ const DashboardPage = () => {
       {/* ============================================ */}
       <section data-testid="alerts-zone">
         <div className="flex items-center gap-2 mb-4">
-          <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">Alerts</h2>
+          <h2 className="text-sm font-semibold text-charcoal-600 uppercase tracking-wider">Alerts</h2>
           {alertCount > 0 && (
             <span className="bg-risk/20 text-risk text-xs px-2 py-0.5 rounded-full">{alertCount}</span>
           )}
