@@ -179,12 +179,12 @@ const DashboardPage = () => {
       {/* Header with Shield Branding */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <img src="/shield-icon.png" alt="" className="h-10 w-auto opacity-30 hidden lg:block" />
+          <img src="/shield-icon.png" alt="" className="w-8 h-8 opacity-80" />
           <div>
-            <h1 className="text-2xl lg:text-3xl font-bold text-white">
+            <h1 className="text-2xl lg:text-3xl font-bold text-charcoal-800">
               Welcome back, {profile?.full_name?.split(' ')[0] || profile?.name?.split(' ')[0] || 'Builder'}
             </h1>
-            <p className="text-gray-400 mt-1">Your business at a glance</p>
+            <p className="text-charcoal-600 mt-1">Your business at a glance</p>
           </div>
         </div>
       </div>
@@ -193,7 +193,7 @@ const DashboardPage = () => {
       {/* ZONE A: EXECUTION */}
       {/* ============================================ */}
       <section data-testid="execution-zone">
-        <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Execution</h2>
+        <h2 className="text-sm font-semibold text-charcoal-600 uppercase tracking-wider mb-4">Execution</h2>
         
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Active Projects */}
