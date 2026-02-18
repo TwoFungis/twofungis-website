@@ -51,8 +51,8 @@ const TrialCountdown = () => {
   const getUrgencyStyle = () => {
     if (daysRemaining <= 1) return 'bg-risk/20 text-risk border-risk/30';
     if (daysRemaining <= 3) return 'bg-warning/20 text-warning border-warning/30';
-    if (daysRemaining <= 7) return 'bg-steel-500/20 text-steel-400 border-steel-500/30';
-    return 'bg-charcoal-700 text-gray-400 border-charcoal-600';
+    if (daysRemaining <= 7) return 'bg-slate-300/20 text-slate-200 border-slate-300/40';
+    return 'bg-slate-400/15 text-slate-300 border-slate-400/30';
   };
 
   const getIcon = () => {
