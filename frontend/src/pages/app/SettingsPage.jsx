@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Settings as SettingsIcon, User, CreditCard, Bell, Shield, Check, Loader2, Crown, FileText, Save, MapPin, Info, X, Sparkles, ExternalLink } from 'lucide-react';
+import { User, CreditCard, Bell, Shield, Check, Loader2, Crown, FileText, Save, MapPin, X, Sparkles, ExternalLink, Clock } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { supabase } from '../../lib/supabase';
 
@@ -14,12 +14,10 @@ const SettingsPage = () => {
   const [isUpgrading, setIsUpgrading] = useState(false);
   const [upgradingPlan, setUpgradingPlan] = useState(null);
   
-  // Business Defaults State
   const [defaultPaymentDays, setDefaultPaymentDays] = useState(profile?.default_payment_days || 30);
   const [isSavingDefaults, setIsSavingDefaults] = useState(false);
   const [defaultsSaved, setDefaultsSaved] = useState(false);
   
-  // Plans & Lifetime State
   const [plans, setPlans] = useState(null);
   const [lifetimeStatus, setLifetimeStatus] = useState({
     remaining: 100,
@@ -31,14 +29,12 @@ const SettingsPage = () => {
   const [showLifetimeModal, setShowLifetimeModal] = useState(false);
   const [isLoadingPlans, setIsLoadingPlans] = useState(true);
 
-  // Load defaults from profile
   useEffect(() => {
     if (profile?.default_payment_days) {
       setDefaultPaymentDays(profile.default_payment_days);
     }
   }, [profile]);
 
-  // Fetch plans and lifetime seats status
   useEffect(() => {
     const fetchPlans = async () => {
       setIsLoadingPlans(true);
@@ -74,7 +70,6 @@ const SettingsPage = () => {
       setDefaultsSaved(true);
       setTimeout(() => setDefaultsSaved(false), 2000);
       
-      // Update local profile
       if (updateProfile) {
         await updateProfile({ default_payment_days: defaultPaymentDays });
       }
@@ -85,7 +80,6 @@ const SettingsPage = () => {
     }
   };
 
-  // Check for payment completion
   useEffect(() => {
     const sessionId = searchParams.get('session_id');
     const paymentStatus = searchParams.get('payment');
@@ -97,32 +91,28 @@ const SettingsPage = () => {
       verifyPayment(sessionId, planType);
     } else if (paymentStatus === 'cancelled') {
       setPaymentMessage({ type: 'error', text: 'Payment was cancelled. Please try again.' });
-      // Clear URL params
       window.history.replaceState({}, '', '/app/settings');
     }
   }, [searchParams]);
 
   const verifyPayment = async (sessionId, planType) => {
-    // Wait a moment for webhook to process
     await new Promise(resolve => setTimeout(resolve, 2000));
     
     try {
-      // Refresh user profile to get updated plan
       if (updateProfile) {
         await updateProfile({});
       }
       
-      const planName = planType === 'LIFETIME_ELITE' ? 'Founding Lifetime (Elite)' : 
+      const planName = planType === 'LIFETIME_ELITE' ? 'Founding Lifetime' : 
                       planType === 'ELITE' ? 'Elite' : 
                       planType === 'PRO' ? 'Pro' : 'your plan';
       
       setPaymentMessage({ 
         type: 'success', 
-        text: `🎉 Payment successful! Welcome to ${planName}!` 
+        text: `Welcome to ${planName}! Your account has been upgraded.` 
       });
       setIsProcessingPayment(false);
       
-      // Refresh lifetime status if it was a lifetime purchase
       if (planType === 'LIFETIME_ELITE') {
         const response = await fetch(`${API_URL}/api/stripe/lifetime-seats`);
         if (response.ok) {
@@ -131,7 +121,6 @@ const SettingsPage = () => {
         }
       }
       
-      // Clear URL parameters
       window.history.replaceState({}, '', '/app/settings');
       
     } catch (error) {
@@ -147,12 +136,10 @@ const SettingsPage = () => {
     setPaymentMessage(null);
 
     try {
-      // Get user's country
       const userCountry = getUserCountry();
       
-      // For lifetime plan, check country client-side first
       if (planType === 'LIFETIME_ELITE' && userCountry !== 'CA') {
-        setPaymentMessage({ type: 'error', text: 'Founding Lifetime is only available in Canada' });
+        setPaymentMessage({ type: 'error', text: 'Founding Lifetime is currently available to Canadian contractors only.' });
         setIsUpgrading(false);
         setUpgradingPlan(null);
         return;
@@ -182,7 +169,6 @@ const SettingsPage = () => {
 
       const data = await response.json();
       
-      // Redirect to Stripe Checkout
       if (data.checkout_url) {
         window.location.href = data.checkout_url;
       } else {
@@ -217,11 +203,9 @@ const SettingsPage = () => {
     }
   };
 
-  // Helper to determine user's country
   const getUserCountry = () => {
     if (profile?.country) return profile.country.toUpperCase();
     
-    // Try to infer from region
     const region = profile?.region || '';
     const canadianProvinces = [
       'British Columbia', 'Alberta', 'Saskatchewan', 'Manitoba',
@@ -240,6 +224,13 @@ const SettingsPage = () => {
   const planStatus = profile?.plan_status || 'inactive';
   const isLifetime = currentPlan === 'LIFETIME_ELITE';
   const isCanada = getUserCountry() === 'CA';
+  const lifetimePurchaseDate = profile?.lifetime_purchased_at ? new Date(profile.lifetime_purchased_at).toLocaleDateString('en-CA', { year: 'numeric', month: 'long', day: 'numeric' }) : null;
+
+  const getPlanDisplayName = (plan) => {
+    if (plan === 'LIFETIME_ELITE') return 'Founding Lifetime';
+    if (plan === 'TRIAL') return 'Trial';
+    return plan.charAt(0) + plan.slice(1).toLowerCase();
+  };
 
   return (
     <div className="space-y-6" data-testid="settings-page">
@@ -248,7 +239,6 @@ const SettingsPage = () => {
         <p className="text-gray-400">Manage your account and subscription</p>
       </div>
 
-      {/* Payment Status Messages */}
       {paymentMessage && (
         <div className={`p-4 rounded-lg flex items-center justify-between ${
           paymentMessage.type === 'success' ? 'bg-success/20 border border-success/50 text-success' :
@@ -270,8 +260,8 @@ const SettingsPage = () => {
       )}
 
       <div className="grid lg:grid-cols-3 gap-6">
-        {/* Profile Section */}
         <div className="lg:col-span-2 space-y-6">
+          {/* Profile Section */}
           <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6">
             <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-6">
               <User className="w-5 h-5 text-steel-400" />
@@ -316,50 +306,57 @@ const SettingsPage = () => {
 
           {/* Subscription Section */}
           <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6">
-            <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-6">
+            <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-4">
               <CreditCard className="w-5 h-5 text-steel-400" />
               Subscription & Billing
             </h2>
             
-            {/* Current Plan */}
-            <div className="mb-6">
-              <p className="text-gray-400 text-sm mb-2">Current Plan</p>
+            {/* Current Plan Display */}
+            <div className="mb-6 p-4 bg-charcoal-700/50 rounded-xl">
+              <p className="text-gray-400 text-sm mb-1">Your current plan</p>
               <div className="flex items-center gap-3">
                 <span className={`text-xl font-bold ${
                   isLifetime ? 'text-warning' :
                   currentPlan === 'ELITE' ? 'text-steel-400' : 
                   currentPlan === 'PRO' ? 'text-success' : 'text-gray-400'
                 }`}>
-                  {isLifetime ? 'Founding Lifetime (Elite)' : 
-                   currentPlan === 'TRIAL' ? 'Trial' :
-                   currentPlan.charAt(0) + currentPlan.slice(1).toLowerCase()}
+                  {getPlanDisplayName(currentPlan)}
                 </span>
                 {(currentPlan === 'ELITE' || isLifetime) && <Crown className="w-5 h-5 text-warning" />}
                 {isLifetime && <Sparkles className="w-5 h-5 text-warning" />}
-                {planStatus === 'active' && !isLifetime && (
+                {planStatus === 'active' && !isLifetime && currentPlan !== 'TRIAL' && (
                   <span className="text-xs bg-success/20 text-success px-2 py-0.5 rounded">Active</span>
                 )}
                 {planStatus === 'past_due' && (
                   <span className="text-xs bg-risk/20 text-risk px-2 py-0.5 rounded">Past Due</span>
                 )}
               </div>
-              {isLifetime && (
-                <p className="text-sm text-gray-400 mt-2">
-                  Lifetime access active since {profile?.lifetime_purchased_at ? new Date(profile.lifetime_purchased_at).toLocaleDateString() : 'purchase'}.
+              
+              {isLifetime && lifetimePurchaseDate && (
+                <p className="text-sm text-warning/80 mt-2 flex items-center gap-1">
+                  <Sparkles className="w-3 h-3" />
+                  Lifetime Elite — Active since {lifetimePurchaseDate}
                 </p>
               )}
+              
+              {currentPlan === 'TRIAL' && profile?.trial_ends_at && (
+                <p className="text-sm text-gray-400 mt-2 flex items-center gap-1">
+                  <Clock className="w-3 h-3" />
+                  Trial ends {new Date(profile.trial_ends_at).toLocaleDateString()}
+                </p>
+              )}
+              
               {!isLifetime && currentPlan !== 'TRIAL' && profile?.stripe_subscription_id && (
                 <button
                   onClick={handleManageBilling}
                   className="mt-3 text-sm text-steel-400 hover:text-white flex items-center gap-1 transition-colors"
                 >
                   <ExternalLink className="w-3 h-3" />
-                  Manage Billing
+                  Manage Subscription
                 </button>
               )}
             </div>
 
-            {/* Loading State */}
             {isLoadingPlans && (
               <div className="flex items-center justify-center py-8">
                 <Loader2 className="w-6 h-6 animate-spin text-steel-400" />
@@ -370,10 +367,11 @@ const SettingsPage = () => {
             {!isLoadingPlans && !isLifetime && (
               <div className="grid md:grid-cols-3 gap-4">
                 {/* Pro Plan */}
-                <div className={`rounded-xl p-5 border ${
-                  currentPlan === 'PRO' ? 'bg-success/10 border-success/50' : 'bg-charcoal-700 border-charcoal-600'
+                <div className={`rounded-xl p-5 border transition-all ${
+                  currentPlan === 'PRO' ? 'bg-success/10 border-success/50' : 'bg-charcoal-700 border-charcoal-600 hover:border-charcoal-500'
                 }`} data-testid="pro-plan-card">
                   <h3 className="text-lg font-bold text-white mb-1">Pro</h3>
+                  <p className="text-xs text-gray-400 mb-2">{plans?.PRO?.tagline || 'For growing trades getting organized.'}</p>
                   <p className="text-2xl font-bold text-white mb-3">
                     ${plans?.PRO?.price || 39}<span className="text-sm text-gray-400">/mo</span>
                   </p>
@@ -391,7 +389,7 @@ const SettingsPage = () => {
                     </span>
                   ) : currentPlan === 'ELITE' ? (
                     <span className="block w-full text-center py-2 rounded-lg bg-charcoal-600 text-gray-400 font-medium text-sm">
-                      Downgrade N/A
+                      Included in Elite
                     </span>
                   ) : (
                     <button
@@ -400,19 +398,20 @@ const SettingsPage = () => {
                       className="w-full bg-steel-500 hover:bg-steel-600 disabled:opacity-50 text-white py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 text-sm"
                       data-testid="upgrade-pro-btn"
                     >
-                      {isUpgrading && upgradingPlan === 'PRO' ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Upgrade'}
+                      {isUpgrading && upgradingPlan === 'PRO' ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Upgrade to Pro'}
                     </button>
                   )}
                 </div>
 
                 {/* Elite Plan */}
-                <div className={`rounded-xl p-5 border ${
-                  currentPlan === 'ELITE' ? 'bg-steel-500/10 border-steel-500' : 'bg-charcoal-700 border-steel-500/50'
+                <div className={`rounded-xl p-5 border transition-all ${
+                  currentPlan === 'ELITE' ? 'bg-steel-500/10 border-steel-500' : 'bg-charcoal-700 border-steel-500/50 hover:border-steel-500'
                 }`} data-testid="elite-plan-card">
                   <div className="flex items-center gap-2 mb-1">
                     <h3 className="text-lg font-bold text-white">Elite</h3>
                     <Crown className="w-4 h-4 text-warning" />
                   </div>
+                  <p className="text-xs text-gray-400 mb-2">{plans?.ELITE?.tagline || 'Built for contractors running serious operations.'}</p>
                   <p className="text-2xl font-bold text-white mb-3">
                     ${plans?.ELITE?.price || 59}<span className="text-sm text-gray-400">/mo</span>
                   </p>
@@ -435,30 +434,31 @@ const SettingsPage = () => {
                       className="w-full bg-steel-500 hover:bg-steel-600 disabled:opacity-50 text-white py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 text-sm"
                       data-testid="upgrade-elite-btn"
                     >
-                      {isUpgrading && upgradingPlan === 'ELITE' ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Upgrade'}
+                      {isUpgrading && upgradingPlan === 'ELITE' ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Upgrade to Elite'}
                     </button>
                   )}
                 </div>
 
                 {/* Founding Lifetime Plan */}
-                <div className={`rounded-xl p-5 border-2 relative overflow-hidden ${
-                  lifetimeStatus.is_active && isCanada
-                    ? 'bg-gradient-to-br from-warning/10 to-charcoal-700 border-warning/50'
+                <div className={`rounded-xl p-5 border-2 relative overflow-hidden transition-all ${
+                  lifetimeStatus.is_active && lifetimeStatus.remaining > 0 && isCanada
+                    ? 'bg-gradient-to-br from-warning/10 via-charcoal-700 to-charcoal-800 border-warning/60 shadow-lg shadow-warning/10'
                     : 'bg-charcoal-700 border-charcoal-600 opacity-75'
                 }`} data-testid="lifetime-plan-card">
-                  {/* Limited Badge */}
-                  <div className="absolute top-0 right-0 bg-warning text-charcoal-900 text-xs font-bold px-2 py-1 rounded-bl">
-                    LIMITED
+                  {/* Badge */}
+                  <div className="absolute top-0 right-0 bg-warning text-charcoal-900 text-[10px] font-bold px-2 py-1 rounded-bl tracking-wide">
+                    FOUNDING MEMBER
                   </div>
                   
                   <div className="flex items-center gap-2 mb-1">
                     <h3 className="text-lg font-bold text-white">Lifetime</h3>
                     <Sparkles className="w-4 h-4 text-warning" />
                   </div>
-                  <p className="text-2xl font-bold text-white mb-1">
+                  <p className="text-xs text-gray-400 mb-2">Permanent Elite access.</p>
+                  <p className="text-2xl font-bold text-white mb-0.5">
                     ${plans?.LIFETIME_ELITE?.price || 599}<span className="text-sm text-gray-400"> CAD</span>
                   </p>
-                  <p className="text-xs text-warning mb-3">One-time payment</p>
+                  <p className="text-[10px] text-warning/80 mb-3">One-time • No renewals • Elite for life</p>
                   
                   <ul className="space-y-1.5 mb-4 text-sm">
                     {['Elite forever', 'No monthly fees', 'Founding badge'].map((f, i) => (
@@ -469,11 +469,11 @@ const SettingsPage = () => {
                     ))}
                   </ul>
                   
-                  {/* Seats Remaining */}
-                  <div className="mb-3 bg-charcoal-800/50 rounded-lg p-2 text-center" data-testid="seats-counter">
-                    <p className="text-xs text-gray-400">Founding Seats</p>
-                    <p className="text-lg font-bold text-warning">
-                      {lifetimeStatus.remaining} <span className="text-sm font-normal text-gray-400">/ {lifetimeStatus.max_seats}</span>
+                  {/* Seats Counter */}
+                  <div className={`mb-3 bg-charcoal-800/70 rounded-lg p-2 text-center ${lifetimeStatus.remaining <= 25 && lifetimeStatus.remaining > 0 ? 'animate-pulse' : ''}`} data-testid="seats-counter">
+                    <p className="text-[10px] text-gray-400 uppercase tracking-wider">Seats Remaining</p>
+                    <p className={`text-lg font-bold ${lifetimeStatus.remaining <= 10 ? 'text-risk' : lifetimeStatus.remaining <= 25 ? 'text-warning' : 'text-warning'}`}>
+                      {lifetimeStatus.remaining} <span className="text-sm font-normal text-gray-500">of {lifetimeStatus.max_seats}</span>
                     </p>
                   </div>
                   
@@ -488,49 +488,40 @@ const SettingsPage = () => {
                       </span>
                     </div>
                   ) : !lifetimeStatus.is_active || lifetimeStatus.remaining <= 0 ? (
-                    <span className="block w-full text-center py-2 rounded-lg bg-charcoal-600 text-gray-400 font-medium text-sm">
-                      Sold Out
-                    </span>
+                    <button className="w-full text-center py-2 rounded-lg bg-charcoal-600 text-gray-300 font-medium text-sm hover:bg-charcoal-500 transition-colors">
+                      Sold Out — Join Waitlist
+                    </button>
                   ) : (
-                    <>
-                      <button
-                        onClick={() => setShowLifetimeModal(true)}
-                        disabled={isUpgrading}
-                        className="w-full bg-warning hover:bg-warning/90 disabled:opacity-50 text-charcoal-900 py-2 rounded-lg font-bold transition-colors flex items-center justify-center gap-2 text-sm"
-                        data-testid="upgrade-lifetime-btn"
-                      >
-                        {isUpgrading && upgradingPlan === 'LIFETIME_ELITE' ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Get Lifetime'}
-                      </button>
-                      <button
-                        onClick={() => setShowLifetimeModal(true)}
-                        className="w-full text-center text-xs text-gray-400 hover:text-white mt-2 flex items-center justify-center gap-1"
-                      >
-                        <Info className="w-3 h-3" />
-                        Learn more
-                      </button>
-                    </>
+                    <button
+                      onClick={() => setShowLifetimeModal(true)}
+                      disabled={isUpgrading}
+                      className="w-full bg-warning hover:bg-warning/90 disabled:opacity-50 text-charcoal-900 py-2.5 rounded-lg font-bold transition-colors flex items-center justify-center gap-2 text-sm"
+                      data-testid="upgrade-lifetime-btn"
+                    >
+                      {isUpgrading && upgradingPlan === 'LIFETIME_ELITE' ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Become a Founder'}
+                    </button>
                   )}
                 </div>
               </div>
             )}
 
-            {/* Lifetime user info */}
+            {/* Lifetime Member Display */}
             {!isLoadingPlans && isLifetime && (
-              <div className="bg-gradient-to-r from-warning/10 to-transparent rounded-xl p-4 border border-warning/30">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-warning/20 flex items-center justify-center">
-                    <Sparkles className="w-5 h-5 text-warning" />
+              <div className="bg-gradient-to-r from-warning/10 to-transparent rounded-xl p-5 border border-warning/30">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-warning/20 flex items-center justify-center">
+                    <Sparkles className="w-6 h-6 text-warning" />
                   </div>
                   <div>
-                    <p className="text-white font-semibold">Founding Member</p>
-                    <p className="text-sm text-gray-400">You have lifetime Elite access. No subscription needed.</p>
+                    <p className="text-white font-semibold text-lg">Founding Lifetime Member</p>
+                    <p className="text-sm text-gray-400">You have permanent Elite access. No subscription to manage.</p>
                   </div>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Business Defaults Section */}
+          {/* Business Defaults */}
           <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6">
             <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-6">
               <FileText className="w-5 h-5 text-steel-400" />
@@ -567,7 +558,6 @@ const SettingsPage = () => {
                   />
                   <span className="text-gray-400 text-sm">days</span>
                 </div>
-                <p className="text-xs text-gray-500 mt-2">This will be used as the default for new quotes and invoices</p>
               </div>
 
               <button
@@ -628,9 +618,6 @@ const SettingsPage = () => {
               <button className="w-full text-left text-gray-400 hover:text-white text-sm transition-colors">
                 Two-factor authentication
               </button>
-              <button className="w-full text-left text-gray-400 hover:text-white text-sm transition-colors">
-                Active sessions
-              </button>
             </div>
           </div>
 
@@ -644,37 +631,41 @@ const SettingsPage = () => {
         </div>
       </div>
 
-      {/* Lifetime Info Modal */}
+      {/* Lifetime Modal */}
       {showLifetimeModal && (
         <>
-          <div className="fixed inset-0 bg-black/60 z-40" onClick={() => setShowLifetimeModal(false)} />
-          <div className="fixed inset-x-4 top-1/2 -translate-y-1/2 max-w-lg mx-auto bg-charcoal-800 rounded-2xl border border-charcoal-700 p-6 z-50" data-testid="lifetime-modal">
+          <div className="fixed inset-0 bg-black/70 z-40 backdrop-blur-sm" onClick={() => setShowLifetimeModal(false)} />
+          <div className="fixed inset-x-4 top-1/2 -translate-y-1/2 max-w-lg mx-auto bg-charcoal-800 rounded-2xl border border-warning/30 p-6 z-50 shadow-2xl" data-testid="lifetime-modal">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-warning/20 flex items-center justify-center">
-                  <Sparkles className="w-5 h-5 text-warning" />
+                <div className="w-12 h-12 rounded-xl bg-warning/20 flex items-center justify-center">
+                  <Sparkles className="w-6 h-6 text-warning" />
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-white">Founding Lifetime</h2>
-                  <p className="text-sm text-gray-400">One-time purchase, forever access</p>
+                  <p className="text-sm text-gray-400">Elite Access</p>
                 </div>
               </div>
-              <button onClick={() => setShowLifetimeModal(false)} className="text-gray-400 hover:text-white">
+              <button onClick={() => setShowLifetimeModal(false)} className="text-gray-400 hover:text-white p-1">
                 <X className="w-6 h-6" />
               </button>
             </div>
 
+            <p className="text-gray-300 mb-5">
+              Secure permanent Elite access to TradeOS™ as an original founding contractor.
+            </p>
+
             <div className="space-y-4 mb-6">
               <div className="bg-charcoal-700/50 rounded-xl p-4">
-                <h3 className="font-semibold text-white mb-2">What you get:</h3>
+                <h3 className="font-semibold text-white mb-3">What You Get</h3>
                 <ul className="space-y-2">
                   {[
-                    'All Elite features forever',
-                    'No monthly subscription fees',
-                    'Exclusive Founding Member badge',
-                    'Priority support for life',
-                    'Early access to new features',
-                    'Lock in before price increases'
+                    'Elite features forever',
+                    'No monthly subscription',
+                    'Founding Member badge (profile + public)',
+                    'Priority feature voting',
+                    'Early access to new tools',
+                    'Locked pricing protection'
                   ].map((item, i) => (
                     <li key={i} className="flex items-center gap-2 text-gray-300 text-sm">
                       <Check className="w-4 h-4 text-warning flex-shrink-0" />
@@ -689,21 +680,26 @@ const SettingsPage = () => {
                   <MapPin className="w-4 h-4 text-warning" />
                   <span className="font-semibold text-warning">Canada Only</span>
                 </div>
-                <p className="text-sm text-gray-400">
-                  Founding Lifetime memberships are limited to {lifetimeStatus.max_seats} Canadian users. 
-                  Your billing address must be in Canada.
+                <p className="text-sm text-gray-300">
+                  Founding Lifetime is available to Canadian contractors only. Billing address must be in Canada. Limited to {lifetimeStatus.max_seats} total members.
                 </p>
               </div>
 
               <div className="bg-charcoal-700/50 rounded-xl p-4 text-center">
-                <p className="text-xs text-gray-400 mb-1">Seats Remaining</p>
-                <p className="text-2xl font-bold text-warning">{lifetimeStatus.remaining} <span className="text-sm text-gray-400">/ {lifetimeStatus.max_seats}</span></p>
+                <p className="text-xs text-gray-400 mb-1 uppercase tracking-wider">Seats Remaining</p>
+                <p className={`text-2xl font-bold ${lifetimeStatus.remaining <= 10 ? 'text-risk' : 'text-warning'}`}>
+                  {lifetimeStatus.remaining} <span className="text-sm text-gray-400">/ {lifetimeStatus.max_seats}</span>
+                </p>
               </div>
 
-              <div className="text-center py-4">
+              <div className="text-center py-3">
                 <p className="text-3xl font-bold text-white">${plans?.LIFETIME_ELITE?.price || 599} <span className="text-lg text-gray-400">CAD</span></p>
                 <p className="text-sm text-gray-400">One-time payment • No recurring charges</p>
               </div>
+              
+              <p className="text-xs text-center text-gray-500 italic">
+                This offer will never be repeated in Canada at this price.
+              </p>
             </div>
 
             <div className="flex gap-4">
