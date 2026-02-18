@@ -498,11 +498,58 @@ const EstimatingPage = () => {
               {/* Terms & Exclusions */}
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Terms</label>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Payment Terms</label>
+                  <div className="flex gap-2 mb-3">
+                    {[7, 14, 30, 45, 60].map((days) => (
+                      <button
+                        key={days}
+                        type="button"
+                        onClick={() => setQuoteForm({ ...quoteForm, payment_days: days })}
+                        className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
+                          quoteForm.payment_days === days
+                            ? 'bg-steel-500 text-white'
+                            : 'bg-charcoal-600 text-gray-400 hover:text-white'
+                        }`}
+                      >
+                        Net {days}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-gray-400 text-sm">Custom:</span>
+                    <input
+                      type="number"
+                      min="1"
+                      value={quoteForm.payment_days}
+                      onChange={(e) => setQuoteForm({ ...quoteForm, payment_days: parseInt(e.target.value) || 30 })}
+                      className="w-20 bg-charcoal-700 border border-charcoal-600 rounded px-3 py-1.5 text-white text-sm focus:border-steel-500 focus:ring-1 focus:ring-steel-500"
+                    />
+                    <span className="text-gray-400 text-sm">days</span>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Quote Valid For</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      min="1"
+                      value={quoteForm.quote_valid_days}
+                      onChange={(e) => setQuoteForm({ ...quoteForm, quote_valid_days: parseInt(e.target.value) || 30 })}
+                      className="w-20 bg-charcoal-700 border border-charcoal-600 rounded px-3 py-2 text-white focus:border-steel-500 focus:ring-1 focus:ring-steel-500"
+                    />
+                    <span className="text-gray-400 text-sm">days</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Additional Terms</label>
                   <textarea
                     value={quoteForm.terms}
                     onChange={(e) => setQuoteForm({ ...quoteForm, terms: e.target.value })}
-                    className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-steel-500 focus:ring-1 focus:ring-steel-500 h-24 resize-none text-sm"
+                    className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-steel-500 focus:ring-1 focus:ring-steel-500 h-20 resize-none text-sm"
+                    placeholder="Additional terms and conditions..."
                   />
                 </div>
                 <div>
@@ -510,7 +557,7 @@ const EstimatingPage = () => {
                   <textarea
                     value={quoteForm.exclusions}
                     onChange={(e) => setQuoteForm({ ...quoteForm, exclusions: e.target.value })}
-                    className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-steel-500 focus:ring-1 focus:ring-steel-500 h-24 resize-none text-sm"
+                    className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-steel-500 focus:ring-1 focus:ring-steel-500 h-20 resize-none text-sm"
                     placeholder="Any work not included..."
                   />
                 </div>
