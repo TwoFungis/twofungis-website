@@ -146,26 +146,27 @@ const AppLayout = () => {
                 <span className="hidden sm:inline">Quick Add</span>
               </button>
 
-            {quickActionOpen && (
-              <>
-                <div className="fixed inset-0 z-40" onClick={() => setQuickActionOpen(false)} />
-                <div className="absolute right-0 mt-2 w-48 bg-charcoal-800 rounded-lg shadow-xl border border-charcoal-700 py-2 z-50">
-                  {quickActions.map((action) => (
-                    <button
-                      key={action.path}
-                      onClick={() => {
-                        navigate(action.path);
-                        setQuickActionOpen(false);
-                      }}
-                      className="flex items-center gap-3 w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-charcoal-700 transition-colors"
-                    >
-                      <action.icon className="w-4 h-4" />
-                      {action.label}
-                    </button>
-                  ))}
-                </div>
-              </>
-            )}
+              {quickActionOpen && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setQuickActionOpen(false)} />
+                  <div className="absolute right-0 mt-2 w-48 bg-charcoal-800 rounded-lg shadow-xl border border-charcoal-700 py-2 z-50">
+                    {quickActions.map((action) => (
+                      <button
+                        key={action.path}
+                        onClick={() => {
+                          navigate(action.path);
+                          setQuickActionOpen(false);
+                        }}
+                        className="flex items-center gap-3 w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-charcoal-700 transition-colors"
+                      >
+                        <action.icon className="w-4 h-4" />
+                        {action.label}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </header>
 
