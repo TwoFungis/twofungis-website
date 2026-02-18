@@ -19,9 +19,16 @@ const DashboardPage = () => {
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  // Check if user is a founder
-  const tier = profile?.subscription_tier?.toLowerCase() || '';
-  const isFounder = tier.includes('founding') || tier === 'lifetime';
+  // Founder emails list
+  const FOUNDER_EMAILS = [
+    "info@twofungis.ca",
+    "swdmarshall@gmail.com", 
+    "carpenterbeau@hotmail.com"
+  ];
+  
+  // Check if user is a founder by email
+  const userEmail = user?.email?.toLowerCase() || '';
+  const isFounder = FOUNDER_EMAILS.map(e => e.toLowerCase()).includes(userEmail);
   
   // User preferences (stored in localStorage)
   const [marginThreshold, setMarginThreshold] = useState(() => 
