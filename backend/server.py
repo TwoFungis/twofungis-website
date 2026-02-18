@@ -10,21 +10,15 @@ from typing import List, Optional, Dict
 import uuid
 from datetime import datetime, timezone
 import httpx
-import stripe
-
-# Import Stripe Checkout from emergentintegrations
-from emergentintegrations.payments.stripe.checkout import (
-    StripeCheckout, 
-    CheckoutSessionResponse, 
-    CheckoutStatusResponse, 
-    CheckoutSessionRequest
-)
 
 # Import bookkeeping routes
 from routes.bookkeeping import router as bookkeeping_router
 
 # Import email routes
 from routes.email import router as email_router
+
+# Import Stripe routes
+from routes.stripe import router as stripe_router
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env', override=False)
