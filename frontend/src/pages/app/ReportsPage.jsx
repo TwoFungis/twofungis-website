@@ -264,9 +264,12 @@ const ReportsPage = () => {
   if (!isElite) {
     return (
       <div className="space-y-6" data-testid="reports-page-locked">
-        <div>
-          <h1 className="text-2xl lg:text-3xl font-bold text-white">Reports</h1>
-          <p className="text-gray-400">Advanced analytics and KPI tracking</p>
+        <div className="flex items-center gap-3">
+          <img src="/shield-icon.png" alt="" className="w-10 h-10 opacity-30 hidden lg:block" />
+          <div>
+            <h1 className="text-2xl lg:text-3xl font-bold text-white">Reports</h1>
+            <p className="text-gray-400">Advanced analytics and KPI tracking</p>
+          </div>
         </div>
 
         <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-12 text-center">
@@ -277,9 +280,13 @@ const ReportsPage = () => {
           <p className="text-gray-400 mb-6 max-w-md mx-auto">
             Upgrade to Elite to unlock advanced reports, KPI dashboards, expense analytics, and PDF export functionality.
           </p>
-          <button className="bg-steel-500 hover:bg-steel-600 text-white px-6 py-3 rounded-lg font-medium transition-colors">
-            Upgrade to Elite - $99/mo
-          </button>
+          <a 
+            href="/app/settings" 
+            className="inline-block bg-steel-500 hover:bg-steel-600 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+            data-testid="upgrade-to-elite-btn"
+          >
+            Upgrade to Elite - $59/mo
+          </a>
         </div>
       </div>
     );
@@ -297,11 +304,11 @@ const ReportsPage = () => {
     <div className="space-y-6" data-testid="reports-page">
       {/* Header with Shield */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <img src="/shield-icon.png" alt="" className="w-10 h-10 opacity-30 hidden lg:block" />
           <div>
-            <h1 className="text-2xl lg:text-3xl font-bold text-charcoal-800">Reports</h1>
-            <p className="text-charcoal-600">Advanced analytics and KPI tracking</p>
+            <h1 className="text-2xl lg:text-3xl font-bold text-white">Reports</h1>
+            <p className="text-gray-400">Advanced analytics and KPI tracking</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
