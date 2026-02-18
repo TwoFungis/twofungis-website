@@ -1,23 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Wallet, Plus, Search, Filter, Upload, Receipt, Tag, Calendar,
-  TrendingUp, TrendingDown, Calculator, FileText, Camera, MoreVertical
+  TrendingUp, TrendingDown, Calculator, FileText, Camera, MoreVertical,
+  Info, DollarSign, Briefcase, User
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
+import { toast } from 'sonner';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
-// Expense categories with colors
+// Enhanced contractor expense categories with deductibility
 const CATEGORIES = {
-  materials: { label: 'Materials', color: 'bg-blue-500/20 text-blue-400' },
-  labor: { label: 'Labor', color: 'bg-purple-500/20 text-purple-400' },
-  equipment: { label: 'Equipment', color: 'bg-teal-500/20 text-teal-400' },
-  subcontractor: { label: 'Subcontractor', color: 'bg-orange-500/20 text-orange-400' },
-  fuel: { label: 'Fuel & Transport', color: 'bg-yellow-500/20 text-yellow-400' },
-  permits: { label: 'Permits & Fees', color: 'bg-green-500/20 text-green-400' },
-  tools: { label: 'Tools', color: 'bg-indigo-500/20 text-indigo-400' },
-  office: { label: 'Office & Admin', color: 'bg-gray-500/20 text-gray-400' },
-  other: { label: 'Other', color: 'bg-charcoal-600 text-gray-300' }
+  'Materials': { label: 'Materials (COGS)', color: 'bg-blue-500/20 text-blue-600', deductibility: 100 },
+  'Consumables': { label: 'Consumables', color: 'bg-cyan-500/20 text-cyan-600', deductibility: 100 },
+  'Tools': { label: 'Tools (<$500)', color: 'bg-indigo-500/20 text-indigo-600', deductibility: 100 },
+  'Equipment': { label: 'Equipment (Capital)', color: 'bg-purple-500/20 text-purple-600', deductibility: 100 },
+  'Vehicle & Fuel': { label: 'Vehicle & Fuel', color: 'bg-yellow-500/20 text-yellow-700', deductibility: 100 },
+  'Meals & Entertainment': { label: 'Meals & Entertainment', color: 'bg-orange-500/20 text-orange-600', deductibility: 50 },
+  'Subcontractors': { label: 'Subcontractors', color: 'bg-teal-500/20 text-teal-600', deductibility: 100 },
+  'Insurance': { label: 'Insurance', color: 'bg-green-500/20 text-green-600', deductibility: 100 },
+  'Office/Admin': { label: 'Office/Admin', color: 'bg-gray-500/20 text-gray-600', deductibility: 100 },
+  'Phone/Internet': { label: 'Phone/Internet', color: 'bg-sky-500/20 text-sky-600', deductibility: 100 },
+  'Travel/Lodging': { label: 'Travel/Lodging', color: 'bg-rose-500/20 text-rose-600', deductibility: 100 },
+  'Training/Certifications': { label: 'Training/Certs', color: 'bg-emerald-500/20 text-emerald-600', deductibility: 100 },
+  'Rent/Shop': { label: 'Rent/Shop', color: 'bg-amber-500/20 text-amber-700', deductibility: 100 },
+  'Other': { label: 'Other', color: 'bg-slate-500/20 text-slate-600', deductibility: 100 }
 };
 
 const ExpensesPage = () => {
