@@ -7,17 +7,15 @@ const TradeOSBanner = () => {
       href="https://tradeos.ca"
       target="_blank"
       rel="noopener noreferrer"
-      className="block w-full py-2 px-4 text-center transition-all duration-300 hover:shadow-lg"
+      className="fixed top-0 left-0 right-0 z-[60] block w-full py-2 px-4 text-center transition-all duration-300 hover:shadow-lg"
       style={{ 
         backgroundColor: '#1a1a2e',
         transform: 'translateY(0)',
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.transform = 'translateY(-2px)';
         e.currentTarget.style.boxShadow = '0 4px 20px rgba(212, 164, 55, 0.3)';
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.transform = 'translateY(0)';
         e.currentTarget.style.boxShadow = 'none';
       }}
     >
