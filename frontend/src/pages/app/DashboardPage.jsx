@@ -11,7 +11,8 @@ import {
   Target,
   CheckCircle2,
   Clock,
-  Wallet
+  Wallet,
+  Plus
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { supabase } from '../../lib/supabase';
@@ -24,13 +25,17 @@ const DashboardPage = () => {
     approved: 0,
     paid: 0
   });
-  const [realProjects, setRealProjects] = useState([]);
-  const [loadingMilestones, setLoadingMilestones] = useState(true);
+  const [projects, setProjects] = useState([]);
+  const [changeOrders, setChangeOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchMilestoneStats = async () => {
+    const fetchDashboardData = async () => {
       if (!user) return;
       
+      setLoading(true);
+      
+      // Fetch milestone stats
       try {
         const { data, error } = await supabase
           .from('project_milestones')
@@ -56,71 +61,46 @@ const DashboardPage = () => {
           .from('projects')
           .select('*')
           .eq('user_id', user.id)
-          .eq('status', 'active')
           .order('created_at', { ascending: false })
           .limit(4);
         
         if (projectsData) {
-          setRealProjects(projectsData);
+          setProjects(projectsData);
         }
       } catch (err) {
         console.error('Error fetching projects:', err);
       }
+
+      // Fetch real change orders
+      try {
+        const { data: coData } = await supabase
+          .from('change_orders')
+          .select('*, projects(name)')
+          .eq('user_id', user.id)
+          .in('status', ['pending', 'submitted'])
+          .order('created_at', { ascending: false })
+          .limit(5);
+        
+        if (coData) {
+          setChangeOrders(coData);
+        }
+      } catch (err) {
+        console.error('Error fetching change orders:', err);
+      }
       
-      setLoadingMilestones(false);
+      setLoading(false);
     };
 
-    fetchMilestoneStats();
+    fetchDashboardData();
   }, [user]);
 
-  // Mock data for demonstration
-  const stats = [
-    { 
-      label: 'Active Projects', 
-      value: '4', 
-      change: '+1 this month',
-      trend: 'up',
-      icon: FolderKanban,
-      color: 'text-steel-400'
-    },
-    { 
-      label: 'Total Contract Value', 
-      value: '$847,500', 
-      change: '+12% vs last month',
-      trend: 'up',
-      icon: DollarSign,
-      color: 'text-success'
-    },
-    { 
-      label: 'Pending Change Orders', 
-      value: '7', 
-      change: '$34,200 pending',
-      trend: 'neutral',
-      icon: FileText,
-      color: 'text-warning'
-    },
-    { 
-      label: 'Avg. Margin', 
-      value: '18.4%', 
-      change: '-2.1% vs target',
-      trend: 'down',
-      icon: TrendingUp,
-      color: 'text-risk'
-    },
-  ];
-
-  const projects = [
-    { name: 'Westside Towers - Unit Finishes', client: 'Ledcor Construction', value: '$245,000', margin: '22%', risk: 'green' },
-    { name: 'Downtown Medical Centre', client: 'Ellis Don', value: '$312,500', margin: '16%', risk: 'yellow' },
-    { name: 'Residential Complex Phase 2', client: 'Bosa Properties', value: '$178,000', margin: '24%', risk: 'green' },
-    { name: 'Commercial Retrofit - Main St', client: 'PCL Contractors', value: '$112,000', margin: '11%', risk: 'red' },
-  ];
-
-  const pendingCOs = [
-    { project: 'Westside Towers', co: 'CO-004', desc: 'Additional trim package', value: '$8,400', days: 5 },
-    { project: 'Medical Centre', co: 'CO-012', desc: 'Layout revision - Level 3', value: '$12,800', days: 12 },
-    { project: 'Commercial Retrofit', co: 'CO-002', desc: 'Material upgrade request', value: '$4,200', days: 3 },
-  ];
+  // Calculate real stats from data
+  const activeProjects = projects.filter(p => p.status === 'active').length;
+  const totalContractValue = projects.reduce((sum, p) => sum + (parseFloat(p.contract_value) || 0), 0);
+  const pendingCOValue = changeOrders.reduce((sum, co) => sum + (parseFloat(co.total_value) || 0), 0);
+  const avgMargin = projects.length > 0 
+    ? projects.reduce((sum, p) => sum + (parseFloat(p.forecast_margin) || 0), 0) / projects.length 
+    : 0;
 
   const getRiskColor = (risk) => {
     switch (risk) {
@@ -130,6 +110,22 @@ const DashboardPage = () => {
       default: return 'bg-gray-500';
     }
   };
+
+  const formatCurrency = (value) => {
+    return new Intl.NumberFormat('en-CA', { 
+      style: 'currency', 
+      currency: 'CAD', 
+      maximumFractionDigits: 0 
+    }).format(value || 0);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-steel-500"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8" data-testid="dashboard-page">
@@ -141,24 +137,56 @@ const DashboardPage = () => {
         <p className="text-gray-400">Here's what's happening with your projects today.</p>
       </div>
 
-      {/* Stats Grid */}
+      {/* Stats Grid - REAL DATA */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {stats.map((stat, i) => (
-          <div key={i} className="bg-charcoal-800 rounded-xl p-4 lg:p-6 border border-charcoal-700" data-testid={`stat-card-${i}`}>
-            <div className="flex items-center justify-between mb-3">
-              <div className={`w-10 h-10 rounded-lg bg-charcoal-700 flex items-center justify-center ${stat.color}`}>
-                <stat.icon className="w-5 h-5" />
-              </div>
-              {stat.trend === 'up' && <ArrowUpRight className="w-4 h-4 text-success" />}
-              {stat.trend === 'down' && <ArrowDownRight className="w-4 h-4 text-risk" />}
+        <div className="bg-charcoal-800 rounded-xl p-4 lg:p-6 border border-charcoal-700" data-testid="stat-card-projects">
+          <div className="flex items-center justify-between mb-3">
+            <div className="w-10 h-10 rounded-lg bg-charcoal-700 flex items-center justify-center text-steel-400">
+              <FolderKanban className="w-5 h-5" />
             </div>
-            <p className="text-2xl lg:text-3xl font-bold text-white mb-1">{stat.value}</p>
-            <p className="text-sm text-gray-500">{stat.label}</p>
-            <p className={`text-xs mt-2 ${stat.trend === 'up' ? 'text-success' : stat.trend === 'down' ? 'text-risk' : 'text-gray-400'}`}>
-              {stat.change}
-            </p>
           </div>
-        ))}
+          <p className="text-2xl lg:text-3xl font-bold text-white mb-1">{activeProjects}</p>
+          <p className="text-sm text-gray-500">Active Projects</p>
+          <p className="text-xs mt-2 text-gray-400">{projects.length} total</p>
+        </div>
+
+        <div className="bg-charcoal-800 rounded-xl p-4 lg:p-6 border border-charcoal-700" data-testid="stat-card-value">
+          <div className="flex items-center justify-between mb-3">
+            <div className="w-10 h-10 rounded-lg bg-charcoal-700 flex items-center justify-center text-success">
+              <DollarSign className="w-5 h-5" />
+            </div>
+            {totalContractValue > 0 && <ArrowUpRight className="w-4 h-4 text-success" />}
+          </div>
+          <p className="text-2xl lg:text-3xl font-bold text-white mb-1">{formatCurrency(totalContractValue)}</p>
+          <p className="text-sm text-gray-500">Total Contract Value</p>
+        </div>
+
+        <div className="bg-charcoal-800 rounded-xl p-4 lg:p-6 border border-charcoal-700" data-testid="stat-card-cos">
+          <div className="flex items-center justify-between mb-3">
+            <div className="w-10 h-10 rounded-lg bg-charcoal-700 flex items-center justify-center text-warning">
+              <FileText className="w-5 h-5" />
+            </div>
+          </div>
+          <p className="text-2xl lg:text-3xl font-bold text-white mb-1">{changeOrders.length}</p>
+          <p className="text-sm text-gray-500">Pending Change Orders</p>
+          <p className="text-xs mt-2 text-warning">{formatCurrency(pendingCOValue)} pending</p>
+        </div>
+
+        <div className="bg-charcoal-800 rounded-xl p-4 lg:p-6 border border-charcoal-700" data-testid="stat-card-margin">
+          <div className="flex items-center justify-between mb-3">
+            <div className="w-10 h-10 rounded-lg bg-charcoal-700 flex items-center justify-center text-steel-400">
+              <TrendingUp className="w-5 h-5" />
+            </div>
+            {avgMargin >= 15 ? <ArrowUpRight className="w-4 h-4 text-success" /> : <ArrowDownRight className="w-4 h-4 text-risk" />}
+          </div>
+          <p className={`text-2xl lg:text-3xl font-bold mb-1 ${avgMargin >= 15 ? 'text-success' : avgMargin >= 10 ? 'text-warning' : 'text-risk'}`}>
+            {avgMargin.toFixed(1)}%
+          </p>
+          <p className="text-sm text-gray-500">Avg. Margin</p>
+          <p className={`text-xs mt-2 ${avgMargin >= 15 ? 'text-success' : 'text-warning'}`}>
+            {avgMargin >= 15 ? 'On target' : 'Below target'}
+          </p>
+        </div>
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
