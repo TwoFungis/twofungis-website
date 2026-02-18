@@ -168,7 +168,7 @@ async def sync_all_founders():
                     f"{SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}",
                     headers=await get_supabase_headers(),
                     json={
-                        "subscription_tier": "founding_lifetime",
+                        "subscription_tier": "lifetime",
                         "subscription_status": "active"
                     }
                 )
