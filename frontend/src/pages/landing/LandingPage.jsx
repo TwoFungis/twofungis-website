@@ -103,7 +103,7 @@ const LandingPage = () => {
           </div>
           <p className="text-gray-500 text-sm mt-8">
             No credit card required • Cancel anytime • 
-            <Link to="/auth" className="text-steel-400 hover:text-white transition-colors ml-1">
+            <Link to="/login" className="text-steel-400 hover:text-white transition-colors ml-1">
               Already have an account? Login
             </Link>
           </p>
