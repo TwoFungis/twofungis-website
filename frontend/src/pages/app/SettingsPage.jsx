@@ -195,6 +195,24 @@ const SettingsPage = () => {
     }
   };
 
+  const handleSaveLaborRate = async () => {
+    const rate = parseFloat(laborRate);
+    if (isNaN(rate) || rate <= 0) {
+      toast.error('Please enter a valid labor rate');
+      return;
+    }
+    
+    try {
+      await updateProfile({ labor_rate: rate });
+      setLaborRateSaved(true);
+      toast.success('Labor rate saved');
+      setTimeout(() => setLaborRateSaved(false), 3000);
+    } catch (error) {
+      console.error('Error saving labor rate:', error);
+      toast.error('Failed to save labor rate');
+    }
+  };
+
   const handleNotificationChange = async (key, value) => {
     setNotifications(prev => ({ ...prev, [key]: value }));
     try {
