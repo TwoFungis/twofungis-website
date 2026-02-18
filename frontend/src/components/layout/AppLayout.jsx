@@ -240,6 +240,9 @@ const AppLayout = () => {
           </aside>
         </>
       )}
+
+      {/* Trial Expired Modal */}
+      <TrialExpiredModal />
     </div>
   );
 };
