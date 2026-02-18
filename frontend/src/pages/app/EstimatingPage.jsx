@@ -208,7 +208,11 @@ const EstimatingPage = () => {
   };
 
   const generatePDF = () => {
-    // Build quote object from form data
+    // Build quote object from form data with flexible payment terms
+    const paymentTermsText = `Payment due within ${quoteForm.payment_days} days of invoice.`;
+    const validityText = `Quote valid for ${quoteForm.quote_valid_days} days.`;
+    const fullTerms = [paymentTermsText, validityText, quoteForm.terms].filter(Boolean).join('\n');
+    
     const quoteData = {
       quote_number: `Q-${Date.now().toString(36).toUpperCase()}`,
       quote_name: quoteForm.quote_name,
@@ -219,7 +223,7 @@ const EstimatingPage = () => {
       subtotal: subtotal,
       markup_amount: markupAmount,
       total: total,
-      terms: quoteForm.terms,
+      terms: fullTerms,
       exclusions: quoteForm.exclusions,
       status: 'draft',
       created_at: new Date().toISOString(),
