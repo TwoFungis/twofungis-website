@@ -410,10 +410,11 @@ const CreateInvoiceModal = ({ onClose, onSuccess, user }) => {
 
     setIsSubmitting(true);
     try {
+      const { data: { session } } = await supabase.auth.getSession();
       const response = await fetch(`${API_URL}/api/invoices`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${user?.access_token}`,
+          'Authorization': `Bearer ${session?.access_token}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
