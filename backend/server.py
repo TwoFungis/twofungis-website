@@ -132,12 +132,6 @@ app.include_router(email_router)
 # Include Stripe routes
 app.include_router(stripe_router)
 
-# Include Marketplace routes
-app.include_router(marketplace_router)
-
-# Include Marketplace V2 routes
-app.include_router(marketplace_v2_router)
-
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
