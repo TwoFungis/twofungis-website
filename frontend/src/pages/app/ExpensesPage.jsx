@@ -345,6 +345,15 @@ const ExpensesPage = () => {
           onSuccess={() => { setShowNewModal(false); fetchExpenses(); }}
         />
       )}
+
+      {/* Edit Expense Modal */}
+      {editingExpense && (
+        <EditExpenseModal 
+          expense={editingExpense}
+          onClose={() => setEditingExpense(null)}
+          onSuccess={() => { setEditingExpense(null); fetchExpenses(); }}
+        />
+      )}
     </div>
   );
 };
