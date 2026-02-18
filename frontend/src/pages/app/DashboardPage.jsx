@@ -144,6 +144,28 @@ const DashboardPage = () => {
 
   return (
     <div className="space-y-8" data-testid="dashboard-page">
+      {/* Gold Founder Badge - Show for founding lifetime users */}
+      {isFounder && (
+        <div className="bg-gradient-to-r from-warning/20 via-warning/10 to-warning/20 rounded-xl border border-warning/40 p-4" data-testid="founder-badge">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 bg-warning/30 rounded-full flex items-center justify-center flex-shrink-0">
+              <img src="/shield-icon.png" alt="" className="w-9 h-9" />
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <h3 className="text-lg font-bold text-warning">Gold Founder</h3>
+                <Crown className="w-5 h-5 text-warning" />
+              </div>
+              <p className="text-gray-300 text-sm">Thank you for being one of our founding members! You have lifetime Elite access.</p>
+            </div>
+            <div className="hidden sm:block text-right">
+              <span className="text-warning font-bold text-lg">Lifetime Elite</span>
+              <p className="text-gray-400 text-xs">All features unlocked forever</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Setup Progress Checklist - Show for trial users */}
       <SetupProgressChecklist />
 
