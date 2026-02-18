@@ -226,13 +226,13 @@ const SetupProgressChecklist = () => {
                   to={item.path}
                   className={`flex items-center gap-3 p-3 rounded-lg transition-all ${
                     isCompleted 
-                      ? 'bg-success/10 border border-success/20' 
-                      : 'bg-charcoal-700 border border-charcoal-700 hover:border-steel-500/50 hover:bg-charcoal-700/50'
+                      ? 'bg-success/20 border border-success/40' 
+                      : 'bg-charcoal-800 border border-charcoal-600 hover:border-steel-500/50 hover:bg-charcoal-700'
                   }`}
                   data-testid={`setup-item-${item.id}`}
                 >
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                    isCompleted ? 'bg-success/20' : 'bg-charcoal-700/50'
+                    isCompleted ? 'bg-success/30' : 'bg-charcoal-700'
                   }`}>
                     {isCompleted ? (
                       <CheckCircle2 className="w-5 h-5 text-success" />
@@ -242,11 +242,11 @@ const SetupProgressChecklist = () => {
                   </div>
                   <div className="min-w-0">
                     <p className={`text-sm font-medium truncate ${
-                      isCompleted ? 'text-success line-through' : 'text-white'
+                      isCompleted ? 'text-success' : 'text-white'
                     }`}>
                       {item.label}
                     </p>
-                    <p className="text-xs text-gray-500 truncate">{item.description}</p>
+                    <p className={`text-xs truncate ${isCompleted ? 'text-success/70' : 'text-gray-500'}`}>{item.description}</p>
                   </div>
                 </Link>
               );
