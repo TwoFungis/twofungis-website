@@ -589,6 +589,95 @@ const SettingsPage = () => {
             )}
           </div>
 
+          {/* Marketplace Section */}
+          <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6">
+            <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-4">
+              <Users className="w-5 h-5 text-steel-400" />
+              Contractor Marketplace
+            </h2>
+            
+            <p className="text-sm text-gray-400 mb-4">
+              Get listed in the TradeOS contractor directory and connect with potential clients.
+            </p>
+
+            {/* Marketplace Toggle */}
+            <div className="flex items-center justify-between p-4 bg-charcoal-700/50 rounded-xl mb-4">
+              <div className="flex items-center gap-3">
+                {isMarketplaceListed ? (
+                  <Eye className="w-5 h-5 text-success" />
+                ) : (
+                  <EyeOff className="w-5 h-5 text-gray-400" />
+                )}
+                <div>
+                  <p className="text-white font-medium">Appear in Marketplace</p>
+                  <p className="text-xs text-gray-400">
+                    {isMarketplaceListed ? 'Your profile is visible to potential clients' : 'Your profile is hidden from the public'}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={handleToggleMarketplace}
+                disabled={isTogglingMarketplace}
+                className={`relative w-12 h-6 rounded-full transition-colors ${
+                  isMarketplaceListed ? 'bg-success' : 'bg-charcoal-600'
+                }`}
+              >
+                {isTogglingMarketplace ? (
+                  <Loader2 className="w-4 h-4 animate-spin absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white" />
+                ) : (
+                  <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
+                    isMarketplaceListed ? 'translate-x-6' : 'translate-x-0.5'
+                  }`} />
+                )}
+              </button>
+            </div>
+
+            {/* Verification Status */}
+            <div className="space-y-3">
+              <p className="text-sm font-medium text-gray-400">Verification Status</p>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { key: 'identity_verified', label: 'Identity', level: 1 },
+                  { key: 'trade_verified', label: 'Trade', level: 2 },
+                  { key: 'insurance_verified', label: 'Insurance', level: 3 },
+                  { key: 'performance_verified', label: 'Performance', level: 4 }
+                ].map(({ key, label, level }) => {
+                  const isVerified = verificationStatus?.[key] || false;
+                  return (
+                    <div 
+                      key={key} 
+                      className={`flex items-center gap-2 p-2 rounded-lg ${
+                        isVerified ? 'bg-success/10' : 'bg-charcoal-700/50'
+                      }`}
+                    >
+                      <ShieldCheck className={`w-4 h-4 ${isVerified ? 'text-success' : 'text-gray-500'}`} />
+                      <span className={`text-sm ${isVerified ? 'text-success' : 'text-gray-400'}`}>
+                        {label}
+                      </span>
+                      {isVerified && <Check className="w-3 h-3 text-success ml-auto" />}
+                    </div>
+                  );
+                })}
+              </div>
+              <p className="text-xs text-gray-500">
+                Contact support to begin the verification process.
+              </p>
+            </div>
+
+            {/* View Profile Link */}
+            {isMarketplaceListed && (
+              <a
+                href="/contractors"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-4 flex items-center gap-2 text-sm text-steel-400 hover:text-white transition-colors"
+              >
+                <ExternalLink className="w-3 h-3" />
+                View Marketplace
+              </a>
+            )}
+          </div>
+
           {/* Business Defaults */}
           <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6">
             <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-6">
