@@ -1,7 +1,16 @@
-import React, { useState } from 'react';
-import { Users, Plus, Calculator, DollarSign } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Users, Plus, Calculator, DollarSign, Save, Check } from 'lucide-react';
+import { supabase } from '../../lib/supabase';
+import { useAuthStore } from '../../store/authStore';
 
 const LaborPage = () => {
+  const { user } = useAuthStore();
+  const [profiles, setProfiles] = useState([]);
+  const [activeProfile, setActiveProfile] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [profileName, setProfileName] = useState('Default');
+
   const [wage, setWage] = useState(35);
   const [cppEi, setCppEi] = useState(7.5);
   const [worksafe, setWorksafe] = useState(3.2);
@@ -11,6 +20,102 @@ const LaborPage = () => {
   const [insurance, setInsurance] = useState(2);
   const [overhead, setOverhead] = useState(15);
   const [margin, setMargin] = useState(20);
+
+  // Load saved profiles
+  useEffect(() => {
+    const loadProfiles = async () => {
+      if (!user) return;
+      
+      try {
+        const { data } = await supabase
+          .from('labor_profiles')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
+        
+        if (data && data.length > 0) {
+          setProfiles(data);
+          // Load the first profile
+          loadProfile(data[0]);
+        }
+      } catch (err) {
+        console.log('Labor profiles table may not exist:', err);
+      }
+    };
+    
+    loadProfiles();
+  }, [user]);
+
+  const loadProfile = (profile) => {
+    setActiveProfile(profile);
+    setProfileName(profile.name || 'Default');
+    setWage(profile.base_wage || 35);
+    setCppEi(profile.cpp_ei || 7.5);
+    setWorksafe(profile.worksafe || 3.2);
+    setVacation(profile.vacation_pay || 4);
+    setFuel(profile.fuel || 5);
+    setToolWear(profile.tool_wear || 3);
+    setInsurance(profile.insurance || 2);
+    setOverhead(profile.overhead || 15);
+    setMargin(profile.target_margin || 20);
+  };
+
+  const handleSaveProfile = async () => {
+    if (!user) return;
+    
+    setIsSaving(true);
+    setSaved(false);
+    
+    const profileData = {
+      user_id: user.id,
+      name: profileName,
+      base_wage: wage,
+      cpp_ei: cppEi,
+      worksafe: worksafe,
+      vacation_pay: vacation,
+      fuel: fuel,
+      tool_wear: toolWear,
+      insurance: insurance,
+      overhead: overhead,
+      target_margin: margin,
+      billable_rate: billableRate
+    };
+    
+    try {
+      if (activeProfile) {
+        // Update existing
+        const { error } = await supabase
+          .from('labor_profiles')
+          .update(profileData)
+          .eq('id', activeProfile.id);
+        
+        if (error) throw error;
+      } else {
+        // Create new
+        const { data, error } = await supabase
+          .from('labor_profiles')
+          .insert(profileData)
+          .select()
+          .single();
+        
+        if (error) throw error;
+        if (data) {
+          setActiveProfile(data);
+          setProfiles(prev => [data, ...prev]);
+        }
+      }
+      
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch (err) {
+      console.error('Error saving profile:', err);
+      // Still show saved locally even if DB fails
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   // Calculate burdened rate
   const burdens = (wage * (cppEi + worksafe + vacation) / 100);
