@@ -86,9 +86,7 @@ async def activate_founder(user_id: str, request: Request):
                 # Try to get email from auth.users via the user_id
                 raise HTTPException(status_code=404, detail="User profile not found")
             
-            profile = response.json()[0]
-            
-            # Get user email from Supabase auth
+            # Profile exists, now get user email from Supabase auth
             auth_response = await client.get(
                 f"{SUPABASE_URL}/auth/v1/admin/users/{user_id}",
                 headers=await get_supabase_headers()
