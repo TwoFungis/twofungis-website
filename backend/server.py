@@ -50,12 +50,13 @@ class StatusCheck(BaseModel):
 class StatusCheckCreate(BaseModel):
     client_name: str
 
-# Subscription Models
+# Subscription Models (kept for backward compatibility)
 class SubscriptionCheckoutRequest(BaseModel):
-    plan_type: str  # 'pro' or 'elite'
+    plan_type: str  # 'pro', 'elite' or 'lifetime_elite'
     origin_url: str  # Frontend URL for success/cancel redirects
     user_id: Optional[str] = None
     email: Optional[str] = None
+    country: Optional[str] = None
 
 class SubscriptionCheckoutResponse(BaseModel):
     checkout_url: str
@@ -72,21 +73,6 @@ class PaymentStatusResponse(BaseModel):
     amount_total: float
     currency: str
     plan_type: Optional[str] = None
-
-
-# Lifetime Plan Models
-class LifetimeSeatsResponse(BaseModel):
-    seats_remaining: int
-    is_available: bool
-    region_lock: str
-    max_seats: int = 100
-
-
-class LifetimeCheckoutRequest(BaseModel):
-    origin_url: str
-    user_id: str
-    email: str
-    country: str  # User's country from profile
 
 
 # Basic API routes
@@ -120,383 +106,18 @@ async def get_status_checks():
     return status_checks
 
 
-# Subscription Plans endpoint
+# Legacy subscription endpoints (redirect to /api/stripe routes)
 @api_router.get("/subscription/plans")
 async def get_subscription_plans():
-    """Get available subscription plans with pricing"""
-    return {
-        "plans": SUBSCRIPTION_PLANS,
-        "trial_days": 7
-    }
+    """Redirect to new plans endpoint"""
+    from routes.stripe import get_plans
+    return await get_plans()
 
-
-# Lifetime Seats Status endpoint
-@api_router.get("/subscription/lifetime/status", response_model=LifetimeSeatsResponse)
+@api_router.get("/subscription/lifetime/status")
 async def get_lifetime_seats_status():
-    """Get the current status of Founding Lifetime memberships"""
-    
-    # Query Supabase for seat status
-    try:
-        async with httpx.AsyncClient() as client:
-            response = await client.post(
-                f"{SUPABASE_URL}/rest/v1/rpc/get_lifetime_seats_status",
-                headers={
-                    "apikey": SUPABASE_SERVICE_KEY,
-                    "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
-                    "Content-Type": "application/json"
-                }
-            )
-            
-            if response.status_code == 200:
-                data = response.json()
-                if data and len(data) > 0:
-                    return LifetimeSeatsResponse(
-                        seats_remaining=data[0].get("seats_remaining", 0),
-                        is_available=data[0].get("is_available", False),
-                        region_lock=data[0].get("region_lock", "CA"),
-                        max_seats=SUBSCRIPTION_PLANS["lifetime_elite"]["max_seats"]
-                    )
-    except Exception as e:
-        logging.error(f"Error fetching lifetime seats status: {str(e)}")
-    
-    # Fallback: query the table directly
-    try:
-        async with httpx.AsyncClient() as client:
-            response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/founding_lifetime_counter?id=eq.1",
-                headers={
-                    "apikey": SUPABASE_SERVICE_KEY,
-                    "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
-                    "Content-Type": "application/json"
-                }
-            )
-            
-            if response.status_code == 200:
-                data = response.json()
-                if data and len(data) > 0:
-                    counter = data[0]
-                    seats_remaining = counter.get("max_seats", 100) - counter.get("seats_sold", 0)
-                    return LifetimeSeatsResponse(
-                        seats_remaining=seats_remaining,
-                        is_available=counter.get("is_active", True) and seats_remaining > 0,
-                        region_lock=counter.get("region_lock", "CA"),
-                        max_seats=counter.get("max_seats", 100)
-                    )
-    except Exception as e:
-        logging.error(f"Error fetching counter directly: {str(e)}")
-    
-    # Default response if all fails
-    return LifetimeSeatsResponse(
-        seats_remaining=100,
-        is_available=True,
-        region_lock="CA",
-        max_seats=100
-    )
-
-
-# Create Checkout Session (handles both subscription and one-time payment)
-@api_router.post("/subscription/checkout", response_model=SubscriptionCheckoutResponse)
-async def create_subscription_checkout(request: SubscriptionCheckoutRequest, http_request: Request):
-    """Create a Stripe checkout session for subscription or lifetime purchase"""
-    
-    # Validate plan type
-    if request.plan_type not in SUBSCRIPTION_PLANS:
-        raise HTTPException(status_code=400, detail=f"Invalid plan type. Must be one of: {list(SUBSCRIPTION_PLANS.keys())}")
-    
-    plan = SUBSCRIPTION_PLANS[request.plan_type]
-    
-    # Special handling for Lifetime Elite
-    if request.plan_type == "lifetime_elite":
-        # Verify country restriction
-        user_country = getattr(request, 'country', None) or 'CA'
-        if user_country != plan.get("region_lock", "CA"):
-            raise HTTPException(
-                status_code=403, 
-                detail=f"Founding Lifetime membership is only available in {plan.get('region_lock', 'CA')}"
-            )
-        
-        # Check seat availability
-        seats_status = await get_lifetime_seats_status()
-        if not seats_status.is_available:
-            raise HTTPException(
-                status_code=410,
-                detail="All Founding Lifetime memberships have been claimed"
-            )
-    
-    # Build success and cancel URLs from frontend origin
-    success_url = f"{request.origin_url}/app/settings?session_id={{CHECKOUT_SESSION_ID}}&payment=success&plan={request.plan_type}"
-    cancel_url = f"{request.origin_url}/app/settings?payment=cancelled"
-    
-    # Set up webhook URL
-    host_url = str(http_request.base_url).rstrip('/')
-    webhook_url = f"{host_url}/api/webhook/stripe"
-    
-    # Initialize Stripe checkout
-    stripe_checkout = StripeCheckout(api_key=STRIPE_API_KEY, webhook_url=webhook_url)
-    
-    # Create metadata for tracking
-    metadata = {
-        "plan_type": request.plan_type,
-        "plan_name": plan["name"],
-        "source": "tradeos_subscription",
-        "mode": plan.get("mode", "subscription")
-    }
-    if request.user_id:
-        metadata["user_id"] = request.user_id
-    if request.email:
-        metadata["email"] = request.email
-    
-    # Create checkout session request
-    checkout_request = CheckoutSessionRequest(
-        amount=plan["amount"],
-        currency=plan["currency"],
-        success_url=success_url,
-        cancel_url=cancel_url,
-        metadata=metadata
-    )
-    
-    try:
-        # Create checkout session
-        session: CheckoutSessionResponse = await stripe_checkout.create_checkout_session(checkout_request)
-        
-        # Store transaction record in MongoDB
-        transaction_record = {
-            "id": str(uuid.uuid4()),
-            "session_id": session.session_id,
-            "user_id": request.user_id,
-            "email": request.email,
-            "plan_type": request.plan_type,
-            "amount": plan["amount"],
-            "currency": plan["currency"],
-            "payment_status": "pending",
-            "payment_mode": plan.get("mode", "subscription"),
-            "metadata": metadata,
-            "created_at": datetime.now(timezone.utc).isoformat(),
-            "updated_at": datetime.now(timezone.utc).isoformat()
-        }
-        await db.payment_transactions.insert_one(transaction_record)
-        
-        return SubscriptionCheckoutResponse(
-            checkout_url=session.url,
-            session_id=session.session_id,
-            plan_type=request.plan_type,
-            amount=plan["amount"]
-        )
-        
-    except Exception as e:
-        logging.error(f"Error creating checkout session: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Failed to create checkout session: {str(e)}")
-
-
-# Check Payment Status
-@api_router.get("/subscription/status/{session_id}", response_model=PaymentStatusResponse)
-async def get_payment_status(session_id: str, http_request: Request):
-    """Check the status of a payment session"""
-    
-    host_url = str(http_request.base_url).rstrip('/')
-    webhook_url = f"{host_url}/api/webhook/stripe"
-    
-    stripe_checkout = StripeCheckout(api_key=STRIPE_API_KEY, webhook_url=webhook_url)
-    
-    try:
-        status: CheckoutStatusResponse = await stripe_checkout.get_checkout_status(session_id)
-        
-        # Get plan type from our stored transaction
-        transaction = await db.payment_transactions.find_one(
-            {"session_id": session_id},
-            {"_id": 0}
-        )
-        plan_type = transaction.get("plan_type") if transaction else None
-        
-        # Update transaction status in database if payment completed
-        if status.payment_status == "paid":
-            await db.payment_transactions.update_one(
-                {"session_id": session_id},
-                {
-                    "$set": {
-                        "payment_status": "paid",
-                        "updated_at": datetime.now(timezone.utc).isoformat()
-                    }
-                }
-            )
-        elif status.status == "expired":
-            await db.payment_transactions.update_one(
-                {"session_id": session_id},
-                {
-                    "$set": {
-                        "payment_status": "expired",
-                        "updated_at": datetime.now(timezone.utc).isoformat()
-                    }
-                }
-            )
-        
-        return PaymentStatusResponse(
-            status=status.status,
-            payment_status=status.payment_status,
-            amount_total=status.amount_total / 100,  # Convert from cents to dollars
-            currency=status.currency,
-            plan_type=plan_type
-        )
-        
-    except Exception as e:
-        logging.error(f"Error checking payment status: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Failed to check payment status: {str(e)}")
-
-
-# Stripe Webhook
-@api_router.post("/webhook/stripe")
-async def stripe_webhook(request: Request):
-    """Handle Stripe webhook events"""
-    
-    host_url = str(request.base_url).rstrip('/')
-    webhook_url = f"{host_url}/api/webhook/stripe"
-    
-    stripe_checkout = StripeCheckout(api_key=STRIPE_API_KEY, webhook_url=webhook_url)
-    
-    try:
-        body = await request.body()
-        signature = request.headers.get("Stripe-Signature")
-        
-        webhook_response = await stripe_checkout.handle_webhook(body, signature)
-        
-        # Get transaction from DB
-        transaction = await db.payment_transactions.find_one(
-            {"session_id": webhook_response.session_id},
-            {"_id": 0}
-        )
-        
-        # Update transaction based on webhook event
-        if webhook_response.payment_status == "paid":
-            plan_type = transaction.get("plan_type") if transaction else None
-            user_id = transaction.get("user_id") if transaction else None
-            payment_mode = transaction.get("payment_mode", "subscription") if transaction else "subscription"
-            
-            await db.payment_transactions.update_one(
-                {"session_id": webhook_response.session_id},
-                {
-                    "$set": {
-                        "payment_status": "paid",
-                        "stripe_payment_id": webhook_response.event_id,
-                        "updated_at": datetime.now(timezone.utc).isoformat()
-                    }
-                }
-            )
-            
-            # Handle Lifetime Elite purchase
-            if plan_type == "lifetime_elite" and user_id:
-                await process_lifetime_purchase(
-                    user_id=user_id,
-                    session_id=webhook_response.session_id,
-                    payment_intent_id=webhook_response.event_id
-                )
-        
-        return {"status": "received", "event_type": webhook_response.event_type}
-        
-    except Exception as e:
-        logging.error(f"Webhook error: {str(e)}")
-        raise HTTPException(status_code=400, detail=str(e))
-
-
-async def process_lifetime_purchase(user_id: str, session_id: str, payment_intent_id: str):
-    """Process a successful Lifetime Elite purchase"""
-    
-    try:
-        # 1. Atomically increment seat counter in Supabase
-        async with httpx.AsyncClient() as client:
-            # Call the increment function
-            response = await client.post(
-                f"{SUPABASE_URL}/rest/v1/rpc/increment_lifetime_seats",
-                headers={
-                    "apikey": SUPABASE_SERVICE_KEY,
-                    "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
-                    "Content-Type": "application/json"
-                }
-            )
-            
-            if response.status_code != 200:
-                logging.error(f"Failed to increment seats: {response.text}")
-                return
-            
-            result = response.json()
-            if result and len(result) > 0 and not result[0].get("success", False):
-                logging.error(f"Seat increment failed: {result[0].get('error_message')}")
-                # TODO: Trigger refund process
-                return
-            
-            # 2. Update user's profile in Supabase
-            update_response = await client.patch(
-                f"{SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}",
-                headers={
-                    "apikey": SUPABASE_SERVICE_KEY,
-                    "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
-                    "Content-Type": "application/json",
-                    "Prefer": "return=minimal"
-                },
-                json={
-                    "plan_type": "lifetime_elite",
-                    "plan_status": "active",
-                    "stripe_payment_intent_id": payment_intent_id,
-                    "lifetime_purchased_at": datetime.now(timezone.utc).isoformat(),
-                    "subscription_tier": "elite"  # For backward compatibility
-                }
-            )
-            
-            if update_response.status_code not in [200, 204]:
-                logging.error(f"Failed to update user profile: {update_response.text}")
-            
-            # 3. Create lifetime purchase record
-            purchase_response = await client.post(
-                f"{SUPABASE_URL}/rest/v1/lifetime_purchases",
-                headers={
-                    "apikey": SUPABASE_SERVICE_KEY,
-                    "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
-                    "Content-Type": "application/json",
-                    "Prefer": "return=minimal"
-                },
-                json={
-                    "user_id": user_id,
-                    "stripe_payment_intent_id": payment_intent_id,
-                    "stripe_session_id": session_id,
-                    "amount": 599,
-                    "currency": "CAD",
-                    "country": "CA"
-                }
-            )
-            
-            if purchase_response.status_code not in [200, 201, 204]:
-                logging.error(f"Failed to create purchase record: {purchase_response.text}")
-            
-            logging.info(f"Successfully processed Lifetime Elite purchase for user {user_id}")
-            
-    except Exception as e:
-        logging.error(f"Error processing lifetime purchase: {str(e)}")
-
-
-# Get user's subscription status
-@api_router.get("/subscription/user/{user_id}")
-async def get_user_subscription(user_id: str):
-    """Get the current subscription status for a user"""
-    
-    # Find the most recent paid transaction for this user
-    transaction = await db.payment_transactions.find_one(
-        {"user_id": user_id, "payment_status": "paid"},
-        {"_id": 0},
-        sort=[("created_at", -1)]
-    )
-    
-    if transaction:
-        return {
-            "has_subscription": True,
-            "plan_type": transaction.get("plan_type"),
-            "subscribed_at": transaction.get("created_at"),
-            "status": "active"
-        }
-    
-    return {
-        "has_subscription": False,
-        "plan_type": "trial",
-        "status": "trialing"
-    }
+    """Redirect to new lifetime-seats endpoint"""
+    from routes.stripe import get_lifetime_seats_endpoint
+    return await get_lifetime_seats_endpoint()
 
 
 # Include the router in the main app
@@ -507,6 +128,9 @@ app.include_router(bookkeeping_router, prefix="/api")
 
 # Include email routes (already has /api prefix)
 app.include_router(email_router)
+
+# Include Stripe routes
+app.include_router(stripe_router)
 
 app.add_middleware(
     CORSMiddleware,
