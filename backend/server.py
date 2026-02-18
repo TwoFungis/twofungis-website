@@ -20,6 +20,12 @@ from routes.email import router as email_router
 # Import Stripe routes
 from routes.stripe import router as stripe_router
 
+# Import Invoices routes
+from routes.invoices import router as invoices_router
+
+# Import Milestones routes
+from routes.milestones import router as milestones_router
+
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env', override=False)
 
@@ -131,6 +137,12 @@ app.include_router(email_router)
 
 # Include Stripe routes
 app.include_router(stripe_router)
+
+# Include Invoices routes
+app.include_router(invoices_router)
+
+# Include Milestones routes
+app.include_router(milestones_router)
 
 app.add_middleware(
     CORSMiddleware,
