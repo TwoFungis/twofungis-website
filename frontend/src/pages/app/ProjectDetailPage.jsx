@@ -1,26 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { 
-  ArrowLeft, 
-  Edit, 
-  TrendingUp, 
-  DollarSign, 
-  FileText, 
-  ClipboardList,
-  Save,
-  X,
-  Trash2,
-  AlertCircle,
-  Calendar,
-  MapPin,
-  Building,
-  Plus,
-  Activity,
-  Target
+  ArrowLeft, Edit, TrendingUp, DollarSign, FileText, ClipboardList,
+  Save, X, Trash2, AlertCircle, Calendar, MapPin, Building, Plus,
+  Activity, Target, Receipt, Wallet, Flag, FolderOpen, Clock
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuthStore } from '../../store/authStore';
-import ProjectMilestones from '../../components/milestones/ProjectMilestones';
 
 const ProjectDetailPage = () => {
   const { id } = useParams();
@@ -33,8 +19,15 @@ const ProjectDetailPage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  
+  // Related data
   const [changeOrders, setChangeOrders] = useState([]);
+  const [milestones, setMilestones] = useState([]);
+  const [invoices, setInvoices] = useState([]);
+  const [expenses, setExpenses] = useState([]);
   const [productionLogs, setProductionLogs] = useState([]);
+  
+  const [activeTab, setActiveTab] = useState('overview');
   
   const [formData, setFormData] = useState({
     name: '',
@@ -50,11 +43,8 @@ const ProjectDetailPage = () => {
     notes: ''
   });
 
-  const [activeTab, setActiveTab] = useState('overview');
-
   const fetchProject = useCallback(async () => {
     if (!user || !id) return;
-    
     setLoading(true);
     setError(null);
     
@@ -94,27 +84,19 @@ const ProjectDetailPage = () => {
     if (!user || !id) return;
     
     try {
-      // Fetch change orders
-      const { data: coData } = await supabase
-        .from('change_orders')
-        .select('*')
-        .eq('project_id', id)
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(5);
+      const [coRes, msRes, invRes, expRes, logRes] = await Promise.all([
+        supabase.from('change_orders').select('*').eq('project_id', id).eq('user_id', user.id).order('created_at', { ascending: false }),
+        supabase.from('project_milestones').select('*').eq('project_id', id).eq('user_id', user.id).order('created_at', { ascending: false }),
+        supabase.from('invoices').select('*').eq('project_id', id).eq('user_id', user.id).order('created_at', { ascending: false }),
+        supabase.from('expenses').select('*').eq('project_id', id).eq('user_id', user.id).order('expense_date', { ascending: false }),
+        supabase.from('production_logs').select('*').eq('project_id', id).eq('user_id', user.id).order('log_date', { ascending: false }).limit(10)
+      ]);
       
-      setChangeOrders(coData || []);
-      
-      // Fetch production logs
-      const { data: logData } = await supabase
-        .from('production_logs')
-        .select('*')
-        .eq('project_id', id)
-        .eq('user_id', user.id)
-        .order('log_date', { ascending: false })
-        .limit(5);
-      
-      setProductionLogs(logData || []);
+      setChangeOrders(coRes.data || []);
+      setMilestones(msRes.data || []);
+      setInvoices(invRes.data || []);
+      setExpenses(expRes.data || []);
+      setProductionLogs(logRes.data || []);
     } catch (err) {
       console.error('Error fetching related data:', err);
     }
@@ -127,20 +109,10 @@ const ProjectDetailPage = () => {
 
   const handleSave = async () => {
     if (!user || !id) return;
-    
     setIsSaving(true);
     setError(null);
     
     try {
-      // Ensure we have a valid session before saving
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        const { error: refreshError } = await supabase.auth.refreshSession();
-        if (refreshError) {
-          throw new Error('Session expired. Please refresh the page and try again.');
-        }
-      }
-
       const { error: updateError } = await supabase
         .from('projects')
         .update({
@@ -159,21 +131,13 @@ const ProjectDetailPage = () => {
         .eq('id', id)
         .eq('user_id', user.id);
 
-      if (updateError) {
-        if (updateError.message?.includes('JWT') || updateError.code === 'PGRST301') {
-          throw new Error('Session expired. Please refresh the page and try again.');
-        }
-        throw updateError;
-      }
+      if (updateError) throw updateError;
       
       setIsEditing(false);
       fetchProject();
     } catch (err) {
       console.error('Error updating project:', err);
-      const errorMessage = err.name === 'AbortError'
-        ? 'Request was interrupted. Please try again.'
-        : err.message || 'Failed to update project';
-      setError('Failed to update project: ' + errorMessage);
+      setError('Failed to update project');
     } finally {
       setIsSaving(false);
     }
@@ -183,35 +147,17 @@ const ProjectDetailPage = () => {
     if (!user || !id) return;
     
     try {
-      // Ensure we have a valid session before deleting
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        const { error: refreshError } = await supabase.auth.refreshSession();
-        if (refreshError) {
-          throw new Error('Session expired. Please refresh the page and try again.');
-        }
-      }
-
       const { error: deleteError } = await supabase
         .from('projects')
         .delete()
         .eq('id', id)
         .eq('user_id', user.id);
 
-      if (deleteError) {
-        if (deleteError.message?.includes('JWT') || deleteError.code === 'PGRST301') {
-          throw new Error('Session expired. Please refresh the page and try again.');
-        }
-        throw deleteError;
-      }
-      
+      if (deleteError) throw deleteError;
       navigate('/app/projects');
     } catch (err) {
       console.error('Error deleting project:', err);
-      const errorMessage = err.name === 'AbortError'
-        ? 'Request was interrupted. Please try again.'
-        : err.message || 'Failed to delete project';
-      setError('Failed to delete project: ' + errorMessage);
+      setError('Failed to delete project');
       setShowDeleteConfirm(false);
     }
   };
@@ -233,24 +179,24 @@ const ProjectDetailPage = () => {
     });
   };
 
-  const getRiskColor = (risk) => {
-    switch (risk) {
-      case 'green': return 'bg-success text-success';
-      case 'yellow': return 'bg-warning text-warning';
-      case 'red': return 'bg-risk text-risk';
-      default: return 'bg-gray-500 text-gray-500';
-    }
-  };
+  // Financial calculations
+  const originalContract = parseFloat(project?.contract_value) || 0;
+  const approvedCOsTotal = changeOrders.filter(co => co.status === 'approved').reduce((sum, co) => sum + (parseFloat(co.total_value) || 0), 0);
+  const totalRevenue = originalContract + approvedCOsTotal;
+  const totalExpenses = expenses.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+  const totalLabor = expenses.filter(e => e.category === 'labor').reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+  const forecastProfit = totalRevenue - totalExpenses;
+  const forecastMargin = totalRevenue > 0 ? (forecastProfit / totalRevenue) * 100 : 0;
 
-  const getStatusBadge = (status) => {
-    const colors = {
-      active: 'bg-success/20 text-success border-success/30',
-      completed: 'bg-steel-500/20 text-steel-400 border-steel-500/30',
-      on_hold: 'bg-warning/20 text-warning border-warning/30',
-      cancelled: 'bg-risk/20 text-risk border-risk/30'
-    };
-    return colors[status] || colors.active;
-  };
+  const tabs = [
+    { id: 'overview', label: 'Overview', icon: ClipboardList },
+    { id: 'milestones', label: 'Milestones', icon: Flag, count: milestones.length },
+    { id: 'invoices', label: 'Invoices', icon: Receipt, count: invoices.length },
+    { id: 'change-orders', label: 'Change Orders', icon: FileText, count: changeOrders.length },
+    { id: 'expenses', label: 'Expenses', icon: Wallet, count: expenses.length },
+    { id: 'documents', label: 'Documents', icon: FolderOpen },
+    { id: 'activity', label: 'Activity', icon: Activity }
+  ];
 
   if (loading) {
     return (
@@ -260,17 +206,14 @@ const ProjectDetailPage = () => {
     );
   }
 
-  if (!project) {
+  if (error || !project) {
     return (
       <div className="text-center py-12">
-        <AlertCircle className="w-12 h-12 text-gray-600 mx-auto mb-4" />
-        <h2 className="text-xl font-semibold text-white mb-2">Project Not Found</h2>
-        <p className="text-gray-400 mb-6">This project doesn't exist or you don't have access.</p>
-        <Link 
-          to="/app/projects" 
-          className="bg-steel-500 hover:bg-steel-600 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-        >
-          Back to Projects
+        <AlertCircle className="w-12 h-12 text-risk mx-auto mb-4" />
+        <h2 className="text-xl font-semibold text-white mb-2">Error</h2>
+        <p className="text-gray-400">{error || 'Project not found'}</p>
+        <Link to="/app/projects" className="mt-4 inline-block text-steel-400 hover:text-steel-300">
+          ← Back to Projects
         </Link>
       </div>
     );
@@ -279,563 +222,473 @@ const ProjectDetailPage = () => {
   return (
     <div className="space-y-6" data-testid="project-detail-page">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-        <Link 
-          to="/app/projects" 
-          className="text-gray-400 hover:text-white transition-colors w-fit"
-          data-testid="back-to-projects"
-        >
-          <ArrowLeft className="w-6 h-6" />
-        </Link>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-3 flex-wrap">
-            <h1 className="text-2xl lg:text-3xl font-bold text-white truncate">{project.name}</h1>
-            <span className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusBadge(project.status)}`}>
-              {project.status?.replace('_', ' ') || 'Active'}
-            </span>
-            <div className={`w-3 h-3 rounded-full ${getRiskColor(project.risk_flag).split(' ')[0]}`} title={`Risk: ${project.risk_flag}`} />
-          </div>
-          <div className="flex items-center gap-4 text-gray-400 text-sm mt-1 flex-wrap">
-            {project.client_gc && (
-              <span className="flex items-center gap-1">
-                <Building className="w-4 h-4" />
-                {project.client_gc}
-              </span>
-            )}
-            {project.region && (
-              <span className="flex items-center gap-1">
-                <MapPin className="w-4 h-4" />
-                {project.region}
-              </span>
-            )}
-            <span className="flex items-center gap-1">
-              <Calendar className="w-4 h-4" />
-              Created {formatDate(project.created_at)}
-            </span>
-          </div>
+      <div className="flex items-start justify-between">
+        <div>
+          <Link to="/app/projects" className="text-gray-400 hover:text-white text-sm flex items-center gap-1 mb-2">
+            <ArrowLeft className="w-4 h-4" /> Back to Projects
+          </Link>
+          <h1 className="text-2xl font-bold text-white">{project.name}</h1>
+          <p className="text-gray-400">{project.client_gc || 'No client'}</p>
         </div>
-        <div className="flex gap-2">
-          <button 
-            onClick={() => setIsEditing(true)}
-            className="bg-charcoal-700 hover:bg-charcoal-600 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
-            data-testid="edit-project-btn"
-          >
-            <Edit className="w-4 h-4" />
-            Edit
-          </button>
-          <button 
-            onClick={() => setShowDeleteConfirm(true)}
-            className="bg-risk/20 hover:bg-risk/30 text-risk px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
-            data-testid="delete-project-btn"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
-        </div>
-      </div>
-
-      {/* Error Message */}
-      {error && (
-        <div className="bg-risk/20 border border-risk/50 text-risk p-4 rounded-lg">
-          {error}
-        </div>
-      )}
-
-      {/* PROJECT FINANCIAL HEALTH PANEL */}
-      <div className="bg-gradient-to-br from-charcoal-800 to-charcoal-900 rounded-2xl border border-charcoal-700 overflow-hidden" data-testid="financial-health-panel">
-        <div className="p-4 lg:p-6 border-b border-charcoal-700 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-steel-500/20 flex items-center justify-center">
-              <TrendingUp className="w-5 h-5 text-steel-400" />
-            </div>
-            <div>
-              <h2 className="text-lg font-bold text-white">Financial Health</h2>
-              <p className="text-xs text-gray-500">Real-time project profitability</p>
-            </div>
-          </div>
-          <div className={`px-4 py-2 rounded-xl font-bold text-2xl ${
-            (project.forecast_margin || 0) >= 20 ? 'bg-success/20 text-success' : 
-            (project.forecast_margin || 0) >= 15 ? 'bg-success/10 text-success' : 
-            (project.forecast_margin || 0) >= 10 ? 'bg-warning/20 text-warning' : 
-            'bg-risk/20 text-risk'
+        <div className="flex items-center gap-2">
+          <span className={`px-3 py-1 rounded-full text-sm border ${
+            project.status === 'active' ? 'bg-success/20 text-success border-success/30' :
+            project.status === 'completed' ? 'bg-steel-500/20 text-steel-400 border-steel-500/30' :
+            'bg-warning/20 text-warning border-warning/30'
           }`}>
-            {project.forecast_margin || 0}%
-            <span className="text-xs font-normal ml-1">margin</span>
-          </div>
+            {project.status}
+          </span>
+          {!isEditing && (
+            <button
+              onClick={() => setIsEditing(true)}
+              className="bg-charcoal-700 hover:bg-charcoal-600 text-white px-3 py-1.5 rounded-lg text-sm flex items-center gap-1"
+            >
+              <Edit className="w-4 h-4" /> Edit
+            </button>
+          )}
         </div>
+      </div>
+
+      {/* ============================================ */}
+      {/* FINANCIAL HEALTH PANEL */}
+      {/* ============================================ */}
+      <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6" data-testid="financial-health-panel">
+        <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Financial Health</h2>
         
-        <div className="p-4 lg:p-6">
-          {/* Main Financial Metrics */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div className="bg-charcoal-700/50 rounded-xl p-4">
-              <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Contract Value</p>
-              <p className="text-xl lg:text-2xl font-bold text-white" data-testid="contract-value">
-                {formatCurrency(project.contract_value)}
-              </p>
-            </div>
-            <div className="bg-charcoal-700/50 rounded-xl p-4">
-              <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Approved COs</p>
-              <p className="text-xl lg:text-2xl font-bold text-warning" data-testid="approved-cos">
-                +{formatCurrency(project.approved_cos)}
-              </p>
-            </div>
-            <div className="bg-charcoal-700/50 rounded-xl p-4">
-              <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Total Revenue</p>
-              <p className="text-xl lg:text-2xl font-bold text-success">
-                {formatCurrency((project.contract_value || 0) + (project.approved_cos || 0))}
-              </p>
-            </div>
-            <div className="bg-charcoal-700/50 rounded-xl p-4">
-              <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Cost to Date</p>
-              <p className="text-xl lg:text-2xl font-bold text-white">
-                {formatCurrency(project.cost_to_date)}
-              </p>
-            </div>
-          </div>
-
-          {/* Profit Calculation */}
-          <div className="bg-charcoal-700/30 rounded-xl p-4 mb-4">
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-              <div className="flex items-center gap-6">
-                <div>
-                  <p className="text-xs text-gray-500">Gross Profit</p>
-                  <p className={`text-2xl font-bold ${
-                    ((project.contract_value || 0) + (project.approved_cos || 0) - (project.cost_to_date || 0)) >= 0 
-                      ? 'text-success' : 'text-risk'
-                  }`}>
-                    {formatCurrency((project.contract_value || 0) + (project.approved_cos || 0) - (project.cost_to_date || 0))}
-                  </p>
-                </div>
-                <div className="h-10 w-px bg-charcoal-600" />
-                <div>
-                  <p className="text-xs text-gray-500">At Completion</p>
-                  <p className="text-2xl font-bold text-white">
-                    {formatCurrency(((project.contract_value || 0) + (project.approved_cos || 0)) * (project.forecast_margin || 0) / 100)}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className={`w-3 h-3 rounded-full ${
-                  (project.forecast_margin || 0) >= 15 ? 'bg-success' : 
-                  (project.forecast_margin || 0) >= 10 ? 'bg-warning' : 'bg-risk'
-                }`} />
-                <span className="text-sm text-gray-400">
-                  {(project.forecast_margin || 0) >= 20 ? 'Excellent' : 
-                   (project.forecast_margin || 0) >= 15 ? 'On Target' : 
-                   (project.forecast_margin || 0) >= 10 ? 'Below Target' : 'At Risk'}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Progress Bar */}
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
           <div>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-gray-400">Completion</span>
-              <span className="text-sm font-semibold text-steel-400">{project.percent_complete || 0}%</span>
-            </div>
-            <div className="h-2 bg-charcoal-700 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-gradient-to-r from-steel-600 to-steel-400 rounded-full transition-all"
-                style={{ width: `${project.percent_complete || 0}%` }}
-              />
-            </div>
+            <p className="text-xs text-gray-500 mb-1">Original Contract</p>
+            <p className="text-xl font-bold text-white">{formatCurrency(originalContract)}</p>
+          </div>
+          <div>
+            <p className="text-xs text-gray-500 mb-1">Approved COs</p>
+            <p className="text-xl font-bold text-warning">{formatCurrency(approvedCOsTotal)}</p>
+          </div>
+          <div>
+            <p className="text-xs text-gray-500 mb-1">Total Revenue</p>
+            <p className="text-xl font-bold text-steel-400">{formatCurrency(totalRevenue)}</p>
+          </div>
+          <div>
+            <p className="text-xs text-gray-500 mb-1">Total Expenses</p>
+            <p className="text-xl font-bold text-risk">{formatCurrency(totalExpenses)}</p>
+          </div>
+          <div>
+            <p className="text-xs text-gray-500 mb-1">Total Labor</p>
+            <p className="text-xl font-bold text-gray-300">{formatCurrency(totalLabor)}</p>
+          </div>
+          <div>
+            <p className="text-xs text-gray-500 mb-1">Gross Profit</p>
+            <p className={`text-xl font-bold ${forecastProfit >= 0 ? 'text-success' : 'text-risk'}`}>
+              {formatCurrency(forecastProfit)}
+            </p>
+          </div>
+          <div>
+            <p className="text-xs text-gray-500 mb-1">Margin</p>
+            <p className={`text-xl font-bold ${forecastMargin >= 15 ? 'text-success' : forecastMargin >= 10 ? 'text-warning' : 'text-risk'}`}>
+              {forecastMargin.toFixed(1)}%
+            </p>
+          </div>
+        </div>
+
+        {/* Progress bar */}
+        <div className="mt-4">
+          <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
+            <span>Completion: {project.percent_complete || 0}%</span>
+            <span>{formatCurrency(totalRevenue)} total</span>
+          </div>
+          <div className="h-2 bg-charcoal-700 rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-steel-500 rounded-full transition-all"
+              style={{ width: `${project.percent_complete || 0}%` }}
+            />
           </div>
         </div>
       </div>
 
-      {/* Tab Navigation */}
-      <div className="flex gap-1 bg-charcoal-800 p-1 rounded-xl border border-charcoal-700">
-        <button
-          onClick={() => setActiveTab('overview')}
-          className={`flex-1 py-2.5 px-4 rounded-lg font-medium text-sm transition-colors flex items-center justify-center gap-2 ${
-            activeTab === 'overview' 
-              ? 'bg-steel-500 text-white' 
-              : 'text-gray-400 hover:text-white hover:bg-charcoal-700'
-          }`}
-          data-testid="tab-overview"
-        >
-          <ClipboardList className="w-4 h-4" />
-          Overview
-        </button>
-        <button
-          onClick={() => setActiveTab('milestones')}
-          className={`flex-1 py-2.5 px-4 rounded-lg font-medium text-sm transition-colors flex items-center justify-center gap-2 ${
-            activeTab === 'milestones' 
-              ? 'bg-steel-500 text-white' 
-              : 'text-gray-400 hover:text-white hover:bg-charcoal-700'
-          }`}
-          data-testid="tab-milestones"
-        >
-          <Target className="w-4 h-4" />
-          Milestones
-        </button>
-        <button
-          onClick={() => setActiveTab('activity')}
-          className={`flex-1 py-2.5 px-4 rounded-lg font-medium text-sm transition-colors flex items-center justify-center gap-2 ${
-            activeTab === 'activity' 
-              ? 'bg-steel-500 text-white' 
-              : 'text-gray-400 hover:text-white hover:bg-charcoal-700'
-          }`}
-          data-testid="tab-activity"
-        >
-          <Activity className="w-4 h-4" />
-          Activity
-        </button>
+      {/* ============================================ */}
+      {/* TABS NAVIGATION */}
+      {/* ============================================ */}
+      <div className="border-b border-charcoal-700">
+        <nav className="flex gap-1 overflow-x-auto pb-px">
+          {tabs.map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
+                activeTab === tab.id
+                  ? 'border-steel-500 text-steel-400'
+                  : 'border-transparent text-gray-400 hover:text-white hover:border-gray-600'
+              }`}
+            >
+              <tab.icon className="w-4 h-4" />
+              {tab.label}
+              {tab.count !== undefined && tab.count > 0 && (
+                <span className="bg-charcoal-700 text-gray-400 text-xs px-1.5 py-0.5 rounded">
+                  {tab.count}
+                </span>
+              )}
+            </button>
+          ))}
+        </nav>
       </div>
 
-      {/* Tab Content */}
-      {activeTab === 'milestones' && (
-        <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6">
-          <ProjectMilestones project={project} onMilestoneChange={fetchProject} />
-        </div>
-      )}
+      {/* ============================================ */}
+      {/* TAB CONTENT */}
+      {/* ============================================ */}
+      <div className="min-h-[400px]">
+        {/* Overview Tab */}
+        {activeTab === 'overview' && (
+          <div className="grid lg:grid-cols-2 gap-6">
+            {/* Project Details */}
+            <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6">
+              <h3 className="font-semibold text-white mb-4">Project Details</h3>
+              {isEditing ? (
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm text-gray-400 mb-1">Project Name</label>
+                    <input
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-3 py-2 text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-400 mb-1">Client/GC</label>
+                    <input
+                      type="text"
+                      value={formData.client_gc}
+                      onChange={(e) => setFormData({ ...formData, client_gc: e.target.value })}
+                      className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-3 py-2 text-white"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm text-gray-400 mb-1">Contract Value</label>
+                      <input
+                        type="number"
+                        value={formData.contract_value}
+                        onChange={(e) => setFormData({ ...formData, contract_value: e.target.value })}
+                        className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-3 py-2 text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-400 mb-1">Forecast Margin %</label>
+                      <input
+                        type="number"
+                        value={formData.forecast_margin}
+                        onChange={(e) => setFormData({ ...formData, forecast_margin: e.target.value })}
+                        className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-3 py-2 text-white"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm text-gray-400 mb-1">Status</label>
+                      <select
+                        value={formData.status}
+                        onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                        className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-3 py-2 text-white"
+                      >
+                        <option value="active">Active</option>
+                        <option value="completed">Completed</option>
+                        <option value="on_hold">On Hold</option>
+                        <option value="cancelled">Cancelled</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm text-gray-400 mb-1">Risk Level</label>
+                      <select
+                        value={formData.risk_flag}
+                        onChange={(e) => setFormData({ ...formData, risk_flag: e.target.value })}
+                        className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-3 py-2 text-white"
+                      >
+                        <option value="green">Low Risk</option>
+                        <option value="yellow">Medium Risk</option>
+                        <option value="red">High Risk</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-400 mb-1">Notes</label>
+                    <textarea
+                      value={formData.notes}
+                      onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                      rows={3}
+                      className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-3 py-2 text-white resize-none"
+                    />
+                  </div>
+                  <div className="flex gap-2 pt-2">
+                    <button
+                      onClick={handleSave}
+                      disabled={isSaving}
+                      className="bg-steel-500 hover:bg-steel-600 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2"
+                    >
+                      {isSaving ? <Clock className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                      Save
+                    </button>
+                    <button
+                      onClick={() => setIsEditing(false)}
+                      className="text-gray-400 hover:text-white px-4 py-2"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={() => setShowDeleteConfirm(true)}
+                      className="ml-auto text-risk hover:text-risk/80 px-4 py-2 flex items-center gap-1"
+                    >
+                      <Trash2 className="w-4 h-4" /> Delete
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-xs text-gray-500">Client/GC</p>
+                      <p className="text-white">{project.client_gc || '—'}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">Region</p>
+                      <p className="text-white">{project.region || '—'}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">Created</p>
+                      <p className="text-white">{formatDate(project.created_at)}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">Completion</p>
+                      <p className="text-white">{project.percent_complete || 0}%</p>
+                    </div>
+                  </div>
+                  {project.notes && (
+                    <div>
+                      <p className="text-xs text-gray-500">Notes</p>
+                      <p className="text-white text-sm mt-1">{project.notes}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
 
-      {activeTab === 'overview' && (
-        <>
-          {/* Project Details Card */}
-          <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6">
-            <h3 className="font-semibold text-white mb-4">Project Details</h3>
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-              <div>
-                <p className="text-sm text-gray-500 mb-1">Client / GC</p>
-                <p className="text-white">{project.client_gc || 'Not specified'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500 mb-1">Region</p>
-                <p className="text-white">{project.region || 'Not specified'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500 mb-1">Created</p>
-                <p className="text-white">{formatDate(project.created_at)}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500 mb-1">Cost to Date</p>
-                <p className="text-white">{formatCurrency(project.cost_to_date)}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500 mb-1">Risk Status</p>
-                <p className={`${getRiskColor(project.risk_flag).split(' ')[1]} capitalize`}>
-                  {project.risk_flag || 'Green'}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500 mb-1">Status</p>
-                <p className="text-white capitalize">{project.status?.replace('_', ' ') || 'Active'}</p>
-              </div>
+            {/* Recent Activity */}
+            <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6">
+              <h3 className="font-semibold text-white mb-4">Recent Activity</h3>
+              {productionLogs.length === 0 ? (
+                <p className="text-gray-500 text-sm text-center py-8">No activity recorded</p>
+              ) : (
+                <div className="space-y-3">
+                  {productionLogs.slice(0, 5).map(log => (
+                    <div key={log.id} className="flex items-start gap-3 p-3 bg-charcoal-700/30 rounded-lg">
+                      <div className="w-8 h-8 bg-charcoal-700 rounded-full flex items-center justify-center flex-shrink-0">
+                        <Activity className="w-4 h-4 text-gray-400" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-white">{log.notes || 'Activity recorded'}</p>
+                        <p className="text-xs text-gray-500">{formatDate(log.log_date)}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
+        )}
 
-      {/* Notes */}
-      {activeTab === 'overview' && project.notes && (
-        <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6">
-          <h3 className="font-semibold text-white mb-3">Notes</h3>
-          <p className="text-gray-400 whitespace-pre-wrap">{project.notes}</p>
-        </div>
-      )}
-        </>
-      )}
-
-      {activeTab === 'activity' && (
-        <div className="grid lg:grid-cols-2 gap-6">
-          {/* Change Orders */}
+        {/* Milestones Tab */}
+        {activeTab === 'milestones' && (
           <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-white flex items-center gap-2">
-                <FileText className="w-5 h-5 text-steel-400" />
-                Recent Change Orders
-              </h3>
-              <Link 
-                to={`/app/change-orders?project=${id}`}
-                className="text-steel-400 hover:text-steel-300 text-sm font-medium"
-              >
-                View All
+              <h3 className="font-semibold text-white">Milestones</h3>
+              <Link to="/app/milestones" className="text-sm text-steel-400 hover:text-steel-300">
+                Manage Milestones →
+              </Link>
+            </div>
+            {milestones.length === 0 ? (
+              <p className="text-gray-500 text-center py-8">No milestones for this project</p>
+            ) : (
+              <div className="space-y-3">
+                {milestones.map(ms => (
+                  <div key={ms.id} className="flex items-center justify-between p-4 bg-charcoal-700/30 rounded-lg">
+                    <div>
+                      <p className="text-white font-medium">{ms.name}</p>
+                      <p className="text-xs text-gray-500">{ms.due_date ? formatDate(ms.due_date) : 'No due date'}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-white font-semibold">{formatCurrency(ms.amount)}</p>
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${
+                        ms.status === 'paid' ? 'bg-success/20 text-success' :
+                        ms.status === 'invoiced' ? 'bg-purple-500/20 text-purple-400' :
+                        ms.status === 'approved' ? 'bg-green-500/20 text-green-400' :
+                        'bg-gray-500/20 text-gray-400'
+                      }`}>{ms.status}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Invoices Tab */}
+        {activeTab === 'invoices' && (
+          <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-semibold text-white">Invoices</h3>
+              <Link to="/app/invoices" className="text-sm text-steel-400 hover:text-steel-300">
+                Manage Invoices →
+              </Link>
+            </div>
+            {invoices.length === 0 ? (
+              <p className="text-gray-500 text-center py-8">No invoices for this project</p>
+            ) : (
+              <div className="space-y-3">
+                {invoices.map(inv => (
+                  <div key={inv.id} className="flex items-center justify-between p-4 bg-charcoal-700/30 rounded-lg">
+                    <div>
+                      <p className="text-white font-medium font-mono">{inv.invoice_number}</p>
+                      <p className="text-xs text-gray-500">{inv.client_name}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-white font-semibold">{formatCurrency(inv.total)}</p>
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${
+                        inv.status === 'paid' ? 'bg-success/20 text-success' :
+                        inv.status === 'sent' ? 'bg-blue-500/20 text-blue-400' :
+                        inv.status === 'overdue' ? 'bg-risk/20 text-risk' :
+                        'bg-gray-500/20 text-gray-400'
+                      }`}>{inv.status}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Change Orders Tab */}
+        {activeTab === 'change-orders' && (
+          <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-semibold text-white">Change Orders</h3>
+              <Link to="/app/change-orders" className="text-sm text-steel-400 hover:text-steel-300">
+                Manage COs →
               </Link>
             </div>
             {changeOrders.length === 0 ? (
-              <div className="text-center py-8">
-                <FileText className="w-10 h-10 text-gray-600 mx-auto mb-3" />
-                <p className="text-gray-400 text-sm mb-3">No change orders yet</p>
-                <Link 
-                  to={`/app/change-orders?new=true&project=${id}`}
-                  className="inline-flex items-center gap-2 text-steel-400 hover:text-steel-300 text-sm font-medium"
-                >
-                  <Plus className="w-4 h-4" />
-                  Create Change Order
-                </Link>
-              </div>
+              <p className="text-gray-500 text-center py-8">No change orders for this project</p>
             ) : (
               <div className="space-y-3">
-                {changeOrders.map((co) => (
-                  <div key={co.id} className="flex items-center justify-between p-3 bg-charcoal-700/50 rounded-lg">
+                {changeOrders.map(co => (
+                  <div key={co.id} className="flex items-center justify-between p-4 bg-charcoal-700/30 rounded-lg">
                     <div>
-                      <p className="text-white font-medium">{co.co_number}</p>
-                      <p className="text-gray-400 text-sm truncate max-w-[200px]">{co.description}</p>
+                      <p className="text-white font-medium">{co.title || `CO-${co.co_number}`}</p>
+                      <p className="text-xs text-gray-500">{formatDate(co.created_at)}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-white font-medium">{formatCurrency(co.total_value)}</p>
-                      <span className={`text-xs px-2 py-0.5 rounded ${
+                      <p className="text-warning font-semibold">{formatCurrency(co.total_value)}</p>
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${
                         co.status === 'approved' ? 'bg-success/20 text-success' :
-                        co.status === 'paid' ? 'bg-steel-500/20 text-steel-400' :
-                        co.status === 'rejected' ? 'bg-risk/20 text-risk' :
-                        'bg-warning/20 text-warning'
-                      }`}>
-                        {co.status}
-                      </span>
+                        co.status === 'pending' ? 'bg-warning/20 text-warning' :
+                        'bg-gray-500/20 text-gray-400'
+                      }`}>{co.status}</span>
                     </div>
                   </div>
                 ))}
               </div>
             )}
           </div>
+        )}
 
-          {/* Production Logs */}
+        {/* Expenses Tab */}
+        {activeTab === 'expenses' && (
           <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-white flex items-center gap-2">
-                <Activity className="w-5 h-5 text-steel-400" />
-                Recent Production Logs
-              </h3>
-              <Link 
-                to={`/app/production?project=${id}`}
-                className="text-steel-400 hover:text-steel-300 text-sm font-medium"
-              >
-                View All
+              <h3 className="font-semibold text-white">Expenses</h3>
+              <Link to="/app/expenses" className="text-sm text-steel-400 hover:text-steel-300">
+                Manage Expenses →
               </Link>
             </div>
-            {productionLogs.length === 0 ? (
-              <div className="text-center py-8">
-                <Activity className="w-10 h-10 text-gray-600 mx-auto mb-3" />
-                <p className="text-gray-400 text-sm mb-3">No production logs yet</p>
-                <Link 
-                  to={`/app/production?new=true&project=${id}`}
-                  className="inline-flex items-center gap-2 text-steel-400 hover:text-steel-300 text-sm font-medium"
-                >
-                  <Plus className="w-4 h-4" />
-                  Add Production Log
-                </Link>
-              </div>
+            {expenses.length === 0 ? (
+              <p className="text-gray-500 text-center py-8">No expenses for this project</p>
             ) : (
               <div className="space-y-3">
-                {productionLogs.map((log) => (
-                  <div key={log.id} className="flex items-center justify-between p-3 bg-charcoal-700/50 rounded-lg">
+                {expenses.map(exp => (
+                  <div key={exp.id} className="flex items-center justify-between p-4 bg-charcoal-700/30 rounded-lg">
                     <div>
-                      <p className="text-white font-medium">{formatDate(log.log_date)}</p>
-                      <p className="text-gray-400 text-sm">{log.crew_count} crew • {log.hours_worked}h</p>
+                      <p className="text-white font-medium">{exp.description}</p>
+                      <p className="text-xs text-gray-500">{exp.category} • {formatDate(exp.expense_date)}</p>
                     </div>
-                    <div className="text-right">
-                      <p className="text-white font-medium">{log.units_installed} {log.unit_type}</p>
-                      <p className="text-gray-400 text-sm truncate max-w-[150px]">{log.scope_completed}</p>
+                    <p className="text-risk font-semibold">{formatCurrency(exp.amount)}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Documents Tab */}
+        {activeTab === 'documents' && (
+          <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6">
+            <h3 className="font-semibold text-white mb-4">Documents</h3>
+            <p className="text-gray-500 text-center py-8">
+              Document management coming soon.
+              <br />
+              <Link to="/app/documents" className="text-steel-400 hover:text-steel-300">
+                Go to Document Vault →
+              </Link>
+            </p>
+          </div>
+        )}
+
+        {/* Activity Tab */}
+        {activeTab === 'activity' && (
+          <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6">
+            <h3 className="font-semibold text-white mb-4">Activity Log</h3>
+            {productionLogs.length === 0 ? (
+              <p className="text-gray-500 text-center py-8">No activity recorded for this project</p>
+            ) : (
+              <div className="space-y-3">
+                {productionLogs.map(log => (
+                  <div key={log.id} className="flex items-start gap-3 p-4 bg-charcoal-700/30 rounded-lg">
+                    <div className="w-10 h-10 bg-charcoal-700 rounded-full flex items-center justify-center flex-shrink-0">
+                      <Activity className="w-5 h-5 text-gray-400" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-white">{log.notes || 'Activity recorded'}</p>
+                      <p className="text-xs text-gray-500 mt-1">{formatDate(log.log_date)}</p>
                     </div>
                   </div>
                 ))}
               </div>
             )}
           </div>
-        </div>
-      )}
-
-      {/* Edit Modal */}
-      {isEditing && (
-        <>
-          <div className="fixed inset-0 bg-black/50 z-40" onClick={() => setIsEditing(false)} />
-          <div className="fixed inset-x-4 top-1/2 -translate-y-1/2 max-w-2xl mx-auto bg-charcoal-800 rounded-2xl border border-charcoal-700 p-6 z-50 max-h-[90vh] overflow-y-auto" data-testid="edit-project-modal">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-white">Edit Project</h2>
-              <button onClick={() => setIsEditing(false)} className="text-gray-400 hover:text-white">
-                <X className="w-6 h-6" />
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Project Name *</label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-4 py-3 text-white focus:border-steel-500 focus:ring-1 focus:ring-steel-500 transition-colors"
-                  required
-                  data-testid="edit-project-name"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Client / GC</label>
-                  <input
-                    type="text"
-                    value={formData.client_gc}
-                    onChange={(e) => setFormData({ ...formData, client_gc: e.target.value })}
-                    className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-4 py-3 text-white focus:border-steel-500 focus:ring-1 focus:ring-steel-500 transition-colors"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Region</label>
-                  <select
-                    value={formData.region}
-                    onChange={(e) => setFormData({ ...formData, region: e.target.value })}
-                    className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-4 py-3 text-white focus:border-steel-500 focus:ring-1 focus:ring-steel-500 transition-colors"
-                  >
-                    <option value="">Select region</option>
-                    <option value="BC">British Columbia</option>
-                    <option value="AB">Alberta</option>
-                    <option value="ON">Ontario</option>
-                    <option value="QC">Quebec</option>
-                    <option value="Other">Other</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Contract Value</label>
-                  <input
-                    type="number"
-                    value={formData.contract_value}
-                    onChange={(e) => setFormData({ ...formData, contract_value: e.target.value })}
-                    className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-4 py-3 text-white focus:border-steel-500 focus:ring-1 focus:ring-steel-500 transition-colors"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Approved COs</label>
-                  <input
-                    type="number"
-                    value={formData.approved_cos}
-                    onChange={(e) => setFormData({ ...formData, approved_cos: e.target.value })}
-                    className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-4 py-3 text-white focus:border-steel-500 focus:ring-1 focus:ring-steel-500 transition-colors"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Cost to Date</label>
-                  <input
-                    type="number"
-                    value={formData.cost_to_date}
-                    onChange={(e) => setFormData({ ...formData, cost_to_date: e.target.value })}
-                    className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-4 py-3 text-white focus:border-steel-500 focus:ring-1 focus:ring-steel-500 transition-colors"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">% Complete</label>
-                  <input
-                    type="number"
-                    min="0"
-                    max="100"
-                    value={formData.percent_complete}
-                    onChange={(e) => setFormData({ ...formData, percent_complete: e.target.value })}
-                    className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-4 py-3 text-white focus:border-steel-500 focus:ring-1 focus:ring-steel-500 transition-colors"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Forecast Margin %</label>
-                  <input
-                    type="number"
-                    value={formData.forecast_margin}
-                    onChange={(e) => setFormData({ ...formData, forecast_margin: e.target.value })}
-                    className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-4 py-3 text-white focus:border-steel-500 focus:ring-1 focus:ring-steel-500 transition-colors"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Status</label>
-                  <select
-                    value={formData.status}
-                    onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                    className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-4 py-3 text-white focus:border-steel-500 focus:ring-1 focus:ring-steel-500 transition-colors"
-                  >
-                    <option value="active">Active</option>
-                    <option value="completed">Completed</option>
-                    <option value="on_hold">On Hold</option>
-                    <option value="cancelled">Cancelled</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Risk Flag</label>
-                  <select
-                    value={formData.risk_flag}
-                    onChange={(e) => setFormData({ ...formData, risk_flag: e.target.value })}
-                    className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-4 py-3 text-white focus:border-steel-500 focus:ring-1 focus:ring-steel-500 transition-colors"
-                  >
-                    <option value="green">Green - On Track</option>
-                    <option value="yellow">Yellow - Attention Needed</option>
-                    <option value="red">Red - At Risk</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Notes</label>
-                <textarea
-                  value={formData.notes}
-                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                  className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-4 py-3 text-white focus:border-steel-500 focus:ring-1 focus:ring-steel-500 transition-colors h-24 resize-none"
-                />
-              </div>
-
-              <div className="flex gap-4 pt-4">
-                <button
-                  type="button"
-                  onClick={() => setIsEditing(false)}
-                  className="flex-1 bg-charcoal-700 hover:bg-charcoal-600 text-white py-3 rounded-lg font-medium transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleSave}
-                  disabled={isSaving}
-                  className="flex-1 bg-steel-500 hover:bg-steel-600 text-white py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
-                  data-testid="save-project-btn"
-                >
-                  {isSaving ? (
-                    <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
-                  ) : (
-                    <>
-                      <Save className="w-5 h-5" />
-                      Save Changes
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        </>
-      )}
+        )}
+      </div>
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
-        <>
-          <div className="fixed inset-0 bg-black/50 z-40" onClick={() => setShowDeleteConfirm(false)} />
-          <div className="fixed inset-x-4 top-1/2 -translate-y-1/2 max-w-md mx-auto bg-charcoal-800 rounded-2xl border border-charcoal-700 p-6 z-50" data-testid="delete-confirm-modal">
-            <div className="text-center">
-              <div className="w-12 h-12 bg-risk/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Trash2 className="w-6 h-6 text-risk" />
-              </div>
-              <h3 className="text-xl font-bold text-white mb-2">Delete Project?</h3>
-              <p className="text-gray-400 mb-6">
-                Are you sure you want to delete "{project.name}"? This will also delete all related change orders and production logs. This action cannot be undone.
-              </p>
-              <div className="flex gap-4">
-                <button
-                  onClick={() => setShowDeleteConfirm(false)}
-                  className="flex-1 bg-charcoal-700 hover:bg-charcoal-600 text-white py-3 rounded-lg font-medium transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleDelete}
-                  className="flex-1 bg-risk hover:bg-risk/80 text-white py-3 rounded-lg font-medium transition-colors"
-                  data-testid="confirm-delete-btn"
-                >
-                  Delete Project
-                </button>
-              </div>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6 max-w-md w-full">
+            <h3 className="text-lg font-semibold text-white mb-2">Delete Project?</h3>
+            <p className="text-gray-400 mb-6">
+              This will permanently delete "{project.name}" and all associated data. This action cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="flex-1 px-4 py-2 text-gray-400 hover:text-white border border-charcoal-600 rounded-lg"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                className="flex-1 bg-risk hover:bg-risk/80 text-white px-4 py-2 rounded-lg font-medium"
+              >
+                Delete Project
+              </button>
             </div>
           </div>
-        </>
+        </div>
       )}
     </div>
   );
