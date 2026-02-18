@@ -289,7 +289,6 @@ const ExpensesPage = () => {
         <NewExpenseModal 
           onClose={() => setShowNewModal(false)}
           onSuccess={() => { setShowNewModal(false); fetchExpenses(); }}
-          user={user}
         />
       )}
     </div>
