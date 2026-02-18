@@ -566,14 +566,18 @@ const ContractorsPage = () => {
 
   // Load contractor detail
   const loadContractorDetail = async (contractor) => {
+    console.log('loadContractorDetail called with:', contractor);
     setLoadingDetail(true);
     try {
       const response = await fetch(`${API_URL}/api/marketplace/contractor/${contractor.user_id}/full`);
+      console.log('API response status:', response.status);
       if (response.ok) {
         const data = await response.json();
+        console.log('Setting selectedContractor:', data);
         setSelectedContractor(data);
       } else {
         // Fallback to basic data if full endpoint fails
+        console.log('API failed, using fallback data');
         setSelectedContractor(contractor);
       }
     } catch (error) {
