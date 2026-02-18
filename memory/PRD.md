@@ -148,20 +148,19 @@
 - ✅ Expense Creation: 100% (P0 Fixed Feb 18)
 - ✅ Invoice Creation: 100% (P0 Fixed Feb 18)
 - ✅ Text Visibility: 100% (P0 Fixed Feb 18)
+- ✅ Setup Progress Checklist Visibility: 100% (Fixed Feb 18)
+- ✅ Phase 2 Enhanced Expenses UI: 100% (Feb 18)
+- ✅ Quick Add Expense Global Button: 100% (Feb 18)
 
 ---
 
 ## Backlog
 
-### P1 - In Progress
-- [ ] Phase 2: Enhanced Expenses UI (Business/Personal toggle, Deductibility %, Payment Method)
-- [ ] Quick Add Expense global button
-
-### P2 - Invoice Hardening
+### P1 - Invoice Hardening
 - [ ] Automatic overdue status calculation
 - [ ] Global Receivables Report
 
-### P3 - Reports Enhancement
+### P2 - Reports Enhancement
 - [ ] Materials by Project report
 - [ ] PDF export for reports
 
