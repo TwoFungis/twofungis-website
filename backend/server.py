@@ -23,6 +23,9 @@ from routes.stripe import router as stripe_router
 # Import Marketplace routes
 from routes.marketplace import router as marketplace_router
 
+# Import Marketplace V2 routes
+from routes.marketplace_v2 import router as marketplace_v2_router
+
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env', override=False)
 
@@ -137,6 +140,9 @@ app.include_router(stripe_router)
 
 # Include Marketplace routes
 app.include_router(marketplace_router)
+
+# Include Marketplace V2 routes
+app.include_router(marketplace_v2_router)
 
 app.add_middleware(
     CORSMiddleware,
