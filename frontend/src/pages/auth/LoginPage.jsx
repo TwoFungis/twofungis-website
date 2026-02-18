@@ -66,14 +66,23 @@ const LoginPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-charcoal-900 flex items-center justify-center px-4">
-      <div className="max-w-md w-full">
+    <div className="min-h-screen bg-charcoal-900 flex items-center justify-center px-4 relative">
+      {/* Background Shield Watermark */}
+      <div 
+        className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-[0.03]"
+      >
+        <img src="/shield-icon.png" alt="" className="w-96 h-96 object-contain" />
+      </div>
+
+      <div className="max-w-md w-full relative z-10">
         <div className="flex justify-center mb-8">
-          <LogoLink size="lg" showText={false} />
+          <Link to="/">
+            <img src="/shield-icon.png" alt="TradeOS" className="h-20 w-auto" />
+          </Link>
         </div>
 
         <div className="bg-charcoal-800 rounded-2xl p-8 border border-charcoal-700" data-testid="login-form">
-          <h2 className="text-2xl font-bold text-white mb-2 text-center">Welcome Back</h2>
+          <h2 className="text-2xl font-bold text-white mb-2 text-center italic">Welcome Back</h2>
           <p className="text-gray-400 text-center mb-8">Sign in to your account</p>
 
           {error && (
