@@ -276,6 +276,15 @@ const ExpensesPage = () => {
           </table>
         )}
       </div>
+
+      {/* New Expense Modal */}
+      {showNewModal && (
+        <NewExpenseModal 
+          onClose={() => setShowNewModal(false)}
+          onSuccess={() => { setShowNewModal(false); fetchExpenses(); }}
+          user={user}
+        />
+      )}
     </div>
   );
 };
