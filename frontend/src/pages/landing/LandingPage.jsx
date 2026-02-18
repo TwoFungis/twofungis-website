@@ -216,11 +216,22 @@ const LandingPage = () => {
           className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-10"
           style={{ backgroundImage: `url(${IMAGES.features})` }}
         />
+        {/* Shield decoration */}
+        <div className="absolute top-10 left-10 opacity-5 pointer-events-none hidden lg:block">
+          <img src="/shield-icon.png" alt="" className="w-32 h-32" />
+        </div>
+        <div className="absolute bottom-10 right-10 opacity-5 pointer-events-none hidden lg:block">
+          <img src="/shield-icon.png" alt="" className="w-32 h-32" />
+        </div>
         <div className="relative max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-              Control. Clarity. Execution.
-            </h2>
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <img src="/shield-icon.png" alt="" className="w-10 h-10 opacity-50" />
+              <h2 className="text-3xl sm:text-4xl font-bold text-white">
+                Control. Clarity. Execution.
+              </h2>
+              <img src="/shield-icon.png" alt="" className="w-10 h-10 opacity-50" />
+            </div>
             <p className="text-gray-400 max-w-2xl mx-auto">
               Every feature built to protect your margin and keep your projects on track.
             </p>
