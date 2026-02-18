@@ -11,51 +11,76 @@
 
 ## What's Been Implemented (Feb 18, 2026)
 
-### ✅ Beta Trial Strategy (NEW - Completed)
-| Feature | Status |
-|---------|--------|
-| **30-Day Free Trial** | ✅ Trial duration extended to 30 days |
-| **Setup Progress Checklist** | ✅ 6-item checklist on dashboard top |
-| **Trial Countdown Badge** | ✅ Shows in header (e.g., "6 days left") |
-| **Reminder Modals** | ✅ Auto-show at 7, 3, 1, 0 days |
-| **Trial Expired Modal** | ✅ Shows after expiration with upgrade prompt |
-| **Labor Rate Setting** | ✅ New field in Settings page |
-| **Email Trigger System** | ✅ 7 branded emails at days 1,3,7,14,21,25,30 |
+### ✅ Light Cloud Grey Theme (NEW - Completed)
+- Changed dark backdrop to light cloud grey (#f4f6f8)
+- Cards are white with light borders
+- Dark charcoal sidebar retained for contrast
+- White header with subtle shadow
+- All text colors adjusted for readability
 
-**Setup Progress Checklist Items:**
-1. Create first project
-2. Set labor rate (NEW)
-3. Create first quote
-4. Add first expense
-5. Create first milestone
-6. Generate first invoice
+### ✅ Materials System - Phase 1 (NEW - Completed)
+**Materials Tab in Projects:**
+- Summary panel: Pre-Tax Total, Tax Total, Total w/ Tax, Billable, Non-Billable
+- Add Material form with all fields:
+  - Item Name, Category, Vendor
+  - Qty, Unit, Unit Cost
+  - Tax Type, Tax Amount
+  - Purchased Date, Paid Status
+  - Billable toggle, Markup %
+  - Notes
 
-**After Trial Expiration:**
-- Pro/Elite features locked
-- Upgrade modal shown
-- User data preserved
+**Material Categories:**
+- Materials, Consumables, Tools, Equipment, Rental, Delivery
 
-### ✅ Dashboard Restructure
-**3-Zone Layout:**
-| Zone | Components |
-|------|------------|
-| **Execution** | Active Projects, Upcoming Milestones, Pending Change Orders |
-| **Financial Control** | Total Contract Value, Forecast Profit, Outstanding Receivables, Overdue Invoices, Forecast Margin |
-| **Alerts** | Past Due Invoices, Trial Expiring, Low Margin Warning |
-| **This Month Summary** | Revenue, Expenses, Est. Tax Owing, Recommended Set-Aside |
+**Units:**
+- Each, Box, Sheet, Linear Ft, Sq Ft, Hours, Days, Gallon, Pound, Other
 
-### ✅ Project Page Restructure
-**Financial Health Panel:**
-- Original Contract, Approved COs Total, Total Revenue, Total Expenses, Total Labor, Forecast Gross Profit, Forecast Margin %
+**Backend API:**
+- `/api/materials` - CRUD operations
+- `/api/materials/project/{id}/summary` - Project summary
+- `/api/materials/categories/list` - Category/unit lists
 
-**Tabbed Interface:**
-- Overview, Milestones, Invoices, Change Orders, Expenses, Documents, Activity Log
+### ✅ Enhanced Expense Categories (NEW - Completed)
+**Contractor-Focused Categories:**
+| Category | Deductibility |
+|----------|---------------|
+| Materials (COGS) | 100% |
+| Consumables | 100% |
+| Tools (<$500) | 100% |
+| Equipment (Capital) | 100% |
+| Vehicle & Fuel | 100% |
+| Meals & Entertainment | **50%** |
+| Subcontractors | 100% |
+| Insurance | 100% |
+| Office/Admin | 100% |
+| Phone/Internet | 100% |
+| Travel/Lodging | 100% |
+| Training/Certifications | 100% |
+| Rent/Shop | 100% |
+| Other | 100% |
 
 ### ✅ Previous Implementations
-- Invoicing System (auto-numbering, status workflow, email notifications)
-- Milestone Management (CRUD, status workflow, edit lock)
-- Expenses API (CRUD, category tracking, tax summary)
-- Bug fixes (Expense modal, Document upload, Elite gate)
+- Beta Trial Strategy (30-day trial, setup checklist, countdown)
+- Dashboard 3-Zone Layout
+- Project Page Financial Health Panel
+- Invoicing System
+- Milestone Management
+- Expenses API
+
+---
+
+## Database Migration Required
+
+**Run in Supabase SQL Editor:**
+```
+/app/migrations/008_materials_and_expenses.sql
+```
+
+This creates:
+- `materials` table with all columns
+- RLS policies for security
+- Indexes for performance
+- Enhanced `expenses` columns (deductibility, business/personal)
 
 ---
 
@@ -71,71 +96,95 @@
 
 ## API Endpoints
 
-### Trial Emails API (NEW)
+### Materials API (NEW)
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/api/trial/status` | GET | Check email system status |
-| `/api/trial/send-email` | POST | Send trial email for specific trigger day |
-| `/api/trial/check-pending-emails` | GET | Check pending emails for user |
-| `/api/trial/process-pending-emails` | POST | Process and send pending emails |
-
-### Invoices API
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/invoices` | GET | List invoices with stats |
-| `/api/invoices` | POST | Create invoice |
-| `/api/invoices/{id}/send` | POST | Mark as sent + email |
-| `/api/invoices/{id}/mark-paid` | POST | Mark as paid |
+| `/api/materials` | GET | List materials with filters |
+| `/api/materials` | POST | Create material |
+| `/api/materials/{id}` | GET | Get material |
+| `/api/materials/{id}` | PATCH | Update material |
+| `/api/materials/{id}` | DELETE | Delete material |
+| `/api/materials/project/{id}/summary` | GET | Project materials summary |
+| `/api/materials/categories/list` | GET | Get valid categories/units |
 
 ### Other APIs
+- Invoices: `/api/invoices/*`
 - Milestones: `/api/milestones/*`
 - Expenses: `/api/expenses/*`
-- Stripe: `/api/stripe/*`
+- Trial: `/api/trial/*`
 
 ---
 
-## Testing Status
-- ✅ Setup Progress Checklist: 100%
-- ✅ Trial Countdown Badge: 100%
-- ✅ Labor Rate Setting: 100%
-- ✅ Trial Email API: 100%
-- ✅ Dashboard 3-Zone: 100%
-- ✅ Project Detail Page: 100%
+## Color System
+
+### Light Theme
+| Element | Color |
+|---------|-------|
+| Main Background | `cloud-100` (#f4f6f8) |
+| Cards/Header | `white` |
+| Card Borders | `cloud-300` (#dde2e8) |
+| Input Backgrounds | `cloud-100` |
+
+### Dark Accents
+| Element | Color |
+|---------|-------|
+| Sidebar | `charcoal-800` (#1a1a1a) |
+| Primary Text | `charcoal-800` (#1a1a1a) |
+| Secondary Text | `charcoal-500` |
+
+### Accent Colors
+| Color | Use |
+|-------|-----|
+| `steel-500` | Primary buttons, links |
+| `success` | Positive values, completed |
+| `warning` | Caution, pending |
+| `risk` | Errors, overdue |
 
 ---
 
 ## Backlog
 
-### P0 - Invoice Hardening (Next)
-- [ ] Automatic overdue status calculation based on due_date
-- [ ] Global Receivables Report page
+### Phase 2 - Enhanced Expenses (In Progress)
+- [x] Update expense categories for contractors
+- [ ] Add deductibility % field
+- [ ] Add business/personal toggle
+- [ ] Quick Add Expense from any page
 
-### P1 - Reporting Section
-- [ ] Reports page with: Profit by Project, Revenue by Month, Expense by Category
-- [ ] PDF/CSV export functionality
+### Phase 3 - Tax Summary & Reports
+- [ ] Tax Summary page (Monthly/Quarterly)
+- [ ] Revenue, Expenses, Deductible totals
+- [ ] Reports: Materials by Project, Expenses by Category
+- [ ] PDF/CSV export
 
-### P2 - UI Polish & Performance
-- [ ] Increase whitespace
-- [ ] Lazy loading for components
-- [ ] Mobile layout verification
+### P0 - Invoice Hardening
+- [ ] Automatic overdue calculation
+- [ ] Global Receivables Report
 
 ---
 
 ## Files Reference
 
-### Trial System
-- `/app/frontend/src/components/trial/SetupProgressChecklist.jsx`
-- `/app/frontend/src/components/trial/TrialCountdown.jsx`
-- `/app/frontend/src/components/trial/TrialExpiredModal.jsx`
-- `/app/backend/routes/trial_emails.py`
+### Theme/Layout
+- `/app/frontend/tailwind.config.js` - Cloud colors
+- `/app/frontend/src/components/layout/AppLayout.jsx` - Light header
+
+### Materials System
+- `/app/frontend/src/components/project/MaterialsTab.jsx`
+- `/app/backend/routes/materials.py`
+- `/app/migrations/008_materials_and_expenses.sql`
 
 ### Core Pages
 - `/app/frontend/src/pages/app/DashboardPage.jsx`
 - `/app/frontend/src/pages/app/ProjectDetailPage.jsx`
-- `/app/frontend/src/pages/app/SettingsPage.jsx`
+- `/app/frontend/src/pages/app/ExpensesPage.jsx`
 
-### Layout
-- `/app/frontend/src/components/layout/AppLayout.jsx`
+---
+
+## Testing Status
+- ✅ Light Theme: 100%
+- ✅ Materials Tab UI: 100%
+- ✅ Materials API: 100% (needs DB migration)
+- ✅ Enhanced Expense Categories: 100%
 
 ---
 
@@ -147,8 +196,6 @@
 ## Version History
 | Date | Version | Changes |
 |------|---------|---------|
-| Feb 18, 2026 | 2.4 | **Beta Trial Strategy**: 30-day trial, Setup Progress Checklist, Trial Countdown, Reminder Modals, Labor Rate setting, Email triggers |
-| Feb 18, 2026 | 2.3 | Dashboard 3-zone restructure, Project Page restructure with Financial Health Panel and tabs |
-| Feb 18, 2026 | 2.2 | Bug fixes (Expense modal, Document upload, Elite gate), Expenses API |
-| Feb 18, 2026 | 2.1 | Dashboard Financial Health Panel, Reports Page, Complete Settings Page |
-| Feb 18, 2026 | 2.0 | Strategic pivot, Invoicing & Milestones |
+| Feb 18, 2026 | 2.5 | **Light Cloud Grey Theme**, Materials System Phase 1, Enhanced Expense Categories |
+| Feb 18, 2026 | 2.4 | Beta Trial Strategy |
+| Feb 18, 2026 | 2.3 | Dashboard/Project restructure |
