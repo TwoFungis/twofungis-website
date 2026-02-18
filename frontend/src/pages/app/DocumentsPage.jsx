@@ -87,14 +87,17 @@ const DocumentsPage = () => {
 
   return (
     <div className="space-y-6" data-testid="documents-page">
-      {/* Header */}
+      {/* Header with Shield */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-charcoal-800 flex items-center gap-3">
-            <FolderOpen className="w-7 h-7 text-steel-400" />
-            Document Vault
-          </h1>
-          <p className="text-charcoal-500 text-sm mt-1">Securely store and organize project documents</p>
+        <div className="flex items-center gap-4">
+          <img src="/shield-icon.png" alt="" className="w-10 h-10 opacity-30 hidden lg:block" />
+          <div>
+            <h1 className="text-2xl font-bold text-charcoal-800 flex items-center gap-3">
+              <FolderOpen className="w-7 h-7 text-steel-500" />
+              Document Vault
+            </h1>
+            <p className="text-charcoal-600 text-sm mt-1">Securely store and organize project documents</p>
+          </div>
         </div>
         <div className="flex items-center gap-3">
           <button
