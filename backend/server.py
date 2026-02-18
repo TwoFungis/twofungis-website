@@ -26,6 +26,9 @@ from routes.invoices import router as invoices_router
 # Import Milestones routes
 from routes.milestones import router as milestones_router
 
+# Import Expenses routes
+from routes.expenses import router as expenses_router
+
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env', override=False)
 
@@ -143,6 +146,9 @@ app.include_router(invoices_router)
 
 # Include Milestones routes
 app.include_router(milestones_router)
+
+# Include Expenses routes
+app.include_router(expenses_router)
 
 app.add_middleware(
     CORSMiddleware,
