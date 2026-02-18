@@ -448,7 +448,7 @@ async def process_pending_emails(authorization: str = Header(None)):
             user_email = user_data.get('email')
             
             # Get pending emails
-            pending_response = await check_pending_emails(f"Bearer dummy")  # We already have user_id
+            pending_response = await check_pending_emails("Bearer dummy")  # We already have user_id
             pending = pending_response.get('pending_emails', [])
             user_name = pending_response.get('user_name', 'Builder')
             
