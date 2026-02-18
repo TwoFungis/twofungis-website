@@ -86,14 +86,17 @@ const ExpensesPage = () => {
 
   return (
     <div className="space-y-6" data-testid="expenses-page">
-      {/* Header */}
+      {/* Header with Shield */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-charcoal-800 flex items-center gap-3">
-            <Wallet className="w-7 h-7 text-steel-400" />
-            Expenses
-          </h1>
-          <p className="text-charcoal-500 text-sm mt-1">Track expenses and manage tax-ready bookkeeping</p>
+        <div className="flex items-center gap-4">
+          <img src="/shield-icon.png" alt="" className="w-10 h-10 opacity-30 hidden lg:block" />
+          <div>
+            <h1 className="text-2xl font-bold text-charcoal-800 flex items-center gap-3">
+              <Wallet className="w-7 h-7 text-steel-500" />
+              Expenses
+            </h1>
+            <p className="text-charcoal-600 text-sm mt-1">Track expenses and manage tax-ready bookkeeping</p>
+          </div>
         </div>
         <div className="flex items-center gap-3">
           <button
