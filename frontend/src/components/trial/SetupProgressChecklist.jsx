@@ -148,12 +148,12 @@ const SetupProgressChecklist = () => {
 
   return (
     <div 
-      className="bg-charcoal-600 rounded-xl border border-charcoal-500 overflow-hidden"
+      className="bg-cloud-100 rounded-xl border border-cloud-300 overflow-hidden"
       data-testid="setup-progress-checklist"
     >
       {/* Header */}
       <div 
-        className="p-4 flex items-center justify-between cursor-pointer hover:bg-charcoal-500/50 transition-colors"
+        className="p-4 flex items-center justify-between cursor-pointer hover:bg-cloud-200 transition-colors"
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <div className="flex items-center gap-3">
@@ -161,7 +161,7 @@ const SetupProgressChecklist = () => {
             <Sparkles className="w-5 h-5 text-steel-400" />
           </div>
           <div>
-            <h3 className="font-semibold text-white flex items-center gap-2">
+            <h3 className="font-semibold text-charcoal-800 flex items-center gap-2">
               Setup Progress
               {isComplete && (
                 <span className="text-xs bg-success/20 text-success px-2 py-0.5 rounded-full">
@@ -169,7 +169,7 @@ const SetupProgressChecklist = () => {
                 </span>
               )}
             </h3>
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-charcoal-500">
               {completedCount} of {totalCount} tasks completed
             </p>
           </div>
@@ -199,22 +199,22 @@ const SetupProgressChecklist = () => {
                 className={isComplete ? 'text-success' : 'text-steel-400'}
               />
             </svg>
-            <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white">
+            <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-charcoal-800">
               {progressPercent}%
             </span>
           </div>
           
           {isExpanded ? (
-            <ChevronUp className="w-5 h-5 text-gray-400" />
+            <ChevronUp className="w-5 h-5 text-charcoal-500" />
           ) : (
-            <ChevronDown className="w-5 h-5 text-gray-400" />
+            <ChevronDown className="w-5 h-5 text-charcoal-500" />
           )}
         </div>
       </div>
 
       {/* Expanded Content */}
       {isExpanded && (
-        <div className="px-4 pb-4 border-t border-charcoal-500">
+        <div className="px-4 pb-4 border-t border-cloud-300">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-4">
             {CHECKLIST_ITEMS.map((item) => {
               const isCompleted = progress[item.checkField];
@@ -227,26 +227,26 @@ const SetupProgressChecklist = () => {
                   className={`flex items-center gap-3 p-3 rounded-lg transition-all ${
                     isCompleted 
                       ? 'bg-success/10 border border-success/20' 
-                      : 'bg-charcoal-700 border border-charcoal-500 hover:border-steel-500/50 hover:bg-charcoal-600'
+                      : 'bg-cloud-200 border border-cloud-300 hover:border-steel-500/50 hover:bg-cloud-100'
                   }`}
                   data-testid={`setup-item-${item.id}`}
                 >
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                    isCompleted ? 'bg-success/20' : 'bg-charcoal-600'
+                    isCompleted ? 'bg-success/20' : 'bg-cloud-100'
                   }`}>
                     {isCompleted ? (
                       <CheckCircle2 className="w-5 h-5 text-success" />
                     ) : (
-                      <Icon className="w-4 h-4 text-gray-400" />
+                      <Icon className="w-4 h-4 text-charcoal-500" />
                     )}
                   </div>
                   <div className="min-w-0">
                     <p className={`text-sm font-medium truncate ${
-                      isCompleted ? 'text-success line-through' : 'text-white'
+                      isCompleted ? 'text-success line-through' : 'text-charcoal-800'
                     }`}>
                       {item.label}
                     </p>
-                    <p className="text-xs text-gray-500 truncate">{item.description}</p>
+                    <p className="text-xs text-charcoal-400 truncate">{item.description}</p>
                   </div>
                 </Link>
               );
@@ -261,7 +261,7 @@ const SetupProgressChecklist = () => {
                   e.stopPropagation();
                   handleDismiss();
                 }}
-                className="text-sm text-gray-400 hover:text-white transition-colors"
+                className="text-sm text-charcoal-500 hover:text-charcoal-800 transition-colors"
               >
                 Dismiss checklist
               </button>
