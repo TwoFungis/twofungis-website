@@ -67,7 +67,12 @@ const AppLayout = () => {
       {/* Desktop Sidebar */}
       <aside className="hidden lg:flex flex-col w-64 bg-charcoal-800 border-r border-charcoal-700" data-testid="desktop-sidebar">
         <div className="p-5 border-b border-charcoal-700">
-          <Logo size="lg" showText={true} />
+          <Link to="/app" className="flex items-center gap-3">
+            <img src="/shield-icon.png" alt="TradeOS" className="h-12 w-auto" />
+            <span className="text-xl font-bold text-white tracking-tight">
+              TRADEOS<span className="text-steel-400 align-super text-xs">™</span>
+            </span>
+          </Link>
         </div>
 
         <nav className="flex-1 p-4 space-y-1">
