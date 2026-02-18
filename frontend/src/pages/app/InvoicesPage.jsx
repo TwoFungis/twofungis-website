@@ -4,6 +4,7 @@ import {
   Eye, Download, MoreVertical, DollarSign, Building2, X, Trash2, Calendar
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
+import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
