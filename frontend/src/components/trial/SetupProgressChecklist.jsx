@@ -148,7 +148,7 @@ const SetupProgressChecklist = () => {
 
   return (
     <div 
-      className="bg-gradient-to-r from-slate-400/20 to-slate-300/10 rounded-xl border border-slate-400/40 overflow-hidden"
+      className="bg-charcoal-600 rounded-xl border border-charcoal-500 overflow-hidden"
       data-testid="setup-progress-checklist"
     >
       {/* Header */}
