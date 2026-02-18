@@ -145,21 +145,25 @@
 - ✅ Materials Tab: 100%
 - ✅ Tax Summary Page: 100%
 - ✅ Enhanced Expenses API: 100%
+- ✅ Expense Creation: 100% (P0 Fixed Feb 18)
+- ✅ Invoice Creation: 100% (P0 Fixed Feb 18)
+- ✅ Text Visibility: 100% (P0 Fixed Feb 18)
 
 ---
 
 ## Backlog
 
-### P0 - Invoice Hardening (Next)
+### P1 - In Progress
+- [ ] Phase 2: Enhanced Expenses UI (Business/Personal toggle, Deductibility %, Payment Method)
+- [ ] Quick Add Expense global button
+
+### P2 - Invoice Hardening
 - [ ] Automatic overdue status calculation
 - [ ] Global Receivables Report
 
-### P1 - Reports Enhancement
+### P3 - Reports Enhancement
 - [ ] Materials by Project report
 - [ ] PDF export for reports
-
-### P2 - Quick Add Expense
-- [ ] Global "Quick Add Expense" button
 
 ---
 
