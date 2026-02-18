@@ -622,4 +622,141 @@ const NewExpenseModal = ({ onClose, onSuccess }) => {
   );
 };
 
+// Edit Expense Modal Component
+const EditExpenseModal = ({ expense, onClose, onSuccess }) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    description: expense.description || '',
+    category: expense.category || 'Materials',
+    amount: expense.amount?.toString() || '',
+    project_name: expense.project_name || '',
+    expense_date: expense.date ? new Date(expense.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+    vendor: expense.vendor || '',
+    notes: expense.notes || '',
+    business_personal: expense.business_personal || 'Business',
+    deductibility_pct: expense.deductibility_pct || 100,
+    payment_method: expense.payment_method || 'Cash'
+  });
+
+  const getAuthHeaders = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    return {
+      'Authorization': `Bearer ${session?.access_token}`,
+      'Content-Type': 'application/json'
+    };
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.description || !formData.amount) {
+      toast.error('Please fill in required fields');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const headers = await getAuthHeaders();
+      const response = await fetch(`${API_URL}/api/expenses/${expense.id}`, {
+        method: 'PATCH',
+        headers,
+        body: JSON.stringify({
+          ...formData,
+          amount: parseFloat(formData.amount),
+          deductibility_pct: formData.business_personal === 'Personal' ? 0 : formData.deductibility_pct
+        })
+      });
+
+      if (response.ok) {
+        toast.success('Expense updated');
+        onSuccess();
+      } else {
+        toast.error('Failed to update expense');
+      }
+    } catch (error) {
+      console.error('Error updating expense:', error);
+      toast.error('Failed to update expense');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+        <div className="p-6 border-b border-charcoal-700 flex items-center justify-between sticky top-0 bg-charcoal-800">
+          <h2 className="text-xl font-bold text-white">Edit Expense</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-white">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-400 mb-1">Description *</label>
+            <input
+              type="text"
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-4 py-2 text-white"
+              placeholder="What was this expense for?"
+            />
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-1">Amount *</label>
+              <input
+                type="number"
+                step="0.01"
+                value={formData.amount}
+                onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-4 py-2 text-white"
+                placeholder="0.00"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-1">Category</label>
+              <select
+                value={formData.category}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-4 py-2 text-white"
+              >
+                {Object.entries(CATEGORIES).map(([key, val]) => (
+                  <option key={key} value={key}>{val.label}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-400 mb-1">Date</label>
+            <input
+              type="date"
+              value={formData.expense_date}
+              onChange={(e) => setFormData({ ...formData, expense_date: e.target.value })}
+              className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-4 py-2 text-white"
+            />
+          </div>
+
+          <div className="flex justify-end gap-3 pt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 text-gray-400 hover:text-white"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="bg-steel-500 hover:bg-steel-600 text-white px-6 py-2 rounded-lg font-medium disabled:opacity-50"
+            >
+              {isSubmitting ? 'Saving...' : 'Save Changes'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
 export default ExpensesPage;
