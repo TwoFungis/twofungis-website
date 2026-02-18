@@ -272,7 +272,7 @@ const DashboardPage = () => {
       {/* Outstanding Payments Widget + Active Projects */}
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Outstanding Payments - Aging Breakdown */}
-        <div className="bg-charcoal-800 rounded-xl border border-charcoal-700" data-testid="outstanding-payments-widget">
+        <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 card-glow animate-fade-in-up animation-delay-200" data-testid="outstanding-payments-widget">
           <div className="p-4 lg:p-5 border-b border-charcoal-700 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <CalendarClock className="w-5 h-5 text-steel-400" />
@@ -289,7 +289,7 @@ const DashboardPage = () => {
             ) : (
               <div className="space-y-3">
                 {/* 0-30 days */}
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between hover-lift p-2 rounded-lg transition-all">
                   <div className="flex items-center gap-3">
                     <div className="w-2 h-8 rounded-full bg-success" />
                     <div>
@@ -300,7 +300,7 @@ const DashboardPage = () => {
                   <p className="text-lg font-semibold text-success">{formatCurrency(aging0to30)}</p>
                 </div>
                 {/* 31-60 days */}
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between hover-lift p-2 rounded-lg transition-all">
                   <div className="flex items-center gap-3">
                     <div className="w-2 h-8 rounded-full bg-warning" />
                     <div>
@@ -311,7 +311,7 @@ const DashboardPage = () => {
                   <p className="text-lg font-semibold text-warning">{formatCurrency(aging31to60)}</p>
                 </div>
                 {/* 60+ days */}
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between hover-lift p-2 rounded-lg transition-all">
                   <div className="flex items-center gap-3">
                     <div className="w-2 h-8 rounded-full bg-risk" />
                     <div>
@@ -326,15 +326,15 @@ const DashboardPage = () => {
                   {totalReceivables > 0 && (
                     <>
                       <div 
-                        className="h-full bg-success" 
+                        className="h-full bg-success animate-progress-grow" 
                         style={{ width: `${(aging0to30 / totalReceivables) * 100}%` }}
                       />
                       <div 
-                        className="h-full bg-warning" 
+                        className="h-full bg-warning animate-progress-grow animation-delay-200" 
                         style={{ width: `${(aging31to60 / totalReceivables) * 100}%` }}
                       />
                       <div 
-                        className="h-full bg-risk" 
+                        className="h-full bg-risk animate-progress-grow animation-delay-300" 
                         style={{ width: `${(aging60plus / totalReceivables) * 100}%` }}
                       />
                     </>
@@ -346,10 +346,10 @@ const DashboardPage = () => {
         </div>
 
         {/* Active Projects */}
-        <div className="bg-charcoal-800 rounded-xl border border-charcoal-700">
+        <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 card-glow animate-fade-in-up animation-delay-300">
           <div className="p-4 lg:p-5 border-b border-charcoal-700 flex items-center justify-between">
             <h2 className="text-base font-semibold text-white">Active Projects</h2>
-            <Link to="/app/projects" className="text-steel-400 text-sm hover:text-steel-300">View all</Link>
+            <Link to="/app/projects" className="text-steel-400 text-sm hover:text-steel-300 transition-colors">View all</Link>
           </div>
           {projects.length === 0 ? (
             <div className="p-8 text-center">
