@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { 
   User, CreditCard, Bell, Shield, Check, Loader2, Crown, FileText, Save, X, 
-  Clock, Edit2, Eye, EyeOff, AlertTriangle, Trash2
+  Clock, Edit2, Eye, EyeOff, AlertTriangle, Trash2, DollarSign
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { supabase } from '../../lib/supabase';
