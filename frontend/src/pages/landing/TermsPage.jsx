@@ -54,7 +54,7 @@ const TermsPage = () => {
               <li><strong>Pro Plan:</strong> $39/month - Core features for managing projects</li>
               <li><strong>Elite Plan:</strong> $59/month - Advanced reporting and priority support</li>
             </ul>
-            <p className="mt-4">All plans include a 7-day free trial. Subscriptions auto-renew monthly unless cancelled. You may cancel at any time from your account settings.</p>
+            <p className="mt-4">All plans include a 30-day free trial. Subscriptions auto-renew monthly unless cancelled. You may cancel at any time from your account settings.</p>
           </section>
 
           <section>

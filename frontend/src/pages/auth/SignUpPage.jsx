@@ -90,7 +90,7 @@ const SignUpPage = () => {
 
         <div className="bg-charcoal-800 rounded-2xl p-8 border border-charcoal-700" data-testid="signup-form">
           <h2 className="text-2xl font-bold text-white mb-2 text-center">Start Your Free Trial</h2>
-          <p className="text-gray-400 text-center mb-2">7 days free, no credit card required</p>
+          <p className="text-gray-400 text-center mb-2">30 days free, no credit card required</p>
           <p className="text-steel-400 text-center text-sm mb-8 capitalize">
             Selected Plan: <strong>{selectedPlan}</strong>
           </p>
