@@ -35,14 +35,14 @@ const TrialExpiredModal = () => {
 
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl border border-cloud-300 w-full max-w-lg overflow-hidden">
+      <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 w-full max-w-lg overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-risk/20 via-warning/10 to-risk/20 p-6 text-center">
           <div className="w-16 h-16 bg-warning/20 rounded-full flex items-center justify-center mx-auto mb-4">
             <Lock className="w-8 h-8 text-warning" />
           </div>
-          <h2 className="text-2xl font-bold text-charcoal-800 mb-2">Your Trial Has Ended</h2>
-          <p className="text-charcoal-500">
+          <h2 className="text-2xl font-bold text-white mb-2">Your Trial Has Ended</h2>
+          <p className="text-gray-400">
             Your 30-day free trial has expired. Upgrade to continue using TradeOS.
           </p>
         </div>
@@ -54,8 +54,8 @@ const TrialExpiredModal = () => {
             <div className="flex items-start gap-3">
               <Check className="w-5 h-5 text-success flex-shrink-0 mt-0.5" />
               <div>
-                <p className="text-charcoal-800 font-medium">Your data is safe!</p>
-                <p className="text-sm text-charcoal-500">
+                <p className="text-white font-medium">Your data is safe!</p>
+                <p className="text-sm text-gray-400">
                   All your projects, invoices, and expenses are preserved. They'll be waiting for you when you upgrade.
                 </p>
               </div>
@@ -64,7 +64,7 @@ const TrialExpiredModal = () => {
 
           {/* What's locked */}
           <div className="mb-6">
-            <h3 className="text-sm font-medium text-charcoal-500 uppercase tracking-wide mb-3">
+            <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wide mb-3">
               Upgrade to unlock:
             </h3>
             <div className="grid grid-cols-2 gap-2">
@@ -87,21 +87,21 @@ const TrialExpiredModal = () => {
           {/* Plans */}
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div className="border border-charcoal-600 rounded-lg p-4">
-              <h4 className="font-bold text-charcoal-800 mb-1">Pro</h4>
+              <h4 className="font-bold text-white mb-1">Pro</h4>
               <p className="text-2xl font-bold text-steel-400 mb-2">
-                $49<span className="text-sm text-charcoal-400">/mo</span>
+                $49<span className="text-sm text-gray-500">/mo</span>
               </p>
-              <p className="text-xs text-charcoal-400">Perfect for growing trades</p>
+              <p className="text-xs text-gray-500">Perfect for growing trades</p>
             </div>
             <div className="border border-purple-500/50 rounded-lg p-4 bg-purple-500/5">
               <div className="flex items-center gap-1 mb-1">
-                <h4 className="font-bold text-charcoal-800">Elite</h4>
+                <h4 className="font-bold text-white">Elite</h4>
                 <Crown className="w-4 h-4 text-warning" />
               </div>
               <p className="text-2xl font-bold text-purple-400 mb-2">
-                $99<span className="text-sm text-charcoal-400">/mo</span>
+                $99<span className="text-sm text-gray-500">/mo</span>
               </p>
-              <p className="text-xs text-charcoal-400">For serious operations</p>
+              <p className="text-xs text-gray-500">For serious operations</p>
             </div>
           </div>
 
@@ -109,14 +109,14 @@ const TrialExpiredModal = () => {
           <div className="flex gap-3">
             <button
               onClick={handleDismiss}
-              className="flex-1 px-4 py-3 text-charcoal-500 hover:text-charcoal-800 border border-charcoal-600 rounded-lg transition-colors"
+              className="flex-1 px-4 py-3 text-gray-400 hover:text-white border border-charcoal-600 rounded-lg transition-colors"
             >
               View limited access
             </button>
             <Link
               to="/app/settings"
               onClick={handleDismiss}
-              className="flex-1 bg-steel-500 hover:bg-steel-600 text-charcoal-800 px-4 py-3 rounded-lg font-medium text-center transition-colors"
+              className="flex-1 bg-steel-500 hover:bg-steel-600 text-white px-4 py-3 rounded-lg font-medium text-center transition-colors"
             >
               Upgrade Now
             </Link>

@@ -82,7 +82,7 @@ const TrialCountdown = () => {
       {/* Reminder Modal */}
       {showReminderModal && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl border border-cloud-300 w-full max-w-md overflow-hidden">
+          <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 w-full max-w-md overflow-hidden">
             {/* Header */}
             <div className={`p-6 ${
               daysRemaining <= 1 
@@ -103,7 +103,7 @@ const TrialCountdown = () => {
                     )}
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold text-charcoal-800">
+                    <h3 className="text-lg font-bold text-white">
                       {daysRemaining === 0 
                         ? 'Your trial ends today!'
                         : daysRemaining === 1 
@@ -111,7 +111,7 @@ const TrialCountdown = () => {
                           : `${daysRemaining} days left in your trial`
                       }
                     </h3>
-                    <p className="text-sm text-charcoal-500">
+                    <p className="text-sm text-gray-400">
                       {daysRemaining <= 3 
                         ? "Don't lose access to your data"
                         : "Unlock all features with a subscription"
@@ -121,7 +121,7 @@ const TrialCountdown = () => {
                 </div>
                 <button
                   onClick={dismissReminder}
-                  className="text-charcoal-500 hover:text-charcoal-800 p-1"
+                  className="text-gray-400 hover:text-white p-1"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -135,7 +135,7 @@ const TrialCountdown = () => {
                   <p className="text-gray-300">
                     Your 30-day trial is ending today. Upgrade now to keep access to:
                   </p>
-                  <ul className="space-y-2 text-sm text-charcoal-500">
+                  <ul className="space-y-2 text-sm text-gray-400">
                     <li className="flex items-center gap-2">
                       <Zap className="w-4 h-4 text-steel-400" /> All your projects and data
                     </li>
@@ -152,9 +152,9 @@ const TrialCountdown = () => {
                   <p className="text-gray-300">
                     Time is running out! Upgrade to Pro or Elite to continue using TradeOS without interruption.
                   </p>
-                  <div className="bg-cloud-200/50 rounded-lg p-4">
-                    <p className="text-sm text-charcoal-500">
-                      <span className="text-charcoal-800 font-medium">Your data is safe.</span> Even after the trial, your projects and records are preserved. You can access them anytime by upgrading.
+                  <div className="bg-charcoal-700/50 rounded-lg p-4">
+                    <p className="text-sm text-gray-400">
+                      <span className="text-white font-medium">Your data is safe.</span> Even after the trial, your projects and records are preserved. You can access them anytime by upgrading.
                     </p>
                   </div>
                 </div>
@@ -164,13 +164,13 @@ const TrialCountdown = () => {
                     You're making great progress! Consider upgrading to unlock advanced features and support your growing business.
                   </p>
                   <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-cloud-200/50 rounded-lg p-3 text-center">
+                    <div className="bg-charcoal-700/50 rounded-lg p-3 text-center">
                       <Crown className="w-5 h-5 text-purple-400 mx-auto mb-1" />
-                      <p className="text-xs text-charcoal-500">Elite Reports</p>
+                      <p className="text-xs text-gray-400">Elite Reports</p>
                     </div>
-                    <div className="bg-cloud-200/50 rounded-lg p-3 text-center">
+                    <div className="bg-charcoal-700/50 rounded-lg p-3 text-center">
                       <Zap className="w-5 h-5 text-steel-400 mx-auto mb-1" />
-                      <p className="text-xs text-charcoal-500">Unlimited Projects</p>
+                      <p className="text-xs text-gray-400">Unlimited Projects</p>
                     </div>
                   </div>
                 </div>
@@ -180,7 +180,7 @@ const TrialCountdown = () => {
               <div className="flex gap-3 mt-6">
                 <button
                   onClick={dismissReminder}
-                  className="flex-1 px-4 py-2 text-charcoal-500 hover:text-charcoal-800 border border-charcoal-600 rounded-lg transition-colors"
+                  className="flex-1 px-4 py-2 text-gray-400 hover:text-white border border-charcoal-600 rounded-lg transition-colors"
                 >
                   Remind me later
                 </button>
@@ -190,7 +190,7 @@ const TrialCountdown = () => {
                   className={`flex-1 px-4 py-2 rounded-lg font-medium text-center transition-colors ${
                     daysRemaining <= 3 
                       ? 'bg-warning hover:bg-warning/90 text-charcoal-900'
-                      : 'bg-steel-500 hover:bg-steel-600 text-charcoal-800'
+                      : 'bg-steel-500 hover:bg-steel-600 text-white'
                   }`}
                 >
                   Upgrade Now
