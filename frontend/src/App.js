@@ -9,8 +9,6 @@ import TermsPage from './pages/landing/TermsPage';
 
 // Public Pages
 import ClientReviewPage from './pages/public/ClientReviewPage';
-import PublicContractorProfile from './pages/public/PublicContractorProfile';
-import ContractorsPage from './pages/public/ContractorsPage';
 
 // Auth Pages
 import LoginPage from './pages/auth/LoginPage';
@@ -22,19 +20,19 @@ import DashboardPage from './pages/app/DashboardPage';
 import ProjectsPage from './pages/app/ProjectsPage';
 import ProjectDetailPage from './pages/app/ProjectDetailPage';
 import EstimatingPage from './pages/app/EstimatingPage';
-import LaborPage from './pages/app/LaborPage';
 import ChangeOrdersPage from './pages/app/ChangeOrdersPage';
-import ProductionPage from './pages/app/ProductionPage';
 import ReportsPage from './pages/app/ReportsPage';
 import SettingsPage from './pages/app/SettingsPage';
 import ProfilePage from './pages/app/ProfilePage';
-import BookkeepingPage from './pages/app/BookkeepingPage';
-import VerificationPage from './pages/app/VerificationPage';
+import MilestonesPage from './pages/app/MilestonesPage';
+import InvoicesPage from './pages/app/InvoicesPage';
+import ExpensesPage from './pages/app/ExpensesPage';
+import DocumentsPage from './pages/app/DocumentsPage';
 
 // Layout
 import AppLayout from './components/layout/AppLayout';
 
-const ProtectedRoute = ({ children, eliteOnly = false }) => {
+const ProtectedRoute = ({ children }) => {
   const { user, profile, loading, initialized } = useAuthStore();
 
   if (!initialized || loading) {
@@ -53,10 +51,6 @@ const ProtectedRoute = ({ children, eliteOnly = false }) => {
     return <Navigate to="/onboarding" replace />;
   }
 
-  if (eliteOnly && profile?.subscription_tier !== 'elite') {
-    return <Navigate to="/app/dashboard" replace />;
-  }
-
   return <>{children}</>;
 };
 
@@ -65,7 +59,6 @@ function App() {
   const initRef = useRef(false);
 
   useEffect(() => {
-    // Prevent double initialization in React StrictMode
     if (!initRef.current && !initialized) {
       initRef.current = true;
       initialize();
@@ -79,16 +72,14 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/terms" element={<TermsPage />} />
-        <Route path="/contractors" element={<ContractorsPage />} />
         <Route path="/client/review/:token" element={<ClientReviewPage />} />
-        <Route path="/contractor/:contractorId" element={<PublicContractorProfile />} />
         
         {/* Auth Routes */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/onboarding" element={<OnboardingPage />} />
         
-        {/* App Routes */}
+        {/* App Routes - Core Business Functions */}
         <Route path="/app" element={
           <ProtectedRoute>
             <AppLayout />
@@ -100,21 +91,17 @@ function App() {
           <Route path="projects/:id" element={<ProjectDetailPage />} />
           <Route path="estimating" element={<EstimatingPage />} />
           <Route path="estimating/:id" element={<EstimatingPage />} />
-          <Route path="labor" element={<LaborPage />} />
           <Route path="change-orders" element={<ChangeOrdersPage />} />
-          <Route path="production" element={<ProductionPage />} />
-          <Route path="reports" element={
-            <ProtectedRoute eliteOnly>
-              <ReportsPage />
-            </ProtectedRoute>
-          } />
+          <Route path="milestones" element={<MilestonesPage />} />
+          <Route path="invoices" element={<InvoicesPage />} />
+          <Route path="expenses" element={<ExpensesPage />} />
+          <Route path="documents" element={<DocumentsPage />} />
+          <Route path="reports" element={<ReportsPage />} />
           <Route path="settings" element={<SettingsPage />} />
           <Route path="profile" element={<ProfilePage />} />
-          <Route path="bookkeeping" element={<BookkeepingPage />} />
-          <Route path="verification" element={<VerificationPage />} />
         </Route>
 
-        {/* Catch all */}
+        {/* Catch all - redirect to home */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
