@@ -162,11 +162,11 @@ const ProjectsPage = () => {
     <div className="space-y-6" data-testid="projects-page">
       {/* Header with Shield */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <img src="/shield-icon.png" alt="" className="w-10 h-10 opacity-30 hidden lg:block" />
           <div>
-            <h1 className="text-2xl lg:text-3xl font-bold text-charcoal-800">Projects</h1>
-            <p className="text-charcoal-600">Manage and track all your active projects</p>
+            <h1 className="text-2xl lg:text-3xl font-bold text-white">Projects</h1>
+            <p className="text-gray-400">Manage and track all your active projects</p>
           </div>
         </div>
         <button
