@@ -3,136 +3,107 @@
 ## Product Overview
 **Name:** TradeOS™  
 **Tagline:** Built for Builders  
+**Headline:** Know your margin. Control your projects. Get paid faster.  
 **Type:** SaaS Web Application - Contractor Operating System  
 **Target Audience:** Trades, Subcontractors, Small GCs
 
 ---
 
-## What's Been Implemented (February 18, 2026)
+## Strategic Direction (Updated February 18, 2026)
+TradeOS has pivoted from a marketplace-hybrid model to a **focused Contractor Operating System** centered on:
+- **Financial Control** - Margin tracking, receivables, expense management
+- **Project Management** - Milestones, change orders, project timelines
+- **Profitability** - Invoice discipline, payment tracking, tax-ready bookkeeping
 
-### ✅ Stripe Integration & Founding Lifetime Plan (NEW - Feb 18, 2026)
-
-#### Subscription Plans
-| Plan | Price | Mode | Features |
-|------|-------|------|----------|
-| **PRO** | $39 CAD/mo | Subscription | Unlimited Projects, Quote Builder, Change Orders, Labor Engine, Production Logs |
-| **ELITE** | $59 CAD/mo | Subscription | Everything in Pro + Advanced Reports, KPI Dashboard, Analytics, Priority Support |
-| **LIFETIME_ELITE** | $599 CAD | One-time Payment | All Elite features forever, Founding Member badge, No monthly fees |
-
-#### Key Implementation Details
-- **Stripe Price IDs configured:**
-  - PRO: `price_1T20NRAVLnc1BWBltTCl65We`
-  - ELITE: `price_1T20OQAVLnc1BWBlxXBFkTWx`
-  - LIFETIME: `price_1T20WNAVLnc1BWBl0gKPyqOd`
-
-- **Lifetime Plan Restrictions:**
-  - Canada-only (region_lock = 'CA')
-  - Limited to 100 founding seats
-  - Billing address verification at Stripe checkout
-  - Server-side country validation before checkout creation
-
-- **Backend Endpoints:**
-  - `GET /api/stripe/plans` - Returns all plans with pricing and lifetime status
-  - `GET /api/stripe/lifetime-seats` - Returns seat availability
-  - `POST /api/stripe/create-checkout-session` - Creates Stripe checkout session
-  - `POST /api/stripe/create-portal-session` - Opens billing portal (not for lifetime)
-  - `POST /api/stripe/webhook` - Handles Stripe events
-
-- **Webhook Events Handled:**
-  - `checkout.session.completed` - Activates subscription/lifetime
-  - `invoice.payment_failed` - Sets plan_status to past_due
-  - `customer.subscription.deleted` - Downgrades to TRIAL
-  - `customer.subscription.updated` - Updates plan status
-  - **Critical:** LIFETIME_ELITE users are protected from subscription events
-
-- **Frontend Settings Page:**
-  - 3-column plan card layout
-  - Live seat counter from API
-  - Country detection from user profile region
-  - Lifetime explanation modal with full details
-  - Error handling for checkout failures
+**Removed:** All public marketplace functionality (contractor directory, job postings, service listings)
 
 ---
 
-### ✅ Full Testing Complete - All Features Verified
-**Testing Agent Results:** 100% Pass Rate (Backend: 23/23, Frontend: All features verified)
+## What's Been Implemented
 
----
+### ✅ Strategic Pivot - Phase 1 Complete (Feb 18, 2026)
+- Marketplace functionality removed from navigation and UI
+- New landing page with updated branding and messaging
+- Simplified navigation focusing on core business functions
 
-### ✅ PHASE: Margin & Invoice Discipline Hardening (COMPLETE)
+### ✅ Invoicing System (NEW - Feb 18, 2026)
+| Feature | Status |
+|---------|--------|
+| Invoice creation with line items | ✅ Complete |
+| Auto-incrementing invoice numbers | ✅ Complete |
+| Status workflow (Draft → Sent → Paid) | ✅ Complete |
+| Receivables dashboard widget | ✅ Complete |
+| Invoice detail view | ✅ Complete |
+| Mark as paid functionality | ✅ Complete |
 
-#### 1. Dashboard Financial Pulse
-- **Quick Stats Bar** - Receivables, This Month, Pending COs, Overdue (60+)
-- **Outstanding Payments Widget** - Aging breakdown with visual progress bar
-- **Staggered entrance animations** for polished UX
-- **Hover effects** on cards (lift + glow)
+**Backend Endpoints:**
+- `GET /api/invoices` - List all invoices with stats
+- `POST /api/invoices` - Create new invoice
+- `GET /api/invoices/{id}` - Get invoice details
+- `PATCH /api/invoices/{id}` - Update draft invoice
+- `POST /api/invoices/{id}/send` - Mark as sent
+- `POST /api/invoices/{id}/mark-paid` - Mark as paid
+- `DELETE /api/invoices/{id}` - Delete draft invoice
+- `GET /api/invoices/stats/receivables` - Aging report
 
-#### 2. Project Financial Health Panel
-- Contract Value, Approved COs, Total Revenue, Cost to Date
-- Gross Profit calculation with health indicator
-- Margin % with status (Excellent/On Target/Below/At Risk)
+### ✅ Milestone Management (NEW - Feb 18, 2026)
+| Feature | Status |
+|---------|--------|
+| Milestone CRUD operations | ✅ Complete |
+| Status workflow (Draft → Submitted → Approved → Invoiced → Paid) | ✅ Complete |
+| Edit lock after invoicing | ✅ Complete |
+| Invoice generation from milestones | ✅ Complete |
+| Milestone statistics | ✅ Complete |
 
-#### 3. Change Order Margin Impact
-- Each CO displays calculated margin % and profit
-- Color-coded badges: green (≥15%), yellow (≥0%), red (<0%)
+**Backend Endpoints:**
+- `GET /api/milestones` - List all milestones with stats
+- `POST /api/milestones` - Create new milestone
+- `GET /api/milestones/{id}` - Get milestone details
+- `PATCH /api/milestones/{id}` - Update milestone (draft/submitted only)
+- `POST /api/milestones/{id}/status` - Update status with workflow validation
+- `DELETE /api/milestones/{id}` - Delete draft milestone
+- `GET /api/milestones/project/{id}/summary` - Project milestone summary
 
-#### 4. Invoice Generation from Milestones
-- "Generate Invoice" button on approved milestones
-- Professional PDF with company branding
-- Invoice number, due date, payment terms
-- Activity log entry for audit trail
+### ✅ Stripe Integration (Live Mode)
+| Plan | Price | Type |
+|------|-------|------|
+| PRO | $39 CAD/mo | Subscription |
+| ELITE | $59 CAD/mo | Subscription |
+| LIFETIME_ELITE | $599 CAD | One-time (100 seats, Canada-only) |
 
-#### 5. Email Notifications
-- **Resend integration** for invoice emails
-- Professional HTML email template with branding
-- Non-blocking - doesn't fail invoice generation
-- Ready to use when RESEND_API_KEY is configured
+### ✅ Dashboard Financial Pulse
+- Quick stats bar (Receivables, This Month, Pending COs, Overdue)
+- Outstanding payments widget with aging breakdown
+- Project financial health panel
 
-#### 6. Default Payment Terms in Settings
-- Quick select: Net 7, 14, 30, 45, 60
-- Custom days input
-- Saved to user profile, auto-applied to invoices
-
----
-
-### ✅ Quality Audit Fixes (Complete)
-- Dashboard shows 100% REAL data (no mock)
-- Change Orders: Full CRUD working
-- Production Logs: Full CRUD working
-- Labor Profile Save: Persists to database
-- Quote Builder: Flexible payment terms (Net 7-60 + custom)
+### ✅ Other Features
+- Change Order management with margin impact
+- Expense tracking with AI receipt scanning
+- Quote builder with flexible payment terms
+- Production logs
+- Labor profile management
 
 ---
 
 ## Database Schema
 
-### Stripe-Related Tables (USER MUST RUN MIGRATION)
+### New Tables Required (Run Migration!)
 ```sql
--- Migration file: /app/migrations/003_stripe_lifetime_plan.sql
+-- Migration file: /app/migrations/006_invoicing_milestones_schema.sql
 
--- users_profile additions:
-- plan_type: 'TRIAL' | 'PRO' | 'ELITE' | 'LIFETIME_ELITE'
-- plan_status: 'active' | 'inactive' | 'past_due' | 'canceled' | 'trialing'
-- country: TEXT
-- stripe_customer_id: TEXT
-- stripe_subscription_id: TEXT
-- stripe_payment_intent_id: TEXT
-- lifetime_purchased_at: TIMESTAMPTZ
-- trial_ends_at: TIMESTAMPTZ
+-- project_milestones: Milestone tracking
+-- invoices: Invoice records
+-- invoice_line_items: Invoice line items
+-- invoice_counters: Auto-increment invoice numbers
+-- invoice_activity_log: Audit trail
+```
 
--- founding_lifetime (single-row control table):
-- id: 1 (always)
-- max_seats: 100
-- seats_sold: 0
-- is_active: true
-- region_lock: 'CA'
+### Tables to Remove (Optional Cleanup)
+```sql
+-- Migration file: /app/migrations/005_drop_marketplace_tables.sql
 
--- lifetime_purchases:
-- user_id, stripe_payment_intent_id, stripe_session_id, amount, currency, billing_country
-
--- Functions:
-- increment_lifetime_seat() - Atomic seat counter
-- get_lifetime_seats_status() - Returns seat availability
+-- marketplace_jobs, contractor_services, contractor_connections
+-- contractor_inquiries, contractor_profiles_public, contractor_verification
 ```
 
 ---
@@ -142,109 +113,80 @@
 - **Backend:** FastAPI + Supabase
 - **Payments:** Stripe (subscriptions + one-time)
 - **PDF Generation:** jsPDF, jsPDF-AutoTable
-- **Email:** Resend (optional)
+- **Email:** Resend
 - **AI:** GPT-4 Vision (via Emergent LLM key)
 
 ---
 
-## Key Files
-- `/app/backend/routes/stripe.py` - **NEW** All Stripe endpoints
-- `/app/backend/server.py` - Main server with router includes
-- `/app/frontend/src/pages/app/SettingsPage.jsx` - Plans UI, lifetime modal
-- `/app/frontend/src/pages/app/DashboardPage.jsx` - Financial pulse
-- `/app/frontend/src/components/milestones/ProjectMilestones.jsx` - Invoice generation
-- `/app/backend/routes/email.py` - Email notifications API
-- `/app/migrations/003_stripe_lifetime_plan.sql` - **USER MUST RUN THIS**
+## Navigation Structure
+```
+Dashboard      - Financial overview
+Projects       - Project management
+Estimates      - Quote builder
+Change Orders  - CO tracking
+Milestones     - Milestone management (NEW)
+Invoices       - Invoice management (NEW)
+Expenses       - Expense tracking
+Document Vault - File storage
+Reports        - Business analytics
+Settings       - Account & subscription
+```
 
 ---
 
-## Required Configuration
-
-### Stripe (Required for payments)
-```env
-# backend/.env
-STRIPE_SECRET_KEY=your_stripe_secret_key_here
-STRIPE_WEBHOOK_SECRET=your_webhook_secret_here
-STRIPE_PRO_PRICE_ID=price_1T20NRAVLnc1BWBltTCl65We
-STRIPE_ELITE_PRICE_ID=price_1T20OQAVLnc1BWBlxXBFkTWx
-STRIPE_LIFETIME_PRICE_ID=price_1T20WNAVLnc1BWBl0gKPyqOd
-```
-
-### Supabase Service Key (Required for seat counter)
-```env
-# backend/.env
-SUPABASE_SERVICE_KEY=eyJ... # Get from Supabase Dashboard > Settings > API
-```
-
-### Email (Optional)
-```env
-# backend/.env
-RESEND_API_KEY=re_your_key_here
-SENDER_EMAIL=invoices@yourdomain.com
-```
+## Key Files
+| File | Purpose |
+|------|---------|
+| `/app/backend/routes/invoices.py` | Invoice API endpoints |
+| `/app/backend/routes/milestones.py` | Milestone API endpoints |
+| `/app/frontend/src/pages/app/InvoicesPage.jsx` | Invoice management UI |
+| `/app/frontend/src/pages/app/MilestonesPage.jsx` | Milestone management UI |
+| `/app/migrations/006_invoicing_milestones_schema.sql` | Database schema |
 
 ---
 
 ## Testing Status
-- ✅ Backend: 23/23 Stripe tests passed
-- ✅ Frontend: All plan cards, modal, buttons working
-- ✅ Country validation: 403 for non-CA on lifetime
-- ✅ Dashboard: Real data + animations
-- ✅ Change Orders CRUD: Working
-- ✅ Production Logs CRUD: Working
-- ✅ Invoice Generation: Working
+- ✅ Backend: 100% (28/28 tests passed)
+- ✅ Frontend: All UI elements present and functional
+- ✅ Landing page branding verified
+- ✅ Auth middleware working correctly
 
 ---
 
 ## Pending User Actions
 
-### Critical
-1. **Run SQL Migration:** Execute `/app/migrations/003_stripe_lifetime_plan.sql` in Supabase SQL Editor
-2. **Run Marketplace V2 Migration:** Execute `/app/migrations/004_marketplace_v2.sql` in Supabase SQL Editor
-3. **Add Real Stripe Keys:** Update `STRIPE_SECRET_KEY` in `/app/backend/.env`
-4. **Add Supabase Service Key:** Update `SUPABASE_SERVICE_KEY` in `/app/backend/.env`
-5. **Set Up Stripe Webhook:** Configure webhook URL in Stripe Dashboard pointing to `/api/stripe/webhook`
+### Critical - Database Setup
+1. **Run SQL Migration:** Execute `/app/migrations/006_invoicing_milestones_schema.sql` in Supabase SQL Editor
+2. **Optional Cleanup:** Execute `/app/migrations/005_drop_marketplace_tables.sql` to remove marketplace tables
+
+### Configuration
+- Stripe keys configured ✅
+- Resend API key configured ✅
+- Supabase connection configured ✅
 
 ---
 
-## What's Been Implemented (February 18, 2026 - Latest)
+## Backlog (P1)
+- [ ] Dashboard Financial Health Panel - Project-level metrics
+- [ ] Reporting Engine - PDF export functionality
+- [ ] Complete Settings Page (Edit Profile, Security, Delete Account)
 
-### ✅ Marketplace V2 - Enhanced Contractor Directory
-- **Clickable Contractor Cards:** Cards in `/contractors` now open a detail modal
-- **Contractor Detail Modal:** 4 tabs - About, Services, Jobs, Contact
-- **Contact Form:** Visitors can message contractors directly
-- **Navigation Links:** Marketplace link added to landing page header and app sidebar
-- **Backend APIs:** Full CRUD for job posts, services, and networking
-
-#### New API Endpoints
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/marketplace/contractor/{id}/full` | GET | Full profile with services & jobs |
-| `/api/marketplace/contractor/{id}/contact` | POST | Send contact message |
-| `/api/marketplace/jobs` | GET/POST | Browse/create job posts |
-| `/api/marketplace/services` | GET/POST | Browse/create service offerings |
-| `/api/marketplace/connections` | GET | View networking connections |
-| `/api/marketplace/my/jobs` | GET | User's own job posts |
-| `/api/marketplace/my/services` | GET | User's own services |
-| `/api/marketplace/my/inquiries` | GET | Received contact inquiries |
-
-#### Database Tables Created (Run migration!)
-- `marketplace_jobs` - Job postings
-- `contractor_services` - Service offerings
-- `contractor_connections` - Network connections
-- `contractor_inquiries` - Contact form submissions
-
----
-
-## Future Tasks (Backlog)
-- [ ] Contractor verification process (approve/manage levels)
-- [ ] Complete Settings page (Edit Profile, Security, Delete Account)
-- [ ] Magic Link error investigation
-- [ ] AI renovation visualization
-- [ ] Payment escrow
+## Future Tasks (P2)
+- [ ] Expense & Tax enhancements
 - [ ] Payment reminders automation
+- [ ] Advanced reports with charts
+- [ ] Final code cleanup (remove orphaned marketplace files)
 
 ---
 
 ## Credentials
-- Test: `test703691@tradeos.test` / `TestPass123!`
+- Test Account: `test703691@tradeos.test` / `TestPass123!`
+
+---
+
+## Version History
+| Date | Version | Changes |
+|------|---------|---------|
+| Feb 18, 2026 | 2.0 | Strategic pivot, Invoicing & Milestones |
+| Feb 17, 2026 | 1.5 | Marketplace V2 (now removed) |
+| Feb 16, 2026 | 1.0 | Initial Stripe integration |
