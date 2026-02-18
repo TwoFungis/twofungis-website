@@ -588,7 +588,7 @@ const ReportsPage = () => {
               <p className="text-sm text-gray-500">At-Risk Projects</p>
             </div>
             <div className="bg-charcoal-800 rounded-xl p-4 border border-charcoal-700">
-              <p className="text-2xl font-bold text-white">{projects.filter(p => p.status === 'active').length}</p>
+              <p className="text-2xl font-bold text-charcoal-800">{projects.filter(p => p.status === 'active').length}</p>
               <p className="text-sm text-gray-500">Active Projects</p>
             </div>
           </div>

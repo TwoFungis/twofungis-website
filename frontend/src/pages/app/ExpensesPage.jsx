@@ -89,11 +89,11 @@ const ExpensesPage = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-3">
+          <h1 className="text-2xl font-bold text-charcoal-800 flex items-center gap-3">
             <Wallet className="w-7 h-7 text-steel-400" />
             Expenses
           </h1>
-          <p className="text-gray-400 text-sm mt-1">Track expenses and manage tax-ready bookkeeping</p>
+          <p className="text-charcoal-500 text-sm mt-1">Track expenses and manage tax-ready bookkeeping</p>
         </div>
         <div className="flex items-center gap-3">
           <button
@@ -118,7 +118,7 @@ const ExpensesPage = () => {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-4">
           <p className="text-gray-400 text-sm">This Month</p>
-          <p className="text-2xl font-bold text-white">${totalExpenses.toLocaleString()}</p>
+          <p className="text-2xl font-bold text-charcoal-800">${totalExpenses.toLocaleString()}</p>
         </div>
         <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-4">
           <p className="text-gray-400 text-sm">Missing Receipts</p>

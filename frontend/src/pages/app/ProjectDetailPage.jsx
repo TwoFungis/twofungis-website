@@ -229,7 +229,7 @@ const ProjectDetailPage = () => {
           <Link to="/app/projects" className="text-gray-400 hover:text-white text-sm flex items-center gap-1 mb-2">
             <ArrowLeft className="w-4 h-4" /> Back to Projects
           </Link>
-          <h1 className="text-2xl font-bold text-white">{project.name}</h1>
+          <h1 className="text-2xl font-bold text-charcoal-800">{project.name}</h1>
           <p className="text-gray-400">{project.client_gc || 'No client'}</p>
         </div>
         <div className="flex items-center gap-2">

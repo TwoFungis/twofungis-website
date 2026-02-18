@@ -165,7 +165,7 @@ const DashboardPage = () => {
                 <FolderKanban className="w-5 h-5 text-steel-400" />
                 <h3 className="font-semibold text-white">Active Projects</h3>
               </div>
-              <span className="text-2xl font-bold text-white">{activeProjects.length}</span>
+              <span className="text-2xl font-bold text-charcoal-800">{activeProjects.length}</span>
             </div>
             <div className="p-5">
               {activeProjects.length === 0 ? (
@@ -207,7 +207,7 @@ const DashboardPage = () => {
                 <Flag className="w-5 h-5 text-steel-400" />
                 <h3 className="font-semibold text-white">Upcoming Milestones</h3>
               </div>
-              <span className="text-2xl font-bold text-white">{upcomingMilestones.length}</span>
+              <span className="text-2xl font-bold text-charcoal-800">{upcomingMilestones.length}</span>
             </div>
             <div className="p-5">
               {upcomingMilestones.length === 0 ? (

@@ -151,11 +151,11 @@ const InvoicesPage = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-3">
+          <h1 className="text-2xl font-bold text-charcoal-800 flex items-center gap-3">
             <Receipt className="w-7 h-7 text-steel-400" />
             Invoices
           </h1>
-          <p className="text-gray-400 text-sm mt-1">Create, send, and track invoices</p>
+          <p className="text-charcoal-500 text-sm mt-1">Create, send, and track invoices</p>
         </div>
         <button
           onClick={() => setShowCreateModal(true)}
@@ -174,7 +174,7 @@ const InvoicesPage = () => {
             <DollarSign className="w-5 h-5 text-steel-400" />
             <p className="text-gray-400 text-sm">Outstanding</p>
           </div>
-          <p className="text-2xl font-bold text-white">${(stats.total_outstanding || 0).toLocaleString()}</p>
+          <p className="text-2xl font-bold text-charcoal-800">${(stats.total_outstanding || 0).toLocaleString()}</p>
         </div>
         <div className="bg-charcoal-800 rounded-xl border border-risk/30 p-4">
           <div className="flex items-center gap-2 mb-2">
@@ -195,7 +195,7 @@ const InvoicesPage = () => {
             <Clock className="w-5 h-5 text-gray-400" />
             <p className="text-gray-400 text-sm">Drafts</p>
           </div>
-          <p className="text-2xl font-bold text-white">{stats.draft_count || 0}</p>
+          <p className="text-2xl font-bold text-charcoal-800">{stats.draft_count || 0}</p>
         </div>
       </div>
 

@@ -90,11 +90,11 @@ const DocumentsPage = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-3">
+          <h1 className="text-2xl font-bold text-charcoal-800 flex items-center gap-3">
             <FolderOpen className="w-7 h-7 text-steel-400" />
             Document Vault
           </h1>
-          <p className="text-gray-400 text-sm mt-1">Securely store and organize project documents</p>
+          <p className="text-charcoal-500 text-sm mt-1">Securely store and organize project documents</p>
         </div>
         <div className="flex items-center gap-3">
           <button

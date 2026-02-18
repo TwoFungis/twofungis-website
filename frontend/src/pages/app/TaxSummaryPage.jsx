@@ -155,8 +155,8 @@ const TaxSummaryPage = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Tax Summary</h1>
-          <p className="text-gray-400 text-sm mt-1">Track expenses, deductions, and tax obligations</p>
+          <h1 className="text-2xl font-bold text-charcoal-800">Tax Summary</h1>
+          <p className="text-charcoal-500 text-sm mt-1">Track expenses, deductions, and tax obligations</p>
         </div>
         
         <div className="flex items-center gap-3">
@@ -258,7 +258,7 @@ const TaxSummaryPage = () => {
                 </div>
                 <span className="text-gray-400 text-sm">Revenue (Paid Invoices)</span>
               </div>
-              <p className="text-2xl font-bold text-white">{formatCurrency(invoiceRevenue)}</p>
+              <p className="text-2xl font-bold text-charcoal-800">{formatCurrency(invoiceRevenue)}</p>
             </div>
 
             <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-5">
@@ -268,7 +268,7 @@ const TaxSummaryPage = () => {
                 </div>
                 <span className="text-gray-400 text-sm">Total Expenses</span>
               </div>
-              <p className="text-2xl font-bold text-white">{formatCurrency(totalExpenses)}</p>
+              <p className="text-2xl font-bold text-charcoal-800">{formatCurrency(totalExpenses)}</p>
               <p className="text-xs text-gray-500 mt-1">{data?.expense_count || 0} expenses</p>
             </div>
 
@@ -289,7 +289,7 @@ const TaxSummaryPage = () => {
                 </div>
                 <span className="text-gray-400 text-sm">Tax Paid (GST/HST/PST)</span>
               </div>
-              <p className="text-2xl font-bold text-white">{formatCurrency(totalTaxPaid)}</p>
+              <p className="text-2xl font-bold text-charcoal-800">{formatCurrency(totalTaxPaid)}</p>
             </div>
           </div>
 
