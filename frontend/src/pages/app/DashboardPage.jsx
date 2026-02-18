@@ -145,42 +145,42 @@ const DashboardPage = () => {
 
       {/* Header */}
       <div>
-        <h1 className="text-2xl lg:text-3xl font-bold text-charcoal-800">
+        <h1 className="text-2xl lg:text-3xl font-bold text-white">
           Welcome back, {profile?.full_name?.split(' ')[0] || profile?.name?.split(' ')[0] || 'Builder'}
         </h1>
-        <p className="text-charcoal-400 mt-1">Your business at a glance</p>
+        <p className="text-gray-500 mt-1">Your business at a glance</p>
       </div>
 
       {/* ============================================ */}
       {/* ZONE A: EXECUTION */}
       {/* ============================================ */}
       <section data-testid="execution-zone">
-        <h2 className="text-sm font-semibold text-charcoal-500 uppercase tracking-wider mb-4">Execution</h2>
+        <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Execution</h2>
         
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Active Projects */}
-          <div className="bg-white rounded-xl border border-cloud-300">
-            <div className="p-5 border-b border-cloud-300 flex items-center justify-between">
+          <div className="bg-charcoal-800 rounded-xl border border-charcoal-700">
+            <div className="p-5 border-b border-charcoal-700 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <FolderKanban className="w-5 h-5 text-steel-400" />
-                <h3 className="font-semibold text-charcoal-800">Active Projects</h3>
+                <h3 className="font-semibold text-white">Active Projects</h3>
               </div>
-              <span className="text-2xl font-bold text-charcoal-800">{activeProjects.length}</span>
+              <span className="text-2xl font-bold text-white">{activeProjects.length}</span>
             </div>
             <div className="p-5">
               {activeProjects.length === 0 ? (
-                <p className="text-charcoal-400 text-sm text-center py-4">No active projects</p>
+                <p className="text-gray-500 text-sm text-center py-4">No active projects</p>
               ) : (
                 <div className="space-y-3">
                   {activeProjects.slice(0, 4).map(project => (
                     <Link 
                       key={project.id}
                       to={`/app/projects/${project.id}`}
-                      className="flex items-center justify-between p-3 bg-cloud-100 rounded-lg hover:bg-cloud-200 transition-colors"
+                      className="flex items-center justify-between p-3 bg-charcoal-700/50 rounded-lg hover:bg-charcoal-700 transition-colors"
                     >
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-charcoal-800 truncate">{project.name}</p>
-                        <p className="text-xs text-charcoal-400">{formatCurrency(project.contract_value)}</p>
+                        <p className="text-sm font-medium text-white truncate">{project.name}</p>
+                        <p className="text-xs text-gray-500">{formatCurrency(project.contract_value)}</p>
                       </div>
                       <div className={`text-sm font-semibold ${
                         (parseFloat(project.forecast_margin) || 0) >= marginThreshold ? 'text-success' : 'text-warning'
@@ -201,27 +201,27 @@ const DashboardPage = () => {
           </div>
 
           {/* Upcoming Milestones */}
-          <div className="bg-white rounded-xl border border-cloud-300">
-            <div className="p-5 border-b border-cloud-300 flex items-center justify-between">
+          <div className="bg-charcoal-800 rounded-xl border border-charcoal-700">
+            <div className="p-5 border-b border-charcoal-700 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Flag className="w-5 h-5 text-steel-400" />
-                <h3 className="font-semibold text-charcoal-800">Upcoming Milestones</h3>
+                <h3 className="font-semibold text-white">Upcoming Milestones</h3>
               </div>
-              <span className="text-2xl font-bold text-charcoal-800">{upcomingMilestones.length}</span>
+              <span className="text-2xl font-bold text-white">{upcomingMilestones.length}</span>
             </div>
             <div className="p-5">
               {upcomingMilestones.length === 0 ? (
-                <p className="text-charcoal-400 text-sm text-center py-4">No upcoming milestones</p>
+                <p className="text-gray-500 text-sm text-center py-4">No upcoming milestones</p>
               ) : (
                 <div className="space-y-3">
                   {upcomingMilestones.map(milestone => (
                     <div 
                       key={milestone.id}
-                      className="flex items-center justify-between p-3 bg-cloud-100 rounded-lg"
+                      className="flex items-center justify-between p-3 bg-charcoal-700/50 rounded-lg"
                     >
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-charcoal-800 truncate">{milestone.name}</p>
-                        <p className="text-xs text-charcoal-400">
+                        <p className="text-sm font-medium text-white truncate">{milestone.name}</p>
+                        <p className="text-xs text-gray-500">
                           {milestone.due_date ? new Date(milestone.due_date).toLocaleDateString() : 'No due date'}
                         </p>
                       </div>
@@ -242,27 +242,27 @@ const DashboardPage = () => {
           </div>
 
           {/* Pending Change Orders */}
-          <div className="bg-cloud-100 rounded-xl border border-cloud-300">
-            <div className="p-5 border-b border-cloud-300 flex items-center justify-between">
+          <div className="bg-charcoal-700/50 rounded-xl border border-charcoal-700">
+            <div className="p-5 border-b border-charcoal-700 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <FileText className="w-5 h-5 text-warning" />
-                <h3 className="font-semibold text-charcoal-800">Pending COs</h3>
+                <h3 className="font-semibold text-white">Pending COs</h3>
               </div>
               <span className="text-2xl font-bold text-warning">{pendingCOs.length}</span>
             </div>
             <div className="p-5">
               {pendingCOs.length === 0 ? (
-                <p className="text-charcoal-400 text-sm text-center py-4">No pending change orders</p>
+                <p className="text-gray-500 text-sm text-center py-4">No pending change orders</p>
               ) : (
                 <div className="space-y-3">
                   {pendingCOs.slice(0, 4).map(co => (
                     <div 
                       key={co.id}
-                      className="flex items-center justify-between p-3 bg-cloud-200 rounded-lg"
+                      className="flex items-center justify-between p-3 bg-charcoal-700 rounded-lg"
                     >
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-charcoal-800 truncate">{co.title || `CO-${co.co_number}`}</p>
-                        <p className="text-xs text-charcoal-400">{co.projects?.name || 'No project'}</p>
+                        <p className="text-sm font-medium text-white truncate">{co.title || `CO-${co.co_number}`}</p>
+                        <p className="text-xs text-gray-500">{co.projects?.name || 'No project'}</p>
                       </div>
                       <div className="text-sm font-semibold text-warning">
                         {formatCurrency(co.total_value)}
@@ -286,60 +286,60 @@ const DashboardPage = () => {
       {/* ZONE B: FINANCIAL CONTROL */}
       {/* ============================================ */}
       <section data-testid="financial-zone">
-        <h2 className="text-sm font-semibold text-charcoal-500 uppercase tracking-wider mb-4">Financial Control</h2>
+        <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Financial Control</h2>
         
         {/* Main Financial Metrics */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white rounded-xl border border-cloud-300 p-5">
-            <p className="text-xs text-charcoal-400 uppercase tracking-wide mb-2">Total Contract Value</p>
-            <p className="text-2xl lg:text-3xl font-bold text-charcoal-800">{formatCurrency(totalContractValue)}</p>
+          <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-5">
+            <p className="text-xs text-gray-500 uppercase tracking-wide mb-2">Total Contract Value</p>
+            <p className="text-2xl lg:text-3xl font-bold text-white">{formatCurrency(totalContractValue)}</p>
             {approvedCOsTotal > 0 && (
-              <p className="text-xs text-charcoal-400 mt-1">+{formatCurrency(approvedCOsTotal)} approved COs</p>
+              <p className="text-xs text-gray-500 mt-1">+{formatCurrency(approvedCOsTotal)} approved COs</p>
             )}
           </div>
 
-          <div className="bg-white rounded-xl border border-cloud-300 p-5">
-            <p className="text-xs text-charcoal-400 uppercase tracking-wide mb-2">Forecast Profit</p>
+          <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-5">
+            <p className="text-xs text-gray-500 uppercase tracking-wide mb-2">Forecast Profit</p>
             <p className={`text-2xl lg:text-3xl font-bold ${forecastProfit >= 0 ? 'text-success' : 'text-risk'}`}>
               {formatCurrency(forecastProfit)}
             </p>
-            <p className="text-xs text-charcoal-400 mt-1">{formatCurrency(totalExpenses)} in expenses</p>
+            <p className="text-xs text-gray-500 mt-1">{formatCurrency(totalExpenses)} in expenses</p>
           </div>
 
           <div className={`rounded-xl border p-5 ${
             totalReceivables > 0 
-              ? 'bg-cloud-100 border-cloud-300' 
-              : 'bg-white border-cloud-300'
+              ? 'bg-charcoal-700/50 border-charcoal-700' 
+              : 'bg-charcoal-800 border-charcoal-700'
           }`}>
-            <p className="text-xs text-charcoal-400 uppercase tracking-wide mb-2">Outstanding Receivables</p>
-            <p className={`text-2xl lg:text-3xl font-bold ${totalReceivables > 0 ? 'text-steel-400' : 'text-charcoal-400'}`}>
+            <p className="text-xs text-gray-500 uppercase tracking-wide mb-2">Outstanding Receivables</p>
+            <p className={`text-2xl lg:text-3xl font-bold ${totalReceivables > 0 ? 'text-steel-400' : 'text-gray-500'}`}>
               {formatCurrency(totalReceivables)}
             </p>
-            <p className="text-xs text-charcoal-400 mt-1">{outstandingInvoices.length} invoice{outstandingInvoices.length !== 1 ? 's' : ''}</p>
+            <p className="text-xs text-gray-500 mt-1">{outstandingInvoices.length} invoice{outstandingInvoices.length !== 1 ? 's' : ''}</p>
           </div>
 
-          <div className={`bg-white rounded-xl border ${overdueAmount > 0 ? 'border-risk/50' : 'border-cloud-300'} p-5`}>
-            <p className="text-xs text-charcoal-400 uppercase tracking-wide mb-2">Overdue Invoices</p>
-            <p className={`text-2xl lg:text-3xl font-bold ${overdueAmount > 0 ? 'text-risk' : 'text-charcoal-400'}`}>
+          <div className={`bg-charcoal-800 rounded-xl border ${overdueAmount > 0 ? 'border-risk/50' : 'border-charcoal-700'} p-5`}>
+            <p className="text-xs text-gray-500 uppercase tracking-wide mb-2">Overdue Invoices</p>
+            <p className={`text-2xl lg:text-3xl font-bold ${overdueAmount > 0 ? 'text-risk' : 'text-gray-500'}`}>
               {formatCurrency(overdueAmount)}
             </p>
-            <p className="text-xs text-charcoal-400 mt-1">{overdueInvoices.length} overdue</p>
+            <p className="text-xs text-gray-500 mt-1">{overdueInvoices.length} overdue</p>
           </div>
         </div>
 
         {/* Forecast Margin with Threshold Selector */}
-        <div className="bg-white rounded-xl border border-cloud-300 p-5">
+        <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-5">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <Percent className="w-5 h-5 text-steel-400" />
-              <h3 className="font-semibold text-charcoal-800">Forecast Margin</h3>
+              <h3 className="font-semibold text-white">Forecast Margin</h3>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-xs text-charcoal-400">Target:</span>
+              <span className="text-xs text-gray-500">Target:</span>
               <select
                 value={marginThreshold}
                 onChange={(e) => handleMarginChange(parseInt(e.target.value))}
-                className="bg-cloud-200 border border-charcoal-600 rounded px-2 py-1 text-sm text-charcoal-800"
+                className="bg-charcoal-700 border border-charcoal-600 rounded px-2 py-1 text-sm text-white"
                 data-testid="margin-threshold-select"
               >
                 <option value="10">10%</option>
@@ -359,14 +359,14 @@ const DashboardPage = () => {
               }`}>
                 {forecastMargin.toFixed(1)}%
               </p>
-              <p className="text-sm text-charcoal-400 mt-1">
+              <p className="text-sm text-gray-500 mt-1">
                 {forecastMargin >= marginThreshold ? 'On target' : `${(marginThreshold - forecastMargin).toFixed(1)}% below target`}
               </p>
             </div>
             
             {/* Visual indicator */}
             <div className="flex-1 max-w-xs">
-              <div className="h-3 bg-cloud-200 rounded-full overflow-hidden">
+              <div className="h-3 bg-charcoal-700 rounded-full overflow-hidden">
                 <div 
                   className={`h-full rounded-full transition-all ${
                     forecastMargin >= marginThreshold ? 'bg-success' : 
@@ -375,7 +375,7 @@ const DashboardPage = () => {
                   style={{ width: `${Math.min(forecastMargin / 40 * 100, 100)}%` }}
                 />
               </div>
-              <div className="flex justify-between mt-1 text-xs text-charcoal-400">
+              <div className="flex justify-between mt-1 text-xs text-gray-500">
                 <span>0%</span>
                 <span className="text-steel-400">{marginThreshold}% target</span>
                 <span>40%</span>
@@ -390,28 +390,28 @@ const DashboardPage = () => {
       {/* ============================================ */}
       <section data-testid="alerts-zone">
         <div className="flex items-center gap-2 mb-4">
-          <h2 className="text-sm font-semibold text-charcoal-500 uppercase tracking-wider">Alerts</h2>
+          <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">Alerts</h2>
           {alertCount > 0 && (
             <span className="bg-risk/20 text-risk text-xs px-2 py-0.5 rounded-full">{alertCount}</span>
           )}
         </div>
         
         {alertCount === 0 ? (
-          <div className="bg-white rounded-xl border border-cloud-300 p-8 text-center">
+          <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-8 text-center">
             <CheckCircle2 className="w-10 h-10 text-success mx-auto mb-3" />
-            <p className="text-charcoal-500">All clear! No alerts at this time.</p>
+            <p className="text-gray-400">All clear! No alerts at this time.</p>
           </div>
         ) : (
           <div className="space-y-3">
             {/* Past Due Invoices */}
             {overdueInvoices.length > 0 && (
-              <div className="bg-white rounded-xl border border-risk/30 p-4 flex items-center gap-4">
+              <div className="bg-charcoal-800 rounded-xl border border-risk/30 p-4 flex items-center gap-4">
                 <div className="w-10 h-10 bg-risk/20 rounded-full flex items-center justify-center flex-shrink-0">
                   <AlertCircle className="w-5 h-5 text-risk" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-charcoal-800 font-medium">Past Due Invoices</p>
-                  <p className="text-sm text-charcoal-500">{overdueInvoices.length} invoice{overdueInvoices.length !== 1 ? 's' : ''} totaling {formatCurrency(overdueAmount)}</p>
+                  <p className="text-white font-medium">Past Due Invoices</p>
+                  <p className="text-sm text-gray-400">{overdueInvoices.length} invoice{overdueInvoices.length !== 1 ? 's' : ''} totaling {formatCurrency(overdueAmount)}</p>
                 </div>
                 <Link 
                   to="/app/invoices?status=overdue"
@@ -424,17 +424,17 @@ const DashboardPage = () => {
 
             {/* Trial Expiring */}
             {trialExpiring && (
-              <div className="bg-cloud-100 rounded-xl border border-cloud-300 p-4 flex items-center gap-4">
+              <div className="bg-charcoal-700/50 rounded-xl border border-charcoal-700 p-4 flex items-center gap-4">
                 <div className="w-10 h-10 bg-warning/20 rounded-full flex items-center justify-center flex-shrink-0">
                   <Clock className="w-5 h-5 text-warning" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-charcoal-800 font-medium">Trial Expiring Soon</p>
-                  <p className="text-sm text-charcoal-500">{daysUntilTrialExpires} day{daysUntilTrialExpires !== 1 ? 's' : ''} remaining</p>
+                  <p className="text-white font-medium">Trial Expiring Soon</p>
+                  <p className="text-sm text-gray-400">{daysUntilTrialExpires} day{daysUntilTrialExpires !== 1 ? 's' : ''} remaining</p>
                 </div>
                 <Link 
                   to="/app/settings"
-                  className="bg-steel-500 hover:bg-steel-600 text-charcoal-800 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
+                  className="bg-steel-500 hover:bg-steel-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
                 >
                   Upgrade →
                 </Link>
@@ -443,13 +443,13 @@ const DashboardPage = () => {
 
             {/* Low Margin Warning */}
             {lowMarginProjects.length > 0 && (
-              <div className="bg-white rounded-xl border border-warning/30 p-4 flex items-center gap-4">
+              <div className="bg-charcoal-800 rounded-xl border border-warning/30 p-4 flex items-center gap-4">
                 <div className="w-10 h-10 bg-warning/20 rounded-full flex items-center justify-center flex-shrink-0">
                   <TrendingUp className="w-5 h-5 text-warning" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-charcoal-800 font-medium">Low Margin Warning</p>
-                  <p className="text-sm text-charcoal-500">{lowMarginProjects.length} project{lowMarginProjects.length !== 1 ? 's' : ''} below {marginThreshold}% margin</p>
+                  <p className="text-white font-medium">Low Margin Warning</p>
+                  <p className="text-sm text-gray-400">{lowMarginProjects.length} project{lowMarginProjects.length !== 1 ? 's' : ''} below {marginThreshold}% margin</p>
                 </div>
                 <Link 
                   to="/app/projects"
@@ -467,17 +467,17 @@ const DashboardPage = () => {
       {/* MONTHLY TAX PANEL */}
       {/* ============================================ */}
       <section data-testid="tax-panel">
-        <h2 className="text-sm font-semibold text-charcoal-500 uppercase tracking-wider mb-4">This Month Summary</h2>
+        <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">This Month Summary</h2>
         
-        <div className="bg-white rounded-xl border border-cloud-300 p-5">
+        <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-5">
           <div className="flex items-center justify-between mb-4">
-            <span className="text-sm text-charcoal-500">{now.toLocaleString('default', { month: 'long', year: 'numeric' })}</span>
+            <span className="text-sm text-gray-400">{now.toLocaleString('default', { month: 'long', year: 'numeric' })}</span>
             <div className="flex items-center gap-2">
-              <span className="text-xs text-charcoal-400">Tax Rate:</span>
+              <span className="text-xs text-gray-500">Tax Rate:</span>
               <select
                 value={taxRate}
                 onChange={(e) => handleTaxRateChange(parseInt(e.target.value))}
-                className="bg-cloud-200 border border-charcoal-600 rounded px-2 py-1 text-sm text-charcoal-800"
+                className="bg-charcoal-700 border border-charcoal-600 rounded px-2 py-1 text-sm text-white"
                 data-testid="tax-rate-select"
               >
                 <option value="15">15%</option>
@@ -491,19 +491,19 @@ const DashboardPage = () => {
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
-              <p className="text-xs text-charcoal-400 mb-1">Revenue</p>
+              <p className="text-xs text-gray-500 mb-1">Revenue</p>
               <p className="text-xl font-bold text-success">{formatCurrency(thisMonthRevenue)}</p>
             </div>
             <div>
-              <p className="text-xs text-charcoal-400 mb-1">Expenses</p>
+              <p className="text-xs text-gray-500 mb-1">Expenses</p>
               <p className="text-xl font-bold text-risk">{formatCurrency(thisMonthExpenses)}</p>
             </div>
             <div>
-              <p className="text-xs text-charcoal-400 mb-1">Est. Tax Owing</p>
+              <p className="text-xs text-gray-500 mb-1">Est. Tax Owing</p>
               <p className="text-xl font-bold text-warning">{formatCurrency(estimatedTax)}</p>
             </div>
             <div>
-              <p className="text-xs text-charcoal-400 mb-1">Recommended Set-Aside</p>
+              <p className="text-xs text-gray-500 mb-1">Recommended Set-Aside</p>
               <p className="text-xl font-bold text-steel-400">{taxRate}%</p>
             </div>
           </div>

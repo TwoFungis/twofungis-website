@@ -212,8 +212,8 @@ const ProjectDetailPage = () => {
     return (
       <div className="text-center py-12">
         <AlertCircle className="w-12 h-12 text-risk mx-auto mb-4" />
-        <h2 className="text-xl font-semibold text-charcoal-800 mb-2">Error</h2>
-        <p className="text-charcoal-500">{error || 'Project not found'}</p>
+        <h2 className="text-xl font-semibold text-white mb-2">Error</h2>
+        <p className="text-gray-400">{error || 'Project not found'}</p>
         <Link to="/app/projects" className="mt-4 inline-block text-steel-400 hover:text-steel-300">
           ← Back to Projects
         </Link>
@@ -226,11 +226,11 @@ const ProjectDetailPage = () => {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <Link to="/app/projects" className="text-charcoal-500 hover:text-charcoal-800 text-sm flex items-center gap-1 mb-2">
+          <Link to="/app/projects" className="text-gray-400 hover:text-white text-sm flex items-center gap-1 mb-2">
             <ArrowLeft className="w-4 h-4" /> Back to Projects
           </Link>
-          <h1 className="text-2xl font-bold text-charcoal-800">{project.name}</h1>
-          <p className="text-charcoal-500">{project.client_gc || 'No client'}</p>
+          <h1 className="text-2xl font-bold text-white">{project.name}</h1>
+          <p className="text-gray-400">{project.client_gc || 'No client'}</p>
         </div>
         <div className="flex items-center gap-2">
           <span className={`px-3 py-1 rounded-full text-sm border ${
@@ -243,7 +243,7 @@ const ProjectDetailPage = () => {
           {!isEditing && (
             <button
               onClick={() => setIsEditing(true)}
-              className="bg-cloud-200 hover:bg-cloud-100 text-charcoal-800 px-3 py-1.5 rounded-lg text-sm flex items-center gap-1"
+              className="bg-charcoal-700 hover:bg-charcoal-700/50 text-white px-3 py-1.5 rounded-lg text-sm flex items-center gap-1"
             >
               <Edit className="w-4 h-4" /> Edit
             </button>
@@ -254,38 +254,38 @@ const ProjectDetailPage = () => {
       {/* ============================================ */}
       {/* FINANCIAL HEALTH PANEL */}
       {/* ============================================ */}
-      <div className="bg-white rounded-xl border border-cloud-300 p-6" data-testid="financial-health-panel">
-        <h2 className="text-sm font-semibold text-charcoal-500 uppercase tracking-wider mb-4">Financial Health</h2>
+      <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6" data-testid="financial-health-panel">
+        <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Financial Health</h2>
         
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
           <div>
-            <p className="text-xs text-charcoal-400 mb-1">Original Contract</p>
-            <p className="text-xl font-bold text-charcoal-800">{formatCurrency(originalContract)}</p>
+            <p className="text-xs text-gray-500 mb-1">Original Contract</p>
+            <p className="text-xl font-bold text-white">{formatCurrency(originalContract)}</p>
           </div>
           <div>
-            <p className="text-xs text-charcoal-400 mb-1">Approved COs</p>
+            <p className="text-xs text-gray-500 mb-1">Approved COs</p>
             <p className="text-xl font-bold text-warning">{formatCurrency(approvedCOsTotal)}</p>
           </div>
           <div>
-            <p className="text-xs text-charcoal-400 mb-1">Total Revenue</p>
+            <p className="text-xs text-gray-500 mb-1">Total Revenue</p>
             <p className="text-xl font-bold text-steel-400">{formatCurrency(totalRevenue)}</p>
           </div>
           <div>
-            <p className="text-xs text-charcoal-400 mb-1">Total Expenses</p>
+            <p className="text-xs text-gray-500 mb-1">Total Expenses</p>
             <p className="text-xl font-bold text-risk">{formatCurrency(totalExpenses)}</p>
           </div>
           <div>
-            <p className="text-xs text-charcoal-400 mb-1">Total Labor</p>
+            <p className="text-xs text-gray-500 mb-1">Total Labor</p>
             <p className="text-xl font-bold text-gray-300">{formatCurrency(totalLabor)}</p>
           </div>
           <div>
-            <p className="text-xs text-charcoal-400 mb-1">Gross Profit</p>
+            <p className="text-xs text-gray-500 mb-1">Gross Profit</p>
             <p className={`text-xl font-bold ${forecastProfit >= 0 ? 'text-success' : 'text-risk'}`}>
               {formatCurrency(forecastProfit)}
             </p>
           </div>
           <div>
-            <p className="text-xs text-charcoal-400 mb-1">Margin</p>
+            <p className="text-xs text-gray-500 mb-1">Margin</p>
             <p className={`text-xl font-bold ${forecastMargin >= 15 ? 'text-success' : forecastMargin >= 10 ? 'text-warning' : 'text-risk'}`}>
               {forecastMargin.toFixed(1)}%
             </p>
@@ -294,11 +294,11 @@ const ProjectDetailPage = () => {
 
         {/* Progress bar */}
         <div className="mt-4">
-          <div className="flex items-center justify-between text-xs text-charcoal-400 mb-1">
+          <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
             <span>Completion: {project.percent_complete || 0}%</span>
             <span>{formatCurrency(totalRevenue)} total</span>
           </div>
-          <div className="h-2 bg-cloud-200 rounded-full overflow-hidden">
+          <div className="h-2 bg-charcoal-700 rounded-full overflow-hidden">
             <div 
               className="h-full bg-steel-500 rounded-full transition-all"
               style={{ width: `${project.percent_complete || 0}%` }}
@@ -310,7 +310,7 @@ const ProjectDetailPage = () => {
       {/* ============================================ */}
       {/* TABS NAVIGATION */}
       {/* ============================================ */}
-      <div className="border-b border-cloud-300">
+      <div className="border-b border-charcoal-700">
         <nav className="flex gap-1 overflow-x-auto pb-px">
           {tabs.map(tab => (
             <button
@@ -319,13 +319,13 @@ const ProjectDetailPage = () => {
               className={`flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
                 activeTab === tab.id
                   ? 'border-steel-500 text-steel-400'
-                  : 'border-transparent text-charcoal-500 hover:text-charcoal-800 hover:border-gray-600'
+                  : 'border-transparent text-gray-400 hover:text-white hover:border-gray-600'
               }`}
             >
               <tab.icon className="w-4 h-4" />
               {tab.label}
               {tab.count !== undefined && tab.count > 0 && (
-                <span className="bg-cloud-200 text-charcoal-500 text-xs px-1.5 py-0.5 rounded">
+                <span className="bg-charcoal-700 text-gray-400 text-xs px-1.5 py-0.5 rounded">
                   {tab.count}
                 </span>
               )}
@@ -342,55 +342,55 @@ const ProjectDetailPage = () => {
         {activeTab === 'overview' && (
           <div className="grid lg:grid-cols-2 gap-6">
             {/* Project Details */}
-            <div className="bg-white rounded-xl border border-cloud-300 p-6">
-              <h3 className="font-semibold text-charcoal-800 mb-4">Project Details</h3>
+            <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6">
+              <h3 className="font-semibold text-white mb-4">Project Details</h3>
               {isEditing ? (
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm text-charcoal-500 mb-1">Project Name</label>
+                    <label className="block text-sm text-gray-400 mb-1">Project Name</label>
                     <input
                       type="text"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full bg-cloud-200 border border-charcoal-600 rounded-lg px-3 py-2 text-charcoal-800"
+                      className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-3 py-2 text-white"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm text-charcoal-500 mb-1">Client/GC</label>
+                    <label className="block text-sm text-gray-400 mb-1">Client/GC</label>
                     <input
                       type="text"
                       value={formData.client_gc}
                       onChange={(e) => setFormData({ ...formData, client_gc: e.target.value })}
-                      className="w-full bg-cloud-200 border border-charcoal-600 rounded-lg px-3 py-2 text-charcoal-800"
+                      className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-3 py-2 text-white"
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm text-charcoal-500 mb-1">Contract Value</label>
+                      <label className="block text-sm text-gray-400 mb-1">Contract Value</label>
                       <input
                         type="number"
                         value={formData.contract_value}
                         onChange={(e) => setFormData({ ...formData, contract_value: e.target.value })}
-                        className="w-full bg-cloud-200 border border-charcoal-600 rounded-lg px-3 py-2 text-charcoal-800"
+                        className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-3 py-2 text-white"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm text-charcoal-500 mb-1">Forecast Margin %</label>
+                      <label className="block text-sm text-gray-400 mb-1">Forecast Margin %</label>
                       <input
                         type="number"
                         value={formData.forecast_margin}
                         onChange={(e) => setFormData({ ...formData, forecast_margin: e.target.value })}
-                        className="w-full bg-cloud-200 border border-charcoal-600 rounded-lg px-3 py-2 text-charcoal-800"
+                        className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-3 py-2 text-white"
                       />
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm text-charcoal-500 mb-1">Status</label>
+                      <label className="block text-sm text-gray-400 mb-1">Status</label>
                       <select
                         value={formData.status}
                         onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                        className="w-full bg-cloud-200 border border-charcoal-600 rounded-lg px-3 py-2 text-charcoal-800"
+                        className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-3 py-2 text-white"
                       >
                         <option value="active">Active</option>
                         <option value="completed">Completed</option>
@@ -399,11 +399,11 @@ const ProjectDetailPage = () => {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm text-charcoal-500 mb-1">Risk Level</label>
+                      <label className="block text-sm text-gray-400 mb-1">Risk Level</label>
                       <select
                         value={formData.risk_flag}
                         onChange={(e) => setFormData({ ...formData, risk_flag: e.target.value })}
-                        className="w-full bg-cloud-200 border border-charcoal-600 rounded-lg px-3 py-2 text-charcoal-800"
+                        className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-3 py-2 text-white"
                       >
                         <option value="green">Low Risk</option>
                         <option value="yellow">Medium Risk</option>
@@ -412,26 +412,26 @@ const ProjectDetailPage = () => {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm text-charcoal-500 mb-1">Notes</label>
+                    <label className="block text-sm text-gray-400 mb-1">Notes</label>
                     <textarea
                       value={formData.notes}
                       onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                       rows={3}
-                      className="w-full bg-cloud-200 border border-charcoal-600 rounded-lg px-3 py-2 text-charcoal-800 resize-none"
+                      className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-3 py-2 text-white resize-none"
                     />
                   </div>
                   <div className="flex gap-2 pt-2">
                     <button
                       onClick={handleSave}
                       disabled={isSaving}
-                      className="bg-steel-500 hover:bg-steel-600 text-charcoal-800 px-4 py-2 rounded-lg font-medium flex items-center gap-2"
+                      className="bg-steel-500 hover:bg-steel-600 text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2"
                     >
                       {isSaving ? <Clock className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                       Save
                     </button>
                     <button
                       onClick={() => setIsEditing(false)}
-                      className="text-charcoal-500 hover:text-charcoal-800 px-4 py-2"
+                      className="text-gray-400 hover:text-white px-4 py-2"
                     >
                       Cancel
                     </button>
@@ -447,26 +447,26 @@ const ProjectDetailPage = () => {
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-xs text-charcoal-400">Client/GC</p>
-                      <p className="text-charcoal-800">{project.client_gc || '—'}</p>
+                      <p className="text-xs text-gray-500">Client/GC</p>
+                      <p className="text-white">{project.client_gc || '—'}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-charcoal-400">Region</p>
-                      <p className="text-charcoal-800">{project.region || '—'}</p>
+                      <p className="text-xs text-gray-500">Region</p>
+                      <p className="text-white">{project.region || '—'}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-charcoal-400">Created</p>
-                      <p className="text-charcoal-800">{formatDate(project.created_at)}</p>
+                      <p className="text-xs text-gray-500">Created</p>
+                      <p className="text-white">{formatDate(project.created_at)}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-charcoal-400">Completion</p>
-                      <p className="text-charcoal-800">{project.percent_complete || 0}%</p>
+                      <p className="text-xs text-gray-500">Completion</p>
+                      <p className="text-white">{project.percent_complete || 0}%</p>
                     </div>
                   </div>
                   {project.notes && (
                     <div>
-                      <p className="text-xs text-charcoal-400">Notes</p>
-                      <p className="text-charcoal-800 text-sm mt-1">{project.notes}</p>
+                      <p className="text-xs text-gray-500">Notes</p>
+                      <p className="text-white text-sm mt-1">{project.notes}</p>
                     </div>
                   )}
                 </div>
@@ -474,20 +474,20 @@ const ProjectDetailPage = () => {
             </div>
 
             {/* Recent Activity */}
-            <div className="bg-white rounded-xl border border-cloud-300 p-6">
-              <h3 className="font-semibold text-charcoal-800 mb-4">Recent Activity</h3>
+            <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6">
+              <h3 className="font-semibold text-white mb-4">Recent Activity</h3>
               {productionLogs.length === 0 ? (
-                <p className="text-charcoal-400 text-sm text-center py-8">No activity recorded</p>
+                <p className="text-gray-500 text-sm text-center py-8">No activity recorded</p>
               ) : (
                 <div className="space-y-3">
                   {productionLogs.slice(0, 5).map(log => (
-                    <div key={log.id} className="flex items-start gap-3 p-3 bg-cloud-100 rounded-lg">
-                      <div className="w-8 h-8 bg-cloud-200 rounded-full flex items-center justify-center flex-shrink-0">
-                        <Activity className="w-4 h-4 text-charcoal-500" />
+                    <div key={log.id} className="flex items-start gap-3 p-3 bg-charcoal-700/50 rounded-lg">
+                      <div className="w-8 h-8 bg-charcoal-700 rounded-full flex items-center justify-center flex-shrink-0">
+                        <Activity className="w-4 h-4 text-gray-400" />
                       </div>
                       <div>
-                        <p className="text-sm text-charcoal-800">{log.notes || 'Activity recorded'}</p>
-                        <p className="text-xs text-charcoal-400">{formatDate(log.log_date)}</p>
+                        <p className="text-sm text-white">{log.notes || 'Activity recorded'}</p>
+                        <p className="text-xs text-gray-500">{formatDate(log.log_date)}</p>
                       </div>
                     </div>
                   ))}
@@ -504,30 +504,30 @@ const ProjectDetailPage = () => {
 
         {/* Milestones Tab */}
         {activeTab === 'milestones' && (
-          <div className="bg-white rounded-xl border border-cloud-300 p-6">
+          <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-charcoal-800">Milestones</h3>
+              <h3 className="font-semibold text-white">Milestones</h3>
               <Link to="/app/milestones" className="text-sm text-steel-400 hover:text-steel-300">
                 Manage Milestones →
               </Link>
             </div>
             {milestones.length === 0 ? (
-              <p className="text-charcoal-400 text-center py-8">No milestones for this project</p>
+              <p className="text-gray-500 text-center py-8">No milestones for this project</p>
             ) : (
               <div className="space-y-3">
                 {milestones.map(ms => (
-                  <div key={ms.id} className="flex items-center justify-between p-4 bg-cloud-100 rounded-lg">
+                  <div key={ms.id} className="flex items-center justify-between p-4 bg-charcoal-700/50 rounded-lg">
                     <div>
-                      <p className="text-charcoal-800 font-medium">{ms.name}</p>
-                      <p className="text-xs text-charcoal-400">{ms.due_date ? formatDate(ms.due_date) : 'No due date'}</p>
+                      <p className="text-white font-medium">{ms.name}</p>
+                      <p className="text-xs text-gray-500">{ms.due_date ? formatDate(ms.due_date) : 'No due date'}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-charcoal-800 font-semibold">{formatCurrency(ms.amount)}</p>
+                      <p className="text-white font-semibold">{formatCurrency(ms.amount)}</p>
                       <span className={`text-xs px-2 py-0.5 rounded-full ${
                         ms.status === 'paid' ? 'bg-success/20 text-success' :
                         ms.status === 'invoiced' ? 'bg-purple-500/20 text-purple-400' :
                         ms.status === 'approved' ? 'bg-green-500/20 text-green-400' :
-                        'bg-gray-500/20 text-charcoal-500'
+                        'bg-gray-500/20 text-gray-400'
                       }`}>{ms.status}</span>
                     </div>
                   </div>
@@ -539,30 +539,30 @@ const ProjectDetailPage = () => {
 
         {/* Invoices Tab */}
         {activeTab === 'invoices' && (
-          <div className="bg-white rounded-xl border border-cloud-300 p-6">
+          <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-charcoal-800">Invoices</h3>
+              <h3 className="font-semibold text-white">Invoices</h3>
               <Link to="/app/invoices" className="text-sm text-steel-400 hover:text-steel-300">
                 Manage Invoices →
               </Link>
             </div>
             {invoices.length === 0 ? (
-              <p className="text-charcoal-400 text-center py-8">No invoices for this project</p>
+              <p className="text-gray-500 text-center py-8">No invoices for this project</p>
             ) : (
               <div className="space-y-3">
                 {invoices.map(inv => (
-                  <div key={inv.id} className="flex items-center justify-between p-4 bg-cloud-100 rounded-lg">
+                  <div key={inv.id} className="flex items-center justify-between p-4 bg-charcoal-700/50 rounded-lg">
                     <div>
-                      <p className="text-charcoal-800 font-medium font-mono">{inv.invoice_number}</p>
-                      <p className="text-xs text-charcoal-400">{inv.client_name}</p>
+                      <p className="text-white font-medium font-mono">{inv.invoice_number}</p>
+                      <p className="text-xs text-gray-500">{inv.client_name}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-charcoal-800 font-semibold">{formatCurrency(inv.total)}</p>
+                      <p className="text-white font-semibold">{formatCurrency(inv.total)}</p>
                       <span className={`text-xs px-2 py-0.5 rounded-full ${
                         inv.status === 'paid' ? 'bg-success/20 text-success' :
                         inv.status === 'sent' ? 'bg-blue-500/20 text-blue-400' :
                         inv.status === 'overdue' ? 'bg-risk/20 text-risk' :
-                        'bg-gray-500/20 text-charcoal-500'
+                        'bg-gray-500/20 text-gray-400'
                       }`}>{inv.status}</span>
                     </div>
                   </div>
@@ -574,29 +574,29 @@ const ProjectDetailPage = () => {
 
         {/* Change Orders Tab */}
         {activeTab === 'change-orders' && (
-          <div className="bg-white rounded-xl border border-cloud-300 p-6">
+          <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-charcoal-800">Change Orders</h3>
+              <h3 className="font-semibold text-white">Change Orders</h3>
               <Link to="/app/change-orders" className="text-sm text-steel-400 hover:text-steel-300">
                 Manage COs →
               </Link>
             </div>
             {changeOrders.length === 0 ? (
-              <p className="text-charcoal-400 text-center py-8">No change orders for this project</p>
+              <p className="text-gray-500 text-center py-8">No change orders for this project</p>
             ) : (
               <div className="space-y-3">
                 {changeOrders.map(co => (
-                  <div key={co.id} className="flex items-center justify-between p-4 bg-cloud-100 rounded-lg">
+                  <div key={co.id} className="flex items-center justify-between p-4 bg-charcoal-700/50 rounded-lg">
                     <div>
-                      <p className="text-charcoal-800 font-medium">{co.title || `CO-${co.co_number}`}</p>
-                      <p className="text-xs text-charcoal-400">{formatDate(co.created_at)}</p>
+                      <p className="text-white font-medium">{co.title || `CO-${co.co_number}`}</p>
+                      <p className="text-xs text-gray-500">{formatDate(co.created_at)}</p>
                     </div>
                     <div className="text-right">
                       <p className="text-warning font-semibold">{formatCurrency(co.total_value)}</p>
                       <span className={`text-xs px-2 py-0.5 rounded-full ${
                         co.status === 'approved' ? 'bg-success/20 text-success' :
                         co.status === 'pending' ? 'bg-warning/20 text-warning' :
-                        'bg-gray-500/20 text-charcoal-500'
+                        'bg-gray-500/20 text-gray-400'
                       }`}>{co.status}</span>
                     </div>
                   </div>
@@ -608,22 +608,22 @@ const ProjectDetailPage = () => {
 
         {/* Expenses Tab */}
         {activeTab === 'expenses' && (
-          <div className="bg-white rounded-xl border border-cloud-300 p-6">
+          <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-charcoal-800">Expenses</h3>
+              <h3 className="font-semibold text-white">Expenses</h3>
               <Link to="/app/expenses" className="text-sm text-steel-400 hover:text-steel-300">
                 Manage Expenses →
               </Link>
             </div>
             {expenses.length === 0 ? (
-              <p className="text-charcoal-400 text-center py-8">No expenses for this project</p>
+              <p className="text-gray-500 text-center py-8">No expenses for this project</p>
             ) : (
               <div className="space-y-3">
                 {expenses.map(exp => (
-                  <div key={exp.id} className="flex items-center justify-between p-4 bg-cloud-100 rounded-lg">
+                  <div key={exp.id} className="flex items-center justify-between p-4 bg-charcoal-700/50 rounded-lg">
                     <div>
-                      <p className="text-charcoal-800 font-medium">{exp.description}</p>
-                      <p className="text-xs text-charcoal-400">{exp.category} • {formatDate(exp.expense_date)}</p>
+                      <p className="text-white font-medium">{exp.description}</p>
+                      <p className="text-xs text-gray-500">{exp.category} • {formatDate(exp.expense_date)}</p>
                     </div>
                     <p className="text-risk font-semibold">{formatCurrency(exp.amount)}</p>
                   </div>
@@ -635,9 +635,9 @@ const ProjectDetailPage = () => {
 
         {/* Documents Tab */}
         {activeTab === 'documents' && (
-          <div className="bg-white rounded-xl border border-cloud-300 p-6">
-            <h3 className="font-semibold text-charcoal-800 mb-4">Documents</h3>
-            <p className="text-charcoal-400 text-center py-8">
+          <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6">
+            <h3 className="font-semibold text-white mb-4">Documents</h3>
+            <p className="text-gray-500 text-center py-8">
               Document management coming soon.
               <br />
               <Link to="/app/documents" className="text-steel-400 hover:text-steel-300">
@@ -649,20 +649,20 @@ const ProjectDetailPage = () => {
 
         {/* Activity Tab */}
         {activeTab === 'activity' && (
-          <div className="bg-white rounded-xl border border-cloud-300 p-6">
-            <h3 className="font-semibold text-charcoal-800 mb-4">Activity Log</h3>
+          <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6">
+            <h3 className="font-semibold text-white mb-4">Activity Log</h3>
             {productionLogs.length === 0 ? (
-              <p className="text-charcoal-400 text-center py-8">No activity recorded for this project</p>
+              <p className="text-gray-500 text-center py-8">No activity recorded for this project</p>
             ) : (
               <div className="space-y-3">
                 {productionLogs.map(log => (
-                  <div key={log.id} className="flex items-start gap-3 p-4 bg-cloud-100 rounded-lg">
-                    <div className="w-10 h-10 bg-cloud-200 rounded-full flex items-center justify-center flex-shrink-0">
-                      <Activity className="w-5 h-5 text-charcoal-500" />
+                  <div key={log.id} className="flex items-start gap-3 p-4 bg-charcoal-700/50 rounded-lg">
+                    <div className="w-10 h-10 bg-charcoal-700 rounded-full flex items-center justify-center flex-shrink-0">
+                      <Activity className="w-5 h-5 text-gray-400" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-charcoal-800">{log.notes || 'Activity recorded'}</p>
-                      <p className="text-xs text-charcoal-400 mt-1">{formatDate(log.log_date)}</p>
+                      <p className="text-white">{log.notes || 'Activity recorded'}</p>
+                      <p className="text-xs text-gray-500 mt-1">{formatDate(log.log_date)}</p>
                     </div>
                   </div>
                 ))}
@@ -675,21 +675,21 @@ const ProjectDetailPage = () => {
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl border border-cloud-300 p-6 max-w-md w-full">
-            <h3 className="text-lg font-semibold text-charcoal-800 mb-2">Delete Project?</h3>
-            <p className="text-charcoal-500 mb-6">
+          <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6 max-w-md w-full">
+            <h3 className="text-lg font-semibold text-white mb-2">Delete Project?</h3>
+            <p className="text-gray-400 mb-6">
               This will permanently delete "{project.name}" and all associated data. This action cannot be undone.
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => setShowDeleteConfirm(false)}
-                className="flex-1 px-4 py-2 text-charcoal-500 hover:text-charcoal-800 border border-charcoal-600 rounded-lg"
+                className="flex-1 px-4 py-2 text-gray-400 hover:text-white border border-charcoal-600 rounded-lg"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDelete}
-                className="flex-1 bg-risk hover:bg-risk/80 text-charcoal-800 px-4 py-2 rounded-lg font-medium"
+                className="flex-1 bg-risk hover:bg-risk/80 text-white px-4 py-2 rounded-lg font-medium"
               >
                 Delete Project
               </button>
