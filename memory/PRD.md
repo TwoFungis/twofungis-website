@@ -209,6 +209,7 @@ Three founding members have been granted lifetime Elite access:
 ## Version History
 | Date | Version | Changes |
 |------|---------|---------|
+| Feb 18, 2026 | 3.2 | **Shield Headers Fixed**: Dark text with shield icons beside all app page headings, removed right shield from landing page, Reports page upgrade button fixed ($59/mo + link), Founder accounts API created and synced |
 | Feb 18, 2026 | 3.1 | **Pricing & Founder Plan**: Fixed pricing (Pro $29, Elite $59), restored Lifetime Founder $599 plan with badging, darker subpage headers, more visible shield watermark (6%), shields on all subpages |
 | Feb 18, 2026 | 3.0 | **Brand Overhaul**: Shield icon branding throughout app (sidebar, login, signup, dashboard, settings, landing page), larger header logos, background watermarks, "Free Month Trial" text |
 | Feb 18, 2026 | 2.9 | **UI Polish**: Setup Progress minimized by default with dark header, larger logos (website/app), shield backdrop watermark, "Free Month Trial" text updated |
