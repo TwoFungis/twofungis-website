@@ -9,117 +9,152 @@
 ## Problem Statement
 Contractors need a purpose-built operating system to manage their business operations - from quoting jobs to tracking profitability, managing change orders, and logging daily production. TradeOS provides all these tools in a single, mobile-first platform designed specifically for the construction trades.
 
-## Core Requirements
-
-### Branding & Design
-- Professional, minimal, industrial style
-- Dark theme with deep charcoal background (#0d0d0d - #333333)
-- Steel blue accents (#5a8fb8)
-- Status colors: Success (green), Warning (yellow), Risk (red)
-
-### Tech Stack
-- **Frontend:** React with Tailwind CSS
-- **Backend:** FastAPI (Python) + Supabase (PostgreSQL)
-- **Payments:** Stripe (subscriptions via emergentintegrations)
-- **State Management:** Zustand
-- **PDF Generation:** jsPDF, jsPDF-AutoTable
-- **AI Receipt Scanning:** GPT-4 Vision (via Emergent LLM key)
-
 ---
 
 ## What's Been Implemented (February 18, 2026)
 
-### ✅ Quality Audit & App Hardening (NEW - Feb 18)
-**Removed all mock data - app now shows REAL database data everywhere**
+### ✅ PHASE: Margin & Invoice Discipline Hardening (COMPLETE)
 
-- [x] **Dashboard** - Now shows REAL project data, change orders, milestones (no more mock)
-- [x] **Change Orders CRUD** - Full create, edit, delete, status change (was mock only)
-- [x] **Production Logs CRUD** - Full create, edit, delete (was mock only)
-- [x] **Labor Profile Save** - Now persists to database (was non-functional)
-- [x] **Flexible Payment Terms** - Quote builder supports Net 7/14/30/45/60 + custom days input
-- [x] **Quote Validity** - Custom quote validity days input
+#### 1. Dashboard Financial Pulse (NEW)
+- **Quick Stats Bar** - Real-time metrics at top of dashboard:
+  - Total Receivables (approved milestones + COs awaiting payment)
+  - This Month Revenue (paid milestones MTD)
+  - Pending COs value
+  - Overdue Amount (60+ days)
+- **Outstanding Payments Widget** - Aging breakdown:
+  - 0-30 days (Current) - Green
+  - 31-60 days (Follow up) - Yellow
+  - 60+ days (At Risk) - Red
+  - Visual progress bar showing distribution
+- Dashboard now shows 100% REAL data from database
 
-**Database Tables Added:**
-- `change_orders` - Track change orders with status, costs, notes
-- `production_logs` - Daily crew production tracking
-- `labor_profiles` - Save labor cost calculator profiles
+#### 2. Project Financial Health Panel (NEW)
+- Prominent panel at top of each project page showing:
+  - Contract Value
+  - Approved COs (with +$ indicator)
+  - Total Revenue (contract + COs)
+  - Cost to Date
+  - Gross Profit (calculated)
+  - Profit at Completion (forecast)
+  - Margin % with health indicator (Excellent/On Target/Below/At Risk)
+  - Completion progress bar
 
-### ✅ Phase 2.5: Bookkeeping & Tax Management
-- [x] **Bookkeeping Page** - `/app/bookkeeping` for expense tracking
-- [x] **AI Receipt Scanner** - GPT-4 Vision powered OCR
-- [x] **Manual Expense Form** - Add expenses without scanning
-- [x] **Bulk Receipt Upload** - Upload and scan multiple receipts
-- [x] **Document Vault** - Store invoices, contracts, quotes
-- [x] **PDF Report Export** - Generate tax-ready expense reports
-- [x] **Tax Savings Advisor** - Tax set-aside %, quarterly calculator, deduction tips
+#### 3. Change Order Margin Impact (NEW)
+- Each CO now displays:
+  - Calculated margin % based on value vs costs
+  - Profit amount (value - labor - material)
+  - Color-coded badge: green (≥15%), yellow (≥0%), red (<0%)
 
-### ✅ Phase 1: Milestone Approval Engine
-- [x] **Milestones Tab** - Tabbed interface (Overview, Milestones, Activity)
-- [x] **Milestone CRUD** - Add, edit, delete with auto-calculated values
-- [x] **Status Workflow** - Draft → Submitted → Approved → Paid
-- [x] **Client Review System** - Secure shareable links for approval
-- [x] **Dashboard Widget** - Milestone summary
+#### 4. Invoice Generation from Milestones (NEW)
+- "Generate Invoice" button on approved milestones
+- Professional PDF invoice generation with:
+  - Company branding
+  - Invoice number (auto-generated)
+  - Client details from project
+  - Milestone breakdown
+  - Payment terms (uses default from settings)
+  - Due date calculation
+- Invoice details stored on milestone (invoice_number, invoice_date, due_date)
+- Activity log entry created for audit trail
 
-### ✅ Phase 2: Contractor Hub
-- [x] **Profile Page** - Editable profile with avatar, bio, skills, certifications
-- [x] **Public Profile** - `/contractor/:id` for customers to view
+#### 5. Audit Trail / Activity Logging (NEW)
+- `activity_log` table created
+- Logs important actions:
+  - Invoice generation
+  - Milestone status changes
+  - (Extensible for future actions)
 
-### ✅ Core Features
-- [x] **Authentication** - Login, signup, magic link, onboarding
-- [x] **Projects CRUD** - Full project management with detail pages
-- [x] **Quote Builder** - Line items, pricing, flexible terms, PDF export
-- [x] **Labor Cost Calculator** - With profile saving
-- [x] **Settings** - Stripe subscription upgrade
+#### 6. Default Payment Terms in Settings (NEW)
+- Business Defaults section added to Settings page
+- Quick select buttons: Net 7, 14, 30, 45, 60
+- Custom days input for flexible terms
+- Saved to user profile
+- Applied automatically to new quotes and invoices
+
+#### 7. Reports Page with Real Analytics (NEW)
+- KPI cards with real data:
+  - Average Margin
+  - Revenue (MTD)
+  - CO Approval Rate
+  - At-Risk Projects count
+- Revenue Trend chart (6 months bar chart)
+- Margin by Project (visual breakdown)
+- Project Performance Table with sortable columns
 
 ---
 
-## Database Schema (Required Tables)
+### ✅ Quality Audit Fixes (Prior Session)
+- Dashboard: Removed all mock data, shows real DB data
+- Change Orders: Full CRUD (was mock only)
+- Production Logs: Full CRUD (was mock only)
+- Labor Profile Save: Now persists to database
+- Quote Builder: Flexible payment terms
 
-### Tables Applied via SQL:
+---
+
+## Database Schema
+
+### Tables (run in Supabase SQL Editor):
+```sql
+-- Core tables from APPLY_THIS_SCHEMA.sql
+users_profile, projects, project_milestones, client_approval_tokens, etc.
+
+-- Additional tables from APPLY_ADDITIONAL_TABLES.sql
+change_orders, production_logs, labor_profiles
+
+-- Invoice/Audit fields (added Feb 18):
+ALTER TABLE project_milestones ADD COLUMN invoice_number TEXT;
+ALTER TABLE project_milestones ADD COLUMN invoice_date TIMESTAMPTZ;
+ALTER TABLE project_milestones ADD COLUMN due_date TIMESTAMPTZ;
+ALTER TABLE project_milestones ADD COLUMN payment_status TEXT DEFAULT 'unpaid';
+ALTER TABLE users_profile ADD COLUMN default_payment_days INTEGER DEFAULT 30;
+
+CREATE TABLE activity_log (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  project_id UUID REFERENCES projects(id) ON DELETE CASCADE,
+  action_type TEXT NOT NULL,
+  entity_type TEXT NOT NULL,
+  entity_id UUID,
+  description TEXT,
+  metadata JSONB DEFAULT '{}',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
 ```
-- users_profile (extended with contractor fields)
-- projects
-- project_milestones
-- change_orders (NEW)
-- production_logs (NEW)
-- labor_profiles (NEW)
-- client_approval_tokens
-- milestone_approval_log
-- contractor_reviews
-- contractor_badges
-- portfolio_images
-- expenses
-- documents
-```
-
-**Important:** Run `/app/APPLY_THIS_SCHEMA.sql` and `/app/APPLY_ADDITIONAL_TABLES.sql` in Supabase SQL Editor.
 
 ---
 
-## Testing Status (Feb 18, 2026)
-- **Dashboard:** ✅ Shows real data
-- **Change Orders CRUD:** ✅ Verified working
-- **Production Logs CRUD:** ✅ Modal functional
-- **Labor Profile Save:** ✅ Saves to database
-- **Quote Builder:** ✅ Flexible payment terms working
+## Tech Stack
+- **Frontend:** React, Tailwind CSS, Zustand
+- **Backend:** FastAPI + Supabase
+- **PDF Generation:** jsPDF, jsPDF-AutoTable
+- **AI:** GPT-4 Vision (via Emergent LLM key) for receipt scanning
+- **Payments:** Stripe (configured)
 
 ---
 
-## Upcoming: Margin & Invoice Discipline Hardening (P0)
-
-User's 7-point plan for next phase:
-
-1. **Milestone-Based Invoice Triggers** - Generate invoice when milestone approved
-2. **Project Profit Clarity Panel** - Financial health metrics on project page
-3. **Change Order Impact Visibility** - Show margin impact on COs
-4. **Receivables Control Dashboard Widget** - Outstanding payments overview
-5. **Audit Trail Locking** - Activity log for key actions
-6. **UI Simplification** - Remove redundant widgets
-7. **Payment Terms Template** - Default terms in settings
+## Key Files Updated This Session
+- `/app/frontend/src/pages/app/DashboardPage.jsx` - Financial pulse dashboard
+- `/app/frontend/src/pages/app/ProjectDetailPage.jsx` - Financial Health Panel
+- `/app/frontend/src/pages/app/ChangeOrdersPage.jsx` - Margin impact visibility
+- `/app/frontend/src/pages/app/SettingsPage.jsx` - Business Defaults section
+- `/app/frontend/src/pages/app/ReportsPage.jsx` - Real analytics & charts
+- `/app/frontend/src/components/milestones/ProjectMilestones.jsx` - Invoice generation
 
 ---
 
-## Future Tasks (DE-PRIORITIZED)
+## Testing Status
+- ✅ Dashboard Quick Stats: Working
+- ✅ Outstanding Payments Widget: Working
+- ✅ Change Orders with margin impact: Working
+- ✅ Project Financial Health Panel: Implemented
+- ✅ Invoice Generation: Implemented
+- ✅ Settings Payment Terms: Implemented
+- ✅ Reports with real data: Implemented
+
+---
+
+## Future Tasks (Backlog)
 - Live Demo mode
 - Customer-facing marketplace
 - AI renovation visualization
@@ -127,10 +162,6 @@ User's 7-point plan for next phase:
 
 ---
 
-## Files of Reference
-- `/app/frontend/src/pages/app/DashboardPage.jsx` - Dashboard with real data
-- `/app/frontend/src/pages/app/ChangeOrdersPage.jsx` - Change Orders CRUD
-- `/app/frontend/src/pages/app/ProductionPage.jsx` - Production Logs CRUD
-- `/app/frontend/src/pages/app/LaborPage.jsx` - Labor calculator with save
-- `/app/frontend/src/pages/app/EstimatingPage.jsx` - Quote builder with flexible terms
-- `/app/APPLY_ADDITIONAL_TABLES.sql` - New tables SQL
+## Credentials for Testing
+- Test account: `test703691@tradeos.test` / `TestPass123!`
+- Or create new account via signup
