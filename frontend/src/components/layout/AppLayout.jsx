@@ -72,15 +72,12 @@ const AppLayout = () => {
                   isActive
                     ? 'bg-steel-500/20 text-steel-400'
                     : 'text-gray-400 hover:text-white hover:bg-charcoal-700'
-                } ${item.elite && profile?.subscription_tier !== 'elite' ? 'opacity-50' : ''}`
+                }`
               }
               data-testid={`nav-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
             >
               <item.icon className="w-5 h-5" />
               <span className="font-medium">{item.label}</span>
-              {item.elite && profile?.subscription_tier !== 'elite' && (
-                <Crown className="w-4 h-4 text-warning ml-auto" />
-              )}
             </NavLink>
           ))}
         </nav>
