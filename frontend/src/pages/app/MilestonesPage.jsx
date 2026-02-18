@@ -4,6 +4,7 @@ import {
   ChevronRight, MoreVertical, Edit2, Trash2, Lock, X, AlertCircle
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
+import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
