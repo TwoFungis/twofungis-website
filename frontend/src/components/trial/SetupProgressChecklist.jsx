@@ -153,12 +153,12 @@ const SetupProgressChecklist = () => {
     >
       {/* Header */}
       <div 
-        className="p-4 flex items-center justify-between cursor-pointer hover:bg-charcoal-700/30 transition-colors"
+        className="p-4 flex items-center justify-between cursor-pointer hover:bg-slate-400/10 transition-colors"
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-steel-500/20 rounded-full flex items-center justify-center">
-            <Sparkles className="w-5 h-5 text-steel-400" />
+          <div className="w-10 h-10 bg-slate-300/30 rounded-full flex items-center justify-center">
+            <Sparkles className="w-5 h-5 text-slate-200" />
           </div>
           <div>
             <h3 className="font-semibold text-white flex items-center gap-2">
