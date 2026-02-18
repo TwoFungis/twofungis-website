@@ -4,7 +4,7 @@ import {
   TrendingUp, FolderKanban, FileText, AlertTriangle, DollarSign,
   ArrowUpRight, ArrowDownRight, Target, CheckCircle2, Clock,
   Receipt, AlertCircle, Bell, Calendar, ChevronRight, Settings,
-  Percent, Wallet, Flag
+  Percent, Wallet, Flag, Crown
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { supabase } from '../../lib/supabase';
@@ -18,6 +18,10 @@ const DashboardPage = () => {
   const [invoices, setInvoices] = useState([]);
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  // Check if user is a founder
+  const tier = profile?.subscription_tier?.toLowerCase() || '';
+  const isFounder = tier.includes('founding') || tier === 'lifetime';
   
   // User preferences (stored in localStorage)
   const [marginThreshold, setMarginThreshold] = useState(() => 
