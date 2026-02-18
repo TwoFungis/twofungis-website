@@ -9,106 +9,67 @@
 
 ---
 
-## Strategic Direction (Updated February 18, 2026)
-TradeOS has pivoted from a marketplace-hybrid model to a **focused Contractor Operating System** centered on:
-- **Financial Control** - Margin tracking, receivables, expense management
-- **Project Management** - Milestones, change orders, project timelines
-- **Profitability** - Invoice discipline, payment tracking, tax-ready bookkeeping
+## What's Been Implemented (Feb 18, 2026)
 
-**Removed:** All public marketplace functionality (contractor directory, job postings, service listings)
+### ✅ Bug Fixes
+| Bug | Status |
+|-----|--------|
+| Add Expense button not working | ✅ FIXED - Modal now opens |
+| Upload Document button not working | ✅ FIXED - Modal now opens |
+| Reports Elite gate showing for Lifetime members | ✅ FIXED - Now checks for 'lifetime', 'elite', 'founding' tier variations |
 
----
+### ✅ Dashboard Financial Health Panel
+- Contract Value, Approved COs, Total Revenue, Gross Profit
+- Average Margin with health indicator (Excellent/On Target/Below/At Risk)
+- Project breakdown with margin bars
 
-## What's Been Implemented
+### ✅ Reports Page (Elite Feature)
+- 4 tabs (Overview, Revenue, Expenses, Projects)
+- Date range filter (Month/Quarter/YTD/All)
+- PDF export (P&L, Revenue, Projects reports)
 
-### ✅ Strategic Pivot - Complete (Feb 18, 2026)
-- Marketplace functionality removed from navigation and UI
-- New landing page with updated branding and messaging
-- Simplified navigation focusing on core business functions
+### ✅ Settings Page - Complete
+- Edit Profile form with validation
+- Change Password functionality
+- Delete Account with confirmation modal
+- Subscription display with upgrade buttons
 
-### ✅ Invoicing System (Feb 18, 2026)
-| Feature | Status |
-|---------|--------|
-| Invoice creation with line items | ✅ Complete |
-| Auto-incrementing invoice numbers | ✅ Complete |
-| Status workflow (Draft → Sent → Paid) | ✅ Complete |
-| Receivables dashboard widget | ✅ Complete |
-| Invoice detail view | ✅ Complete |
-| Mark as paid functionality | ✅ Complete |
+### ✅ Invoicing System
+- Invoice creation with line items
+- Auto-incrementing invoice numbers
+- Status workflow (Draft → Sent → Paid)
+- Email notification on send (if client email provided)
+- Receivables dashboard widget
 
-### ✅ Milestone Management (Feb 18, 2026)
-| Feature | Status |
-|---------|--------|
-| Milestone CRUD operations | ✅ Complete |
-| Status workflow (Draft → Submitted → Approved → Invoiced → Paid) | ✅ Complete |
-| Edit lock after invoicing | ✅ Complete |
-| Invoice generation from milestones | ✅ Complete |
-| Milestone statistics | ✅ Complete |
+### ✅ Milestone Management
+- Milestone CRUD with status workflow
+- Status workflow (Draft → Submitted → Approved → Invoiced → Paid)
+- Edit lock after invoicing
+- Invoice generation from milestones
 
-### ✅ Dashboard Financial Health Panel (Feb 18, 2026)
-| Feature | Status |
-|---------|--------|
-| Contract Value display | ✅ Complete |
-| Approved COs tracking | ✅ Complete |
-| Total Revenue calculation | ✅ Complete |
-| Gross Profit calculation | ✅ Complete |
-| Average Margin with health indicator | ✅ Complete |
-| Project breakdown with margin bars | ✅ Complete |
-
-### ✅ Reports Page (Elite Feature) (Feb 18, 2026)
-| Feature | Status |
-|---------|--------|
-| Elite gate for non-Elite users | ✅ Complete |
-| Overview tab with KPIs | ✅ Complete |
-| Revenue tab with monthly breakdown | ✅ Complete |
-| Expenses tab with category breakdown | ✅ Complete |
-| Projects tab with performance table | ✅ Complete |
-| Date range filter (Month/Quarter/YTD/All) | ✅ Complete |
-| PDF Export (P&L, Revenue, Projects) | ✅ Complete |
-
-### ✅ Settings Page - Complete (Feb 18, 2026)
-| Feature | Status |
-|---------|--------|
-| Profile viewing & editing | ✅ Complete |
-| Change password | ✅ Complete |
-| Delete account with confirmation | ✅ Complete |
-| Subscription display & upgrade | ✅ Complete |
-| Invoice defaults | ✅ Complete |
-| Notification preferences | ✅ Complete |
-
-### ✅ Stripe Integration (Live Mode)
-| Plan | Price | Type |
-|------|-------|------|
-| PRO | $49 CAD/mo | Subscription |
-| ELITE | $99 CAD/mo | Subscription |
-| LIFETIME_ELITE | $599 CAD | One-time (100 seats, Canada-only) |
-
-### ✅ Other Features
-- Change Order management with margin impact
-- Expense tracking with AI receipt scanning
-- Quote builder with flexible payment terms
-- Production logs
-- Labor profile management
+### ✅ Expenses API (NEW)
+- Full CRUD API for expenses
+- Category tracking (Materials, Labor, Equipment, etc.)
+- Tax deductible flag
+- Receipt URL storage
+- Tax summary endpoint
 
 ---
 
-## Database Schema
+## Database Migrations Required
 
-### New Tables Required (Run Migration!)
-```sql
--- Migration file: /app/migrations/006_invoicing_milestones_schema.sql
+### Run These in Supabase SQL Editor:
 
--- project_milestones: Milestone tracking
--- invoices: Invoice records
--- invoice_line_items: Invoice line items
--- invoice_counters: Auto-increment invoice numbers
--- invoice_activity_log: Audit trail
-```
+1. **`/app/migrations/006_invoicing_milestones_schema.sql`** - Creates:
+   - `project_milestones` table
+   - `invoices` table
+   - `invoice_line_items` table
+   - `invoice_counters` table
+   - `invoice_activity_log` table
 
-### Tables to Remove (Optional Cleanup)
-```sql
--- Migration file: /app/migrations/005_drop_marketplace_tables.sql
-```
+2. **`/app/migrations/007_expenses_schema_fix.sql`** - Updates expenses table:
+   - Adds missing columns: `expense_date`, `amount`, `category`, `description`, etc.
+   - Creates indexes and RLS policies
 
 ---
 
@@ -122,68 +83,57 @@ TradeOS has pivoted from a marketplace-hybrid model to a **focused Contractor Op
 
 ---
 
-## Navigation Structure
-```
-Dashboard      - Financial overview with Health Panel
-Projects       - Project management
-Estimates      - Quote builder
-Change Orders  - CO tracking
-Milestones     - Milestone management
-Invoices       - Invoice management
-Expenses       - Expense tracking
-Document Vault - File storage
-Reports        - Business analytics (Elite)
-Settings       - Account & subscription
-```
-
----
-
 ## API Endpoints
 
 ### Invoices API
-- `GET /api/invoices` - List all invoices with stats
-- `POST /api/invoices` - Create new invoice
-- `GET /api/invoices/{id}` - Get invoice details
-- `PATCH /api/invoices/{id}` - Update draft invoice
-- `POST /api/invoices/{id}/send` - Mark as sent
-- `POST /api/invoices/{id}/mark-paid` - Mark as paid
-- `DELETE /api/invoices/{id}` - Delete draft invoice
-- `GET /api/invoices/stats/receivables` - Aging report
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/invoices` | GET | List invoices with stats |
+| `/api/invoices` | POST | Create invoice |
+| `/api/invoices/{id}` | GET | Get invoice details |
+| `/api/invoices/{id}` | PATCH | Update draft invoice |
+| `/api/invoices/{id}/send` | POST | Mark as sent + email |
+| `/api/invoices/{id}/mark-paid` | POST | Mark as paid |
+| `/api/invoices/{id}` | DELETE | Delete draft invoice |
 
 ### Milestones API
-- `GET /api/milestones` - List all milestones with stats
-- `POST /api/milestones` - Create new milestone
-- `GET /api/milestones/{id}` - Get milestone details
-- `PATCH /api/milestones/{id}` - Update milestone
-- `POST /api/milestones/{id}/status` - Update status with workflow validation
-- `DELETE /api/milestones/{id}` - Delete draft milestone
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/milestones` | GET | List milestones |
+| `/api/milestones` | POST | Create milestone |
+| `/api/milestones/{id}` | GET | Get milestone |
+| `/api/milestones/{id}` | PATCH | Update milestone |
+| `/api/milestones/{id}/status` | POST | Update status |
+| `/api/milestones/{id}` | DELETE | Delete draft milestone |
+
+### Expenses API
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/expenses` | GET | List expenses with stats |
+| `/api/expenses` | POST | Create expense |
+| `/api/expenses/{id}` | GET | Get expense |
+| `/api/expenses/{id}` | PATCH | Update expense |
+| `/api/expenses/{id}` | DELETE | Delete expense |
+| `/api/expenses/summary/tax` | GET | Tax summary |
 
 ---
 
 ## Testing Status
-- ✅ Backend: 100% (28/28 tests passed)
-- ✅ Frontend: 100% (All features verified)
-- ✅ Dashboard Financial Health Panel verified
-- ✅ Reports Page Elite gate verified
-- ✅ Settings Page all sections verified
+- ✅ Frontend: 100% (All modals, buttons, forms working)
+- ⚠️ Backend: Database tables need to be created
+- ✅ Reports Elite gate: Working for all tier variations
 
 ---
 
-## User Actions Required
+## Backlog
 
-### Critical - Database Setup
-Run SQL migration `/app/migrations/006_invoicing_milestones_schema.sql` in Supabase SQL Editor
-
----
-
-## Backlog (P1)
-- [ ] Email notifications when invoices sent (integrate with Resend)
+### P1 - Next Up
+- [ ] Automatic overdue invoice status updates (cron job)
 - [ ] Invoice PDF generation and download
-- [ ] Automatic overdue invoice status updates
 
-## Future Tasks (P2)
-- [ ] Payment reminders automation
+### P2 - Future
 - [ ] Client portal for invoice viewing
+- [ ] Payment reminders automation
 - [ ] Advanced tax reporting
 - [ ] Final code cleanup (remove orphaned marketplace files)
 
@@ -197,7 +147,6 @@ Run SQL migration `/app/migrations/006_invoicing_milestones_schema.sql` in Supab
 ## Version History
 | Date | Version | Changes |
 |------|---------|---------|
-| Feb 18, 2026 | 2.1 | Dashboard Financial Health Panel, Reports Page with PDF export, Complete Settings Page |
+| Feb 18, 2026 | 2.2 | Bug fixes (Expense modal, Document upload, Elite gate), Expenses API |
+| Feb 18, 2026 | 2.1 | Dashboard Financial Health Panel, Reports Page, Complete Settings Page |
 | Feb 18, 2026 | 2.0 | Strategic pivot, Invoicing & Milestones |
-| Feb 17, 2026 | 1.5 | Marketplace V2 (now removed) |
-| Feb 16, 2026 | 1.0 | Initial Stripe integration |
