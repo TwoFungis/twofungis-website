@@ -276,7 +276,7 @@ const ChangeOrdersPage = () => {
         </div>
         <div className="bg-charcoal-800 rounded-xl p-4 border border-charcoal-700">
           <p className="text-gray-500 text-sm mb-1">Pending COs</p>
-          <p className="text-2xl font-bold text-charcoal-800">{changeOrders.filter(co => co.status === 'pending' || co.status === 'submitted').length}</p>
+          <p className="text-2xl font-bold text-white">{changeOrders.filter(co => co.status === 'pending' || co.status === 'submitted').length}</p>
         </div>
         <div className="bg-charcoal-800 rounded-xl p-4 border border-charcoal-700">
           <p className="text-gray-500 text-sm mb-1">Approved Value</p>
@@ -284,7 +284,7 @@ const ChangeOrdersPage = () => {
         </div>
         <div className="bg-charcoal-800 rounded-xl p-4 border border-charcoal-700">
           <p className="text-gray-500 text-sm mb-1">Total COs</p>
-          <p className="text-2xl font-bold text-charcoal-800">{changeOrders.length}</p>
+          <p className="text-2xl font-bold text-white">{changeOrders.length}</p>
         </div>
       </div>
 

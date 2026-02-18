@@ -186,7 +186,7 @@ const MilestonesPage = () => {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-4">
           <p className="text-gray-400 text-sm">Total Milestones</p>
-          <p className="text-2xl font-bold text-charcoal-800">{stats.total}</p>
+          <p className="text-2xl font-bold text-white">{stats.total}</p>
         </div>
         <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-4">
           <p className="text-gray-400 text-sm">Pending Approval</p>
@@ -198,7 +198,7 @@ const MilestonesPage = () => {
         </div>
         <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-4">
           <p className="text-gray-400 text-sm">Total Value</p>
-          <p className="text-2xl font-bold text-charcoal-800">${stats.total_value?.toLocaleString()}</p>
+          <p className="text-2xl font-bold text-white">${stats.total_value?.toLocaleString()}</p>
         </div>
       </div>
 
