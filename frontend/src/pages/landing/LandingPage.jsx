@@ -51,6 +51,12 @@ const LandingPage = () => {
             >
               Start Trial
             </Link>
+            <Link 
+              to="/auth" 
+              className="md:hidden text-gray-400 hover:text-white transition-colors text-sm font-medium mr-3"
+            >
+              Login
+            </Link>
           </div>
         </div>
       </header>
