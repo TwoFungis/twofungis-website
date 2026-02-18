@@ -155,15 +155,24 @@ const AppLayout = () => {
               {quickActionOpen && (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setQuickActionOpen(false)} />
-                  <div className="absolute right-0 mt-2 w-48 bg-charcoal-800 rounded-lg shadow-xl border border-charcoal-700 py-2 z-50">
-                    {quickActions.map((action) => (
+                  <div className="absolute right-0 mt-2 w-52 bg-charcoal-800 rounded-lg shadow-xl border border-charcoal-700 py-2 z-50">
+                    {quickActions.map((action, idx) => (
                       <button
-                        key={action.path}
+                        key={action.label}
                         onClick={() => {
-                          navigate(action.path);
+                          if (action.action) {
+                            action.action();
+                          } else if (action.path) {
+                            navigate(action.path);
+                          }
                           setQuickActionOpen(false);
                         }}
-                        className="flex items-center gap-3 w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-charcoal-700 transition-colors"
+                        className={`flex items-center gap-3 w-full px-4 py-2 transition-colors ${
+                          action.highlight 
+                            ? 'text-steel-400 hover:text-steel-300 hover:bg-steel-500/10 font-medium' 
+                            : 'text-gray-300 hover:text-white hover:bg-charcoal-700'
+                        } ${idx === 0 ? 'border-b border-charcoal-700 pb-2 mb-1' : ''}`}
+                        data-testid={`quick-action-${action.label.toLowerCase().replace(/\s+/g, '-')}`}
                       >
                         <action.icon className="w-4 h-4" />
                         {action.label}
