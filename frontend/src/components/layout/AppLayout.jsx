@@ -192,13 +192,13 @@ const AppLayout = () => {
 
         {/* Page Content with Shield Backdrop */}
         <main className="flex-1 p-4 lg:p-8 pb-20 lg:pb-8 overflow-auto relative">
-          {/* Large Shield Watermark - Centered Background */}
+          {/* Large Shield Watermark - Centered Background - More Visible */}
           <div 
             className="fixed inset-0 pointer-events-none z-0 flex items-center justify-center"
-            style={{ marginLeft: '200px' }} // Offset for sidebar
+            style={{ marginLeft: '200px' }}
           >
             <div 
-              className="w-[600px] h-[600px] opacity-[0.03]"
+              className="w-[700px] h-[700px] opacity-[0.06]"
               style={{
                 backgroundImage: 'url(/shield-icon.png)',
                 backgroundSize: 'contain',
