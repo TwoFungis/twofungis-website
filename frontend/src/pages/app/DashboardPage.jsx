@@ -324,7 +324,7 @@ const DashboardPage = () => {
       {/* ZONE B: FINANCIAL CONTROL */}
       {/* ============================================ */}
       <section data-testid="financial-zone">
-        <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Financial Control</h2>
+        <h2 className="text-sm font-semibold text-charcoal-600 uppercase tracking-wider mb-4">Financial Control</h2>
         
         {/* Main Financial Metrics */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -428,7 +428,7 @@ const DashboardPage = () => {
       {/* ============================================ */}
       <section data-testid="alerts-zone">
         <div className="flex items-center gap-2 mb-4">
-          <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">Alerts</h2>
+          <h2 className="text-sm font-semibold text-charcoal-600 uppercase tracking-wider">Alerts</h2>
           {alertCount > 0 && (
             <span className="bg-risk/20 text-risk text-xs px-2 py-0.5 rounded-full">{alertCount}</span>
           )}
@@ -505,7 +505,7 @@ const DashboardPage = () => {
       {/* MONTHLY TAX PANEL */}
       {/* ============================================ */}
       <section data-testid="tax-panel">
-        <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">This Month Summary</h2>
+        <h2 className="text-sm font-semibold text-charcoal-600 uppercase tracking-wider mb-4">This Month Summary</h2>
         
         <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-5">
           <div className="flex items-center justify-between mb-4">
