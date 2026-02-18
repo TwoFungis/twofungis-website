@@ -214,7 +214,7 @@ const SetupProgressChecklist = () => {
 
       {/* Expanded Content */}
       {isExpanded && (
-        <div className="px-4 pb-4 border-t border-slate-400/20">
+        <div className="px-4 pb-4 border-t border-charcoal-500">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-4">
             {CHECKLIST_ITEMS.map((item) => {
               const isCompleted = progress[item.checkField];
@@ -227,12 +227,12 @@ const SetupProgressChecklist = () => {
                   className={`flex items-center gap-3 p-3 rounded-lg transition-all ${
                     isCompleted 
                       ? 'bg-success/10 border border-success/20' 
-                      : 'bg-slate-400/10 border border-slate-400/30 hover:border-slate-300/50 hover:bg-slate-400/20'
+                      : 'bg-charcoal-700 border border-charcoal-500 hover:border-steel-500/50 hover:bg-charcoal-600'
                   }`}
                   data-testid={`setup-item-${item.id}`}
                 >
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                    isCompleted ? 'bg-success/20' : 'bg-slate-400/20'
+                    isCompleted ? 'bg-success/20' : 'bg-charcoal-600'
                   }`}>
                     {isCompleted ? (
                       <CheckCircle2 className="w-5 h-5 text-success" />
