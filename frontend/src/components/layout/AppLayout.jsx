@@ -120,7 +120,7 @@ const AppLayout = () => {
         <header className="bg-charcoal-800 border-b border-charcoal-700 px-4 lg:px-8 py-4 flex items-center justify-between">
           <button
             onClick={() => setMobileMenuOpen(true)}
-            className="lg:hidden text-charcoal-600 hover:text-charcoal-800"
+            className="lg:hidden text-gray-400 hover:text-white"
             data-testid="mobile-menu-btn"
           >
             <Menu className="w-6 h-6" />
@@ -149,7 +149,7 @@ const AppLayout = () => {
               {quickActionOpen && (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setQuickActionOpen(false)} />
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-cloud-300 py-2 z-50">
+                  <div className="absolute right-0 mt-2 w-48 bg-charcoal-800 rounded-lg shadow-xl border border-charcoal-700 py-2 z-50">
                     {quickActions.map((action) => (
                       <button
                         key={action.path}
@@ -157,7 +157,7 @@ const AppLayout = () => {
                           navigate(action.path);
                           setQuickActionOpen(false);
                         }}
-                        className="flex items-center gap-3 w-full px-4 py-2 text-charcoal-600 hover:text-charcoal-800 hover:bg-cloud-100 transition-colors"
+                        className="flex items-center gap-3 w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-charcoal-700 transition-colors"
                       >
                         <action.icon className="w-4 h-4" />
                         {action.label}
