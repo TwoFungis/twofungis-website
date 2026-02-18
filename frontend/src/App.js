@@ -78,6 +78,7 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/terms" element={<TermsPage />} />
+        <Route path="/contractors" element={<ContractorsPage />} />
         <Route path="/client/review/:token" element={<ClientReviewPage />} />
         <Route path="/contractor/:contractorId" element={<PublicContractorProfile />} />
         
