@@ -231,10 +231,10 @@ async def get_lifetime_seats_status():
     )
 
 
-# Create Checkout Session
+# Create Checkout Session (handles both subscription and one-time payment)
 @api_router.post("/subscription/checkout", response_model=SubscriptionCheckoutResponse)
 async def create_subscription_checkout(request: SubscriptionCheckoutRequest, http_request: Request):
-    """Create a Stripe checkout session for subscription"""
+    """Create a Stripe checkout session for subscription or lifetime purchase"""
     
     # Validate plan type
     if request.plan_type not in SUBSCRIPTION_PLANS:
@@ -242,8 +242,26 @@ async def create_subscription_checkout(request: SubscriptionCheckoutRequest, htt
     
     plan = SUBSCRIPTION_PLANS[request.plan_type]
     
+    # Special handling for Lifetime Elite
+    if request.plan_type == "lifetime_elite":
+        # Verify country restriction
+        user_country = getattr(request, 'country', None) or 'CA'
+        if user_country != plan.get("region_lock", "CA"):
+            raise HTTPException(
+                status_code=403, 
+                detail=f"Founding Lifetime membership is only available in {plan.get('region_lock', 'CA')}"
+            )
+        
+        # Check seat availability
+        seats_status = await get_lifetime_seats_status()
+        if not seats_status.is_available:
+            raise HTTPException(
+                status_code=410,
+                detail="All Founding Lifetime memberships have been claimed"
+            )
+    
     # Build success and cancel URLs from frontend origin
-    success_url = f"{request.origin_url}/app/settings?session_id={{CHECKOUT_SESSION_ID}}&payment=success"
+    success_url = f"{request.origin_url}/app/settings?session_id={{CHECKOUT_SESSION_ID}}&payment=success&plan={request.plan_type}"
     cancel_url = f"{request.origin_url}/app/settings?payment=cancelled"
     
     # Set up webhook URL
@@ -257,7 +275,8 @@ async def create_subscription_checkout(request: SubscriptionCheckoutRequest, htt
     metadata = {
         "plan_type": request.plan_type,
         "plan_name": plan["name"],
-        "source": "tradeos_subscription"
+        "source": "tradeos_subscription",
+        "mode": plan.get("mode", "subscription")
     }
     if request.user_id:
         metadata["user_id"] = request.user_id
@@ -287,6 +306,7 @@ async def create_subscription_checkout(request: SubscriptionCheckoutRequest, htt
             "amount": plan["amount"],
             "currency": plan["currency"],
             "payment_status": "pending",
+            "payment_mode": plan.get("mode", "subscription"),
             "metadata": metadata,
             "created_at": datetime.now(timezone.utc).isoformat(),
             "updated_at": datetime.now(timezone.utc).isoformat()
