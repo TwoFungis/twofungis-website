@@ -43,6 +43,14 @@ const MilestonesPage = () => {
     total_value: 0
   });
 
+  const getAuthHeaders = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    return {
+      'Authorization': `Bearer ${session?.access_token}`,
+      'Content-Type': 'application/json'
+    };
+  };
+
   useEffect(() => {
     fetchMilestones();
   }, []);
@@ -50,9 +58,8 @@ const MilestonesPage = () => {
   const fetchMilestones = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`${API_URL}/api/milestones`, {
-        headers: { 'Authorization': `Bearer ${user?.access_token}` }
-      });
+      const headers = await getAuthHeaders();
+      const response = await fetch(`${API_URL}/api/milestones`, { headers });
       if (response.ok) {
         const data = await response.json();
         setMilestones(data.milestones || []);
@@ -75,12 +82,10 @@ const MilestonesPage = () => {
 
   const handleStatusChange = async (milestoneId, newStatus) => {
     try {
+      const headers = await getAuthHeaders();
       const response = await fetch(`${API_URL}/api/milestones/${milestoneId}/status`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${user?.access_token}`,
-          'Content-Type': 'application/json'
-        },
+        headers,
         body: JSON.stringify({ status: newStatus })
       });
 
@@ -100,12 +105,10 @@ const MilestonesPage = () => {
     // Navigate to invoices page with milestone pre-populated
     // For now, we'll create the invoice directly
     try {
+      const headers = await getAuthHeaders();
       const response = await fetch(`${API_URL}/api/invoices`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${user?.access_token}`,
-          'Content-Type': 'application/json'
-        },
+        headers,
         body: JSON.stringify({
           milestone_id: milestone.id,
           project_id: milestone.project_id,
