@@ -4,10 +4,10 @@ import { Link } from 'react-router-dom';
 // Logo component with different size variants
 export const Logo = ({ size = 'md', showText = true, className = '' }) => {
   const sizes = {
-    sm: { img: 'h-8', text: 'text-lg' },
-    md: { img: 'h-10', text: 'text-xl' },
-    lg: { img: 'h-12', text: 'text-2xl' },
-    xl: { img: 'h-16', text: 'text-3xl' },
+    sm: { img: 'h-10', text: 'text-lg' },
+    md: { img: 'h-12', text: 'text-xl' },
+    lg: { img: 'h-14', text: 'text-2xl' },
+    xl: { img: 'h-20', text: 'text-3xl' },
   };
 
   const { img, text } = sizes[size] || sizes.md;
