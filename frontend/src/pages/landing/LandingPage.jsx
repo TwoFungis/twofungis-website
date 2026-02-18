@@ -230,7 +230,6 @@ const LandingPage = () => {
               <h2 className="text-3xl sm:text-4xl font-bold text-white">
                 Control. Clarity. Execution.
               </h2>
-              <img src="/shield-icon.png" alt="" className="w-10 h-10 opacity-50" />
             </div>
             <p className="text-gray-400 max-w-2xl mx-auto">
               Every feature built to protect your margin and keep your projects on track.
