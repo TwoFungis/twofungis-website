@@ -9,6 +9,8 @@ from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional, Dict
 import uuid
 from datetime import datetime, timezone
+import httpx
+import stripe
 
 # Import Stripe Checkout from emergentintegrations
 from emergentintegrations.payments.stripe.checkout import (
