@@ -3,10 +3,11 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { 
   ArrowLeft, Edit, TrendingUp, DollarSign, FileText, ClipboardList,
   Save, X, Trash2, AlertCircle, Calendar, MapPin, Building, Plus,
-  Activity, Target, Receipt, Wallet, Flag, FolderOpen, Clock
+  Activity, Target, Receipt, Wallet, Flag, FolderOpen, Clock, Package
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuthStore } from '../../store/authStore';
+import MaterialsTab from '../../components/project/MaterialsTab';
 
 const ProjectDetailPage = () => {
   const { id } = useParams();
