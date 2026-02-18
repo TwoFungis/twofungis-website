@@ -605,6 +605,12 @@ const ProjectMilestones = ({ project, onMilestoneChange }) => {
                       {/* Value and actions */}
                       <div className="flex items-center gap-3 sm:flex-col sm:items-end">
                         <p className="text-xl font-bold text-white">{formatCurrency(milestone.milestone_value)}</p>
+                        {/* Invoice badge if generated */}
+                        {milestone.invoice_number && (
+                          <span className="text-xs text-steel-400 bg-steel-500/20 px-2 py-0.5 rounded">
+                            {milestone.invoice_number}
+                          </span>
+                        )}
                         <div className="flex items-center gap-1">
                           {milestone.status === 'draft' && (
                             <button
@@ -614,6 +620,26 @@ const ProjectMilestones = ({ project, onMilestoneChange }) => {
                               data-testid={`submit-milestone-${index}`}
                             >
                               <Send className="w-4 h-4" />
+                            </button>
+                          )}
+                          {milestone.status === 'approved' && !milestone.invoice_number && (
+                            <button
+                              onClick={() => generateInvoice(milestone)}
+                              className="p-2 text-steel-400 hover:text-steel-300 hover:bg-steel-500/20 rounded-lg transition-colors flex items-center gap-1"
+                              title="Generate Invoice"
+                              data-testid={`generate-invoice-${index}`}
+                            >
+                              <FileText className="w-4 h-4" />
+                            </button>
+                          )}
+                          {milestone.status === 'approved' && milestone.invoice_number && (
+                            <button
+                              onClick={() => generateInvoice(milestone)}
+                              className="p-2 text-gray-400 hover:text-white hover:bg-charcoal-600 rounded-lg transition-colors"
+                              title="Download Invoice"
+                              data-testid={`download-invoice-${index}`}
+                            >
+                              <Download className="w-4 h-4" />
                             </button>
                           )}
                           {milestone.status === 'approved' && (
