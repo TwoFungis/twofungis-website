@@ -21,6 +21,8 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { Logo, LogoIcon } from '../ui/Logo';
+import TrialCountdown from '../trial/TrialCountdown';
+import TrialExpiredModal from '../trial/TrialExpiredModal';
 
 const AppLayout = () => {
   const { profile, signOut } = useAuthStore();
