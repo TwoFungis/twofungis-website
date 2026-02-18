@@ -115,8 +115,13 @@ const LandingPage = () => {
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-charcoal-900/90 backdrop-blur-md border-b border-charcoal-700/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <LogoLink size="sm" showText={false} />
+          <div className="flex items-center justify-between h-20">
+            <Link to="/" className="flex items-center gap-3">
+              <img src="/shield-icon.png" alt="TradeOS" className="h-12 w-auto" />
+              <span className="text-xl font-bold text-white tracking-tight hidden sm:block">
+                TRADEOS<span className="text-steel-400 align-super text-xs">™</span>
+              </span>
+            </Link>
             <nav className="hidden md:flex items-center gap-8">
               <a href="#features" className="text-gray-400 hover:text-white transition-colors text-sm font-medium">Features</a>
               <a href="#pricing" className="text-gray-400 hover:text-white transition-colors text-sm font-medium">Pricing</a>
