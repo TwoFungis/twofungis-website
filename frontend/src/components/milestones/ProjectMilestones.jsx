@@ -395,6 +395,29 @@ const ProjectMilestones = ({ project, onMilestoneChange }) => {
     // Save
     doc.save(`Invoice_${invoiceNumber}_${milestone.name.replace(/\s+/g, '_')}.pdf`);
     
+    // Send email notification (non-blocking)
+    try {
+      const API_URL = process.env.REACT_APP_BACKEND_URL;
+      await fetch(`${API_URL}/api/email/send-invoice`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          recipient_email: project?.client_email || user?.email,
+          recipient_name: project?.client_gc || 'Client',
+          invoice_number: invoiceNumber,
+          project_name: project?.name || 'Project',
+          milestone_name: milestone.name,
+          amount: parseFloat(milestone.milestone_value) || 0,
+          due_date: dueDate.toLocaleDateString(),
+          company_name: profile?.company_name || 'TradeOS',
+          payment_terms: defaultPaymentDays
+        })
+      });
+    } catch (emailErr) {
+      console.log('Email notification skipped:', emailErr.message);
+      // Don't block on email failure
+    }
+    
     // Refresh milestones
     fetchMilestones();
   };
