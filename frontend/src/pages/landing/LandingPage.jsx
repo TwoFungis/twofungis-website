@@ -154,7 +154,7 @@ const LandingPage = () => {
             <img 
               src="/logo.png" 
               alt="TradeOS - Built for Builders" 
-              className="h-36 sm:h-44 lg:h-52 w-auto drop-shadow-2xl"
+              className="h-44 sm:h-56 lg:h-64 w-auto drop-shadow-2xl"
             />
           </div>
           
