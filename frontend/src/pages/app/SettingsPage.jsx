@@ -49,8 +49,10 @@ const SettingsPage = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   
   const [defaultPaymentDays, setDefaultPaymentDays] = useState(profile?.default_payment_days || 30);
+  const [laborRate, setLaborRate] = useState(profile?.labor_rate || '');
   const [isSavingDefaults, setIsSavingDefaults] = useState(false);
   const [defaultsSaved, setDefaultsSaved] = useState(false);
+  const [laborRateSaved, setLaborRateSaved] = useState(false);
   
   const [plans, setPlans] = useState(null);
   const [isLoadingPlans, setIsLoadingPlans] = useState(true);
@@ -71,6 +73,7 @@ const SettingsPage = () => {
         phone: profile.phone || ''
       });
       setDefaultPaymentDays(profile.default_payment_days || 30);
+      setLaborRate(profile.labor_rate || '');
     }
   }, [profile]);
 
