@@ -194,6 +194,7 @@
 ## Version History
 | Date | Version | Changes |
 |------|---------|---------|
+| Feb 18, 2026 | 3.1 | **Pricing & Founder Plan**: Fixed pricing (Pro $29, Elite $59), restored Lifetime Founder $599 plan with badging, darker subpage headers, more visible shield watermark (6%), shields on all subpages |
 | Feb 18, 2026 | 3.0 | **Brand Overhaul**: Shield icon branding throughout app (sidebar, login, signup, dashboard, settings, landing page), larger header logos, background watermarks, "Free Month Trial" text |
 | Feb 18, 2026 | 2.9 | **UI Polish**: Setup Progress minimized by default with dark header, larger logos (website/app), shield backdrop watermark, "Free Month Trial" text updated |
 | Feb 18, 2026 | 2.8 | **Phase 2 Complete**: Setup Progress visibility fix, Enhanced Expenses UI (Business/Personal toggle, Deductibility %, Payment Method), Quick Add Expense global button |
