@@ -9,8 +9,6 @@ import {
 import { useAuthStore } from '../../store/authStore';
 import { supabase } from '../../lib/supabase';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
-
 const DashboardPage = () => {
   const { profile, user } = useAuthStore();
   const [projects, setProjects] = useState([]);
