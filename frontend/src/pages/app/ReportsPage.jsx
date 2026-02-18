@@ -18,7 +18,9 @@ const ReportsPage = () => {
   const [expenses, setExpenses] = useState([]);
   const [activeTab, setActiveTab] = useState('overview');
   const [dateRange, setDateRange] = useState('ytd');
-  const isElite = profile?.subscription_tier === 'elite' || profile?.subscription_tier === 'lifetime';
+  // Check for any elite tier variation (elite, lifetime, lifetime_elite, founding_lifetime, etc.)
+  const tier = profile?.subscription_tier?.toLowerCase() || '';
+  const isElite = tier === 'elite' || tier.includes('lifetime') || tier.includes('founding');
 
   useEffect(() => {
     const fetchData = async () => {
