@@ -13,6 +13,15 @@ module.exports = {
         sm: 'calc(var(--radius) - 4px)'
       },
       colors: {
+        // Light cloud grey backdrop
+        'cloud': {
+          50: '#fafbfc',
+          100: '#f4f6f8',
+          200: '#e9ecf0',
+          300: '#dde2e8',
+          400: '#c5cdd6',
+        },
+        // Dark accents for contrast
         'charcoal': {
           900: '#0d0d0d',
           800: '#1a1a1a',
