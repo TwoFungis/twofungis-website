@@ -3,16 +3,11 @@
 ## Product Overview
 **Name:** TradeOS™  
 **Tagline:** Built for Builders  
-**Type:** SaaS Web Application → **Evolving to Renovation Marketplace**  
-**Target Audience:** Trades, Subcontractors, Small GCs, and Homeowners (Customers)
+**Type:** SaaS Web Application - Contractor Operating System  
+**Target Audience:** Trades, Subcontractors, Small GCs
 
 ## Problem Statement
 Contractors need a purpose-built operating system to manage their business operations - from quoting jobs to tracking profitability, managing change orders, and logging daily production. TradeOS provides all these tools in a single, mobile-first platform designed specifically for the construction trades.
-
-**NEW VISION:** TradeOS is evolving into a full renovation marketplace where:
-- **Contractors** showcase skills, build reputation, and bid on jobs
-- **Customers** post renovation projects, visualize results with AI, and hire contractors
-- **Everyone** tracks project progress and milestones in real-time
 
 ## Core Requirements
 
@@ -21,188 +16,121 @@ Contractors need a purpose-built operating system to manage their business opera
 - Dark theme with deep charcoal background (#0d0d0d - #333333)
 - Steel blue accents (#5a8fb8)
 - Status colors: Success (green), Warning (yellow), Risk (red)
-- Milestone status colors: Draft (gray), Submitted (steel blue), Approved (green), Paid (dark green)
 
 ### Tech Stack
 - **Frontend:** React with Tailwind CSS
 - **Backend:** FastAPI (Python) + Supabase (PostgreSQL)
 - **Payments:** Stripe (subscriptions via emergentintegrations)
 - **State Management:** Zustand
-- **PDF Generation:** jsPDF
+- **PDF Generation:** jsPDF, jsPDF-AutoTable
 - **AI Receipt Scanning:** GPT-4 Vision (via Emergent LLM key)
-- **AI Visualization:** Gemini Nano Banana (planned for Phase 5)
 
 ---
 
-## What's Been Implemented (February 17, 2026)
+## What's Been Implemented (February 18, 2026)
 
-### ✅ Phase 2.5: Bookkeeping & Tax Management (NEW)
-- [x] **Bookkeeping Page** - New page at `/app/bookkeeping` for expense tracking
-- [x] **AI Receipt Scanner** - GPT-4 Vision powered OCR to extract vendor, amounts, tax, category
+### ✅ Quality Audit & App Hardening (NEW - Feb 18)
+**Removed all mock data - app now shows REAL database data everywhere**
+
+- [x] **Dashboard** - Now shows REAL project data, change orders, milestones (no more mock)
+- [x] **Change Orders CRUD** - Full create, edit, delete, status change (was mock only)
+- [x] **Production Logs CRUD** - Full create, edit, delete (was mock only)
+- [x] **Labor Profile Save** - Now persists to database (was non-functional)
+- [x] **Flexible Payment Terms** - Quote builder supports Net 7/14/30/45/60 + custom days input
+- [x] **Quote Validity** - Custom quote validity days input
+
+**Database Tables Added:**
+- `change_orders` - Track change orders with status, costs, notes
+- `production_logs` - Daily crew production tracking
+- `labor_profiles` - Save labor cost calculator profiles
+
+### ✅ Phase 2.5: Bookkeeping & Tax Management
+- [x] **Bookkeeping Page** - `/app/bookkeeping` for expense tracking
+- [x] **AI Receipt Scanner** - GPT-4 Vision powered OCR
 - [x] **Manual Expense Form** - Add expenses without scanning
-- [x] **Bulk Receipt Upload** - Upload and scan multiple receipts at once
-- [x] **Document Vault** - Store invoices, contracts, quotes, and other business documents
+- [x] **Bulk Receipt Upload** - Upload and scan multiple receipts
+- [x] **Document Vault** - Store invoices, contracts, quotes
 - [x] **PDF Report Export** - Generate tax-ready expense reports
-- [x] **Tax Savings Advisor** - Recommended tax set-aside %, quarterly payment calculator, deduction tips
-- [x] **Expense Categories** - 14 categories (Materials, Labor, Equipment, Vehicle, Tools, etc.)
-- [x] **Tax Support** - Canadian (HST/GST/PST, CPP) and US (Sales Tax, Self-Employment Tax)
-- [x] **Storage Limits** - By subscription: Trial (100MB), Pro (500MB), Elite (2GB)
-- [x] **Fiscal Year Tracking** - Track expenses by year and quarter
-- [x] **Database Schema** - `expenses` and `documents` tables
+- [x] **Tax Savings Advisor** - Tax set-aside %, quarterly calculator, deduction tips
 
-### ✅ Phase 1: Milestone Approval Engine (NEW)
-- [x] **Milestones Tab in Project Detail** - New tabbed interface (Overview, Milestones, Activity)
-- [x] **Milestone CRUD** - Add, edit, delete milestones with auto-calculated values from contract %
-- [x] **Status Workflow** - Draft → Submitted → Approved → Paid with color coding
-- [x] **Client Review System** - Secure shareable links for client approval
-- [x] **Client Approval Page** - Public page at `/client/review/:token`
-- [x] **Dashboard Milestone Widget** - Summary of Total/Pending/Approved/Paid values
-- [x] **Database Schema v2** - New tables: project_milestones, client_approval_tokens, milestone_approval_log
+### ✅ Phase 1: Milestone Approval Engine
+- [x] **Milestones Tab** - Tabbed interface (Overview, Milestones, Activity)
+- [x] **Milestone CRUD** - Add, edit, delete with auto-calculated values
+- [x] **Status Workflow** - Draft → Submitted → Approved → Paid
+- [x] **Client Review System** - Secure shareable links for approval
+- [x] **Dashboard Widget** - Milestone summary
 
-### ✅ Phase 2: Contractor Hub (NEW)
-- [x] **Profile Page** - New dedicated profile page with tabs (Profile, Account)
-- [x] **Contractor Profile Component** - Full editable profile with avatar, bio, skills, certifications
-- [x] **Skills Selection** - Clickable skill tags (18 options: Finishing Carpentry, Framing, Tile Work, etc.)
-- [x] **Certifications Selection** - Clickable certification badges (Licensed Contractor, OSHA 30, etc.)
-- [x] **Service Areas Management** - Add/remove service regions
-- [x] **Work Portfolio** - Display completed projects
-- [x] **Client Reviews Section** - Display reviews with star ratings
-- [x] **Public Profile Page** - `/contractor/:id` for customers to view contractor profiles
-- [x] **Sidebar "My Profile" Link** - Easy access to profile from navigation
-- [x] **Database Schema v3** - New tables: contractor_reviews, contractor_badges, portfolio_images
+### ✅ Phase 2: Contractor Hub
+- [x] **Profile Page** - Editable profile with avatar, bio, skills, certifications
+- [x] **Public Profile** - `/contractor/:id` for customers to view
 
-### ✅ Critical Bug Fixes Completed
-- [x] **AbortError on Quote Save - FIXED**
-- [x] **"Not authenticated" on Onboarding - FIXED**
-- [x] Improved session handling across all Supabase operations
-
-### ✅ Completed Features
-
-#### Backend API
-- [x] FastAPI server with health check
-- [x] Stripe subscription checkout (Pro/Elite plans)
-- [x] Payment status verification endpoint
-- [x] Webhook handler for Stripe events
-
-#### Authentication (Fully Functional)
-- [x] Login page (email/password + magic link toggle)
-- [x] Signup page with plan selection
-- [x] Onboarding flow (3-step)
-- [x] Session persistence and refresh handling
-
-#### App Pages (All Functional)
-- [x] Dashboard with stats cards + milestone summary widget
-- [x] **Projects CRUD** with Detail Page (tabs: Overview, Milestones, Activity)
-- [x] **Quote Builder** - Line items, pricing, PDF export
-- [x] Labor Cost Calculator
-- [x] Change Orders page (mock data)
-- [x] Production Logs page (mock data)
-- [x] Reports page (Elite-gated)
-- [x] Settings with Stripe Upgrade
+### ✅ Core Features
+- [x] **Authentication** - Login, signup, magic link, onboarding
+- [x] **Projects CRUD** - Full project management with detail pages
+- [x] **Quote Builder** - Line items, pricing, flexible terms, PDF export
+- [x] **Labor Cost Calculator** - With profile saving
+- [x] **Settings** - Stripe subscription upgrade
 
 ---
 
-## ⚠️ ACTION REQUIRED: Run Database Schema Updates
+## Database Schema (Required Tables)
 
-**STATUS: ✅ COMPLETED (Feb 17, 2026)**
+### Tables Applied via SQL:
+```
+- users_profile (extended with contractor fields)
+- projects
+- project_milestones
+- change_orders (NEW)
+- production_logs (NEW)
+- labor_profiles (NEW)
+- client_approval_tokens
+- milestone_approval_log
+- contractor_reviews
+- contractor_badges
+- portfolio_images
+- expenses
+- documents
+```
 
-The user has successfully applied the consolidated database schema which includes:
-- All columns needed for `users_profile` (bio, skills, certifications, etc.)
-- `project_milestones` table for milestone tracking
-- Support for contractor reviews and badges
-
-The simplified schema was applied via `/app/APPLY_THIS_SCHEMA.sql` (consolidated version).
-
----
-
-## Recent Enhancements (Feb 17, 2026)
-
-### ✅ Professional PDF Invoicing
-- Integrated `downloadQuotePDF` from `/app/frontend/src/utils/pdfGenerator.js`
-- Added "Download PDF" button to saved quotes in Estimating page
-- Professional PDF layout with company branding
-
-### ✅ Landing Page Enhancements
-- **ROI Calculator Section** - Shows potential savings ($18K-$27K recovery, 25x-38x ROI)
-- **Video Demo Section** - "Watch How TradeOS Works" placeholder with play button
-- **Success Stories/Case Studies** - 3 cards with real contractor results (+12% margin, 3hrs saved, $0 unpaid extras)
+**Important:** Run `/app/APPLY_THIS_SCHEMA.sql` and `/app/APPLY_ADDITIONAL_TABLES.sql` in Supabase SQL Editor.
 
 ---
 
-## Marketplace Roadmap (5 Phases)
-
-### Phase 1: Foundation & Milestone Engine ✅ COMPLETE
-- User roles (contractor/customer)
-- Milestone system with client approval
-- Dashboard updates
-
-### Phase 2: Contractor Hub (NEXT)
-- Contractor profiles (skills, certifications, portfolio)
-- Work history & project showcase
-- Review/rating system
-
-### Phase 3: Customer Side & Job Posting
-- Customer accounts & dashboard
-- Post renovation projects with photos
-- Define scope, budget, timeline
-
-### Phase 4: Marketplace & Bidding
-- Contractors browse available jobs
-- Submit bids with proposals
-- Client reviews & accepts bids
-
-### Phase 5: AI Visualization
-- Customer uploads room photo
-- Select products/materials
-- Gemini Nano Banana generates "after" visualization
+## Testing Status (Feb 18, 2026)
+- **Dashboard:** ✅ Shows real data
+- **Change Orders CRUD:** ✅ Verified working
+- **Production Logs CRUD:** ✅ Modal functional
+- **Labor Profile Save:** ✅ Saves to database
+- **Quote Builder:** ✅ Flexible payment terms working
 
 ---
 
-## Testing Status (Feb 17, 2026)
-- **Backend API:** ✅ 100% Pass
-- **Frontend E2E:** ✅ 100% Pass
-  - All existing features ✅
-  - Milestones tab ✅
-  - Tab navigation ✅
-  - Client review page route ✅
-  - Signup → Onboarding → Dashboard flow ✅ VERIFIED
-  - Database schema applied and working ✅
+## Upcoming: Margin & Invoice Discipline Hardening (P0)
+
+User's 7-point plan for next phase:
+
+1. **Milestone-Based Invoice Triggers** - Generate invoice when milestone approved
+2. **Project Profit Clarity Panel** - Financial health metrics on project page
+3. **Change Order Impact Visibility** - Show margin impact on COs
+4. **Receivables Control Dashboard Widget** - Outstanding payments overview
+5. **Audit Trail Locking** - Activity log for key actions
+6. **UI Simplification** - Remove redundant widgets
+7. **Payment Terms Template** - Default terms in settings
 
 ---
 
-## P1 Upcoming Tasks
-
-1. **Implement "Live Demo" Mode** - Allow prospective users to explore the app with mock data without signup
-2. **Make ROI Calculator Interactive** - Add input fields so users can enter their own project values
-3. **Add actual demo video** - Record or embed a 2-min product walkthrough
-
-## P2 Future Tasks (Per Marketplace Vision)
-
-### Phase 3: Customer & Marketplace Foundation
-- Customer-facing accounts and project views
-- Job posting and bidding system for contractors
-
-### Phase 4: AI Visualization & Advanced Features
-- AI-powered "See your renovation" tool (Gemini Nano Banana)
-- Advanced analytics and reporting
-
-### Phase 5: Additional Enhancements
-- Mobile PWA Support
-- Contractor verification system
-- Payment escrow for milestones
+## Future Tasks (DE-PRIORITIZED)
+- Live Demo mode
+- Customer-facing marketplace
+- AI renovation visualization
+- Payment escrow
 
 ---
 
 ## Files of Reference
-- `/app/frontend/src/pages/app/ProjectDetailPage.jsx` - Project detail with tabs
-- `/app/frontend/src/components/milestones/ProjectMilestones.jsx` - Milestone component
-- `/app/frontend/src/pages/public/ClientReviewPage.jsx` - Client approval page
-- `/app/frontend/src/pages/app/DashboardPage.jsx` - Dashboard with milestone widget
-- `/app/supabase_schema_v2.sql` - New milestone database schema
-
----
-
-## Notes
-- Dashboard, Change Orders, and Production pages show MOCKED demo data by design
-- Milestone feature requires running `supabase_schema_v2.sql` first
-- Client review links expire after 90 days by default
+- `/app/frontend/src/pages/app/DashboardPage.jsx` - Dashboard with real data
+- `/app/frontend/src/pages/app/ChangeOrdersPage.jsx` - Change Orders CRUD
+- `/app/frontend/src/pages/app/ProductionPage.jsx` - Production Logs CRUD
+- `/app/frontend/src/pages/app/LaborPage.jsx` - Labor calculator with save
+- `/app/frontend/src/pages/app/EstimatingPage.jsx` - Quote builder with flexible terms
+- `/app/APPLY_ADDITIONAL_TABLES.sql` - New tables SQL
