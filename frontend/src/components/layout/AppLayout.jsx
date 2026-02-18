@@ -18,12 +18,14 @@ import {
   FileSpreadsheet,
   Crown,
   User,
-  PieChart
+  PieChart,
+  Briefcase
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { Logo, LogoIcon } from '../ui/Logo';
 import TrialCountdown from '../trial/TrialCountdown';
 import TrialExpiredModal from '../trial/TrialExpiredModal';
+import QuickAddExpenseModal from './QuickAddExpenseModal';
 
 const AppLayout = () => {
   const { profile, signOut } = useAuthStore();
