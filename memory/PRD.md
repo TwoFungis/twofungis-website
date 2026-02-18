@@ -194,6 +194,7 @@
 ## Version History
 | Date | Version | Changes |
 |------|---------|---------|
+| Feb 18, 2026 | 2.9 | **UI Polish**: Setup Progress minimized by default with dark header, larger logos (website/app), shield backdrop watermark, "Free Month Trial" text updated |
 | Feb 18, 2026 | 2.8 | **Phase 2 Complete**: Setup Progress visibility fix, Enhanced Expenses UI (Business/Personal toggle, Deductibility %, Payment Method), Quick Add Expense global button |
 | Feb 18, 2026 | 2.7 | **P0 Bug Fixes**: Fixed ExpensesPage runtime error (CATEGORIES case sensitivity), fixed expense/invoice creation auth, fixed text visibility across all pages |
 | Feb 18, 2026 | 2.6 | **Phase 2 & 3**: Enhanced Expenses (14 categories + deductibility), Tax Summary Page |
