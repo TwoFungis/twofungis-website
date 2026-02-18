@@ -37,6 +37,8 @@ const ExpensesPage = () => {
   const [dateRange, setDateRange] = useState('month');
   const [showNewModal, setShowNewModal] = useState(false);
   const [showTaxSummary, setShowTaxSummary] = useState(false);
+  const [activeActionMenu, setActiveActionMenu] = useState(null);
+  const [editingExpense, setEditingExpense] = useState(null);
 
   useEffect(() => {
     fetchExpenses();
