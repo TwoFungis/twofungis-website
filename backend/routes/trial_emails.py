@@ -56,7 +56,7 @@ def get_user_id_from_token(authorization: str) -> Optional[str]:
         decoded = base64.urlsafe_b64decode(payload)
         data = json.loads(decoded)
         return data.get('sub')
-    except:
+    except Exception:
         return None
 
 
