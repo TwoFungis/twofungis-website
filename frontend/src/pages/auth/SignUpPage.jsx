@@ -82,14 +82,23 @@ const SignUpPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-charcoal-900 flex items-center justify-center px-4 py-12">
-      <div className="max-w-md w-full">
+    <div className="min-h-screen bg-charcoal-900 flex items-center justify-center px-4 py-12 relative">
+      {/* Background Shield Watermark */}
+      <div 
+        className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-[0.03]"
+      >
+        <img src="/shield-icon.png" alt="" className="w-96 h-96 object-contain" />
+      </div>
+
+      <div className="max-w-md w-full relative z-10">
         <div className="flex justify-center mb-8">
-          <LogoLink size="lg" showText={false} />
+          <Link to="/">
+            <img src="/shield-icon.png" alt="TradeOS" className="h-20 w-auto" />
+          </Link>
         </div>
 
         <div className="bg-charcoal-800 rounded-2xl p-8 border border-charcoal-700" data-testid="signup-form">
-          <h2 className="text-2xl font-bold text-white mb-2 text-center">Start Your Free Trial</h2>
+          <h2 className="text-2xl font-bold text-white mb-2 text-center italic">Start Your Free Trial</h2>
           <p className="text-gray-400 text-center mb-2">30 days free, no credit card required</p>
           <p className="text-steel-400 text-center text-sm mb-8 capitalize">
             Selected Plan: <strong>{selectedPlan}</strong>
