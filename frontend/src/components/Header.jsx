@@ -112,6 +112,15 @@ const Header = () => {
             >
               Portfolio
             </button>
+
+            <Link
+              to="/contractors"
+              className="text-white transition-colors duration-200 font-medium"
+              onMouseEnter={(e) => e.target.style.color='#228B22'}
+              onMouseLeave={(e) => e.target.style.color='white'}
+            >
+              Marketplace
+            </Link>
             
             {/* Locations Dropdown */}
             <div className="relative" ref={dropdownRef}>
@@ -241,6 +250,14 @@ const Header = () => {
               >
                 Portfolio
               </button>
+
+              <Link
+                to="/contractors"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="text-white transition-colors duration-200 font-medium text-left"
+              >
+                Marketplace
+              </Link>
               
               {/* Mobile Locations */}
               <div className="border-t border-gray-800 pt-4">
