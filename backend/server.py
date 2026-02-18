@@ -167,6 +167,70 @@ async def get_subscription_plans():
     }
 
 
+# Lifetime Seats Status endpoint
+@api_router.get("/subscription/lifetime/status", response_model=LifetimeSeatsResponse)
+async def get_lifetime_seats_status():
+    """Get the current status of Founding Lifetime memberships"""
+    
+    # Query Supabase for seat status
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                f"{SUPABASE_URL}/rest/v1/rpc/get_lifetime_seats_status",
+                headers={
+                    "apikey": SUPABASE_SERVICE_KEY,
+                    "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+                    "Content-Type": "application/json"
+                }
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data and len(data) > 0:
+                    return LifetimeSeatsResponse(
+                        seats_remaining=data[0].get("seats_remaining", 0),
+                        is_available=data[0].get("is_available", False),
+                        region_lock=data[0].get("region_lock", "CA"),
+                        max_seats=SUBSCRIPTION_PLANS["lifetime_elite"]["max_seats"]
+                    )
+    except Exception as e:
+        logging.error(f"Error fetching lifetime seats status: {str(e)}")
+    
+    # Fallback: query the table directly
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                f"{SUPABASE_URL}/rest/v1/founding_lifetime_counter?id=eq.1",
+                headers={
+                    "apikey": SUPABASE_SERVICE_KEY,
+                    "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+                    "Content-Type": "application/json"
+                }
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data and len(data) > 0:
+                    counter = data[0]
+                    seats_remaining = counter.get("max_seats", 100) - counter.get("seats_sold", 0)
+                    return LifetimeSeatsResponse(
+                        seats_remaining=seats_remaining,
+                        is_available=counter.get("is_active", True) and seats_remaining > 0,
+                        region_lock=counter.get("region_lock", "CA"),
+                        max_seats=counter.get("max_seats", 100)
+                    )
+    except Exception as e:
+        logging.error(f"Error fetching counter directly: {str(e)}")
+    
+    # Default response if all fails
+    return LifetimeSeatsResponse(
+        seats_remaining=100,
+        is_available=True,
+        region_lock="CA",
+        max_seats=100
+    )
+
+
 # Create Checkout Session
 @api_router.post("/subscription/checkout", response_model=SubscriptionCheckoutResponse)
 async def create_subscription_checkout(request: SubscriptionCheckoutRequest, http_request: Request):
