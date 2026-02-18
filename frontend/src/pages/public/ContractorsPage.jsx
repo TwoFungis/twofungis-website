@@ -3,8 +3,9 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { 
   Search, MapPin, Briefcase, Shield, ShieldCheck, Star, ChevronDown, Users, Filter, X, ExternalLink,
   Phone, Mail, Globe, ArrowLeft, Calendar, DollarSign, Clock, MessageSquare, Send, Wrench, Building2,
-  UserPlus, CheckCircle
+  UserPlus, CheckCircle, Plus, Home, LogOut
 } from 'lucide-react';
+import { useAuthStore } from '../../store/authStore';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -112,7 +113,7 @@ const ContractorCard = ({ contractor, onClick }) => {
 };
 
 // Contractor Detail Modal/View
-const ContractorDetail = ({ contractor, onClose, onConnect }) => {
+const ContractorDetail = ({ contractor, onClose, onConnect, isLoggedIn }) => {
   const [contactForm, setContactForm] = useState({
     name: '',
     email: '',
@@ -286,13 +287,23 @@ const ContractorDetail = ({ contractor, onClose, onConnect }) => {
               </div>
 
               {/* Connect Button */}
-              <button
-                onClick={onConnect}
-                className="w-full bg-steel-500/20 hover:bg-steel-500/30 text-steel-400 py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
-              >
-                <UserPlus className="w-5 h-5" />
-                Connect with {contractor.company_name}
-              </button>
+              {isLoggedIn ? (
+                <button
+                  onClick={onConnect}
+                  className="w-full bg-steel-500/20 hover:bg-steel-500/30 text-steel-400 py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
+                >
+                  <UserPlus className="w-5 h-5" />
+                  Connect with {contractor.company_name}
+                </button>
+              ) : (
+                <Link
+                  to="/signup?intent=connect"
+                  className="w-full bg-steel-500 hover:bg-steel-600 text-white py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
+                >
+                  <UserPlus className="w-5 h-5" />
+                  Sign Up to Connect
+                </Link>
+              )}
             </div>
           )}
 
@@ -485,9 +496,177 @@ const ContractorDetail = ({ contractor, onClose, onConnect }) => {
   );
 };
 
+// Post Job Modal
+const PostJobModal = ({ onClose, onSuccess }) => {
+  const { user } = useAuthStore();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    trade_required: '',
+    location: '',
+    budget_min: '',
+    budget_max: '',
+    timeline: ''
+  });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const { data: { session } } = await (await import('../../lib/supabase')).supabase.auth.getSession();
+      
+      const response = await fetch(`${API_URL}/api/marketplace/jobs`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.access_token}`
+        },
+        body: JSON.stringify({
+          ...formData,
+          budget_min: formData.budget_min ? parseFloat(formData.budget_min) : null,
+          budget_max: formData.budget_max ? parseFloat(formData.budget_max) : null
+        })
+      });
+
+      if (response.ok) {
+        onSuccess();
+        onClose();
+      } else {
+        const error = await response.json();
+        alert(error.detail || 'Failed to post job');
+      }
+    } catch (error) {
+      console.error('Error posting job:', error);
+      alert('Failed to post job');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-charcoal-800 rounded-2xl border border-charcoal-700 w-full max-w-lg">
+        <div className="p-6 border-b border-charcoal-700 flex items-center justify-between">
+          <h2 className="text-xl font-bold text-white">Post a Job</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-white">
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-400 mb-1">Job Title *</label>
+            <input
+              type="text"
+              required
+              value={formData.title}
+              onChange={(e) => setFormData({...formData, title: e.target.value})}
+              className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-4 py-2 text-white"
+              placeholder="e.g., Need Electrician for Residential Project"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-400 mb-1">Description *</label>
+            <textarea
+              required
+              rows={3}
+              value={formData.description}
+              onChange={(e) => setFormData({...formData, description: e.target.value})}
+              className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-4 py-2 text-white resize-none"
+              placeholder="Describe the job requirements..."
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-1">Trade Required *</label>
+              <select
+                required
+                value={formData.trade_required}
+                onChange={(e) => setFormData({...formData, trade_required: e.target.value})}
+                className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-4 py-2 text-white"
+              >
+                <option value="">Select trade...</option>
+                <option value="Electrician">Electrician</option>
+                <option value="Plumber">Plumber</option>
+                <option value="Carpenter">Carpenter</option>
+                <option value="HVAC">HVAC</option>
+                <option value="Roofer">Roofer</option>
+                <option value="Painter">Painter</option>
+                <option value="Concrete">Concrete</option>
+                <option value="Framing">Framing</option>
+                <option value="Drywall">Drywall</option>
+                <option value="General Contractor">General Contractor</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-1">Location *</label>
+              <input
+                type="text"
+                required
+                value={formData.location}
+                onChange={(e) => setFormData({...formData, location: e.target.value})}
+                className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-4 py-2 text-white"
+                placeholder="City, Province"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-1">Budget Min ($)</label>
+              <input
+                type="number"
+                value={formData.budget_min}
+                onChange={(e) => setFormData({...formData, budget_min: e.target.value})}
+                className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-4 py-2 text-white"
+                placeholder="0"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-1">Budget Max ($)</label>
+              <input
+                type="number"
+                value={formData.budget_max}
+                onChange={(e) => setFormData({...formData, budget_max: e.target.value})}
+                className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-4 py-2 text-white"
+                placeholder="0"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-400 mb-1">Timeline</label>
+            <input
+              type="text"
+              value={formData.timeline}
+              onChange={(e) => setFormData({...formData, timeline: e.target.value})}
+              className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-4 py-2 text-white"
+              placeholder="e.g., 2 weeks, ASAP, Flexible"
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full bg-steel-500 hover:bg-steel-600 disabled:opacity-50 text-white py-3 rounded-lg font-medium"
+          >
+            {isSubmitting ? 'Posting...' : 'Post Job'}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+};
+
 // Main Page
 const ContractorsPage = () => {
   const navigate = useNavigate();
+  const { user, profile, signOut } = useAuthStore();
   const [searchParams, setSearchParams] = useSearchParams();
   
   const [contractors, setContractors] = useState([]);
@@ -506,6 +685,11 @@ const ContractorsPage = () => {
   // Selected contractor for detail view
   const [selectedContractor, setSelectedContractor] = useState(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
+  
+  // Post job modal
+  const [showPostJobModal, setShowPostJobModal] = useState(false);
+
+  const isLoggedIn = !!user;
 
   // Fetch filter options
   useEffect(() => {
@@ -566,18 +750,13 @@ const ContractorsPage = () => {
 
   // Load contractor detail
   const loadContractorDetail = async (contractor) => {
-    console.log('loadContractorDetail called with:', contractor);
     setLoadingDetail(true);
     try {
       const response = await fetch(`${API_URL}/api/marketplace/contractor/${contractor.user_id}/full`);
-      console.log('API response status:', response.status);
       if (response.ok) {
         const data = await response.json();
-        console.log('Setting selectedContractor:', data);
         setSelectedContractor(data);
       } else {
-        // Fallback to basic data if full endpoint fails
-        console.log('API failed, using fallback data');
         setSelectedContractor(contractor);
       }
     } catch (error) {
@@ -607,38 +786,77 @@ const ContractorsPage = () => {
 
   const hasActiveFilters = selectedTrade || selectedRegion || minVerification > 0 || acceptingOnly;
 
-  const handleConnect = () => {
-    // Redirect to signup to connect
-    navigate('/signup?intent=connect');
+  const handleConnect = async () => {
+    if (!isLoggedIn) {
+      navigate('/signup?intent=connect');
+      return;
+    }
+    // TODO: Send connection request
+    alert('Connection request sent!');
   };
 
   return (
     <div className="min-h-screen bg-charcoal-900">
-      {/* Header */}
+      {/* Header - Auth Aware */}
       <header className="bg-charcoal-800 border-b border-charcoal-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-            <div>
+            <div className="flex items-center gap-4">
               <Link to="/" className="text-2xl font-bold text-white" data-testid="marketplace-logo">
                 TradeOS<span className="text-warning">™</span>
               </Link>
-              <p className="text-gray-400 text-sm mt-1">Contractor Marketplace</p>
+              <span className="text-gray-500">|</span>
+              <span className="text-gray-400 text-sm">Contractor Marketplace</span>
             </div>
+            
             <div className="flex items-center gap-3">
-              <Link 
-                to="/login" 
-                className="text-gray-300 hover:text-white px-4 py-2 font-medium transition-colors"
-                data-testid="login-btn"
-              >
-                Sign In
-              </Link>
-              <Link 
-                to="/signup" 
-                className="bg-steel-500 hover:bg-steel-600 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm"
-                data-testid="signup-btn"
-              >
-                Get Started
-              </Link>
+              {isLoggedIn ? (
+                <>
+                  <Link 
+                    to="/app/dashboard" 
+                    className="flex items-center gap-2 text-gray-300 hover:text-white px-3 py-2 font-medium transition-colors"
+                    data-testid="back-to-app-btn"
+                  >
+                    <Home className="w-4 h-4" />
+                    <span className="hidden sm:inline">Dashboard</span>
+                  </Link>
+                  <button
+                    onClick={() => setShowPostJobModal(true)}
+                    className="bg-steel-500 hover:bg-steel-600 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm flex items-center gap-2"
+                    data-testid="post-job-btn"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Post Job
+                  </button>
+                  <div className="flex items-center gap-2 pl-3 border-l border-charcoal-700">
+                    <span className="text-gray-400 text-sm hidden sm:inline">{profile?.company_name || user?.email}</span>
+                    <button
+                      onClick={signOut}
+                      className="text-gray-400 hover:text-white p-2"
+                      title="Sign Out"
+                    >
+                      <LogOut className="w-4 h-4" />
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <Link 
+                    to="/login" 
+                    className="text-gray-300 hover:text-white px-4 py-2 font-medium transition-colors"
+                    data-testid="login-btn"
+                  >
+                    Sign In
+                  </Link>
+                  <Link 
+                    to="/signup" 
+                    className="bg-steel-500 hover:bg-steel-600 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm"
+                    data-testid="signup-btn"
+                  >
+                    Get Started
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -857,14 +1075,24 @@ const ContractorsPage = () => {
           <p className="text-gray-400 mb-6">
             Join TradeOS to get listed in our marketplace, post jobs, offer services, and connect with other contractors.
           </p>
-          <Link
-            to="/signup"
-            className="inline-flex items-center gap-2 bg-warning hover:bg-warning/90 text-charcoal-900 px-6 py-3 rounded-lg font-bold transition-colors"
-            data-testid="cta-signup"
-          >
-            Get Started Free
-            <ExternalLink className="w-4 h-4" />
-          </Link>
+          {isLoggedIn ? (
+            <Link
+              to="/app/settings"
+              className="inline-flex items-center gap-2 bg-warning hover:bg-warning/90 text-charcoal-900 px-6 py-3 rounded-lg font-bold transition-colors"
+            >
+              Manage Your Listing
+              <ExternalLink className="w-4 h-4" />
+            </Link>
+          ) : (
+            <Link
+              to="/signup"
+              className="inline-flex items-center gap-2 bg-warning hover:bg-warning/90 text-charcoal-900 px-6 py-3 rounded-lg font-bold transition-colors"
+              data-testid="cta-signup"
+            >
+              Get Started Free
+              <ExternalLink className="w-4 h-4" />
+            </Link>
+          )}
         </div>
       </div>
 
@@ -881,6 +1109,7 @@ const ContractorsPage = () => {
           contractor={selectedContractor} 
           onClose={() => setSelectedContractor(null)}
           onConnect={handleConnect}
+          isLoggedIn={isLoggedIn}
         />
       )}
 
@@ -892,6 +1121,16 @@ const ContractorsPage = () => {
             <p className="text-white">Loading contractor details...</p>
           </div>
         </div>
+      )}
+
+      {/* Post Job Modal */}
+      {showPostJobModal && (
+        <PostJobModal
+          onClose={() => setShowPostJobModal(false)}
+          onSuccess={() => {
+            alert('Job posted successfully!');
+          }}
+        />
       )}
     </div>
   );
