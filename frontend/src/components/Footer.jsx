@@ -1,5 +1,6 @@
 import React from 'react';
 import { Mail, Phone, MapPin } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -11,11 +12,13 @@ const Footer = () => {
           <div className="grid md:grid-cols-3 gap-8 mb-8">
             {/* Company Info */}
             <div>
-              <img
-                src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png"
-                alt="Two Fungis Ltd"
-                className="h-20 w-auto mb-4"
-              />
+              <Link to="/#home">
+                <img
+                  src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png"
+                  alt="Two Fungis Ltd"
+                  className="h-20 w-auto mb-4 cursor-pointer"
+                />
+              </Link>
               <p className="text-gray-400 mb-4" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                 Premium interior finishing services for residential, commercial, and high-rise projects across Coastal B.C and Vancouver Island.
               </p>
@@ -30,19 +33,19 @@ const Footer = () => {
               <h3 className="text-xl font-bold mb-4" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>Quick Links</h3>
               <ul className="space-y-2" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                 <li>
-                  <a href="#home" className="text-gray-400 transition-colors" style={{ ':hover': { color: '#228B22' } }} onMouseEnter={(e) => e.target.style.color='#228B22'} onMouseLeave={(e) => e.target.style.color='#9ca3af'}>Home</a>
+                  <Link to="/#home" className="text-gray-400 transition-colors" onMouseEnter={(e) => e.target.style.color='#228B22'} onMouseLeave={(e) => e.target.style.color='#9ca3af'}>Home</Link>
                 </li>
                 <li>
-                  <a href="#about" className="text-gray-400 transition-colors" onMouseEnter={(e) => e.target.style.color='#228B22'} onMouseLeave={(e) => e.target.style.color='#9ca3af'}>About Us</a>
+                  <Link to="/#about" className="text-gray-400 transition-colors" onMouseEnter={(e) => e.target.style.color='#228B22'} onMouseLeave={(e) => e.target.style.color='#9ca3af'}>About Us</Link>
                 </li>
                 <li>
-                  <a href="#services" className="text-gray-400 transition-colors" onMouseEnter={(e) => e.target.style.color='#228B22'} onMouseLeave={(e) => e.target.style.color='#9ca3af'}>Services</a>
+                  <Link to="/#services" className="text-gray-400 transition-colors" onMouseEnter={(e) => e.target.style.color='#228B22'} onMouseLeave={(e) => e.target.style.color='#9ca3af'}>Services</Link>
                 </li>
                 <li>
-                  <a href="#portfolio" className="text-gray-400 transition-colors" onMouseEnter={(e) => e.target.style.color='#228B22'} onMouseLeave={(e) => e.target.style.color='#9ca3af'}>Portfolio</a>
+                  <Link to="/#portfolio" className="text-gray-400 transition-colors" onMouseEnter={(e) => e.target.style.color='#228B22'} onMouseLeave={(e) => e.target.style.color='#9ca3af'}>Portfolio</Link>
                 </li>
                 <li>
-                  <a href="#contact" className="text-gray-400 transition-colors" onMouseEnter={(e) => e.target.style.color='#228B22'} onMouseLeave={(e) => e.target.style.color='#9ca3af'}>Contact</a>
+                  <Link to="/#contact" className="text-gray-400 transition-colors" onMouseEnter={(e) => e.target.style.color='#228B22'} onMouseLeave={(e) => e.target.style.color='#9ca3af'}>Contact</Link>
                 </li>
               </ul>
             </div>
