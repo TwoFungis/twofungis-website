@@ -582,6 +582,7 @@ const SettingsPage = () => {
                 <div className="flex items-center gap-2 mb-1">
                   <h3 className="text-xl font-bold text-white">Lifetime Founder</h3>
                   <span className="bg-warning/20 text-warning text-xs px-2 py-0.5 rounded-full font-medium">LIMITED</span>
+                  <span className="bg-risk/20 text-risk text-xs px-2 py-0.5 rounded-full font-bold animate-pulse">97/100 REMAINING</span>
                 </div>
                 <p className="text-gray-300 text-sm mb-3">
                   Join our first 100 founders and lock in lifetime access to TradeOS Elite features. 
