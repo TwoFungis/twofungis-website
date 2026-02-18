@@ -249,9 +249,12 @@ const EstimatingPage = () => {
   return (
     <div className="space-y-6" data-testid="estimating-page">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl lg:text-3xl font-bold text-white">Estimating</h1>
-          <p className="text-gray-400">Create and manage quotes for your projects</p>
+        <div className="flex items-center gap-4">
+          <img src="/shield-icon.png" alt="" className="w-10 h-10 opacity-30 hidden lg:block" />
+          <div>
+            <h1 className="text-2xl lg:text-3xl font-bold text-charcoal-800">Estimating</h1>
+            <p className="text-charcoal-600">Create and manage quotes for your projects</p>
+          </div>
         </div>
         <button 
           onClick={() => setIsModalOpen(true)}
