@@ -17,7 +17,8 @@ import {
   X,
   FileSpreadsheet,
   Crown,
-  User
+  User,
+  PieChart
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { Logo, LogoIcon } from '../ui/Logo';
