@@ -31,6 +31,7 @@ const AppLayout = () => {
   const { profile, signOut } = useAuthStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [quickActionOpen, setQuickActionOpen] = useState(false);
+  const [showQuickExpenseModal, setShowQuickExpenseModal] = useState(false);
   const navigate = useNavigate();
 
   // Focused navigation - Core business functions only
