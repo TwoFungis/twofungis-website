@@ -29,6 +29,7 @@ import ReportsPage from './pages/app/ReportsPage';
 import SettingsPage from './pages/app/SettingsPage';
 import ProfilePage from './pages/app/ProfilePage';
 import BookkeepingPage from './pages/app/BookkeepingPage';
+import VerificationPage from './pages/app/VerificationPage';
 
 // Layout
 import AppLayout from './components/layout/AppLayout';
@@ -110,6 +111,7 @@ function App() {
           <Route path="settings" element={<SettingsPage />} />
           <Route path="profile" element={<ProfilePage />} />
           <Route path="bookkeeping" element={<BookkeepingPage />} />
+          <Route path="verification" element={<VerificationPage />} />
         </Route>
 
         {/* Catch all */}
