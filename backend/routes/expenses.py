@@ -214,10 +214,18 @@ async def create_expense(
         raise HTTPException(status_code=401, detail="Unauthorized")
     
     try:
+        # Get default deductibility based on category
+        category = data.category if data.category in CATEGORIES else "Other"
+        default_deductibility = CATEGORIES.get(category, {}).get("deductibility", 100)
+        
+        # If personal expense, set deductibility to 0
+        deductibility = 0 if data.business_personal == "Personal" else (data.deductibility_pct or default_deductibility)
+        deductible_amount = data.amount * (deductibility / 100) if deductibility else 0
+        
         expense_data = {
             "user_id": user_id,
             "description": data.description,
-            "category": data.category if data.category in CATEGORIES else "other",
+            "category": category,
             "amount": data.amount,
             "project_name": data.project_name,
             "project_id": data.project_id,
@@ -227,7 +235,11 @@ async def create_expense(
             "receipt_url": data.receipt_url,
             "has_receipt": bool(data.receipt_url),
             "tax_amount": data.tax_amount or 0,
-            "is_tax_deductible": data.is_tax_deductible
+            "is_tax_deductible": data.is_tax_deductible,
+            "deductibility_pct": deductibility,
+            "deductible_amount": deductible_amount,
+            "business_personal": data.business_personal,
+            "payment_method": data.payment_method
         }
         
         result = await supabase_request("POST", "expenses", data=expense_data)
