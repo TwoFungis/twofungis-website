@@ -143,12 +143,15 @@ const DashboardPage = () => {
       {/* Setup Progress Checklist - Show for trial users */}
       <SetupProgressChecklist />
 
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl lg:text-3xl font-bold text-charcoal-800">
-          Welcome back, {profile?.full_name?.split(' ')[0] || profile?.name?.split(' ')[0] || 'Builder'}
-        </h1>
-        <p className="text-charcoal-500 mt-1">Your business at a glance</p>
+      {/* Header with Shield Branding */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl lg:text-3xl font-bold text-charcoal-800 flex items-center gap-3">
+            <img src="/shield-icon.png" alt="" className="h-10 w-auto opacity-20 hidden lg:block" />
+            Welcome back, {profile?.full_name?.split(' ')[0] || profile?.name?.split(' ')[0] || 'Builder'}
+          </h1>
+          <p className="text-charcoal-500 mt-1">Your business at a glance</p>
+        </div>
       </div>
 
       {/* ============================================ */}
