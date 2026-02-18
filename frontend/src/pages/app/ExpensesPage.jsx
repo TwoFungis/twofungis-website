@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { 
   Wallet, Plus, Search, Filter, Upload, Receipt, Tag, Calendar,
   TrendingUp, TrendingDown, Calculator, FileText, Camera, MoreVertical,
-  Info, DollarSign, Briefcase, User
+  Info, DollarSign, Briefcase, User, X
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
+import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
