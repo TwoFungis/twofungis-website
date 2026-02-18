@@ -38,7 +38,9 @@ const EstimatingPage = () => {
     tier_level: 'custom',
     profit_target_pct: 20,
     exclusions: '',
-    terms: 'Payment due within 30 days of invoice.\nQuote valid for 30 days.'
+    payment_days: 30,
+    quote_valid_days: 30,
+    terms: ''
   });
   
   // Quote lines
