@@ -130,15 +130,21 @@ const AppLayout = () => {
             <LogoIcon size="md" />
           </div>
 
-          <div className="relative">
-            <button
-              onClick={() => setQuickActionOpen(!quickActionOpen)}
-              className="bg-steel-500 hover:bg-steel-600 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
-              data-testid="quick-add-btn"
-            >
-              <Plus className="w-5 h-5" />
-              <span className="hidden sm:inline">Quick Add</span>
-            </button>
+          <div className="hidden lg:block" />
+
+          <div className="flex items-center gap-3">
+            {/* Trial Countdown Badge */}
+            <TrialCountdown />
+            
+            <div className="relative">
+              <button
+                onClick={() => setQuickActionOpen(!quickActionOpen)}
+                className="bg-steel-500 hover:bg-steel-600 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+                data-testid="quick-add-btn"
+              >
+                <Plus className="w-5 h-5" />
+                <span className="hidden sm:inline">Quick Add</span>
+              </button>
 
             {quickActionOpen && (
               <>
