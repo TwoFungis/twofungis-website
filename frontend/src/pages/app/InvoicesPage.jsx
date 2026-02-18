@@ -46,12 +46,19 @@ const InvoicesPage = () => {
     fetchInvoices();
   }, []);
 
+  const getAuthHeaders = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    return {
+      'Authorization': `Bearer ${session?.access_token}`,
+      'Content-Type': 'application/json'
+    };
+  };
+
   const fetchInvoices = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`${API_URL}/api/invoices`, {
-        headers: { 'Authorization': `Bearer ${user?.access_token}` }
-      });
+      const headers = await getAuthHeaders();
+      const response = await fetch(`${API_URL}/api/invoices`, { headers });
       if (response.ok) {
         const data = await response.json();
         setInvoices(data.invoices || []);
