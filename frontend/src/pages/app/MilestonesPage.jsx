@@ -384,7 +384,6 @@ const MilestonesPage = () => {
         <MilestoneModal 
           onClose={() => setShowCreateModal(false)}
           onSuccess={() => { setShowCreateModal(false); fetchMilestones(); }}
-          user={user}
         />
       )}
 
@@ -394,7 +393,6 @@ const MilestonesPage = () => {
           milestone={selectedMilestone}
           onClose={() => { setShowEditModal(false); setSelectedMilestone(null); }}
           onSuccess={() => { setShowEditModal(false); setSelectedMilestone(null); fetchMilestones(); }}
-          user={user}
         />
       )}
     </div>
