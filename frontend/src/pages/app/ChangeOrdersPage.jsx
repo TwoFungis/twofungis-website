@@ -326,6 +326,12 @@ const ChangeOrdersPage = () => {
           <div className="divide-y divide-charcoal-700">
             {filteredCOs.map((co) => {
               const daysPending = Math.floor((new Date() - new Date(co.created_at)) / (1000 * 60 * 60 * 24));
+              // Calculate margin impact
+              const projectData = projects.find(p => p.id === co.project_id);
+              const coValue = parseFloat(co.total_value) || 0;
+              const coCost = (parseFloat(co.labor_cost) || 0) + (parseFloat(co.material_cost) || 0);
+              const coProfit = coValue - coCost;
+              const coMargin = coValue > 0 ? ((coProfit / coValue) * 100).toFixed(1) : 0;
               
               return (
                 <div key={co.id} className="p-4 lg:p-6 hover:bg-charcoal-700/50 transition-colors" data-testid={`co-row-${co.id}`}>
@@ -337,6 +343,20 @@ const ChangeOrdersPage = () => {
                         {getStatusBadge(co.status)}
                       </div>
                       <p className="text-white font-medium mb-2">{co.description}</p>
+                      {/* Margin Impact Badge */}
+                      {coValue > 0 && (
+                        <div className="flex items-center gap-3 text-xs mb-2">
+                          <span className={`px-2 py-0.5 rounded ${
+                            parseFloat(coMargin) >= 15 ? 'bg-success/20 text-success' :
+                            parseFloat(coMargin) >= 0 ? 'bg-warning/20 text-warning' : 'bg-risk/20 text-risk'
+                          }`}>
+                            {parseFloat(coMargin) >= 0 ? '+' : ''}{coMargin}% margin
+                          </span>
+                          <span className="text-gray-500">
+                            Profit: <span className={coProfit >= 0 ? 'text-success' : 'text-risk'}>{formatCurrency(coProfit)}</span>
+                          </span>
+                        </div>
+                      )}
                       {(co.status === 'pending' || co.status === 'submitted') && daysPending > 7 && (
                         <div className="flex items-center gap-2 text-xs text-warning">
                           <AlertTriangle className="w-3 h-3" />
