@@ -99,7 +99,12 @@ const LandingPage = () => {
               See Features
             </a>
           </div>
-          <p className="text-gray-500 text-sm mt-8">No credit card required • Cancel anytime</p>
+          <p className="text-gray-500 text-sm mt-8">
+            No credit card required • Cancel anytime • 
+            <Link to="/auth" className="text-steel-400 hover:text-white transition-colors ml-1">
+              Already have an account? Login
+            </Link>
+          </p>
           
           {/* Trust badges */}
           <div className="flex items-center justify-center gap-8 mt-12 text-gray-500 text-sm">
