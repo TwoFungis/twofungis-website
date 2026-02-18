@@ -203,7 +203,12 @@ const SettingsPage = () => {
     }
     
     try {
-      await updateProfile({ labor_rate: rate });
+      const result = await updateProfile({ labor_rate: rate });
+      if (result?.error) {
+        console.error('Error saving labor rate:', result.error);
+        toast.error(result.error.message || 'Failed to save labor rate');
+        return;
+      }
       setLaborRateSaved(true);
       toast.success('Labor rate saved');
       setTimeout(() => setLaborRateSaved(false), 3000);
