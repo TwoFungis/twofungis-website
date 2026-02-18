@@ -36,7 +36,7 @@ const LandingPage = () => {
               <a href="#pricing" className="text-gray-400 hover:text-white transition-colors text-sm font-medium">Pricing</a>
               <a href="#testimonials" className="text-gray-400 hover:text-white transition-colors text-sm font-medium">Reviews</a>
               <a href="#faq" className="text-gray-400 hover:text-white transition-colors text-sm font-medium">FAQ</a>
-              <Link to="/login" className="text-gray-400 hover:text-white transition-colors text-sm font-medium">Login</Link>
+              <Link to="/auth" className="text-gray-400 hover:text-white transition-colors text-sm font-medium">Login</Link>
               <Link 
                 to="/signup" 
                 className="bg-steel-500 hover:bg-steel-600 text-white px-5 py-2.5 rounded-lg font-medium transition-all hover:shadow-lg hover:shadow-steel-500/25"
