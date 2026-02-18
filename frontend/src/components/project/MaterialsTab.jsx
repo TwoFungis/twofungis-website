@@ -245,28 +245,28 @@ const MaterialsTab = ({ projectId }) => {
   return (
     <div className="space-y-6" data-testid="materials-tab">
       {/* Summary Panel */}
-      <div className="bg-white rounded-xl border border-cloud-300 p-5">
-        <h3 className="text-sm font-semibold text-charcoal-400 uppercase tracking-wider mb-4">Materials Summary</h3>
+      <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-5">
+        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Materials Summary</h3>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <div>
-            <p className="text-xs text-charcoal-400 uppercase">Pre-Tax Total</p>
-            <p className="text-xl font-bold text-charcoal-800">{formatCurrency(summary.total_pretax)}</p>
+            <p className="text-xs text-gray-500 uppercase">Pre-Tax Total</p>
+            <p className="text-xl font-bold text-white">{formatCurrency(summary.total_pretax)}</p>
           </div>
           <div>
-            <p className="text-xs text-charcoal-400 uppercase">Tax Total</p>
-            <p className="text-xl font-bold text-charcoal-800">{formatCurrency(summary.total_tax)}</p>
+            <p className="text-xs text-gray-500 uppercase">Tax Total</p>
+            <p className="text-xl font-bold text-white">{formatCurrency(summary.total_tax)}</p>
           </div>
           <div>
-            <p className="text-xs text-charcoal-400 uppercase">Total w/ Tax</p>
+            <p className="text-xs text-gray-500 uppercase">Total w/ Tax</p>
             <p className="text-xl font-bold text-steel-500">{formatCurrency(summary.total_with_tax)}</p>
           </div>
           <div>
-            <p className="text-xs text-charcoal-400 uppercase">Billable</p>
+            <p className="text-xs text-gray-500 uppercase">Billable</p>
             <p className="text-xl font-bold text-success">{formatCurrency(summary.billable_total)}</p>
           </div>
           <div>
-            <p className="text-xs text-charcoal-400 uppercase">Non-Billable</p>
-            <p className="text-xl font-bold text-charcoal-500">{formatCurrency(summary.non_billable_total)}</p>
+            <p className="text-xs text-gray-500 uppercase">Non-Billable</p>
+            <p className="text-xl font-bold text-gray-400">{formatCurrency(summary.non_billable_total)}</p>
           </div>
         </div>
       </div>
@@ -285,12 +285,12 @@ const MaterialsTab = ({ projectId }) => {
 
       {/* Add/Edit Form */}
       {showAddForm && (
-        <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-cloud-300 p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6 space-y-4">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-charcoal-800">
+            <h3 className="text-lg font-semibold text-white">
               {editingId ? 'Edit Material' : 'Add New Material'}
             </h3>
-            <button type="button" onClick={resetForm} className="text-charcoal-400 hover:text-charcoal-600">
+            <button type="button" onClick={resetForm} className="text-gray-500 hover:text-gray-300">
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -298,12 +298,12 @@ const MaterialsTab = ({ projectId }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {/* Item Name */}
             <div className="lg:col-span-2">
-              <label className="block text-sm font-medium text-charcoal-600 mb-1">Item Name *</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Item Name *</label>
               <input
                 type="text"
                 value={formData.item_name}
                 onChange={(e) => setFormData({...formData, item_name: e.target.value})}
-                className="w-full bg-cloud-100 border border-cloud-300 rounded-lg px-4 py-3 text-charcoal-800 focus:border-steel-500 focus:outline-none text-lg"
+                className="w-full bg-charcoal-700/50 border border-charcoal-700 rounded-lg px-4 py-3 text-white focus:border-steel-500 focus:outline-none text-lg"
                 placeholder="e.g., 2x4x8 Spruce Studs"
                 required
                 data-testid="input-item-name"
@@ -312,11 +312,11 @@ const MaterialsTab = ({ projectId }) => {
 
             {/* Category */}
             <div>
-              <label className="block text-sm font-medium text-charcoal-600 mb-1">Category</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Category</label>
               <select
                 value={formData.category}
                 onChange={(e) => setFormData({...formData, category: e.target.value})}
-                className="w-full bg-cloud-100 border border-cloud-300 rounded-lg px-4 py-3 text-charcoal-800 focus:border-steel-500 focus:outline-none"
+                className="w-full bg-charcoal-700/50 border border-charcoal-700 rounded-lg px-4 py-3 text-white focus:border-steel-500 focus:outline-none"
                 data-testid="select-category"
               >
                 {CATEGORIES.map(cat => (
@@ -327,24 +327,24 @@ const MaterialsTab = ({ projectId }) => {
 
             {/* Vendor */}
             <div>
-              <label className="block text-sm font-medium text-charcoal-600 mb-1">Vendor / Supplier</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Vendor / Supplier</label>
               <input
                 type="text"
                 value={formData.vendor}
                 onChange={(e) => setFormData({...formData, vendor: e.target.value})}
-                className="w-full bg-cloud-100 border border-cloud-300 rounded-lg px-4 py-3 text-charcoal-800 focus:border-steel-500 focus:outline-none"
+                className="w-full bg-charcoal-700/50 border border-charcoal-700 rounded-lg px-4 py-3 text-white focus:border-steel-500 focus:outline-none"
                 placeholder="e.g., Home Depot"
               />
             </div>
 
             {/* Quantity */}
             <div>
-              <label className="block text-sm font-medium text-charcoal-600 mb-1">Quantity</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Quantity</label>
               <input
                 type="number"
                 value={formData.qty}
                 onChange={(e) => setFormData({...formData, qty: e.target.value})}
-                className="w-full bg-cloud-100 border border-cloud-300 rounded-lg px-4 py-3 text-charcoal-800 focus:border-steel-500 focus:outline-none text-lg"
+                className="w-full bg-charcoal-700/50 border border-charcoal-700 rounded-lg px-4 py-3 text-white focus:border-steel-500 focus:outline-none text-lg"
                 min="0"
                 step="0.01"
                 data-testid="input-qty"
@@ -353,11 +353,11 @@ const MaterialsTab = ({ projectId }) => {
 
             {/* Unit */}
             <div>
-              <label className="block text-sm font-medium text-charcoal-600 mb-1">Unit</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Unit</label>
               <select
                 value={formData.unit}
                 onChange={(e) => setFormData({...formData, unit: e.target.value})}
-                className="w-full bg-cloud-100 border border-cloud-300 rounded-lg px-4 py-3 text-charcoal-800 focus:border-steel-500 focus:outline-none"
+                className="w-full bg-charcoal-700/50 border border-charcoal-700 rounded-lg px-4 py-3 text-white focus:border-steel-500 focus:outline-none"
               >
                 {UNITS.map(u => (
                   <option key={u.value} value={u.value}>{u.label}</option>
@@ -367,14 +367,14 @@ const MaterialsTab = ({ projectId }) => {
 
             {/* Unit Cost */}
             <div>
-              <label className="block text-sm font-medium text-charcoal-600 mb-1">Unit Cost *</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Unit Cost *</label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-charcoal-400">$</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
                 <input
                   type="number"
                   value={formData.unit_cost}
                   onChange={(e) => setFormData({...formData, unit_cost: e.target.value})}
-                  className="w-full bg-cloud-100 border border-cloud-300 rounded-lg pl-8 pr-4 py-3 text-charcoal-800 focus:border-steel-500 focus:outline-none text-lg"
+                  className="w-full bg-charcoal-700/50 border border-charcoal-700 rounded-lg pl-8 pr-4 py-3 text-white focus:border-steel-500 focus:outline-none text-lg"
                   min="0"
                   step="0.01"
                   required
@@ -385,19 +385,19 @@ const MaterialsTab = ({ projectId }) => {
 
             {/* Line Total (calculated) */}
             <div>
-              <label className="block text-sm font-medium text-charcoal-600 mb-1">Line Total</label>
-              <div className="bg-cloud-200 border border-cloud-300 rounded-lg px-4 py-3 text-charcoal-800 font-semibold text-lg">
+              <label className="block text-sm font-medium text-gray-300 mb-1">Line Total</label>
+              <div className="bg-charcoal-700 border border-charcoal-700 rounded-lg px-4 py-3 text-white font-semibold text-lg">
                 {formatCurrency(calculateLineTotal())}
               </div>
             </div>
 
             {/* Tax Type */}
             <div>
-              <label className="block text-sm font-medium text-charcoal-600 mb-1">Tax Type</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Tax Type</label>
               <select
                 value={formData.tax_type}
                 onChange={(e) => setFormData({...formData, tax_type: e.target.value})}
-                className="w-full bg-cloud-100 border border-cloud-300 rounded-lg px-4 py-3 text-charcoal-800 focus:border-steel-500 focus:outline-none"
+                className="w-full bg-charcoal-700/50 border border-charcoal-700 rounded-lg px-4 py-3 text-white focus:border-steel-500 focus:outline-none"
               >
                 {TAX_TYPES.map(t => (
                   <option key={t.value} value={t.value}>{t.label}</option>
@@ -407,14 +407,14 @@ const MaterialsTab = ({ projectId }) => {
 
             {/* Tax Amount */}
             <div>
-              <label className="block text-sm font-medium text-charcoal-600 mb-1">Tax Amount</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Tax Amount</label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-charcoal-400">$</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
                 <input
                   type="number"
                   value={formData.tax_amount}
                   onChange={(e) => setFormData({...formData, tax_amount: e.target.value})}
-                  className="w-full bg-cloud-100 border border-cloud-300 rounded-lg pl-8 pr-4 py-3 text-charcoal-800 focus:border-steel-500 focus:outline-none"
+                  className="w-full bg-charcoal-700/50 border border-charcoal-700 rounded-lg pl-8 pr-4 py-3 text-white focus:border-steel-500 focus:outline-none"
                   min="0"
                   step="0.01"
                 />
@@ -423,22 +423,22 @@ const MaterialsTab = ({ projectId }) => {
 
             {/* Purchase Date */}
             <div>
-              <label className="block text-sm font-medium text-charcoal-600 mb-1">Purchase Date</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Purchase Date</label>
               <input
                 type="date"
                 value={formData.purchased_date}
                 onChange={(e) => setFormData({...formData, purchased_date: e.target.value})}
-                className="w-full bg-cloud-100 border border-cloud-300 rounded-lg px-4 py-3 text-charcoal-800 focus:border-steel-500 focus:outline-none"
+                className="w-full bg-charcoal-700/50 border border-charcoal-700 rounded-lg px-4 py-3 text-white focus:border-steel-500 focus:outline-none"
               />
             </div>
 
             {/* Paid Status */}
             <div>
-              <label className="block text-sm font-medium text-charcoal-600 mb-1">Paid Status</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Paid Status</label>
               <select
                 value={formData.paid_status}
                 onChange={(e) => setFormData({...formData, paid_status: e.target.value})}
-                className="w-full bg-cloud-100 border border-cloud-300 rounded-lg px-4 py-3 text-charcoal-800 focus:border-steel-500 focus:outline-none"
+                className="w-full bg-charcoal-700/50 border border-charcoal-700 rounded-lg px-4 py-3 text-white focus:border-steel-500 focus:outline-none"
               >
                 <option value="Unpaid">Unpaid</option>
                 <option value="Paid">Paid</option>
@@ -447,14 +447,14 @@ const MaterialsTab = ({ projectId }) => {
 
             {/* Billable Toggle */}
             <div>
-              <label className="block text-sm font-medium text-charcoal-600 mb-1">Billable to Client?</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Billable to Client?</label>
               <button
                 type="button"
                 onClick={() => setFormData({...formData, billable: !formData.billable})}
                 className={`w-full py-3 rounded-lg font-medium transition-colors ${
                   formData.billable 
                     ? 'bg-success text-white' 
-                    : 'bg-cloud-200 text-charcoal-600 border border-cloud-300'
+                    : 'bg-charcoal-700 text-gray-300 border border-charcoal-700'
                 }`}
               >
                 {formData.billable ? 'Yes - Billable' : 'No - Not Billable'}
@@ -464,28 +464,28 @@ const MaterialsTab = ({ projectId }) => {
             {/* Markup % (if billable) */}
             {formData.billable && (
               <div>
-                <label className="block text-sm font-medium text-charcoal-600 mb-1">Markup %</label>
+                <label className="block text-sm font-medium text-gray-300 mb-1">Markup %</label>
                 <div className="relative">
                   <input
                     type="number"
                     value={formData.markup_pct}
                     onChange={(e) => setFormData({...formData, markup_pct: e.target.value})}
-                    className="w-full bg-cloud-100 border border-cloud-300 rounded-lg px-4 py-3 pr-8 text-charcoal-800 focus:border-steel-500 focus:outline-none"
+                    className="w-full bg-charcoal-700/50 border border-charcoal-700 rounded-lg px-4 py-3 pr-8 text-white focus:border-steel-500 focus:outline-none"
                     min="0"
                     step="1"
                   />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-charcoal-400">%</span>
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">%</span>
                 </div>
               </div>
             )}
 
             {/* Notes */}
             <div className="lg:col-span-3">
-              <label className="block text-sm font-medium text-charcoal-600 mb-1">Notes</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Notes</label>
               <textarea
                 value={formData.notes}
                 onChange={(e) => setFormData({...formData, notes: e.target.value})}
-                className="w-full bg-cloud-100 border border-cloud-300 rounded-lg px-4 py-3 text-charcoal-800 focus:border-steel-500 focus:outline-none"
+                className="w-full bg-charcoal-700/50 border border-charcoal-700 rounded-lg px-4 py-3 text-white focus:border-steel-500 focus:outline-none"
                 rows="2"
                 placeholder="Optional notes..."
               />
@@ -493,15 +493,15 @@ const MaterialsTab = ({ projectId }) => {
           </div>
 
           {/* Totals Summary */}
-          <div className="bg-cloud-100 rounded-lg p-4 mt-4">
+          <div className="bg-charcoal-700/50 rounded-lg p-4 mt-4">
             <div className="flex flex-wrap gap-6">
               <div>
-                <p className="text-xs text-charcoal-400 uppercase">Total w/ Tax</p>
-                <p className="text-2xl font-bold text-charcoal-800">{formatCurrency(calculateTotalWithTax())}</p>
+                <p className="text-xs text-gray-500 uppercase">Total w/ Tax</p>
+                <p className="text-2xl font-bold text-white">{formatCurrency(calculateTotalWithTax())}</p>
               </div>
               {formData.billable && formData.markup_pct > 0 && (
                 <div>
-                  <p className="text-xs text-charcoal-400 uppercase">Marked Up Total</p>
+                  <p className="text-xs text-gray-500 uppercase">Marked Up Total</p>
                   <p className="text-2xl font-bold text-success">{formatCurrency(calculateMarkedUpTotal())}</p>
                 </div>
               )}
@@ -513,7 +513,7 @@ const MaterialsTab = ({ projectId }) => {
             <button
               type="button"
               onClick={resetForm}
-              className="flex-1 bg-cloud-200 hover:bg-cloud-300 text-charcoal-600 py-3 rounded-lg font-medium transition-colors"
+              className="flex-1 bg-charcoal-700 hover:bg-cloud-300 text-gray-300 py-3 rounded-lg font-medium transition-colors"
             >
               Cancel
             </button>
@@ -531,10 +531,10 @@ const MaterialsTab = ({ projectId }) => {
       {/* Materials List */}
       <div className="space-y-3">
         {materials.length === 0 ? (
-          <div className="bg-white rounded-xl border border-cloud-300 p-12 text-center">
+          <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-12 text-center">
             <Package className="w-12 h-12 text-charcoal-300 mx-auto mb-4" />
-            <p className="text-charcoal-500">No materials added yet</p>
-            <p className="text-sm text-charcoal-400 mt-1">Click "Add Material" to start tracking job materials</p>
+            <p className="text-gray-400">No materials added yet</p>
+            <p className="text-sm text-gray-500 mt-1">Click "Add Material" to start tracking job materials</p>
           </div>
         ) : (
           materials.map((material) => {
@@ -542,35 +542,35 @@ const MaterialsTab = ({ projectId }) => {
             return (
               <div
                 key={material.id}
-                className="bg-white rounded-xl border border-cloud-300 p-4 hover:border-steel-400 transition-colors"
+                className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-4 hover:border-steel-400 transition-colors"
                 data-testid={`material-row-${material.id}`}
               >
                 <div className="flex items-start gap-4">
                   <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                    material.billable ? 'bg-success/10' : 'bg-cloud-200'
+                    material.billable ? 'bg-success/10' : 'bg-charcoal-700'
                   }`}>
-                    <CategoryIcon className={`w-5 h-5 ${material.billable ? 'text-success' : 'text-charcoal-500'}`} />
+                    <CategoryIcon className={`w-5 h-5 ${material.billable ? 'text-success' : 'text-gray-400'}`} />
                   </div>
                   
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-4">
                       <div>
-                        <h4 className="font-semibold text-charcoal-800">{material.item_name}</h4>
+                        <h4 className="font-semibold text-white">{material.item_name}</h4>
                         <div className="flex flex-wrap gap-2 mt-1">
-                          <span className="text-xs bg-cloud-200 text-charcoal-600 px-2 py-0.5 rounded">
+                          <span className="text-xs bg-charcoal-700 text-gray-300 px-2 py-0.5 rounded">
                             {material.category}
                           </span>
                           {material.vendor && (
-                            <span className="text-xs text-charcoal-400">{material.vendor}</span>
+                            <span className="text-xs text-gray-500">{material.vendor}</span>
                           )}
-                          <span className="text-xs text-charcoal-400">
+                          <span className="text-xs text-gray-500">
                             {material.qty} {material.unit} × {formatCurrency(material.unit_cost)}
                           </span>
                         </div>
                       </div>
                       
                       <div className="text-right flex-shrink-0">
-                        <p className="text-lg font-bold text-charcoal-800">
+                        <p className="text-lg font-bold text-white">
                           {formatCurrency(material.total_with_tax)}
                         </p>
                         {material.billable && material.markup_pct > 0 && (
@@ -596,21 +596,21 @@ const MaterialsTab = ({ projectId }) => {
                     </div>
                     
                     {material.notes && (
-                      <p className="text-sm text-charcoal-400 mt-2">{material.notes}</p>
+                      <p className="text-sm text-gray-500 mt-2">{material.notes}</p>
                     )}
                   </div>
 
                   <div className="flex gap-1 flex-shrink-0">
                     <button
                       onClick={() => handleEdit(material)}
-                      className="p-2 text-charcoal-400 hover:text-steel-500 transition-colors"
+                      className="p-2 text-gray-500 hover:text-steel-500 transition-colors"
                       title="Edit"
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleDelete(material.id)}
-                      className="p-2 text-charcoal-400 hover:text-risk transition-colors"
+                      className="p-2 text-gray-500 hover:text-risk transition-colors"
                       title="Delete"
                     >
                       <Trash2 className="w-4 h-4" />
