@@ -40,7 +40,7 @@ const LocationPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white pt-[52px]">
+    <div className="min-h-screen bg-white">
       <TradeOSBanner />
       <Header />
       
