@@ -117,7 +117,7 @@ const AppLayout = () => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-h-screen">
         {/* Top Bar */}
-        <header className="bg-charcoal-800 border-b border-charcoal-700 px-4 lg:px-8 py-4 flex items-center justify-between">
+        <header className="bg-white border-b border-cloud-300 px-4 lg:px-8 py-4 flex items-center justify-between shadow-sm">
           <button
             onClick={() => setMobileMenuOpen(true)}
             className="lg:hidden text-gray-400 hover:text-white"
