@@ -305,6 +305,68 @@ const SettingsPage = () => {
               </div>
             </div>
           </div>
+
+          {/* Business Defaults Section */}
+          <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6">
+            <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-6">
+              <FileText className="w-5 h-5 text-steel-400" />
+              Business Defaults
+            </h2>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-2">Default Payment Terms</label>
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {[7, 14, 30, 45, 60].map((days) => (
+                    <button
+                      key={days}
+                      type="button"
+                      onClick={() => setDefaultPaymentDays(days)}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        defaultPaymentDays === days
+                          ? 'bg-steel-500 text-white'
+                          : 'bg-charcoal-700 text-gray-400 hover:text-white hover:bg-charcoal-600'
+                      }`}
+                    >
+                      Net {days}
+                    </button>
+                  ))}
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-400 text-sm">Custom:</span>
+                  <input
+                    type="number"
+                    min="1"
+                    value={defaultPaymentDays}
+                    onChange={(e) => setDefaultPaymentDays(parseInt(e.target.value) || 30)}
+                    className="w-20 bg-charcoal-700 border border-charcoal-600 rounded px-3 py-2 text-white text-sm focus:border-steel-500 focus:ring-1 focus:ring-steel-500"
+                  />
+                  <span className="text-gray-400 text-sm">days</span>
+                </div>
+                <p className="text-xs text-gray-500 mt-2">This will be used as the default for new quotes and invoices</p>
+              </div>
+
+              <button
+                onClick={handleSaveDefaults}
+                disabled={isSavingDefaults}
+                className={`${defaultsSaved ? 'bg-success' : 'bg-steel-500 hover:bg-steel-600'} text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2`}
+              >
+                {isSavingDefaults ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : defaultsSaved ? (
+                  <>
+                    <Check className="w-4 h-4" />
+                    Saved
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4" />
+                    Save Defaults
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* Sidebar */}
