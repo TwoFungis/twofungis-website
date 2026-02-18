@@ -20,6 +20,9 @@ from routes.email import router as email_router
 # Import Stripe routes
 from routes.stripe import router as stripe_router
 
+# Import Marketplace routes
+from routes.marketplace import router as marketplace_router
+
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env', override=False)
 
