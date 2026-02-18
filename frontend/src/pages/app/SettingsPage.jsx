@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Settings as SettingsIcon, User, CreditCard, Bell, Shield, Check, Loader2, Crown } from 'lucide-react';
+import { Settings as SettingsIcon, User, CreditCard, Bell, Shield, Check, Loader2, Crown, FileText, Save } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
+import { supabase } from '../../lib/supabase';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -11,6 +12,44 @@ const SettingsPage = () => {
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [paymentMessage, setPaymentMessage] = useState(null);
   const [isUpgrading, setIsUpgrading] = useState(false);
+  
+  // Business Defaults State
+  const [defaultPaymentDays, setDefaultPaymentDays] = useState(profile?.default_payment_days || 30);
+  const [isSavingDefaults, setIsSavingDefaults] = useState(false);
+  const [defaultsSaved, setDefaultsSaved] = useState(false);
+
+  // Load defaults from profile
+  useEffect(() => {
+    if (profile?.default_payment_days) {
+      setDefaultPaymentDays(profile.default_payment_days);
+    }
+  }, [profile]);
+
+  const handleSaveDefaults = async () => {
+    if (!user) return;
+    
+    setIsSavingDefaults(true);
+    try {
+      const { error } = await supabase
+        .from('users_profile')
+        .update({ default_payment_days: defaultPaymentDays })
+        .eq('user_id', user.id);
+      
+      if (error) throw error;
+      
+      setDefaultsSaved(true);
+      setTimeout(() => setDefaultsSaved(false), 2000);
+      
+      // Update local profile
+      if (updateProfile) {
+        await updateProfile({ default_payment_days: defaultPaymentDays });
+      }
+    } catch (err) {
+      console.error('Error saving defaults:', err);
+    } finally {
+      setIsSavingDefaults(false);
+    }
+  };
 
   // Check for payment return from Stripe
   useEffect(() => {
