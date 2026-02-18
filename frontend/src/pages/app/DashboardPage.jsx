@@ -140,6 +140,9 @@ const DashboardPage = () => {
 
   return (
     <div className="space-y-8" data-testid="dashboard-page">
+      {/* Setup Progress Checklist - Show for trial users */}
+      <SetupProgressChecklist />
+
       {/* Header */}
       <div>
         <h1 className="text-2xl lg:text-3xl font-bold text-white">
