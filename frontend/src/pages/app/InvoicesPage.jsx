@@ -82,9 +82,10 @@ const InvoicesPage = () => {
 
   const handleSendInvoice = async (invoiceId) => {
     try {
+      const headers = await getAuthHeaders();
       const response = await fetch(`${API_URL}/api/invoices/${invoiceId}/send`, {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${user?.access_token}` }
+        headers
       });
       if (response.ok) {
         toast.success('Invoice sent successfully');
@@ -99,12 +100,10 @@ const InvoicesPage = () => {
 
   const handleMarkPaid = async (invoiceId) => {
     try {
+      const headers = await getAuthHeaders();
       const response = await fetch(`${API_URL}/api/invoices/${invoiceId}/mark-paid`, {
         method: 'POST',
-        headers: { 
-          'Authorization': `Bearer ${user?.access_token}`,
-          'Content-Type': 'application/json'
-        },
+        headers,
         body: JSON.stringify({ status: 'paid' })
       });
       if (response.ok) {
@@ -122,9 +121,10 @@ const InvoicesPage = () => {
     if (!confirm('Are you sure you want to delete this invoice?')) return;
     
     try {
+      const headers = await getAuthHeaders();
       const response = await fetch(`${API_URL}/api/invoices/${invoiceId}`, {
         method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${user?.access_token}` }
+        headers
       });
       if (response.ok) {
         toast.success('Invoice deleted');
