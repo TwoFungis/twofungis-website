@@ -326,7 +326,7 @@ const BookkeepingPage = () => {
             </div>
             <span className="text-gray-400 text-sm">Total Expenses</span>
           </div>
-          <p className="text-2xl font-bold text-charcoal-800">{formatCurrency(stats.totalExpenses)}</p>
+          <p className="text-2xl font-bold text-white">{formatCurrency(stats.totalExpenses)}</p>
         </div>
 
         <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-4">
@@ -336,7 +336,7 @@ const BookkeepingPage = () => {
             </div>
             <span className="text-gray-400 text-sm">Tax Paid</span>
           </div>
-          <p className="text-2xl font-bold text-charcoal-800">{formatCurrency(stats.totalTax)}</p>
+          <p className="text-2xl font-bold text-white">{formatCurrency(stats.totalTax)}</p>
         </div>
 
         <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-4">
@@ -346,7 +346,7 @@ const BookkeepingPage = () => {
             </div>
             <span className="text-gray-400 text-sm">Receipts</span>
           </div>
-          <p className="text-2xl font-bold text-charcoal-800">{stats.expenseCount}</p>
+          <p className="text-2xl font-bold text-white">{stats.expenseCount}</p>
         </div>
 
         <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-4">
@@ -356,7 +356,7 @@ const BookkeepingPage = () => {
             </div>
             <span className="text-gray-400 text-sm">Deductible</span>
           </div>
-          <p className="text-2xl font-bold text-charcoal-800">{formatCurrency(stats.deductible)}</p>
+          <p className="text-2xl font-bold text-white">{formatCurrency(stats.deductible)}</p>
         </div>
       </div>
 
@@ -513,11 +513,11 @@ const BookkeepingPage = () => {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <p className="text-gray-400 text-sm mb-1">Total Expenses</p>
-              <p className="text-2xl font-bold text-charcoal-800">{formatCurrency(stats.totalExpenses)}</p>
+              <p className="text-2xl font-bold text-white">{formatCurrency(stats.totalExpenses)}</p>
             </div>
             <div>
               <p className="text-gray-400 text-sm mb-1">HST/GST Paid</p>
-              <p className="text-2xl font-bold text-charcoal-800">{formatCurrency(stats.totalTax)}</p>
+              <p className="text-2xl font-bold text-white">{formatCurrency(stats.totalTax)}</p>
             </div>
             <div>
               <p className="text-gray-400 text-sm mb-1">Deductible Amount</p>
@@ -525,7 +525,7 @@ const BookkeepingPage = () => {
             </div>
             <div>
               <p className="text-gray-400 text-sm mb-1">Receipt Count</p>
-              <p className="text-2xl font-bold text-charcoal-800">{stats.expenseCount}</p>
+              <p className="text-2xl font-bold text-white">{stats.expenseCount}</p>
             </div>
           </div>
         </div>

@@ -242,7 +242,7 @@ const ProductionPage = () => {
             <Calendar className="w-4 h-4" />
             <span className="text-sm">Today</span>
           </div>
-          <p className="text-2xl font-bold text-charcoal-800">{todayLogs.length}</p>
+          <p className="text-2xl font-bold text-white">{todayLogs.length}</p>
           <p className="text-sm text-gray-400">Logs entered</p>
         </div>
         <div className="bg-charcoal-800 rounded-xl p-4 border border-charcoal-700">
@@ -250,7 +250,7 @@ const ProductionPage = () => {
             <Users className="w-4 h-4" />
             <span className="text-sm">Crew Hours</span>
           </div>
-          <p className="text-2xl font-bold text-charcoal-800">{todayHours}</p>
+          <p className="text-2xl font-bold text-white">{todayHours}</p>
           <p className="text-sm text-gray-400">Today</p>
         </div>
         <div className="bg-charcoal-800 rounded-xl p-4 border border-charcoal-700">
@@ -258,7 +258,7 @@ const ProductionPage = () => {
             <CheckSquare className="w-4 h-4" />
             <span className="text-sm">Units</span>
           </div>
-          <p className="text-2xl font-bold text-charcoal-800">{todayUnits.toLocaleString()}</p>
+          <p className="text-2xl font-bold text-white">{todayUnits.toLocaleString()}</p>
           <p className="text-sm text-gray-400">Installed today</p>
         </div>
         <div className="bg-charcoal-800 rounded-xl p-4 border border-charcoal-700">
