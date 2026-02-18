@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { supabase } from '../../lib/supabase';
+import SetupProgressChecklist from '../../components/trial/SetupProgressChecklist';
 
 const DashboardPage = () => {
   const { profile, user } = useAuthStore();
