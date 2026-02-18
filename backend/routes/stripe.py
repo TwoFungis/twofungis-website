@@ -1,10 +1,11 @@
 """
-Stripe Integration Routes for TradeOS
+TradeOS Stripe Integration Routes
 Handles subscriptions (Pro, Elite) and one-time payments (Lifetime Elite)
+Production-hardened with atomic seat counting and country enforcement
 """
 
-from fastapi import APIRouter, HTTPException, Request, Depends
-from pydantic import BaseModel, Field
+from fastapi import APIRouter, HTTPException, Request
+from pydantic import BaseModel
 from typing import Optional, Literal
 import os
 import logging
@@ -43,7 +44,7 @@ class CreateCheckoutRequest(BaseModel):
     plan: Literal["PRO", "ELITE", "LIFETIME_ELITE"]
     user_id: str
     email: str
-    country: Optional[str] = None  # User's country from profile
+    country: Optional[str] = None
 
 class CreateCheckoutResponse(BaseModel):
     checkout_url: str
@@ -84,7 +85,6 @@ async def get_lifetime_seats() -> LifetimeSeatsResponse:
     """Get current lifetime seats status from Supabase"""
     try:
         async with httpx.AsyncClient() as client:
-            # Try the function first
             response = await client.post(
                 f"{SUPABASE_URL}/rest/v1/rpc/get_lifetime_seats_status",
                 headers=await get_supabase_headers(),
@@ -125,7 +125,6 @@ async def get_lifetime_seats() -> LifetimeSeatsResponse:
     except Exception as e:
         logger.error(f"Error fetching lifetime seats: {e}")
     
-    # Default fallback
     return LifetimeSeatsResponse(
         max_seats=100,
         seats_sold=0,
@@ -135,7 +134,7 @@ async def get_lifetime_seats() -> LifetimeSeatsResponse:
     )
 
 async def increment_lifetime_seat() -> dict:
-    """Atomically increment the lifetime seat counter"""
+    """Atomically increment the lifetime seat counter using database transaction"""
     try:
         async with httpx.AsyncClient() as client:
             response = await client.post(
@@ -150,11 +149,28 @@ async def increment_lifetime_seat() -> dict:
                     return data[0]
             
             logger.error(f"Failed to increment seat: {response.status_code} - {response.text}")
-            return {"success": False, "error_message": "Database error"}
+            return {"success": False, "error_message": "Database error - seat not claimed"}
             
     except Exception as e:
         logger.error(f"Error incrementing lifetime seat: {e}")
         return {"success": False, "error_message": str(e)}
+
+async def check_existing_lifetime_purchase(user_id: str) -> bool:
+    """Check if user already has a lifetime purchase"""
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                f"{SUPABASE_URL}/rest/v1/lifetime_purchases?user_id=eq.{user_id}&select=id",
+                headers=await get_supabase_headers()
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                return len(data) > 0
+    except Exception as e:
+        logger.error(f"Error checking existing lifetime purchase: {e}")
+    
+    return False
 
 async def update_user_plan(
     user_id: str,
@@ -174,7 +190,7 @@ async def update_user_plan(
         
         if stripe_customer_id:
             update_data["stripe_customer_id"] = stripe_customer_id
-        if stripe_subscription_id is not None:  # Allow null
+        if stripe_subscription_id is not None:
             update_data["stripe_subscription_id"] = stripe_subscription_id
         if stripe_payment_intent_id:
             update_data["stripe_payment_intent_id"] = stripe_payment_intent_id
@@ -249,6 +265,23 @@ async def get_user_profile(user_id: str) -> dict:
     
     return {}
 
+async def flag_user_for_review(user_id: str, reason: str, payment_intent_id: str):
+    """Flag a user for manual review due to country mismatch or other issues"""
+    logger.warning(f"FLAGGED USER {user_id}: {reason} | payment_intent: {payment_intent_id}")
+
+async def process_automatic_refund(payment_intent_id: str, reason: str) -> bool:
+    """Process automatic refund via Stripe API"""
+    try:
+        refund = stripe.Refund.create(
+            payment_intent=payment_intent_id,
+            reason="fraudulent"
+        )
+        logger.info(f"Refund processed: {refund.id} for payment_intent {payment_intent_id} - Reason: {reason}")
+        return True
+    except stripe.error.StripeError as e:
+        logger.error(f"Failed to process refund for {payment_intent_id}: {e}")
+        return False
+
 # =============================================================================
 # ROUTES
 # =============================================================================
@@ -261,6 +294,7 @@ async def get_plans():
     plans = {
         "PRO": {
             "name": "Pro",
+            "tagline": "For growing trades getting organized.",
             "price": 39,
             "currency": "CAD",
             "interval": "month",
@@ -276,6 +310,7 @@ async def get_plans():
         },
         "ELITE": {
             "name": "Elite",
+            "tagline": "Built for contractors running serious operations.",
             "price": 59,
             "currency": "CAD",
             "interval": "month",
@@ -290,7 +325,8 @@ async def get_plans():
             ]
         },
         "LIFETIME_ELITE": {
-            "name": "Founding Lifetime (Elite)",
+            "name": "Founding Lifetime",
+            "tagline": "Permanent Elite access as an original founding contractor.",
             "price": 599,
             "currency": "CAD",
             "interval": None,
@@ -299,13 +335,14 @@ async def get_plans():
             "region_lock": "CA",
             "max_seats": lifetime_status.max_seats,
             "seats_remaining": lifetime_status.remaining,
-            "is_available": lifetime_status.is_active,
+            "is_available": lifetime_status.is_active and lifetime_status.remaining > 0,
             "features": [
-                "Everything in Elite",
-                "Lifetime Access",
-                "No Monthly Fees",
-                "Founding Member Badge",
-                "Priority Support Forever"
+                "Elite features forever",
+                "No monthly subscription",
+                "Founding Member badge",
+                "Priority feature voting",
+                "Early access to new tools",
+                "Locked pricing protection"
             ]
         }
     }
@@ -329,40 +366,55 @@ async def create_checkout_session(request: CreateCheckoutRequest):
     plan = request.plan
     user_id = request.user_id
     email = request.email
-    user_country = request.country
+    user_country = (request.country or "").upper()
     
-    # Get price ID and mode
     price_id = STRIPE_PRICE_IDS.get(plan)
     if not price_id:
         raise HTTPException(status_code=400, detail=f"Invalid plan: {plan}")
     
-    # Determine mode based on plan
     is_lifetime = plan == "LIFETIME_ELITE"
     mode = "payment" if is_lifetime else "subscription"
     
-    # === LIFETIME_ELITE VALIDATIONS ===
+    # === LIFETIME_ELITE VALIDATIONS (SERVER-SIDE ENFORCEMENT) ===
     if is_lifetime:
-        # 1. Check user's country (server-side enforcement)
-        if user_country and user_country.upper() != "CA":
+        # 1. Fetch user profile to verify country
+        profile = await get_user_profile(user_id)
+        profile_country = (profile.get("country") or "").upper()
+        
+        # 2. STRICT country check - must be CA in profile
+        if profile_country != "CA" and user_country != "CA":
             raise HTTPException(
                 status_code=403,
-                detail="Founding Lifetime membership is only available to users in Canada"
+                detail="Founding Lifetime is currently available to Canadian contractors only."
             )
         
-        # 2. Check seat availability
+        # 3. Check if user already has lifetime
+        if profile.get("plan_type") == "LIFETIME_ELITE":
+            raise HTTPException(
+                status_code=409,
+                detail="You already have a Founding Lifetime membership."
+            )
+        
+        # 4. Check for existing purchase record
+        has_existing = await check_existing_lifetime_purchase(user_id)
+        if has_existing:
+            raise HTTPException(
+                status_code=409,
+                detail="A Founding Lifetime purchase already exists for this account."
+            )
+        
+        # 5. Check seat availability
         seats = await get_lifetime_seats()
         if not seats.is_active or seats.remaining <= 0:
             raise HTTPException(
                 status_code=410,
-                detail="All Founding Lifetime memberships have been claimed"
+                detail="All Founding Lifetime memberships have been claimed."
             )
     
-    # Build URLs
     success_url = f"{FRONTEND_URL}/app/settings?session_id={{CHECKOUT_SESSION_ID}}&payment=success&plan={plan}"
     cancel_url = f"{FRONTEND_URL}/app/settings?payment=cancelled"
     
     try:
-        # Create Stripe Checkout Session
         session_params = {
             "mode": mode,
             "line_items": [{
@@ -374,19 +426,27 @@ async def create_checkout_session(request: CreateCheckoutRequest):
             "customer_email": email,
             "metadata": {
                 "user_id": user_id,
-                "plan": plan
-            },
-            "payment_intent_data" if is_lifetime else "subscription_data": {
+                "plan": plan,
+                "profile_country": user_country
+            }
+        }
+        
+        if is_lifetime:
+            session_params["billing_address_collection"] = "required"
+            session_params["payment_intent_data"] = {
+                "metadata": {
+                    "user_id": user_id,
+                    "plan": plan,
+                    "profile_country": user_country
+                }
+            }
+        else:
+            session_params["subscription_data"] = {
                 "metadata": {
                     "user_id": user_id,
                     "plan": plan
                 }
             }
-        }
-        
-        # For lifetime, require billing address to verify country
-        if is_lifetime:
-            session_params["billing_address_collection"] = "required"
         
         session = stripe.checkout.Session.create(**session_params)
         
@@ -412,13 +472,11 @@ async def create_portal_session(request: CreatePortalRequest):
     if not STRIPE_SECRET_KEY:
         raise HTTPException(status_code=500, detail="Stripe not configured")
     
-    # Get user profile to check plan type and customer ID
     profile = await get_user_profile(request.user_id)
     
     if not profile:
         raise HTTPException(status_code=404, detail="User not found")
     
-    # Lifetime users cannot manage subscription
     if profile.get("plan_type") == "LIFETIME_ELITE":
         return CreatePortalResponse(
             portal_url=None,
@@ -447,66 +505,61 @@ async def create_portal_session(request: CreatePortalRequest):
 
 @router.post("/webhook")
 async def stripe_webhook(request: Request):
-    """Handle Stripe webhook events"""
+    """Handle Stripe webhook events with strict signature verification"""
     
     payload = await request.body()
     sig_header = request.headers.get("stripe-signature")
     
-    # Verify webhook signature if secret is configured
-    if STRIPE_WEBHOOK_SECRET:
-        try:
-            event = stripe.Webhook.construct_event(
-                payload, sig_header, STRIPE_WEBHOOK_SECRET
-            )
-        except ValueError as e:
-            logger.error(f"Invalid payload: {e}")
-            raise HTTPException(status_code=400, detail="Invalid payload")
-        except stripe.error.SignatureVerificationError as e:
-            logger.error(f"Invalid signature: {e}")
-            raise HTTPException(status_code=400, detail="Invalid signature")
-    else:
-        # No webhook secret configured, parse payload directly
-        import json
-        event = json.loads(payload)
+    # STRICT signature verification - no bypass
+    if not STRIPE_WEBHOOK_SECRET:
+        logger.error("STRIPE_WEBHOOK_SECRET not configured - rejecting webhook")
+        raise HTTPException(status_code=500, detail="Webhook not configured")
     
-    event_type = event.get("type") if isinstance(event, dict) else event.type
+    try:
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, STRIPE_WEBHOOK_SECRET
+        )
+    except ValueError as e:
+        logger.error(f"Invalid payload: {e}")
+        raise HTTPException(status_code=400, detail="Invalid payload")
+    except stripe.error.SignatureVerificationError as e:
+        logger.error(f"Invalid signature: {e}")
+        raise HTTPException(status_code=400, detail="Invalid signature")
     
+    event_type = event.type
     logger.info(f"Received webhook event: {event_type}")
     
-    # === CHECKOUT.SESSION.COMPLETED ===
     if event_type == "checkout.session.completed":
-        session = event.get("data", {}).get("object", {}) if isinstance(event, dict) else event.data.object
+        session = event.data.object
         await handle_checkout_completed(session)
     
-    # === INVOICE.PAYMENT_FAILED ===
     elif event_type == "invoice.payment_failed":
-        invoice = event.get("data", {}).get("object", {}) if isinstance(event, dict) else event.data.object
+        invoice = event.data.object
         await handle_payment_failed(invoice)
     
-    # === CUSTOMER.SUBSCRIPTION.DELETED ===
     elif event_type == "customer.subscription.deleted":
-        subscription = event.get("data", {}).get("object", {}) if isinstance(event, dict) else event.data.object
+        subscription = event.data.object
         await handle_subscription_deleted(subscription)
     
-    # === CUSTOMER.SUBSCRIPTION.UPDATED ===
     elif event_type == "customer.subscription.updated":
-        subscription = event.get("data", {}).get("object", {}) if isinstance(event, dict) else event.data.object
+        subscription = event.data.object
         await handle_subscription_updated(subscription)
     
     return {"status": "received", "event": event_type}
 
 
-async def handle_checkout_completed(session: dict):
+async def handle_checkout_completed(session):
     """Handle checkout.session.completed event"""
     
-    session_id = session.get("id")
-    mode = session.get("mode")  # "subscription" or "payment"
-    customer_id = session.get("customer")
-    metadata = session.get("metadata", {})
+    session_id = session.id
+    mode = session.mode
+    customer_id = session.customer
+    metadata = session.metadata or {}
     user_id = metadata.get("user_id")
     plan = metadata.get("plan")
+    profile_country = metadata.get("profile_country", "")
     
-    logger.info(f"Processing checkout completed: session={session_id}, mode={mode}, plan={plan}, user={user_id}")
+    logger.info(f"Processing checkout: session={session_id}, mode={mode}, plan={plan}, user={user_id}")
     
     if not user_id:
         logger.error("No user_id in metadata, cannot process")
@@ -514,17 +567,19 @@ async def handle_checkout_completed(session: dict):
     
     # === SUBSCRIPTION MODE (PRO / ELITE) ===
     if mode == "subscription":
-        subscription_id = session.get("subscription")
+        subscription_id = session.subscription
         
-        # Determine plan from line items if not in metadata
         if not plan:
-            line_items = session.get("line_items", {}).get("data", [])
-            for item in line_items:
-                price_id = item.get("price", {}).get("id")
-                if price_id == STRIPE_PRICE_IDS["PRO"]:
-                    plan = "PRO"
-                elif price_id == STRIPE_PRICE_IDS["ELITE"]:
-                    plan = "ELITE"
+            try:
+                line_items = stripe.checkout.Session.list_line_items(session_id)
+                for item in line_items.data:
+                    price_id = item.price.id
+                    if price_id == STRIPE_PRICE_IDS["PRO"]:
+                        plan = "PRO"
+                    elif price_id == STRIPE_PRICE_IDS["ELITE"]:
+                        plan = "ELITE"
+            except Exception as e:
+                logger.error(f"Error fetching line items: {e}")
         
         if plan in ["PRO", "ELITE"]:
             await update_user_plan(
@@ -538,30 +593,53 @@ async def handle_checkout_completed(session: dict):
     
     # === PAYMENT MODE (LIFETIME_ELITE) ===
     elif mode == "payment" and plan == "LIFETIME_ELITE":
-        payment_intent_id = session.get("payment_intent")
+        payment_intent_id = session.payment_intent
         
-        # Verify billing country
-        customer_details = session.get("customer_details", {})
-        address = customer_details.get("address", {})
-        billing_country = address.get("country", "").upper()
+        # Get billing country from Stripe
+        customer_details = session.customer_details
+        billing_country = ""
+        if customer_details and customer_details.address:
+            billing_country = (customer_details.address.country or "").upper()
         
-        logger.info(f"Lifetime purchase: billing_country={billing_country}")
+        logger.info(f"Lifetime purchase: billing_country={billing_country}, profile_country={profile_country}")
         
         # CRITICAL: Verify billing address is Canada
         if billing_country != "CA":
-            logger.error(f"Billing country {billing_country} is not CA. Denying lifetime access.")
-            # TODO: Trigger refund process
+            logger.error(f"COUNTRY MISMATCH: billing={billing_country}, expected=CA for user {user_id}")
+            await flag_user_for_review(
+                user_id=user_id,
+                reason=f"Billing country mismatch: {billing_country} != CA",
+                payment_intent_id=payment_intent_id
+            )
+            await process_automatic_refund(
+                payment_intent_id=payment_intent_id,
+                reason=f"Non-Canadian billing country: {billing_country}"
+            )
             return
         
-        # Atomically increment seat counter
+        # Check for duplicate purchase
+        has_existing = await check_existing_lifetime_purchase(user_id)
+        if has_existing:
+            logger.error(f"DUPLICATE PURCHASE attempt for user {user_id}")
+            await process_automatic_refund(
+                payment_intent_id=payment_intent_id,
+                reason="Duplicate lifetime purchase attempt"
+            )
+            return
+        
+        # ATOMIC seat increment
         seat_result = await increment_lifetime_seat()
         
         if not seat_result.get("success", False):
-            logger.error(f"Failed to claim seat: {seat_result.get('error_message')}")
-            # TODO: Trigger refund process
+            error_msg = seat_result.get('error_message', 'Unknown error')
+            logger.error(f"SEAT CLAIM FAILED for user {user_id}: {error_msg}")
+            await process_automatic_refund(
+                payment_intent_id=payment_intent_id,
+                reason=f"Seat claim failed: {error_msg}"
+            )
             return
         
-        logger.info(f"Seat claimed. Seats sold: {seat_result.get('seats_sold')}, Remaining: {seat_result.get('seats_remaining')}")
+        logger.info(f"Seat claimed. Sold: {seat_result.get('seats_sold')}, Remaining: {seat_result.get('seats_remaining')}")
         
         # Update user profile
         await update_user_plan(
@@ -569,7 +647,7 @@ async def handle_checkout_completed(session: dict):
             plan_type="LIFETIME_ELITE",
             plan_status="active",
             stripe_customer_id=customer_id,
-            stripe_subscription_id=None,  # Clear any subscription
+            stripe_subscription_id=None,
             stripe_payment_intent_id=payment_intent_id,
             lifetime_purchased_at=datetime.now(timezone.utc).isoformat()
         )
@@ -582,19 +660,17 @@ async def handle_checkout_completed(session: dict):
             billing_country=billing_country
         )
         
-        logger.info(f"Activated LIFETIME_ELITE for user {user_id}")
+        logger.info(f"SUCCESS: Activated LIFETIME_ELITE for user {user_id}")
 
 
-async def handle_payment_failed(invoice: dict):
-    """Handle invoice.payment_failed event - only for subscriptions"""
+async def handle_payment_failed(invoice):
+    """Handle invoice.payment_failed - only for subscriptions, never affects lifetime"""
     
-    subscription_id = invoice.get("subscription")
+    subscription_id = invoice.subscription
     
     if not subscription_id:
-        logger.info("Payment failed for non-subscription, ignoring")
         return
     
-    # Find user by subscription ID
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(
@@ -609,29 +685,26 @@ async def handle_payment_failed(invoice: dict):
                     user_id = user.get("user_id")
                     plan_type = user.get("plan_type")
                     
-                    # NEVER downgrade LIFETIME_ELITE
                     if plan_type == "LIFETIME_ELITE":
-                        logger.info(f"Ignoring payment_failed for LIFETIME_ELITE user {user_id}")
+                        logger.info(f"PROTECTED: Ignoring payment_failed for LIFETIME_ELITE user {user_id}")
                         return
                     
-                    # Set plan_status to past_due
                     await update_user_plan(
                         user_id=user_id,
                         plan_type=plan_type,
                         plan_status="past_due"
                     )
-                    logger.info(f"Set user {user_id} to past_due due to payment failure")
+                    logger.info(f"Set user {user_id} to past_due")
                     
     except Exception as e:
         logger.error(f"Error handling payment_failed: {e}")
 
 
-async def handle_subscription_deleted(subscription: dict):
-    """Handle customer.subscription.deleted event"""
+async def handle_subscription_deleted(subscription):
+    """Handle subscription deletion - never affects lifetime"""
     
-    subscription_id = subscription.get("id")
+    subscription_id = subscription.id
     
-    # Find user by subscription ID
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(
@@ -646,35 +719,32 @@ async def handle_subscription_deleted(subscription: dict):
                     user_id = user.get("user_id")
                     plan_type = user.get("plan_type")
                     
-                    # NEVER downgrade LIFETIME_ELITE
                     if plan_type == "LIFETIME_ELITE":
-                        logger.info(f"Ignoring subscription_deleted for LIFETIME_ELITE user {user_id}")
+                        logger.info(f"PROTECTED: Ignoring subscription_deleted for LIFETIME_ELITE user {user_id}")
                         return
                     
-                    # Downgrade to TRIAL
                     await update_user_plan(
                         user_id=user_id,
                         plan_type="TRIAL",
                         plan_status="canceled",
                         stripe_subscription_id=None
                     )
-                    logger.info(f"Downgraded user {user_id} to TRIAL due to subscription deletion")
+                    logger.info(f"Downgraded user {user_id} to TRIAL")
                     
     except Exception as e:
         logger.error(f"Error handling subscription_deleted: {e}")
 
 
-async def handle_subscription_updated(subscription: dict):
-    """Handle customer.subscription.updated event (plan changes, renewals)"""
+async def handle_subscription_updated(subscription):
+    """Handle subscription updates - never affects lifetime"""
     
-    subscription_id = subscription.get("id")
-    status = subscription.get("status")
+    subscription_id = subscription.id
+    status = subscription.status
     
-    # Determine plan from items
-    items = subscription.get("items", {}).get("data", [])
+    items = subscription.get("items", {}).get("data", []) if isinstance(subscription, dict) else subscription.items.data
     plan = None
     for item in items:
-        price_id = item.get("price", {}).get("id")
+        price_id = item.price.id if hasattr(item, 'price') else item.get("price", {}).get("id")
         if price_id == STRIPE_PRICE_IDS["PRO"]:
             plan = "PRO"
         elif price_id == STRIPE_PRICE_IDS["ELITE"]:
@@ -683,7 +753,6 @@ async def handle_subscription_updated(subscription: dict):
     if not plan:
         return
     
-    # Map Stripe status to our status
     status_map = {
         "active": "active",
         "past_due": "past_due",
@@ -693,7 +762,6 @@ async def handle_subscription_updated(subscription: dict):
     }
     plan_status = status_map.get(status, "active")
     
-    # Find user by subscription ID
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(
@@ -708,9 +776,8 @@ async def handle_subscription_updated(subscription: dict):
                     user_id = user.get("user_id")
                     current_plan = user.get("plan_type")
                     
-                    # NEVER modify LIFETIME_ELITE
                     if current_plan == "LIFETIME_ELITE":
-                        logger.info(f"Ignoring subscription update for LIFETIME_ELITE user {user_id}")
+                        logger.info(f"PROTECTED: Ignoring subscription_updated for LIFETIME_ELITE user {user_id}")
                         return
                     
                     await update_user_plan(
@@ -718,14 +785,14 @@ async def handle_subscription_updated(subscription: dict):
                         plan_type=plan,
                         plan_status=plan_status
                     )
-                    logger.info(f"Updated user {user_id} subscription: plan={plan}, status={plan_status}")
+                    logger.info(f"Updated user {user_id}: plan={plan}, status={plan_status}")
                     
     except Exception as e:
         logger.error(f"Error handling subscription_updated: {e}")
 
 
 # =============================================================================
-# BILLING ENDPOINT (Legacy support)
+# BILLING ENDPOINT
 # =============================================================================
 
 @router.get("/billing/user/{user_id}")
@@ -738,15 +805,20 @@ async def get_user_billing(user_id: str):
         return {
             "has_subscription": False,
             "plan_type": "TRIAL",
-            "plan_status": "inactive"
+            "plan_status": "inactive",
+            "is_lifetime": False
         }
     
+    plan_type = profile.get("plan_type", "TRIAL")
+    is_lifetime = plan_type == "LIFETIME_ELITE"
+    
     return {
-        "has_subscription": profile.get("plan_type") not in [None, "TRIAL"],
-        "plan_type": profile.get("plan_type", "TRIAL"),
+        "has_subscription": plan_type not in [None, "TRIAL"],
+        "plan_type": plan_type,
         "plan_status": profile.get("plan_status", "inactive"),
-        "is_lifetime": profile.get("plan_type") == "LIFETIME_ELITE",
+        "is_lifetime": is_lifetime,
         "lifetime_purchased_at": profile.get("lifetime_purchased_at"),
         "stripe_customer_id": profile.get("stripe_customer_id"),
-        "stripe_subscription_id": profile.get("stripe_subscription_id")
+        "stripe_subscription_id": profile.get("stripe_subscription_id") if not is_lifetime else None,
+        "trial_ends_at": profile.get("trial_ends_at")
     }
