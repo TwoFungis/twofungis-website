@@ -332,6 +332,9 @@ app.include_router(api_router)
 # Include bookkeeping routes under /api
 app.include_router(bookkeeping_router, prefix="/api")
 
+# Include email routes (already has /api prefix)
+app.include_router(email_router)
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
