@@ -4,9 +4,11 @@ import {
   LayoutDashboard, 
   FolderKanban, 
   Calculator, 
-  Users, 
   FileText, 
-  ClipboardList, 
+  Flag, 
+  Receipt, 
+  Wallet,
+  FolderOpen,
   BarChart3, 
   Settings,
   Plus,
@@ -15,9 +17,7 @@ import {
   X,
   FileSpreadsheet,
   Crown,
-  User,
-  Receipt,
-  Store
+  User
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { Logo, LogoIcon } from '../ui/Logo';
@@ -28,24 +28,25 @@ const AppLayout = () => {
   const [quickActionOpen, setQuickActionOpen] = useState(false);
   const navigate = useNavigate();
 
+  // Focused navigation - Core business functions only
   const navItems = [
     { path: '/app/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { path: '/app/projects', icon: FolderKanban, label: 'Projects' },
-    { path: '/app/estimating', icon: Calculator, label: 'Estimating' },
-    { path: '/app/labor', icon: Users, label: 'Labor' },
+    { path: '/app/estimating', icon: Calculator, label: 'Estimates' },
     { path: '/app/change-orders', icon: FileText, label: 'Change Orders' },
-    { path: '/app/production', icon: ClipboardList, label: 'Production' },
-    { path: '/app/bookkeeping', icon: Receipt, label: 'Bookkeeping' },
-    { path: '/contractors', icon: Store, label: 'Marketplace', external: true },
-    { path: '/app/reports', icon: BarChart3, label: 'Reports', elite: true },
+    { path: '/app/milestones', icon: Flag, label: 'Milestones' },
+    { path: '/app/invoices', icon: Receipt, label: 'Invoices' },
+    { path: '/app/expenses', icon: Wallet, label: 'Expenses' },
+    { path: '/app/documents', icon: FolderOpen, label: 'Document Vault' },
+    { path: '/app/reports', icon: BarChart3, label: 'Reports' },
     { path: '/app/settings', icon: Settings, label: 'Settings' },
   ];
 
   const quickActions = [
-    { label: 'New Quote', path: '/app/estimating?new=true', icon: FileSpreadsheet },
+    { label: 'New Estimate', path: '/app/estimating?new=true', icon: FileSpreadsheet },
     { label: 'New Project', path: '/app/projects?new=true', icon: FolderKanban },
     { label: 'New Change Order', path: '/app/change-orders?new=true', icon: FileText },
-    { label: 'New Daily Log', path: '/app/production?new=true', icon: ClipboardList },
+    { label: 'New Invoice', path: '/app/invoices?new=true', icon: Receipt },
   ];
 
   const handleSignOut = async () => {
