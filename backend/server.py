@@ -35,6 +35,9 @@ from routes.trial_emails import router as trial_emails_router
 # Import Materials routes
 from routes.materials import router as materials_router
 
+# Import Founders routes
+from routes.founders import router as founders_router
+
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env', override=False)
 
