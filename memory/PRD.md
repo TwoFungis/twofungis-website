@@ -1,7 +1,7 @@
 # TradeOS - Product Requirements Document
 
 ## Product Overview
-**Name:** TradeOS™  
+**Name:** TradeOS  
 **Tagline:** Built for Builders  
 **Headline:** Know your margin. Control your projects. Get paid faster.  
 **Type:** SaaS Web Application - Contractor Operating System  
@@ -11,34 +11,39 @@
 
 ## What's Been Implemented (Feb 18, 2026)
 
-### ✅ Bug Fixes
+### ✅ Dashboard Restructure (NEW - Completed)
+**3-Zone Layout as per user PRD:**
+| Zone | Components |
+|------|------------|
+| **Execution** | Active Projects, Upcoming Milestones, Pending Change Orders |
+| **Financial Control** | Total Contract Value, Forecast Profit, Outstanding Receivables, Overdue Invoices, Forecast Margin with visual indicator |
+| **Alerts** | Past Due Invoices, Trial Expiring, Low Margin Warning (with selectable threshold) |
+| **This Month Summary** | Revenue, Expenses, Est. Tax Owing, Recommended Set-Aside (with selectable tax rate) |
+
+**User Preference Dropdowns:**
+- Margin Threshold: 10%, 15%, 20%, 25%, 30% (stored in localStorage)
+- Tax Rate: 15%, 20%, 25%, 30%, 35% (stored in localStorage)
+
+### ✅ Project Page Restructure (NEW - Completed)
+**Financial Health Panel (Top Section):**
+- Original Contract, Approved COs Total, Total Revenue, Total Expenses, Total Labor, Forecast Gross Profit, Forecast Margin %
+- Completion progress bar
+
+**Tabbed Interface:**
+- Overview, Milestones, Invoices, Change Orders, Expenses, Documents, Activity Log
+
+### ✅ Bug Fixes (Previous Session)
 | Bug | Status |
 |-----|--------|
-| Add Expense button not working | ✅ FIXED - Modal now opens |
-| Upload Document button not working | ✅ FIXED - Modal now opens |
-| Reports Elite gate showing for Lifetime members | ✅ FIXED - Now checks for 'lifetime', 'elite', 'founding' tier variations |
-
-### ✅ Dashboard Financial Health Panel
-- Contract Value, Approved COs, Total Revenue, Gross Profit
-- Average Margin with health indicator (Excellent/On Target/Below/At Risk)
-- Project breakdown with margin bars
-
-### ✅ Reports Page (Elite Feature)
-- 4 tabs (Overview, Revenue, Expenses, Projects)
-- Date range filter (Month/Quarter/YTD/All)
-- PDF export (P&L, Revenue, Projects reports)
-
-### ✅ Settings Page - Complete
-- Edit Profile form with validation
-- Change Password functionality
-- Delete Account with confirmation modal
-- Subscription display with upgrade buttons
+| Add Expense button not working | ✅ FIXED |
+| Upload Document button not working | ✅ FIXED |
+| Reports Elite gate showing for Lifetime members | ✅ FIXED |
 
 ### ✅ Invoicing System
 - Invoice creation with line items
-- Auto-incrementing invoice numbers
+- Auto-incrementing invoice numbers (INV-XXXX)
 - Status workflow (Draft → Sent → Paid)
-- Email notification on send (if client email provided)
+- Email notification on send
 - Receivables dashboard widget
 
 ### ✅ Milestone Management
@@ -47,37 +52,20 @@
 - Edit lock after invoicing
 - Invoice generation from milestones
 
-### ✅ Expenses API (NEW)
+### ✅ Expenses API
 - Full CRUD API for expenses
-- Category tracking (Materials, Labor, Equipment, etc.)
+- Category tracking
 - Tax deductible flag
 - Receipt URL storage
 - Tax summary endpoint
 
 ---
 
-## Database Migrations Required
-
-### Run These in Supabase SQL Editor:
-
-1. **`/app/migrations/006_invoicing_milestones_schema.sql`** - Creates:
-   - `project_milestones` table
-   - `invoices` table
-   - `invoice_line_items` table
-   - `invoice_counters` table
-   - `invoice_activity_log` table
-
-2. **`/app/migrations/007_expenses_schema_fix.sql`** - Updates expenses table:
-   - Adds missing columns: `expense_date`, `amount`, `category`, `description`, etc.
-   - Creates indexes and RLS policies
-
----
-
 ## Tech Stack
 - **Frontend:** React, Tailwind CSS, Zustand
 - **Backend:** FastAPI + Supabase
-- **Payments:** Stripe (subscriptions + one-time)
-- **PDF Generation:** jsPDF, jsPDF-AutoTable
+- **Database:** Supabase (Postgres)
+- **Payments:** Stripe
 - **Email:** Resend
 - **AI:** GPT-4 Vision (via Emergent LLM key)
 
@@ -119,23 +107,37 @@
 ---
 
 ## Testing Status
-- ✅ Frontend: 100% (All modals, buttons, forms working)
-- ⚠️ Backend: Database tables need to be created
-- ✅ Reports Elite gate: Working for all tier variations
+- ✅ Dashboard Page: 100% - All 3 zones working, dropdowns persist to localStorage
+- ✅ Project Detail Page: 100% - Financial Health Panel and all 7 tabs working
+- ✅ Edit/Delete Project: Working with confirmation modal
+- ✅ Frontend: Fully tested
 
 ---
 
 ## Backlog
 
-### P1 - Next Up
-- [ ] Automatic overdue invoice status updates (cron job)
-- [ ] Invoice PDF generation and download
+### P0 - Invoice Hardening (Next)
+- [ ] Invoice status workflow: Draft → Sent → Paid → Overdue
+- [ ] Automatic overdue calculation based on due_date
+- [ ] Global Receivables Report page
 
-### P2 - Future
-- [ ] Client portal for invoice viewing
-- [ ] Payment reminders automation
-- [ ] Advanced tax reporting
-- [ ] Final code cleanup (remove orphaned marketplace files)
+### P1 - Reporting Section
+- [ ] Reports page with: Profit by Project, Revenue by Month, Expense by Category, Labor Cost Summary, Outstanding Invoices, Margin Trend
+- [ ] PDF/CSV export functionality
+
+### P1 - Tax & Expense Improvement
+- [ ] Monthly summary panel (already in dashboard)
+- [ ] Quarterly summary projection
+
+### P2 - UI Polish
+- [ ] Increase whitespace throughout app
+- [ ] Larger fonts for financial metrics
+- [ ] Color scheme adherence check
+
+### P2 - Performance
+- [ ] Lazy loading for components
+- [ ] Optimized dashboard queries
+- [ ] Mobile layout verification
 
 ---
 
@@ -147,6 +149,7 @@
 ## Version History
 | Date | Version | Changes |
 |------|---------|---------|
+| Feb 18, 2026 | 2.3 | Dashboard 3-zone restructure, Project Page restructure with Financial Health Panel and tabs |
 | Feb 18, 2026 | 2.2 | Bug fixes (Expense modal, Document upload, Elite gate), Expenses API |
 | Feb 18, 2026 | 2.1 | Dashboard Financial Health Panel, Reports Page, Complete Settings Page |
 | Feb 18, 2026 | 2.0 | Strategic pivot, Invoicing & Milestones |
