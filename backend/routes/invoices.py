@@ -481,13 +481,13 @@ async def send_invoice(
     invoice_id: str,
     authorization: str = Header(None)
 ):
-    """Mark invoice as sent and optionally send email"""
+    """Mark invoice as sent and send email notification to client"""
     user_id = get_user_id_from_token(authorization)
     if not user_id:
         raise HTTPException(status_code=401, detail="Unauthorized")
     
     try:
-        # Get invoice
+        # Get invoice with line items
         invoices = await supabase_request(
             "GET",
             "invoices",
@@ -523,7 +523,58 @@ async def send_invoice(
             "details": {"sent_to": invoice.get('client_email')}
         })
         
-        return {"status": "sent", "message": "Invoice marked as sent"}
+        email_sent = False
+        email_error = None
+        
+        # Send email if client email is present
+        if invoice.get('client_email'):
+            try:
+                # Get user profile for company name
+                profiles = await supabase_request(
+                    "GET",
+                    "users_profile",
+                    params={"id": f"eq.{user_id}"}
+                )
+                company_name = profiles[0].get('company_name', 'Your Contractor') if profiles else 'Your Contractor'
+                
+                # Call the email endpoint internally
+                email_url = f"{os.environ.get('REACT_APP_BACKEND_URL', 'http://localhost:8001')}/api/email/send-invoice"
+                
+                async with httpx.AsyncClient() as client:
+                    email_response = await client.post(
+                        email_url,
+                        json={
+                            "recipient_email": invoice['client_email'],
+                            "recipient_name": invoice['client_name'],
+                            "invoice_number": invoice['invoice_number'],
+                            "project_name": invoice.get('project_name', 'Project'),
+                            "milestone_name": "Invoice",
+                            "amount": invoice['total'],
+                            "due_date": invoice.get('due_date', ''),
+                            "company_name": company_name,
+                            "payment_terms": invoice.get('payment_terms_days', 30)
+                        },
+                        timeout=10.0
+                    )
+                    
+                    if email_response.status_code == 200:
+                        result = email_response.json()
+                        email_sent = result.get('status') == 'success'
+                        if not email_sent:
+                            email_error = result.get('message')
+                    else:
+                        email_error = f"Email API returned {email_response.status_code}"
+                        
+            except Exception as e:
+                logger.warning(f"Failed to send invoice email: {e}")
+                email_error = str(e)
+        
+        return {
+            "status": "sent", 
+            "message": "Invoice marked as sent",
+            "email_sent": email_sent,
+            "email_error": email_error
+        }
     
     except HTTPException:
         raise
