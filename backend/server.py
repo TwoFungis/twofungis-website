@@ -159,6 +159,9 @@ app.include_router(expenses_router)
 # Include Trial Emails routes
 app.include_router(trial_emails_router)
 
+# Include Materials routes
+app.include_router(materials_router)
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
