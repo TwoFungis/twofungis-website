@@ -68,6 +68,34 @@ const ExpensesPage = () => {
     }
   };
 
+  const handleDeleteExpense = async (expenseId) => {
+    if (!window.confirm('Are you sure you want to delete this expense?')) return;
+    
+    try {
+      const headers = await getAuthHeaders();
+      const response = await fetch(`${API_URL}/api/expenses/${expenseId}`, {
+        method: 'DELETE',
+        headers
+      });
+      
+      if (response.ok) {
+        toast.success('Expense deleted');
+        fetchExpenses();
+      } else {
+        toast.error('Failed to delete expense');
+      }
+    } catch (error) {
+      console.error('Error deleting expense:', error);
+      toast.error('Failed to delete expense');
+    }
+    setActiveActionMenu(null);
+  };
+
+  const handleEditExpense = (expense) => {
+    setEditingExpense(expense);
+    setActiveActionMenu(null);
+  };
+
   const filteredExpenses = expenses.filter(exp => {
     const matchesSearch = exp.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          exp.project_name?.toLowerCase().includes(searchTerm.toLowerCase());
