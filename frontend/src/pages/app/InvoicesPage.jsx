@@ -151,13 +151,13 @@ const InvoicesPage = () => {
       {/* Header with Shield */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <img src="/shield-icon.png" alt="" className="w-10 h-10 opacity-30 hidden lg:block" />
+          <img src="/shield-icon.png" alt="" className="w-8 h-8 opacity-80" />
           <div>
-            <h1 className="text-2xl font-bold text-white flex items-center gap-3">
+            <h1 className="text-2xl font-bold text-charcoal-800 flex items-center gap-3">
               <Receipt className="w-7 h-7 text-steel-500" />
               Invoices
             </h1>
-            <p className="text-gray-400 text-sm mt-1">Create, send, and track invoices</p>
+            <p className="text-charcoal-600 text-sm mt-1">Create, send, and track invoices</p>
           </div>
         </div>
         <button
