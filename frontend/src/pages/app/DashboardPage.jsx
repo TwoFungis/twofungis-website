@@ -145,10 +145,10 @@ const DashboardPage = () => {
 
       {/* Header */}
       <div>
-        <h1 className="text-2xl lg:text-3xl font-bold text-white">
+        <h1 className="text-2xl lg:text-3xl font-bold text-charcoal-800">
           Welcome back, {profile?.full_name?.split(' ')[0] || profile?.name?.split(' ')[0] || 'Builder'}
         </h1>
-        <p className="text-gray-500 mt-1">Your business at a glance</p>
+        <p className="text-charcoal-500 mt-1">Your business at a glance</p>
       </div>
 
       {/* ============================================ */}
