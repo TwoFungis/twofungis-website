@@ -306,8 +306,20 @@ const NewExpenseModal = ({ onClose, onSuccess }) => {
     expense_date: new Date().toISOString().split('T')[0],
     vendor: '',
     notes: '',
-    business_personal: 'Business'
+    business_personal: 'Business',
+    deductibility_pct: 100,
+    payment_method: 'Cash'
   });
+
+  // Auto-update deductibility when category changes
+  const handleCategoryChange = (category) => {
+    const defaultDeductibility = CATEGORIES[category]?.deductibility || 100;
+    setFormData(prev => ({ 
+      ...prev, 
+      category,
+      deductibility_pct: defaultDeductibility
+    }));
+  };
 
   const getAuthHeaders = async () => {
     const { data: { session } } = await supabase.auth.getSession();
@@ -332,7 +344,8 @@ const NewExpenseModal = ({ onClose, onSuccess }) => {
         headers,
         body: JSON.stringify({
           ...formData,
-          amount: parseFloat(formData.amount)
+          amount: parseFloat(formData.amount),
+          deductibility_pct: formData.business_personal === 'Personal' ? 0 : formData.deductibility_pct
         })
       });
 
@@ -351,17 +364,52 @@ const NewExpenseModal = ({ onClose, onSuccess }) => {
     }
   };
 
+  const PAYMENT_METHODS = ['Cash', 'Credit Card', 'Debit Card', 'E-Transfer', 'Cheque', 'Other'];
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" data-testid="new-expense-modal">
-      <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 w-full max-w-lg">
-        <div className="p-6 border-b border-charcoal-700 flex items-center justify-between">
+      <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+        <div className="p-6 border-b border-charcoal-700 flex items-center justify-between sticky top-0 bg-charcoal-800">
           <h2 className="text-xl font-bold text-white">Add Expense</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-white">
-            <span className="text-2xl">&times;</span>
+            <X className="w-5 h-5" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          {/* Business / Personal Toggle */}
+          <div>
+            <label className="block text-sm font-medium text-gray-400 mb-2">Expense Type</label>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setFormData(prev => ({ ...prev, business_personal: 'Business' }))}
+                className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 ${
+                  formData.business_personal === 'Business'
+                    ? 'bg-steel-500 text-white'
+                    : 'bg-charcoal-700 text-gray-400 hover:text-white'
+                }`}
+                data-testid="expense-type-business"
+              >
+                <Briefcase className="w-4 h-4" />
+                Business
+              </button>
+              <button
+                type="button"
+                onClick={() => setFormData(prev => ({ ...prev, business_personal: 'Personal' }))}
+                className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 ${
+                  formData.business_personal === 'Personal'
+                    ? 'bg-purple-500 text-white'
+                    : 'bg-charcoal-700 text-gray-400 hover:text-white'
+                }`}
+                data-testid="expense-type-personal"
+              >
+                <User className="w-4 h-4" />
+                Personal
+              </button>
+            </div>
+          </div>
+
           <div>
             <label className="block text-sm font-medium text-gray-400 mb-1">Description *</label>
             <input
@@ -380,7 +428,7 @@ const NewExpenseModal = ({ onClose, onSuccess }) => {
               <label className="block text-sm font-medium text-gray-400 mb-1">Category</label>
               <select
                 value={formData.category}
-                onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
+                onChange={(e) => handleCategoryChange(e.target.value)}
                 className="w-full bg-charcoal-900 border border-charcoal-700 rounded-lg px-4 py-2 text-white focus:border-steel-500 focus:outline-none"
               >
                 {Object.entries(CATEGORIES).map(([key, val]) => (
@@ -409,6 +457,43 @@ const NewExpenseModal = ({ onClose, onSuccess }) => {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
+              <label className="block text-sm font-medium text-gray-400 mb-1">Payment Method</label>
+              <select
+                value={formData.payment_method}
+                onChange={(e) => setFormData(prev => ({ ...prev, payment_method: e.target.value }))}
+                className="w-full bg-charcoal-900 border border-charcoal-700 rounded-lg px-4 py-2 text-white focus:border-steel-500 focus:outline-none"
+                data-testid="expense-payment-method"
+              >
+                {PAYMENT_METHODS.map(method => (
+                  <option key={method} value={method}>{method}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-1">
+                Deductibility %
+                {formData.business_personal === 'Personal' && (
+                  <span className="text-gray-500 text-xs ml-1">(N/A for personal)</span>
+                )}
+              </label>
+              <div className="relative">
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  value={formData.business_personal === 'Personal' ? 0 : formData.deductibility_pct}
+                  onChange={(e) => setFormData(prev => ({ ...prev, deductibility_pct: parseInt(e.target.value) || 0 }))}
+                  disabled={formData.business_personal === 'Personal'}
+                  className="w-full bg-charcoal-900 border border-charcoal-700 rounded-lg px-4 py-2 text-white focus:border-steel-500 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                  data-testid="expense-deductibility"
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">%</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
               <label className="block text-sm font-medium text-gray-400 mb-1">Project (optional)</label>
               <input
                 type="text"
@@ -427,6 +512,17 @@ const NewExpenseModal = ({ onClose, onSuccess }) => {
                 className="w-full bg-charcoal-900 border border-charcoal-700 rounded-lg px-4 py-2 text-white focus:border-steel-500 focus:outline-none"
               />
             </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-400 mb-1">Vendor (optional)</label>
+            <input
+              type="text"
+              value={formData.vendor}
+              onChange={(e) => setFormData(prev => ({ ...prev, vendor: e.target.value }))}
+              className="w-full bg-charcoal-900 border border-charcoal-700 rounded-lg px-4 py-2 text-white focus:border-steel-500 focus:outline-none"
+              placeholder="e.g., Home Depot"
+            />
           </div>
 
           <div>
