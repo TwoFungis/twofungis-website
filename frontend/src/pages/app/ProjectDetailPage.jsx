@@ -340,53 +340,106 @@ const ProjectDetailPage = () => {
         </div>
       )}
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-charcoal-800 rounded-xl p-4 lg:p-6 border border-charcoal-700">
-          <DollarSign className="w-6 h-6 text-steel-400 mb-2" />
-          <p className="text-2xl font-bold text-white" data-testid="contract-value">
-            {formatCurrency(project.contract_value)}
-          </p>
-          <p className="text-sm text-gray-500">Contract Value</p>
-        </div>
-        <div className="bg-charcoal-800 rounded-xl p-4 lg:p-6 border border-charcoal-700">
-          <FileText className="w-6 h-6 text-warning mb-2" />
-          <p className="text-2xl font-bold text-white" data-testid="approved-cos">
-            {formatCurrency(project.approved_cos)}
-          </p>
-          <p className="text-sm text-gray-500">Approved COs</p>
-        </div>
-        <div className="bg-charcoal-800 rounded-xl p-4 lg:p-6 border border-charcoal-700">
-          <ClipboardList className="w-6 h-6 text-steel-400 mb-2" />
-          <p className="text-2xl font-bold text-white" data-testid="percent-complete">
-            {project.percent_complete || 0}%
-          </p>
-          <p className="text-sm text-gray-500">Complete</p>
-        </div>
-        <div className="bg-charcoal-800 rounded-xl p-4 lg:p-6 border border-charcoal-700">
-          <TrendingUp className="w-6 h-6 text-success mb-2" />
-          <p className={`text-2xl font-bold ${(project.forecast_margin || 0) >= 15 ? 'text-success' : (project.forecast_margin || 0) >= 10 ? 'text-warning' : 'text-risk'}`} data-testid="forecast-margin">
+      {/* PROJECT FINANCIAL HEALTH PANEL */}
+      <div className="bg-gradient-to-br from-charcoal-800 to-charcoal-900 rounded-2xl border border-charcoal-700 overflow-hidden" data-testid="financial-health-panel">
+        <div className="p-4 lg:p-6 border-b border-charcoal-700 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-steel-500/20 flex items-center justify-center">
+              <TrendingUp className="w-5 h-5 text-steel-400" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-white">Financial Health</h2>
+              <p className="text-xs text-gray-500">Real-time project profitability</p>
+            </div>
+          </div>
+          <div className={`px-4 py-2 rounded-xl font-bold text-2xl ${
+            (project.forecast_margin || 0) >= 20 ? 'bg-success/20 text-success' : 
+            (project.forecast_margin || 0) >= 15 ? 'bg-success/10 text-success' : 
+            (project.forecast_margin || 0) >= 10 ? 'bg-warning/20 text-warning' : 
+            'bg-risk/20 text-risk'
+          }`}>
             {project.forecast_margin || 0}%
-          </p>
-          <p className="text-sm text-gray-500">Forecast Margin</p>
+            <span className="text-xs font-normal ml-1">margin</span>
+          </div>
         </div>
-      </div>
+        
+        <div className="p-4 lg:p-6">
+          {/* Main Financial Metrics */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div className="bg-charcoal-700/50 rounded-xl p-4">
+              <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Contract Value</p>
+              <p className="text-xl lg:text-2xl font-bold text-white" data-testid="contract-value">
+                {formatCurrency(project.contract_value)}
+              </p>
+            </div>
+            <div className="bg-charcoal-700/50 rounded-xl p-4">
+              <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Approved COs</p>
+              <p className="text-xl lg:text-2xl font-bold text-warning" data-testid="approved-cos">
+                +{formatCurrency(project.approved_cos)}
+              </p>
+            </div>
+            <div className="bg-charcoal-700/50 rounded-xl p-4">
+              <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Total Revenue</p>
+              <p className="text-xl lg:text-2xl font-bold text-success">
+                {formatCurrency((project.contract_value || 0) + (project.approved_cos || 0))}
+              </p>
+            </div>
+            <div className="bg-charcoal-700/50 rounded-xl p-4">
+              <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">Cost to Date</p>
+              <p className="text-xl lg:text-2xl font-bold text-white">
+                {formatCurrency(project.cost_to_date)}
+              </p>
+            </div>
+          </div>
 
-      {/* Progress Bar */}
-      <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="font-semibold text-white">Project Progress</h3>
-          <span className="text-steel-400 font-medium">{project.percent_complete || 0}%</span>
-        </div>
-        <div className="h-3 bg-charcoal-700 rounded-full overflow-hidden">
-          <div 
-            className="h-full bg-gradient-to-r from-steel-600 to-steel-400 rounded-full transition-all"
-            style={{ width: `${project.percent_complete || 0}%` }}
-          />
-        </div>
-        <div className="flex justify-between mt-3 text-sm text-gray-500">
-          <span>Cost to Date: {formatCurrency(project.cost_to_date)}</span>
-          <span>Total Value: {formatCurrency((project.contract_value || 0) + (project.approved_cos || 0))}</span>
+          {/* Profit Calculation */}
+          <div className="bg-charcoal-700/30 rounded-xl p-4 mb-4">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+              <div className="flex items-center gap-6">
+                <div>
+                  <p className="text-xs text-gray-500">Gross Profit</p>
+                  <p className={`text-2xl font-bold ${
+                    ((project.contract_value || 0) + (project.approved_cos || 0) - (project.cost_to_date || 0)) >= 0 
+                      ? 'text-success' : 'text-risk'
+                  }`}>
+                    {formatCurrency((project.contract_value || 0) + (project.approved_cos || 0) - (project.cost_to_date || 0))}
+                  </p>
+                </div>
+                <div className="h-10 w-px bg-charcoal-600" />
+                <div>
+                  <p className="text-xs text-gray-500">At Completion</p>
+                  <p className="text-2xl font-bold text-white">
+                    {formatCurrency(((project.contract_value || 0) + (project.approved_cos || 0)) * (project.forecast_margin || 0) / 100)}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className={`w-3 h-3 rounded-full ${
+                  (project.forecast_margin || 0) >= 15 ? 'bg-success' : 
+                  (project.forecast_margin || 0) >= 10 ? 'bg-warning' : 'bg-risk'
+                }`} />
+                <span className="text-sm text-gray-400">
+                  {(project.forecast_margin || 0) >= 20 ? 'Excellent' : 
+                   (project.forecast_margin || 0) >= 15 ? 'On Target' : 
+                   (project.forecast_margin || 0) >= 10 ? 'Below Target' : 'At Risk'}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Progress Bar */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm text-gray-400">Completion</span>
+              <span className="text-sm font-semibold text-steel-400">{project.percent_complete || 0}%</span>
+            </div>
+            <div className="h-2 bg-charcoal-700 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-gradient-to-r from-steel-600 to-steel-400 rounded-full transition-all"
+                style={{ width: `${project.percent_complete || 0}%` }}
+              />
+            </div>
+          </div>
         </div>
       </div>
 
