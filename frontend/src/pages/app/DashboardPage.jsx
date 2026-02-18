@@ -145,12 +145,14 @@ const DashboardPage = () => {
 
       {/* Header with Shield Branding */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl lg:text-3xl font-bold text-charcoal-800 flex items-center gap-3">
-            <img src="/shield-icon.png" alt="" className="h-10 w-auto opacity-20 hidden lg:block" />
-            Welcome back, {profile?.full_name?.split(' ')[0] || profile?.name?.split(' ')[0] || 'Builder'}
-          </h1>
-          <p className="text-charcoal-500 mt-1">Your business at a glance</p>
+        <div className="flex items-center gap-3">
+          <img src="/shield-icon.png" alt="" className="h-10 w-auto opacity-30 hidden lg:block" />
+          <div>
+            <h1 className="text-2xl lg:text-3xl font-bold text-white">
+              Welcome back, {profile?.full_name?.split(' ')[0] || profile?.name?.split(' ')[0] || 'Builder'}
+            </h1>
+            <p className="text-gray-400 mt-1">Your business at a glance</p>
+          </div>
         </div>
       </div>
 
@@ -158,7 +160,7 @@ const DashboardPage = () => {
       {/* ZONE A: EXECUTION */}
       {/* ============================================ */}
       <section data-testid="execution-zone">
-        <h2 className="text-sm font-semibold text-charcoal-700 uppercase tracking-wider mb-4">Execution</h2>
+        <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Execution</h2>
         
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Active Projects */}
@@ -393,7 +395,7 @@ const DashboardPage = () => {
       {/* ============================================ */}
       <section data-testid="alerts-zone">
         <div className="flex items-center gap-2 mb-4">
-          <h2 className="text-sm font-semibold text-charcoal-600 uppercase tracking-wider">Alerts</h2>
+          <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">Alerts</h2>
           {alertCount > 0 && (
             <span className="bg-risk/20 text-risk text-xs px-2 py-0.5 rounded-full">{alertCount}</span>
           )}
