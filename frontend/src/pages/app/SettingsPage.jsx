@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Settings as SettingsIcon, User, CreditCard, Bell, Shield, Check, Loader2, Crown, FileText, Save } from 'lucide-react';
+import { Settings as SettingsIcon, User, CreditCard, Bell, Shield, Check, Loader2, Crown, FileText, Save, MapPin, Info, X, Sparkles } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { supabase } from '../../lib/supabase';
 
@@ -17,6 +17,15 @@ const SettingsPage = () => {
   const [defaultPaymentDays, setDefaultPaymentDays] = useState(profile?.default_payment_days || 30);
   const [isSavingDefaults, setIsSavingDefaults] = useState(false);
   const [defaultsSaved, setDefaultsSaved] = useState(false);
+  
+  // Lifetime Plan State
+  const [lifetimeStatus, setLifetimeStatus] = useState({
+    seats_remaining: 100,
+    is_available: true,
+    region_lock: 'CA',
+    max_seats: 100
+  });
+  const [showLifetimeModal, setShowLifetimeModal] = useState(false);
 
   // Load defaults from profile
   useEffect(() => {
@@ -24,6 +33,23 @@ const SettingsPage = () => {
       setDefaultPaymentDays(profile.default_payment_days);
     }
   }, [profile]);
+
+  // Fetch lifetime seats status
+  useEffect(() => {
+    const fetchLifetimeStatus = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/subscription/lifetime/status`);
+        if (response.ok) {
+          const data = await response.json();
+          setLifetimeStatus(data);
+        }
+      } catch (error) {
+        console.error('Error fetching lifetime status:', error);
+      }
+    };
+    
+    fetchLifetimeStatus();
+  }, []);
 
   const handleSaveDefaults = async () => {
     if (!user) return;
@@ -51,54 +77,63 @@ const SettingsPage = () => {
     }
   };
 
-  // Check for payment return from Stripe
+  // Check for payment completion
   useEffect(() => {
     const sessionId = searchParams.get('session_id');
     const paymentStatus = searchParams.get('payment');
-    
-    if (sessionId && paymentStatus === 'success') {
-      pollPaymentStatus(sessionId);
+    const planType = searchParams.get('plan');
+
+    if (paymentStatus === 'success' && sessionId) {
+      setIsProcessingPayment(true);
+      setPaymentMessage({ type: 'info', text: 'Verifying your payment...' });
+      pollPaymentStatus(sessionId, 0, planType);
     } else if (paymentStatus === 'cancelled') {
-      setPaymentMessage({ type: 'warning', text: 'Payment was cancelled. You can try again anytime.' });
+      setPaymentMessage({ type: 'error', text: 'Payment was cancelled. Please try again.' });
     }
   }, [searchParams]);
 
-  const pollPaymentStatus = async (sessionId, attempts = 0) => {
-    const maxAttempts = 5;
+  const pollPaymentStatus = async (sessionId, attempts, planType) => {
+    const maxAttempts = 10;
     const pollInterval = 2000;
 
     if (attempts >= maxAttempts) {
-      setPaymentMessage({ type: 'warning', text: 'Payment verification timed out. Please check your email for confirmation.' });
+      setPaymentMessage({ type: 'error', text: 'Payment verification timed out. Please contact support.' });
       setIsProcessingPayment(false);
       return;
     }
 
-    setIsProcessingPayment(true);
-
     try {
       const response = await fetch(`${API_URL}/api/subscription/status/${sessionId}`);
-      if (!response.ok) throw new Error('Failed to check payment status');
-      
       const data = await response.json();
-      
+
       if (data.payment_status === 'paid') {
-        setPaymentMessage({ type: 'success', text: `Payment successful! You are now on the ${data.plan_type?.toUpperCase()} plan.` });
+        const planName = planType === 'lifetime_elite' ? 'Founding Lifetime (Elite)' : 
+                        planType === 'elite' ? 'Elite' : 
+                        planType === 'pro' ? 'Pro' : 'your plan';
+        setPaymentMessage({ 
+          type: 'success', 
+          text: `🎉 Payment successful! Welcome to ${planName}!` 
+        });
         setIsProcessingPayment(false);
-        // Update local profile state
-        if (updateProfile && data.plan_type) {
-          await updateProfile({ subscription_tier: data.plan_type });
+        
+        // Refresh user profile
+        if (updateProfile) {
+          await updateProfile({});
         }
-        // Clear URL params
+        
+        // Clear URL parameters
         window.history.replaceState({}, '', '/app/settings');
         return;
-      } else if (data.status === 'expired') {
+      }
+
+      if (data.status === 'expired') {
         setPaymentMessage({ type: 'error', text: 'Payment session expired. Please try again.' });
         setIsProcessingPayment(false);
         return;
       }
-      
+
       // Continue polling
-      setTimeout(() => pollPaymentStatus(sessionId, attempts + 1), pollInterval);
+      setTimeout(() => pollPaymentStatus(sessionId, attempts + 1, planType), pollInterval);
     } catch (error) {
       console.error('Error checking payment status:', error);
       setPaymentMessage({ type: 'error', text: 'Error checking payment status. Please contact support.' });
@@ -111,6 +146,17 @@ const SettingsPage = () => {
     setPaymentMessage(null);
 
     try {
+      // For lifetime plan, check country
+      if (planType === 'lifetime_elite') {
+        const userCountry = profile?.country || profile?.region?.includes('Canada') || profile?.region?.includes('British Columbia') || profile?.region?.includes('Ontario') || profile?.region?.includes('Alberta') || profile?.region?.includes('Quebec') ? 'CA' : 'OTHER';
+        
+        if (userCountry !== 'CA' && !lifetimeStatus.is_available) {
+          setPaymentMessage({ type: 'error', text: 'Founding Lifetime is only available in Canada' });
+          setIsUpgrading(false);
+          return;
+        }
+      }
+
       const response = await fetch(`${API_URL}/api/subscription/checkout`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -118,7 +164,8 @@ const SettingsPage = () => {
           plan_type: planType,
           origin_url: window.location.origin,
           user_id: user?.id,
-          email: user?.email
+          email: user?.email,
+          country: profile?.country || 'CA'
         })
       });
 
@@ -142,7 +189,15 @@ const SettingsPage = () => {
     }
   };
 
-  const currentPlan = profile?.subscription_tier || 'trial';
+  const currentPlan = profile?.plan_type || profile?.subscription_tier || 'trial';
+  const isLifetime = currentPlan === 'lifetime_elite';
+  const isCanada = profile?.country === 'CA' || 
+                   profile?.region?.includes('British Columbia') || 
+                   profile?.region?.includes('Ontario') || 
+                   profile?.region?.includes('Alberta') ||
+                   profile?.region?.includes('Quebec') ||
+                   profile?.region?.includes('Manitoba') ||
+                   profile?.region?.includes('Saskatchewan');
 
   return (
     <div className="space-y-6" data-testid="settings-page">
@@ -225,85 +280,179 @@ const SettingsPage = () => {
             <div className="mb-6">
               <p className="text-gray-400 text-sm mb-2">Current Plan</p>
               <div className="flex items-center gap-3">
-                <span className={`text-xl font-bold capitalize ${
+                <span className={`text-xl font-bold ${
+                  isLifetime ? 'text-warning' :
                   currentPlan === 'elite' ? 'text-steel-400' : 
                   currentPlan === 'pro' ? 'text-success' : 'text-warning'
                 }`}>
-                  {currentPlan}
+                  {isLifetime ? 'Founding Lifetime (Elite)' : currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1)}
                 </span>
-                {currentPlan === 'elite' && <Crown className="w-5 h-5 text-warning" />}
+                {(currentPlan === 'elite' || isLifetime) && <Crown className="w-5 h-5 text-warning" />}
+                {isLifetime && <Sparkles className="w-5 h-5 text-warning" />}
               </div>
+              {isLifetime && (
+                <p className="text-sm text-gray-400 mt-2">
+                  No subscription. Lifetime access active since {profile?.lifetime_purchased_at ? new Date(profile.lifetime_purchased_at).toLocaleDateString() : 'purchase date'}.
+                </p>
+              )}
             </div>
 
             {/* Plan Cards */}
-            <div className="grid md:grid-cols-2 gap-4">
-              {/* Pro Plan */}
-              <div className={`rounded-xl p-6 border ${
-                currentPlan === 'pro' ? 'bg-success/10 border-success/50' : 'bg-charcoal-700 border-charcoal-600'
-              }`}>
-                <h3 className="text-lg font-bold text-white mb-1">Pro</h3>
-                <p className="text-2xl font-bold text-white mb-4">$39<span className="text-sm text-gray-400">/mo</span></p>
-                <ul className="space-y-2 mb-4 text-sm">
-                  {['Unlimited Projects', 'Quote Builder + PDF', 'Change Order Manager', 'Labor Cost Engine', 'Production Logs'].map((f, i) => (
-                    <li key={i} className="flex items-center gap-2 text-gray-300">
-                      <Check className="w-4 h-4 text-success" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                {currentPlan === 'pro' ? (
-                  <span className="block w-full text-center py-2 rounded-lg bg-success/20 text-success font-medium">
-                    Current Plan
-                  </span>
-                ) : currentPlan === 'elite' ? (
-                  <span className="block w-full text-center py-2 rounded-lg bg-charcoal-600 text-gray-400 font-medium">
-                    Downgrade not available
-                  </span>
-                ) : (
-                  <button
-                    onClick={() => handleUpgrade('pro')}
-                    disabled={isUpgrading}
-                    className="w-full bg-steel-500 hover:bg-steel-600 disabled:opacity-50 text-white py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
-                    data-testid="upgrade-pro-btn"
-                  >
-                    {isUpgrading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Upgrade to Pro'}
-                  </button>
-                )}
-              </div>
-
-              {/* Elite Plan */}
-              <div className={`rounded-xl p-6 border-2 ${
-                currentPlan === 'elite' ? 'bg-steel-500/10 border-steel-500' : 'bg-charcoal-700 border-steel-500/50'
-              }`}>
-                <div className="flex items-center gap-2 mb-1">
-                  <h3 className="text-lg font-bold text-white">Elite</h3>
-                  <Crown className="w-4 h-4 text-warning" />
+            {!isLifetime && (
+              <div className="grid md:grid-cols-3 gap-4">
+                {/* Pro Plan */}
+                <div className={`rounded-xl p-5 border ${
+                  currentPlan === 'pro' ? 'bg-success/10 border-success/50' : 'bg-charcoal-700 border-charcoal-600'
+                }`}>
+                  <h3 className="text-lg font-bold text-white mb-1">Pro</h3>
+                  <p className="text-2xl font-bold text-white mb-3">$39<span className="text-sm text-gray-400">/mo</span></p>
+                  <ul className="space-y-1.5 mb-4 text-sm">
+                    {['Unlimited Projects', 'Quote Builder', 'Change Orders', 'Labor Engine'].map((f, i) => (
+                      <li key={i} className="flex items-center gap-2 text-gray-300">
+                        <Check className="w-3 h-3 text-success flex-shrink-0" />
+                        <span className="text-xs">{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  {currentPlan === 'pro' ? (
+                    <span className="block w-full text-center py-2 rounded-lg bg-success/20 text-success font-medium text-sm">
+                      Current Plan
+                    </span>
+                  ) : currentPlan === 'elite' ? (
+                    <span className="block w-full text-center py-2 rounded-lg bg-charcoal-600 text-gray-400 font-medium text-sm">
+                      Downgrade N/A
+                    </span>
+                  ) : (
+                    <button
+                      onClick={() => handleUpgrade('pro')}
+                      disabled={isUpgrading}
+                      className="w-full bg-steel-500 hover:bg-steel-600 disabled:opacity-50 text-white py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 text-sm"
+                      data-testid="upgrade-pro-btn"
+                    >
+                      {isUpgrading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Upgrade'}
+                    </button>
+                  )}
                 </div>
-                <p className="text-2xl font-bold text-white mb-4">$59<span className="text-sm text-gray-400">/mo</span></p>
-                <ul className="space-y-2 mb-4 text-sm">
-                  {['Everything in Pro', 'Advanced Reports & KPIs', 'Production Analytics', 'Priority Support', 'Early Feature Access'].map((f, i) => (
-                    <li key={i} className="flex items-center gap-2 text-gray-300">
-                      <Check className="w-4 h-4 text-steel-400" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                {currentPlan === 'elite' ? (
-                  <span className="block w-full text-center py-2 rounded-lg bg-steel-500/20 text-steel-400 font-medium">
-                    Current Plan
-                  </span>
-                ) : (
-                  <button
-                    onClick={() => handleUpgrade('elite')}
-                    disabled={isUpgrading}
-                    className="w-full bg-steel-500 hover:bg-steel-600 disabled:opacity-50 text-white py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
-                    data-testid="upgrade-elite-btn"
-                  >
-                    {isUpgrading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Upgrade to Elite'}
-                  </button>
-                )}
+
+                {/* Elite Plan */}
+                <div className={`rounded-xl p-5 border ${
+                  currentPlan === 'elite' ? 'bg-steel-500/10 border-steel-500' : 'bg-charcoal-700 border-steel-500/50'
+                }`}>
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="text-lg font-bold text-white">Elite</h3>
+                    <Crown className="w-4 h-4 text-warning" />
+                  </div>
+                  <p className="text-2xl font-bold text-white mb-3">$59<span className="text-sm text-gray-400">/mo</span></p>
+                  <ul className="space-y-1.5 mb-4 text-sm">
+                    {['Everything in Pro', 'Advanced Reports', 'KPIs & Analytics', 'Priority Support'].map((f, i) => (
+                      <li key={i} className="flex items-center gap-2 text-gray-300">
+                        <Check className="w-3 h-3 text-steel-400 flex-shrink-0" />
+                        <span className="text-xs">{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  {currentPlan === 'elite' ? (
+                    <span className="block w-full text-center py-2 rounded-lg bg-steel-500/20 text-steel-400 font-medium text-sm">
+                      Current Plan
+                    </span>
+                  ) : (
+                    <button
+                      onClick={() => handleUpgrade('elite')}
+                      disabled={isUpgrading}
+                      className="w-full bg-steel-500 hover:bg-steel-600 disabled:opacity-50 text-white py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 text-sm"
+                      data-testid="upgrade-elite-btn"
+                    >
+                      {isUpgrading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Upgrade'}
+                    </button>
+                  )}
+                </div>
+
+                {/* Founding Lifetime Plan */}
+                <div className={`rounded-xl p-5 border-2 relative overflow-hidden ${
+                  lifetimeStatus.is_available && isCanada
+                    ? 'bg-gradient-to-br from-warning/10 to-charcoal-700 border-warning/50'
+                    : 'bg-charcoal-700 border-charcoal-600 opacity-75'
+                }`}>
+                  {/* Limited Badge */}
+                  <div className="absolute top-0 right-0 bg-warning text-charcoal-900 text-xs font-bold px-2 py-1 rounded-bl">
+                    LIMITED
+                  </div>
+                  
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="text-lg font-bold text-white">Lifetime</h3>
+                    <Sparkles className="w-4 h-4 text-warning" />
+                  </div>
+                  <p className="text-2xl font-bold text-white mb-1">$599<span className="text-sm text-gray-400"> CAD</span></p>
+                  <p className="text-xs text-warning mb-3">One-time payment</p>
+                  
+                  <ul className="space-y-1.5 mb-4 text-sm">
+                    {['Elite forever', 'No monthly fees', 'Founding badge'].map((f, i) => (
+                      <li key={i} className="flex items-center gap-2 text-gray-300">
+                        <Check className="w-3 h-3 text-warning flex-shrink-0" />
+                        <span className="text-xs">{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  
+                  {/* Seats Remaining */}
+                  <div className="mb-3 bg-charcoal-800/50 rounded-lg p-2 text-center">
+                    <p className="text-xs text-gray-400">Founding Memberships</p>
+                    <p className="text-lg font-bold text-warning">
+                      {lifetimeStatus.seats_remaining} <span className="text-sm font-normal text-gray-400">/ {lifetimeStatus.max_seats}</span>
+                    </p>
+                  </div>
+                  
+                  {!isCanada ? (
+                    <div className="text-center">
+                      <div className="flex items-center justify-center gap-1 text-gray-400 text-xs mb-2">
+                        <MapPin className="w-3 h-3" />
+                        <span>Canada only</span>
+                      </div>
+                      <span className="block w-full text-center py-2 rounded-lg bg-charcoal-600 text-gray-500 font-medium text-sm cursor-not-allowed">
+                        Not Available
+                      </span>
+                    </div>
+                  ) : !lifetimeStatus.is_available ? (
+                    <span className="block w-full text-center py-2 rounded-lg bg-charcoal-600 text-gray-400 font-medium text-sm">
+                      Sold Out
+                    </span>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => setShowLifetimeModal(true)}
+                        disabled={isUpgrading}
+                        className="w-full bg-warning hover:bg-warning/90 disabled:opacity-50 text-charcoal-900 py-2 rounded-lg font-bold transition-colors flex items-center justify-center gap-2 text-sm"
+                        data-testid="upgrade-lifetime-btn"
+                      >
+                        {isUpgrading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Get Lifetime'}
+                      </button>
+                      <button
+                        onClick={() => setShowLifetimeModal(true)}
+                        className="w-full text-center text-xs text-gray-400 hover:text-white mt-2 flex items-center justify-center gap-1"
+                      >
+                        <Info className="w-3 h-3" />
+                        Learn more
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
+
+            {/* Lifetime user info */}
+            {isLifetime && (
+              <div className="bg-gradient-to-r from-warning/10 to-transparent rounded-xl p-4 border border-warning/30">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-warning/20 flex items-center justify-center">
+                    <Sparkles className="w-5 h-5 text-warning" />
+                  </div>
+                  <div>
+                    <p className="text-white font-semibold">Founding Member</p>
+                    <p className="text-sm text-gray-400">You have lifetime Elite access. No subscription needed.</p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Business Defaults Section */}
@@ -410,15 +559,101 @@ const SettingsPage = () => {
             </div>
           </div>
 
-          <div className="bg-risk/10 border border-risk/30 rounded-xl p-6">
-            <h2 className="text-lg font-semibold text-white mb-2">Danger Zone</h2>
+          <div className="bg-charcoal-800 rounded-xl border border-risk/30 p-6">
+            <h2 className="text-lg font-semibold text-white mb-4">Danger Zone</h2>
             <p className="text-gray-400 text-sm mb-4">Once you delete your account, there is no going back.</p>
-            <button className="bg-risk hover:bg-risk/80 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm">
+            <button className="w-full bg-risk/20 hover:bg-risk/30 text-risk py-2 rounded-lg font-medium transition-colors text-sm">
               Delete Account
             </button>
           </div>
         </div>
       </div>
+
+      {/* Lifetime Info Modal */}
+      {showLifetimeModal && (
+        <>
+          <div className="fixed inset-0 bg-black/60 z-40" onClick={() => setShowLifetimeModal(false)} />
+          <div className="fixed inset-x-4 top-1/2 -translate-y-1/2 max-w-lg mx-auto bg-charcoal-800 rounded-2xl border border-charcoal-700 p-6 z-50" data-testid="lifetime-modal">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-warning/20 flex items-center justify-center">
+                  <Sparkles className="w-5 h-5 text-warning" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-white">Founding Lifetime</h2>
+                  <p className="text-sm text-gray-400">One-time purchase, forever access</p>
+                </div>
+              </div>
+              <button onClick={() => setShowLifetimeModal(false)} className="text-gray-400 hover:text-white">
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            <div className="space-y-4 mb-6">
+              <div className="bg-charcoal-700/50 rounded-xl p-4">
+                <h3 className="font-semibold text-white mb-2">What you get:</h3>
+                <ul className="space-y-2">
+                  {[
+                    'All Elite features forever',
+                    'No monthly subscription fees',
+                    'Exclusive Founding Member badge',
+                    'Priority support for life',
+                    'Early access to new features',
+                    'Lock in before price increases'
+                  ].map((item, i) => (
+                    <li key={i} className="flex items-center gap-2 text-gray-300 text-sm">
+                      <Check className="w-4 h-4 text-warning flex-shrink-0" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="bg-warning/10 border border-warning/30 rounded-xl p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <MapPin className="w-4 h-4 text-warning" />
+                  <span className="font-semibold text-warning">Canada Only</span>
+                </div>
+                <p className="text-sm text-gray-400">
+                  Founding Lifetime memberships are currently limited to 100 Canadian users. 
+                  Your billing address must be in Canada.
+                </p>
+              </div>
+
+              <div className="text-center py-4">
+                <p className="text-3xl font-bold text-white">$599 <span className="text-lg text-gray-400">CAD</span></p>
+                <p className="text-sm text-gray-400">One-time payment • No recurring charges</p>
+              </div>
+            </div>
+
+            <div className="flex gap-4">
+              <button
+                onClick={() => setShowLifetimeModal(false)}
+                className="flex-1 bg-charcoal-700 hover:bg-charcoal-600 text-white py-3 rounded-lg font-medium transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  setShowLifetimeModal(false);
+                  handleUpgrade('lifetime_elite');
+                }}
+                disabled={isUpgrading || !lifetimeStatus.is_available}
+                className="flex-1 bg-warning hover:bg-warning/90 disabled:opacity-50 text-charcoal-900 py-3 rounded-lg font-bold transition-colors flex items-center justify-center gap-2"
+              >
+                {isUpgrading ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <>
+                    <Sparkles className="w-5 h-5" />
+                    Purchase Lifetime
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };
