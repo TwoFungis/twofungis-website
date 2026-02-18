@@ -496,7 +496,7 @@ const SettingsPage = () => {
               <h3 className="text-lg font-bold text-white">Pro</h3>
               <p className="text-gray-400 text-sm mb-2">For growing trades getting organized.</p>
               <p className="text-2xl font-bold text-white mb-4">
-                $49<span className="text-sm text-gray-400">/month</span>
+                $29<span className="text-sm text-gray-400">/month</span>
               </p>
               <ul className="space-y-2 text-sm text-gray-300 mb-4">
                 <li className="flex items-center gap-2"><Check className="w-4 h-4 text-success" /> Unlimited projects</li>
@@ -532,7 +532,7 @@ const SettingsPage = () => {
               </div>
               <p className="text-gray-400 text-sm mb-2">For contractors running serious operations.</p>
               <p className="text-2xl font-bold text-white mb-4">
-                $99<span className="text-sm text-gray-400">/month</span>
+                $59<span className="text-sm text-gray-400">/month</span>
               </p>
               <ul className="space-y-2 text-sm text-gray-300 mb-4">
                 <li className="flex items-center gap-2"><Check className="w-4 h-4 text-success" /> Everything in Pro</li>
@@ -558,6 +558,75 @@ const SettingsPage = () => {
                   {profile?.subscription_tier === 'lifetime' ? 'Lifetime Access' : 'Current Plan'}
                 </div>
               )}
+            </div>
+          </div>
+        )}
+
+        {/* Lifetime Founder Plan */}
+        {profile?.subscription_tier !== 'lifetime' && (
+          <div className="mt-6 bg-gradient-to-r from-warning/10 to-warning/5 rounded-xl border border-warning/30 p-6">
+            <div className="flex items-start gap-4">
+              <div className="w-16 h-16 bg-warning/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                <img src="/shield-icon.png" alt="" className="w-10 h-10" />
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="text-xl font-bold text-white">Lifetime Founder</h3>
+                  <span className="bg-warning/20 text-warning text-xs px-2 py-0.5 rounded-full font-medium">LIMITED</span>
+                </div>
+                <p className="text-gray-300 text-sm mb-3">
+                  Join our first 100 founders and lock in lifetime access to TradeOS Elite features. 
+                  One payment, forever access. Help shape the future of the platform.
+                </p>
+                <div className="flex items-center gap-4 mb-4">
+                  <p className="text-3xl font-bold text-warning">
+                    $599<span className="text-sm text-gray-400 font-normal"> one-time</span>
+                  </p>
+                  <span className="text-gray-500 line-through">$1,416/yr value</span>
+                </div>
+                <ul className="grid grid-cols-2 gap-2 text-sm text-gray-300 mb-4">
+                  <li className="flex items-center gap-2"><Check className="w-4 h-4 text-warning" /> All Elite features forever</li>
+                  <li className="flex items-center gap-2"><Check className="w-4 h-4 text-warning" /> Founder badge on profile</li>
+                  <li className="flex items-center gap-2"><Check className="w-4 h-4 text-warning" /> Priority feature requests</li>
+                  <li className="flex items-center gap-2"><Check className="w-4 h-4 text-warning" /> Direct founder support line</li>
+                </ul>
+                <div className="flex items-center gap-4">
+                  <button
+                    onClick={() => handleUpgrade('lifetime')}
+                    disabled={isUpgrading}
+                    className="bg-warning hover:bg-warning/90 disabled:opacity-50 text-charcoal-900 px-6 py-2.5 rounded-lg font-bold transition-colors flex items-center gap-2"
+                  >
+                    {isUpgrading && upgradingPlan === 'lifetime' ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                      <>
+                        <img src="/shield-icon.png" alt="" className="w-5 h-5" />
+                        Become a Founder
+                      </>
+                    )}
+                  </button>
+                  <span className="text-gray-500 text-sm">Only 100 spots available</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Lifetime Founder Badge - shown if user is a founder */}
+        {profile?.subscription_tier === 'lifetime' && (
+          <div className="mt-6 bg-gradient-to-r from-warning/20 to-warning/10 rounded-xl border border-warning/50 p-6">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 bg-warning/30 rounded-xl flex items-center justify-center">
+                <img src="/shield-icon.png" alt="" className="w-10 h-10" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-xl font-bold text-warning">Lifetime Founder</h3>
+                  <Crown className="w-5 h-5 text-warning" />
+                </div>
+                <p className="text-gray-300 text-sm">Thank you for being one of our founding members!</p>
+                <p className="text-warning text-sm font-medium mt-1">All Elite features • Forever access • Founder #XX</p>
+              </div>
             </div>
           </div>
         )}
