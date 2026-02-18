@@ -23,6 +23,17 @@ const TradeOSBanner = () => {
       }}
     >
       <div className="container mx-auto flex items-center justify-center gap-3 flex-wrap">
+        {/* Powered by text */}
+        <span 
+          className="text-sm font-medium"
+          style={{ 
+            color: '#555555', 
+            fontFamily: 'system-ui, -apple-system, sans-serif'
+          }}
+        >
+          Powered by:
+        </span>
+        
         {/* Shield Logo */}
         <img 
           src="/tradeos-logo.png" 
@@ -64,7 +75,7 @@ const TradeOSBanner = () => {
             fontFamily: 'system-ui, -apple-system, sans-serif'
           }}
         >
-          Visit Site <ArrowRight size={12} strokeWidth={3} />
+          Free Trial <ArrowRight size={12} strokeWidth={3} />
         </span>
       </div>
     </a>
