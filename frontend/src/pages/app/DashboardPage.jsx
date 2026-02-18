@@ -190,60 +190,99 @@ const DashboardPage = () => {
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
-        {/* Active Projects */}
+        {/* Active Projects - REAL DATA */}
         <div className="bg-charcoal-800 rounded-xl border border-charcoal-700">
           <div className="p-4 lg:p-6 border-b border-charcoal-700 flex items-center justify-between">
             <h2 className="text-lg font-semibold text-white">Active Projects</h2>
-            <a href="/app/projects" className="text-steel-400 text-sm hover:text-steel-300">View all</a>
+            <Link to="/app/projects" className="text-steel-400 text-sm hover:text-steel-300">View all</Link>
           </div>
-          <div className="divide-y divide-charcoal-700">
-            {projects.map((project, i) => (
-              <div key={i} className="p-4 lg:p-6 hover:bg-charcoal-700/50 transition-colors">
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-medium text-white truncate">{project.name}</h3>
-                    <p className="text-sm text-gray-500">{project.client}</p>
+          {projects.length === 0 ? (
+            <div className="p-8 text-center">
+              <FolderKanban className="w-10 h-10 text-gray-600 mx-auto mb-3" />
+              <p className="text-gray-400 mb-4">No projects yet</p>
+              <Link 
+                to="/app/projects?new=true"
+                className="inline-flex items-center gap-2 text-steel-400 hover:text-steel-300 text-sm font-medium"
+              >
+                <Plus className="w-4 h-4" />
+                Create your first project
+              </Link>
+            </div>
+          ) : (
+            <div className="divide-y divide-charcoal-700">
+              {projects.map((project) => (
+                <Link 
+                  key={project.id} 
+                  to={`/app/projects/${project.id}`}
+                  className="p-4 lg:p-6 hover:bg-charcoal-700/50 transition-colors block"
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-medium text-white truncate">{project.name}</h3>
+                      <p className="text-sm text-gray-500">{project.client_gc || 'No client'}</p>
+                    </div>
+                    <div className={`w-3 h-3 rounded-full ${getRiskColor(project.risk_flag)} ml-3 mt-1.5`} />
                   </div>
-                  <div className={`w-3 h-3 rounded-full ${getRiskColor(project.risk)} ml-3 mt-1.5`} />
-                </div>
-                <div className="flex items-center gap-4 text-sm">
-                  <span className="text-gray-400">Value: <span className="text-white">{project.value}</span></span>
-                  <span className="text-gray-400">Margin: <span className={project.margin >= '15%' ? 'text-success' : 'text-warning'}>{project.margin}</span></span>
-                </div>
-              </div>
-            ))}
-          </div>
+                  <div className="flex items-center gap-4 text-sm">
+                    <span className="text-gray-400">Value: <span className="text-white">{formatCurrency(project.contract_value)}</span></span>
+                    <span className="text-gray-400">Margin: <span className={parseFloat(project.forecast_margin) >= 15 ? 'text-success' : 'text-warning'}>{project.forecast_margin || 0}%</span></span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
 
-        {/* Pending Change Orders */}
+        {/* Pending Change Orders - REAL DATA */}
         <div className="bg-charcoal-800 rounded-xl border border-charcoal-700">
           <div className="p-4 lg:p-6 border-b border-charcoal-700 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <h2 className="text-lg font-semibold text-white">Pending Change Orders</h2>
-              <span className="bg-warning/20 text-warning text-xs px-2 py-0.5 rounded-full">{pendingCOs.length}</span>
+              {changeOrders.length > 0 && (
+                <span className="bg-warning/20 text-warning text-xs px-2 py-0.5 rounded-full">{changeOrders.length}</span>
+              )}
             </div>
-            <a href="/app/change-orders" className="text-steel-400 text-sm hover:text-steel-300">View all</a>
+            <Link to="/app/change-orders" className="text-steel-400 text-sm hover:text-steel-300">View all</Link>
           </div>
-          <div className="divide-y divide-charcoal-700">
-            {pendingCOs.map((co, i) => (
-              <div key={i} className="p-4 lg:p-6 hover:bg-charcoal-700/50 transition-colors">
-                <div className="flex items-start justify-between mb-2">
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs bg-charcoal-600 text-gray-300 px-2 py-0.5 rounded">{co.co}</span>
-                      <span className="text-sm text-gray-500">{co.project}</span>
+          {changeOrders.length === 0 ? (
+            <div className="p-8 text-center">
+              <FileText className="w-10 h-10 text-gray-600 mx-auto mb-3" />
+              <p className="text-gray-400 mb-4">No pending change orders</p>
+              <Link 
+                to="/app/change-orders?new=true"
+                className="inline-flex items-center gap-2 text-steel-400 hover:text-steel-300 text-sm font-medium"
+              >
+                <Plus className="w-4 h-4" />
+                Create change order
+              </Link>
+            </div>
+          ) : (
+            <div className="divide-y divide-charcoal-700">
+              {changeOrders.map((co) => {
+                const daysPending = Math.floor((new Date() - new Date(co.created_at)) / (1000 * 60 * 60 * 24));
+                return (
+                  <div key={co.id} className="p-4 lg:p-6 hover:bg-charcoal-700/50 transition-colors">
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-xs bg-charcoal-600 text-gray-300 px-2 py-0.5 rounded">{co.co_number}</span>
+                          <span className="text-sm text-gray-500">{co.projects?.name || 'Unknown Project'}</span>
+                        </div>
+                        <p className="text-white">{co.description}</p>
+                      </div>
+                      <span className="text-lg font-semibold text-white whitespace-nowrap">{formatCurrency(co.total_value)}</span>
                     </div>
-                    <p className="text-white">{co.desc}</p>
+                    {daysPending > 0 && (
+                      <div className="flex items-center gap-2 text-xs">
+                        <AlertTriangle className="w-3 h-3 text-warning" />
+                        <span className="text-warning">{daysPending} days pending</span>
+                      </div>
+                    )}
                   </div>
-                  <span className="text-lg font-semibold text-white whitespace-nowrap">{co.value}</span>
-                </div>
-                <div className="flex items-center gap-2 text-xs">
-                  <AlertTriangle className="w-3 h-3 text-warning" />
-                  <span className="text-warning">{co.days} days pending</span>
-                </div>
-              </div>
-            ))}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
 
