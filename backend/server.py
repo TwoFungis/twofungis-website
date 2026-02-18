@@ -29,6 +29,9 @@ from routes.milestones import router as milestones_router
 # Import Expenses routes
 from routes.expenses import router as expenses_router
 
+# Import Trial Emails routes
+from routes.trial_emails import router as trial_emails_router
+
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env', override=False)
 
@@ -149,6 +152,9 @@ app.include_router(milestones_router)
 
 # Include Expenses routes
 app.include_router(expenses_router)
+
+# Include Trial Emails routes
+app.include_router(trial_emails_router)
 
 app.add_middleware(
     CORSMiddleware,
