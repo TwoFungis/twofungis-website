@@ -1,149 +1,124 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  TrendingUp, 
-  FolderKanban, 
-  FileText, 
-  AlertTriangle,
-  DollarSign,
-  ArrowUpRight,
-  ArrowDownRight,
-  Target,
-  CheckCircle2,
-  Clock,
-  Wallet,
-  Plus,
-  Receipt,
-  CalendarClock,
-  AlertCircle
+  TrendingUp, FolderKanban, FileText, AlertTriangle, DollarSign,
+  ArrowUpRight, ArrowDownRight, Target, CheckCircle2, Clock,
+  Receipt, AlertCircle, Bell, Calendar, ChevronRight, Settings,
+  Percent, Wallet, Flag
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { supabase } from '../../lib/supabase';
 
+const API_URL = process.env.REACT_APP_BACKEND_URL;
+
 const DashboardPage = () => {
   const { profile, user } = useAuthStore();
-  const [milestoneStats, setMilestoneStats] = useState({
-    total: 0,
-    pending: 0,
-    approved: 0,
-    paid: 0
-  });
   const [projects, setProjects] = useState([]);
   const [changeOrders, setChangeOrders] = useState([]);
-  const [allMilestones, setAllMilestones] = useState([]);
+  const [milestones, setMilestones] = useState([]);
+  const [invoices, setInvoices] = useState([]);
+  const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  // User preferences (stored in localStorage)
+  const [marginThreshold, setMarginThreshold] = useState(() => 
+    parseInt(localStorage.getItem('tradeos_margin_threshold') || '15')
+  );
+  const [taxRate, setTaxRate] = useState(() => 
+    parseInt(localStorage.getItem('tradeos_tax_rate') || '25')
+  );
 
   useEffect(() => {
-    const fetchDashboardData = async () => {
-      if (!user) return;
-      
-      setLoading(true);
-      
-      // Fetch all milestones for receivables calculation
-      try {
-        const { data, error } = await supabase
-          .from('project_milestones')
-          .select('*, projects(name)')
-          .eq('user_id', user.id);
-
-        if (!error && data) {
-          setAllMilestones(data);
-          const stats = data.reduce((acc, m) => ({
-            total: acc.total + (parseFloat(m.milestone_value) || 0),
-            pending: acc.pending + (m.status === 'submitted' ? parseFloat(m.milestone_value) || 0 : 0),
-            approved: acc.approved + (m.status === 'approved' ? parseFloat(m.milestone_value) || 0 : 0),
-            paid: acc.paid + (m.status === 'paid' ? parseFloat(m.milestone_value) || 0 : 0)
-          }), { total: 0, pending: 0, approved: 0, paid: 0 });
-          setMilestoneStats(stats);
-        }
-      } catch (err) {
-        console.error('Error fetching milestone stats:', err);
-      }
-      
-      // Fetch real projects
-      try {
-        const { data: projectsData } = await supabase
-          .from('projects')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false })
-          .limit(4);
-        
-        if (projectsData) {
-          setProjects(projectsData);
-        }
-      } catch (err) {
-        console.error('Error fetching projects:', err);
-      }
-
-      // Fetch all change orders (for receivables calculation)
-      try {
-        const { data: coData } = await supabase
-          .from('change_orders')
-          .select('*, projects(name)')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false });
-        
-        if (coData) {
-          setChangeOrders(coData);
-        }
-      } catch (err) {
-        console.error('Error fetching change orders:', err);
-      }
-      
-      setLoading(false);
-    };
-
     fetchDashboardData();
   }, [user]);
 
-  // Calculate real stats from data
-  const activeProjects = projects.filter(p => p.status === 'active').length;
-  const totalContractValue = projects.reduce((sum, p) => sum + (parseFloat(p.contract_value) || 0), 0);
-  const pendingCOs = changeOrders.filter(co => co.status === 'pending' || co.status === 'submitted');
-  const pendingCOValue = pendingCOs.reduce((sum, co) => sum + (parseFloat(co.total_value) || 0), 0);
-  const avgMargin = projects.length > 0 
-    ? projects.reduce((sum, p) => sum + (parseFloat(p.forecast_margin) || 0), 0) / projects.length 
-    : 0;
+  const fetchDashboardData = async () => {
+    if (!user) return;
+    setLoading(true);
 
-  // Calculate receivables (approved milestones + approved COs not yet paid)
-  const approvedMilestones = allMilestones.filter(m => m.status === 'approved');
-  const approvedCOs = changeOrders.filter(co => co.status === 'approved');
-  const totalReceivables = 
-    approvedMilestones.reduce((sum, m) => sum + (parseFloat(m.milestone_value) || 0), 0) +
-    approvedCOs.reduce((sum, co) => sum + (parseFloat(co.total_value) || 0), 0);
+    try {
+      const [projectsRes, cosRes, milestonesRes, invoicesRes, expensesRes] = await Promise.all([
+        supabase.from('projects').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
+        supabase.from('change_orders').select('*, projects(name)').eq('user_id', user.id).order('created_at', { ascending: false }),
+        supabase.from('project_milestones').select('*').eq('user_id', user.id).order('due_date', { ascending: true }),
+        supabase.from('invoices').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
+        supabase.from('expenses').select('*').eq('user_id', user.id).order('expense_date', { ascending: false })
+      ]);
 
-  // Calculate this month's revenue (paid milestones this month)
-  const now = new Date();
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-  const thisMonthPaid = allMilestones
-    .filter(m => m.status === 'paid' && m.paid_at && new Date(m.paid_at) >= startOfMonth)
-    .reduce((sum, m) => sum + (parseFloat(m.milestone_value) || 0), 0);
-
-  // Calculate aging buckets for outstanding payments
-  const getAgingDays = (date) => {
-    if (!date) return 0;
-    return Math.floor((now - new Date(date)) / (1000 * 60 * 60 * 24));
-  };
-
-  const aging0to30 = approvedMilestones
-    .filter(m => getAgingDays(m.approved_at) <= 30)
-    .reduce((sum, m) => sum + (parseFloat(m.milestone_value) || 0), 0);
-  const aging31to60 = approvedMilestones
-    .filter(m => getAgingDays(m.approved_at) > 30 && getAgingDays(m.approved_at) <= 60)
-    .reduce((sum, m) => sum + (parseFloat(m.milestone_value) || 0), 0);
-  const aging60plus = approvedMilestones
-    .filter(m => getAgingDays(m.approved_at) > 60)
-    .reduce((sum, m) => sum + (parseFloat(m.milestone_value) || 0), 0);
-
-  const getRiskColor = (risk) => {
-    switch (risk) {
-      case 'green': return 'bg-success';
-      case 'yellow': return 'bg-warning';
-      case 'red': return 'bg-risk';
-      default: return 'bg-gray-500';
+      setProjects(projectsRes.data || []);
+      setChangeOrders(cosRes.data || []);
+      setMilestones(milestonesRes.data || []);
+      setInvoices(invoicesRes.data || []);
+      setExpenses(expensesRes.data || []);
+    } catch (err) {
+      console.error('Error fetching dashboard data:', err);
+    } finally {
+      setLoading(false);
     }
   };
+
+  // Save preferences
+  const handleMarginChange = (val) => {
+    setMarginThreshold(val);
+    localStorage.setItem('tradeos_margin_threshold', val.toString());
+  };
+
+  const handleTaxRateChange = (val) => {
+    setTaxRate(val);
+    localStorage.setItem('tradeos_tax_rate', val.toString());
+  };
+
+  // Calculations
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  const activeProjects = projects.filter(p => p.status === 'active');
+  const totalContractValue = projects.reduce((sum, p) => sum + (parseFloat(p.contract_value) || 0), 0);
+  const approvedCOsTotal = changeOrders.filter(co => co.status === 'approved').reduce((sum, co) => sum + (parseFloat(co.total_value) || 0), 0);
+  const totalRevenue = totalContractValue + approvedCOsTotal;
+  
+  const totalExpenses = expenses.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+  const forecastProfit = totalRevenue - totalExpenses;
+  const forecastMargin = totalRevenue > 0 ? (forecastProfit / totalRevenue) * 100 : 0;
+
+  // Receivables
+  const outstandingInvoices = invoices.filter(inv => ['sent', 'viewed', 'overdue'].includes(inv.status));
+  const totalReceivables = outstandingInvoices.reduce((sum, inv) => sum + (parseFloat(inv.total) || 0), 0);
+  
+  // Overdue invoices
+  const overdueInvoices = invoices.filter(inv => {
+    if (inv.status === 'paid') return false;
+    if (!inv.due_date) return false;
+    return new Date(inv.due_date) < now;
+  });
+  const overdueAmount = overdueInvoices.reduce((sum, inv) => sum + (parseFloat(inv.total) || 0), 0);
+
+  // Pending items
+  const pendingCOs = changeOrders.filter(co => co.status === 'pending' || co.status === 'submitted');
+  const upcomingMilestones = milestones.filter(m => 
+    m.status !== 'paid' && m.due_date && new Date(m.due_date) >= now
+  ).slice(0, 5);
+
+  // Low margin projects
+  const lowMarginProjects = projects.filter(p => (parseFloat(p.forecast_margin) || 0) < marginThreshold);
+
+  // Trial expiring check
+  const trialEndsAt = profile?.trial_ends_at ? new Date(profile.trial_ends_at) : null;
+  const daysUntilTrialExpires = trialEndsAt ? Math.ceil((trialEndsAt - now) / (1000 * 60 * 60 * 24)) : null;
+  const trialExpiring = profile?.subscription_tier === 'trial' && daysUntilTrialExpires !== null && daysUntilTrialExpires <= 7;
+
+  // This month stats
+  const thisMonthExpenses = expenses
+    .filter(e => e.expense_date && new Date(e.expense_date) >= startOfMonth)
+    .reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+  
+  const thisMonthRevenue = invoices
+    .filter(inv => inv.status === 'paid' && inv.paid_at && new Date(inv.paid_at) >= startOfMonth)
+    .reduce((sum, inv) => sum + (parseFloat(inv.total) || 0), 0);
+
+  const estimatedTax = thisMonthRevenue > thisMonthExpenses 
+    ? (thisMonthRevenue - thisMonthExpenses) * (taxRate / 100) 
+    : 0;
 
   const formatCurrency = (value) => {
     return new Intl.NumberFormat('en-CA', { 
@@ -152,6 +127,9 @@ const DashboardPage = () => {
       maximumFractionDigits: 0 
     }).format(value || 0);
   };
+
+  // Alert count
+  const alertCount = overdueInvoices.length + (trialExpiring ? 1 : 0) + lowMarginProjects.length;
 
   if (loading) {
     return (
@@ -162,391 +140,367 @@ const DashboardPage = () => {
   }
 
   return (
-    <div className="space-y-6" data-testid="dashboard-page">
-      {/* Welcome */}
-      <div className="animate-fade-in-up">
-        <h1 className="text-2xl lg:text-3xl font-bold text-white mb-1">
-          Welcome back, {profile?.name?.split(' ')[0] || 'Builder'}
+    <div className="space-y-8" data-testid="dashboard-page">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl lg:text-3xl font-bold text-white">
+          Welcome back, {profile?.full_name?.split(' ')[0] || profile?.name?.split(' ')[0] || 'Builder'}
         </h1>
-        <p className="text-gray-400 text-sm">Here's your financial pulse for today.</p>
+        <p className="text-gray-500 mt-1">Your business at a glance</p>
       </div>
 
-      {/* QUICK STATS BAR - Financial Pulse */}
-      <div className="bg-gradient-to-r from-charcoal-800 to-charcoal-900 rounded-2xl border border-charcoal-700 p-4 lg:p-6 animate-fade-in-up animation-delay-100" data-testid="quick-stats-bar">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8">
-          {/* Total Receivables */}
-          <div className="flex items-center gap-3 hover-lift">
-            <div className="w-12 h-12 rounded-xl bg-success/20 flex items-center justify-center">
-              <Receipt className="w-6 h-6 text-success" />
+      {/* ============================================ */}
+      {/* ZONE A: EXECUTION */}
+      {/* ============================================ */}
+      <section data-testid="execution-zone">
+        <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Execution</h2>
+        
+        <div className="grid lg:grid-cols-3 gap-6">
+          {/* Active Projects */}
+          <div className="bg-charcoal-800 rounded-xl border border-charcoal-700">
+            <div className="p-5 border-b border-charcoal-700 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <FolderKanban className="w-5 h-5 text-steel-400" />
+                <h3 className="font-semibold text-white">Active Projects</h3>
+              </div>
+              <span className="text-2xl font-bold text-white">{activeProjects.length}</span>
             </div>
-            <div>
-              <p className="text-xs text-gray-500 uppercase tracking-wide">Receivables</p>
-              <p className="text-xl lg:text-2xl font-bold text-success">{formatCurrency(totalReceivables)}</p>
+            <div className="p-5">
+              {activeProjects.length === 0 ? (
+                <p className="text-gray-500 text-sm text-center py-4">No active projects</p>
+              ) : (
+                <div className="space-y-3">
+                  {activeProjects.slice(0, 4).map(project => (
+                    <Link 
+                      key={project.id}
+                      to={`/app/projects/${project.id}`}
+                      className="flex items-center justify-between p-3 bg-charcoal-700/30 rounded-lg hover:bg-charcoal-700/50 transition-colors"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-white truncate">{project.name}</p>
+                        <p className="text-xs text-gray-500">{formatCurrency(project.contract_value)}</p>
+                      </div>
+                      <div className={`text-sm font-semibold ${
+                        (parseFloat(project.forecast_margin) || 0) >= marginThreshold ? 'text-success' : 'text-warning'
+                      }`}>
+                        {project.forecast_margin || 0}%
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
+              <Link 
+                to="/app/projects"
+                className="mt-4 flex items-center justify-center gap-1 text-sm text-steel-400 hover:text-steel-300"
+              >
+                View all projects <ChevronRight className="w-4 h-4" />
+              </Link>
             </div>
           </div>
 
-          {/* This Month Revenue */}
-          <div className="flex items-center gap-3 hover-lift">
-            <div className="w-12 h-12 rounded-xl bg-steel-500/20 flex items-center justify-center">
-              <DollarSign className="w-6 h-6 text-steel-400" />
+          {/* Upcoming Milestones */}
+          <div className="bg-charcoal-800 rounded-xl border border-charcoal-700">
+            <div className="p-5 border-b border-charcoal-700 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Flag className="w-5 h-5 text-steel-400" />
+                <h3 className="font-semibold text-white">Upcoming Milestones</h3>
+              </div>
+              <span className="text-2xl font-bold text-white">{upcomingMilestones.length}</span>
             </div>
-            <div>
-              <p className="text-xs text-gray-500 uppercase tracking-wide">This Month</p>
-              <p className="text-xl lg:text-2xl font-bold text-white">{formatCurrency(thisMonthPaid)}</p>
+            <div className="p-5">
+              {upcomingMilestones.length === 0 ? (
+                <p className="text-gray-500 text-sm text-center py-4">No upcoming milestones</p>
+              ) : (
+                <div className="space-y-3">
+                  {upcomingMilestones.map(milestone => (
+                    <div 
+                      key={milestone.id}
+                      className="flex items-center justify-between p-3 bg-charcoal-700/30 rounded-lg"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-white truncate">{milestone.name}</p>
+                        <p className="text-xs text-gray-500">
+                          {milestone.due_date ? new Date(milestone.due_date).toLocaleDateString() : 'No due date'}
+                        </p>
+                      </div>
+                      <div className="text-sm font-semibold text-steel-400">
+                        {formatCurrency(milestone.amount)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <Link 
+                to="/app/milestones"
+                className="mt-4 flex items-center justify-center gap-1 text-sm text-steel-400 hover:text-steel-300"
+              >
+                View all milestones <ChevronRight className="w-4 h-4" />
+              </Link>
             </div>
           </div>
 
-          {/* Outstanding COs */}
-          <div className="flex items-center gap-3 hover-lift">
-            <div className="w-12 h-12 rounded-xl bg-warning/20 flex items-center justify-center">
-              <FileText className="w-6 h-6 text-warning" />
+          {/* Pending Change Orders */}
+          <div className="bg-charcoal-800 rounded-xl border border-charcoal-700">
+            <div className="p-5 border-b border-charcoal-700 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <FileText className="w-5 h-5 text-warning" />
+                <h3 className="font-semibold text-white">Pending COs</h3>
+              </div>
+              <span className="text-2xl font-bold text-warning">{pendingCOs.length}</span>
             </div>
-            <div>
-              <p className="text-xs text-gray-500 uppercase tracking-wide">Pending COs</p>
-              <p className="text-xl lg:text-2xl font-bold text-warning">{formatCurrency(pendingCOValue)}</p>
+            <div className="p-5">
+              {pendingCOs.length === 0 ? (
+                <p className="text-gray-500 text-sm text-center py-4">No pending change orders</p>
+              ) : (
+                <div className="space-y-3">
+                  {pendingCOs.slice(0, 4).map(co => (
+                    <div 
+                      key={co.id}
+                      className="flex items-center justify-between p-3 bg-charcoal-700/30 rounded-lg"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-white truncate">{co.title || `CO-${co.co_number}`}</p>
+                        <p className="text-xs text-gray-500">{co.projects?.name || 'No project'}</p>
+                      </div>
+                      <div className="text-sm font-semibold text-warning">
+                        {formatCurrency(co.total_value)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <Link 
+                to="/app/change-orders"
+                className="mt-4 flex items-center justify-center gap-1 text-sm text-steel-400 hover:text-steel-300"
+              >
+                View all COs <ChevronRight className="w-4 h-4" />
+              </Link>
             </div>
           </div>
+        </div>
+      </section>
 
-          {/* Overdue Amount */}
-          <div className="flex items-center gap-3 hover-lift">
-            <div className={`w-12 h-12 rounded-xl ${aging60plus > 0 ? 'bg-risk/20' : 'bg-charcoal-700'} flex items-center justify-center`}>
-              <AlertCircle className={`w-6 h-6 ${aging60plus > 0 ? 'text-risk animate-pulse-subtle' : 'text-gray-500'}`} />
+      {/* ============================================ */}
+      {/* ZONE B: FINANCIAL CONTROL */}
+      {/* ============================================ */}
+      <section data-testid="financial-zone">
+        <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Financial Control</h2>
+        
+        {/* Main Financial Metrics */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-5">
+            <p className="text-xs text-gray-500 uppercase tracking-wide mb-2">Total Contract Value</p>
+            <p className="text-2xl lg:text-3xl font-bold text-white">{formatCurrency(totalContractValue)}</p>
+            {approvedCOsTotal > 0 && (
+              <p className="text-xs text-gray-500 mt-1">+{formatCurrency(approvedCOsTotal)} approved COs</p>
+            )}
+          </div>
+
+          <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-5">
+            <p className="text-xs text-gray-500 uppercase tracking-wide mb-2">Forecast Profit</p>
+            <p className={`text-2xl lg:text-3xl font-bold ${forecastProfit >= 0 ? 'text-success' : 'text-risk'}`}>
+              {formatCurrency(forecastProfit)}
+            </p>
+            <p className="text-xs text-gray-500 mt-1">{formatCurrency(totalExpenses)} in expenses</p>
+          </div>
+
+          <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-5">
+            <p className="text-xs text-gray-500 uppercase tracking-wide mb-2">Outstanding Receivables</p>
+            <p className="text-2xl lg:text-3xl font-bold text-steel-400">{formatCurrency(totalReceivables)}</p>
+            <p className="text-xs text-gray-500 mt-1">{outstandingInvoices.length} invoice{outstandingInvoices.length !== 1 ? 's' : ''}</p>
+          </div>
+
+          <div className={`bg-charcoal-800 rounded-xl border ${overdueAmount > 0 ? 'border-risk/50' : 'border-charcoal-700'} p-5`}>
+            <p className="text-xs text-gray-500 uppercase tracking-wide mb-2">Overdue Invoices</p>
+            <p className={`text-2xl lg:text-3xl font-bold ${overdueAmount > 0 ? 'text-risk' : 'text-gray-500'}`}>
+              {formatCurrency(overdueAmount)}
+            </p>
+            <p className="text-xs text-gray-500 mt-1">{overdueInvoices.length} overdue</p>
+          </div>
+        </div>
+
+        {/* Forecast Margin with Threshold Selector */}
+        <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-5">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Percent className="w-5 h-5 text-steel-400" />
+              <h3 className="font-semibold text-white">Forecast Margin</h3>
             </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-500">Target:</span>
+              <select
+                value={marginThreshold}
+                onChange={(e) => handleMarginChange(parseInt(e.target.value))}
+                className="bg-charcoal-700 border border-charcoal-600 rounded px-2 py-1 text-sm text-white"
+                data-testid="margin-threshold-select"
+              >
+                <option value="10">10%</option>
+                <option value="15">15%</option>
+                <option value="20">20%</option>
+                <option value="25">25%</option>
+                <option value="30">30%</option>
+              </select>
+            </div>
+          </div>
+          
+          <div className="flex items-end gap-4">
             <div>
-              <p className="text-xs text-gray-500 uppercase tracking-wide">Overdue (60+)</p>
-              <p className={`text-xl lg:text-2xl font-bold ${aging60plus > 0 ? 'text-risk' : 'text-gray-500'}`}>
-                {formatCurrency(aging60plus)}
+              <p className={`text-4xl font-bold ${
+                forecastMargin >= marginThreshold ? 'text-success' : 
+                forecastMargin >= marginThreshold - 5 ? 'text-warning' : 'text-risk'
+              }`}>
+                {forecastMargin.toFixed(1)}%
+              </p>
+              <p className="text-sm text-gray-500 mt-1">
+                {forecastMargin >= marginThreshold ? 'On target' : `${(marginThreshold - forecastMargin).toFixed(1)}% below target`}
               </p>
             </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-charcoal-800 rounded-xl p-4 lg:p-5 border border-charcoal-700 card-glow animate-fade-in-up animation-delay-200" data-testid="stat-card-projects">
-          <div className="flex items-center justify-between mb-2">
-            <div className="w-9 h-9 rounded-lg bg-charcoal-700 flex items-center justify-center text-steel-400">
-              <FolderKanban className="w-4 h-4" />
-            </div>
-          </div>
-          <p className="text-2xl font-bold text-white mb-0.5">{activeProjects}</p>
-          <p className="text-xs text-gray-500">Active Projects</p>
-        </div>
-
-        <div className="bg-charcoal-800 rounded-xl p-4 lg:p-5 border border-charcoal-700 card-glow animate-fade-in-up animation-delay-300" data-testid="stat-card-value">
-          <div className="flex items-center justify-between mb-2">
-            <div className="w-9 h-9 rounded-lg bg-charcoal-700 flex items-center justify-center text-success">
-              <DollarSign className="w-4 h-4" />
-            </div>
-            {totalContractValue > 0 && <ArrowUpRight className="w-4 h-4 text-success" />}
-          </div>
-          <p className="text-2xl font-bold text-white mb-0.5">{formatCurrency(totalContractValue)}</p>
-          <p className="text-xs text-gray-500">Contract Value</p>
-        </div>
-
-        <div className="bg-charcoal-800 rounded-xl p-4 lg:p-5 border border-charcoal-700 card-glow animate-fade-in-up animation-delay-400" data-testid="stat-card-cos">
-          <div className="flex items-center justify-between mb-2">
-            <div className="w-9 h-9 rounded-lg bg-charcoal-700 flex items-center justify-center text-warning">
-              <FileText className="w-4 h-4" />
-            </div>
-          </div>
-          <p className="text-2xl font-bold text-white mb-0.5">{pendingCOs.length}</p>
-          <p className="text-xs text-gray-500">Pending COs</p>
-        </div>
-
-        <div className="bg-charcoal-800 rounded-xl p-4 lg:p-5 border border-charcoal-700 card-glow animate-fade-in-up animation-delay-500" data-testid="stat-card-margin">
-          <div className="flex items-center justify-between mb-2">
-            <div className="w-9 h-9 rounded-lg bg-charcoal-700 flex items-center justify-center text-steel-400">
-              <TrendingUp className="w-4 h-4" />
-            </div>
-            {avgMargin >= 15 ? <ArrowUpRight className="w-4 h-4 text-success" /> : <ArrowDownRight className="w-4 h-4 text-risk" />}
-          </div>
-          <p className={`text-2xl font-bold mb-0.5 ${avgMargin >= 15 ? 'text-success' : avgMargin >= 10 ? 'text-warning' : 'text-risk'}`}>
-            {avgMargin.toFixed(1)}%
-          </p>
-          <p className="text-xs text-gray-500">Avg. Margin</p>
-        </div>
-      </div>
-
-      {/* Outstanding Payments Widget + Active Projects */}
-      <div className="grid lg:grid-cols-2 gap-6">
-        {/* Outstanding Payments - Aging Breakdown */}
-        <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 card-glow animate-fade-in-up animation-delay-200" data-testid="outstanding-payments-widget">
-          <div className="p-4 lg:p-5 border-b border-charcoal-700 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <CalendarClock className="w-5 h-5 text-steel-400" />
-              <h2 className="text-base font-semibold text-white">Outstanding Payments</h2>
-            </div>
-            <span className="text-lg font-bold text-white">{formatCurrency(totalReceivables)}</span>
-          </div>
-          <div className="p-4 lg:p-5">
-            {totalReceivables === 0 ? (
-              <div className="text-center py-6">
-                <CheckCircle2 className="w-10 h-10 text-success mx-auto mb-2" />
-                <p className="text-gray-400">All caught up! No outstanding payments.</p>
+            
+            {/* Visual indicator */}
+            <div className="flex-1 max-w-xs">
+              <div className="h-3 bg-charcoal-700 rounded-full overflow-hidden">
+                <div 
+                  className={`h-full rounded-full transition-all ${
+                    forecastMargin >= marginThreshold ? 'bg-success' : 
+                    forecastMargin >= marginThreshold - 5 ? 'bg-warning' : 'bg-risk'
+                  }`}
+                  style={{ width: `${Math.min(forecastMargin / 40 * 100, 100)}%` }}
+                />
               </div>
-            ) : (
-              <div className="space-y-3">
-                {/* 0-30 days */}
-                <div className="flex items-center justify-between hover-lift p-2 rounded-lg transition-all">
-                  <div className="flex items-center gap-3">
-                    <div className="w-2 h-8 rounded-full bg-success" />
-                    <div>
-                      <p className="text-sm font-medium text-white">0-30 days</p>
-                      <p className="text-xs text-gray-500">Current</p>
-                    </div>
-                  </div>
-                  <p className="text-lg font-semibold text-success">{formatCurrency(aging0to30)}</p>
+              <div className="flex justify-between mt-1 text-xs text-gray-500">
+                <span>0%</span>
+                <span className="text-steel-400">{marginThreshold}% target</span>
+                <span>40%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================ */}
+      {/* ZONE C: ALERTS */}
+      {/* ============================================ */}
+      <section data-testid="alerts-zone">
+        <div className="flex items-center gap-2 mb-4">
+          <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">Alerts</h2>
+          {alertCount > 0 && (
+            <span className="bg-risk/20 text-risk text-xs px-2 py-0.5 rounded-full">{alertCount}</span>
+          )}
+        </div>
+        
+        {alertCount === 0 ? (
+          <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-8 text-center">
+            <CheckCircle2 className="w-10 h-10 text-success mx-auto mb-3" />
+            <p className="text-gray-400">All clear! No alerts at this time.</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {/* Past Due Invoices */}
+            {overdueInvoices.length > 0 && (
+              <div className="bg-charcoal-800 rounded-xl border border-risk/30 p-4 flex items-center gap-4">
+                <div className="w-10 h-10 bg-risk/20 rounded-full flex items-center justify-center flex-shrink-0">
+                  <AlertCircle className="w-5 h-5 text-risk" />
                 </div>
-                {/* 31-60 days */}
-                <div className="flex items-center justify-between hover-lift p-2 rounded-lg transition-all">
-                  <div className="flex items-center gap-3">
-                    <div className="w-2 h-8 rounded-full bg-warning" />
-                    <div>
-                      <p className="text-sm font-medium text-white">31-60 days</p>
-                      <p className="text-xs text-gray-500">Follow up</p>
-                    </div>
-                  </div>
-                  <p className="text-lg font-semibold text-warning">{formatCurrency(aging31to60)}</p>
+                <div className="flex-1">
+                  <p className="text-white font-medium">Past Due Invoices</p>
+                  <p className="text-sm text-gray-400">{overdueInvoices.length} invoice{overdueInvoices.length !== 1 ? 's' : ''} totaling {formatCurrency(overdueAmount)}</p>
                 </div>
-                {/* 60+ days */}
-                <div className="flex items-center justify-between hover-lift p-2 rounded-lg transition-all">
-                  <div className="flex items-center gap-3">
-                    <div className="w-2 h-8 rounded-full bg-risk" />
-                    <div>
-                      <p className="text-sm font-medium text-white">60+ days</p>
-                      <p className="text-xs text-gray-500">At risk</p>
-                    </div>
-                  </div>
-                  <p className="text-lg font-semibold text-risk">{formatCurrency(aging60plus)}</p>
+                <Link 
+                  to="/app/invoices?status=overdue"
+                  className="text-sm text-risk hover:text-risk/80 font-medium"
+                >
+                  View →
+                </Link>
+              </div>
+            )}
+
+            {/* Trial Expiring */}
+            {trialExpiring && (
+              <div className="bg-charcoal-800 rounded-xl border border-warning/30 p-4 flex items-center gap-4">
+                <div className="w-10 h-10 bg-warning/20 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Clock className="w-5 h-5 text-warning" />
                 </div>
-                {/* Progress bar */}
-                <div className="mt-4 h-2 bg-charcoal-700 rounded-full overflow-hidden flex">
-                  {totalReceivables > 0 && (
-                    <>
-                      <div 
-                        className="h-full bg-success animate-progress-grow" 
-                        style={{ width: `${(aging0to30 / totalReceivables) * 100}%` }}
-                      />
-                      <div 
-                        className="h-full bg-warning animate-progress-grow animation-delay-200" 
-                        style={{ width: `${(aging31to60 / totalReceivables) * 100}%` }}
-                      />
-                      <div 
-                        className="h-full bg-risk animate-progress-grow animation-delay-300" 
-                        style={{ width: `${(aging60plus / totalReceivables) * 100}%` }}
-                      />
-                    </>
-                  )}
+                <div className="flex-1">
+                  <p className="text-white font-medium">Trial Expiring Soon</p>
+                  <p className="text-sm text-gray-400">{daysUntilTrialExpires} day{daysUntilTrialExpires !== 1 ? 's' : ''} remaining</p>
                 </div>
+                <Link 
+                  to="/app/settings"
+                  className="text-sm text-warning hover:text-warning/80 font-medium"
+                >
+                  Upgrade →
+                </Link>
+              </div>
+            )}
+
+            {/* Low Margin Warning */}
+            {lowMarginProjects.length > 0 && (
+              <div className="bg-charcoal-800 rounded-xl border border-warning/30 p-4 flex items-center gap-4">
+                <div className="w-10 h-10 bg-warning/20 rounded-full flex items-center justify-center flex-shrink-0">
+                  <TrendingUp className="w-5 h-5 text-warning" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-white font-medium">Low Margin Warning</p>
+                  <p className="text-sm text-gray-400">{lowMarginProjects.length} project{lowMarginProjects.length !== 1 ? 's' : ''} below {marginThreshold}% margin</p>
+                </div>
+                <Link 
+                  to="/app/projects"
+                  className="text-sm text-warning hover:text-warning/80 font-medium"
+                >
+                  Review →
+                </Link>
               </div>
             )}
           </div>
-        </div>
+        )}
+      </section>
 
-        {/* Active Projects */}
-        <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 card-glow animate-fade-in-up animation-delay-300">
-          <div className="p-4 lg:p-5 border-b border-charcoal-700 flex items-center justify-between">
-            <h2 className="text-base font-semibold text-white">Active Projects</h2>
-            <Link to="/app/projects" className="text-steel-400 text-sm hover:text-steel-300 transition-colors">View all</Link>
-          </div>
-          {projects.length === 0 ? (
-            <div className="p-8 text-center">
-              <FolderKanban className="w-10 h-10 text-gray-600 mx-auto mb-3" />
-              <p className="text-gray-400 mb-4">No projects yet</p>
-              <Link 
-                to="/app/projects?new=true"
-                className="inline-flex items-center gap-2 text-steel-400 hover:text-steel-300 text-sm font-medium"
+      {/* ============================================ */}
+      {/* MONTHLY TAX PANEL */}
+      {/* ============================================ */}
+      <section data-testid="tax-panel">
+        <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">This Month Summary</h2>
+        
+        <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-5">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-sm text-gray-400">{now.toLocaleString('default', { month: 'long', year: 'numeric' })}</span>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-500">Tax Rate:</span>
+              <select
+                value={taxRate}
+                onChange={(e) => handleTaxRateChange(parseInt(e.target.value))}
+                className="bg-charcoal-700 border border-charcoal-600 rounded px-2 py-1 text-sm text-white"
+                data-testid="tax-rate-select"
               >
-                <Plus className="w-4 h-4" />
-                Create your first project
-              </Link>
+                <option value="15">15%</option>
+                <option value="20">20%</option>
+                <option value="25">25%</option>
+                <option value="30">30%</option>
+                <option value="35">35%</option>
+              </select>
             </div>
-          ) : (
-            <div className="divide-y divide-charcoal-700">
-              {projects.slice(0, 3).map((project) => (
-                <Link 
-                  key={project.id} 
-                  to={`/app/projects/${project.id}`}
-                  className="p-4 lg:p-5 hover:bg-charcoal-700/50 transition-colors block"
-                >
-                  <div className="flex items-start justify-between mb-1">
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-medium text-white truncate text-sm">{project.name}</h3>
-                      <p className="text-xs text-gray-500">{project.client_gc || 'No client'}</p>
-                    </div>
-                    <div className={`w-2.5 h-2.5 rounded-full ${getRiskColor(project.risk_flag)} ml-3 mt-1`} />
-                  </div>
-                  <div className="flex items-center gap-3 text-xs mt-2">
-                    <span className="text-gray-400">{formatCurrency(project.contract_value)}</span>
-                    <span className={parseFloat(project.forecast_margin) >= 15 ? 'text-success' : 'text-warning'}>{project.forecast_margin || 0}% margin</span>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
+          </div>
 
-      {/* Pending Change Orders */}
-      {pendingCOs.length > 0 && (
-        <div className="bg-charcoal-800 rounded-xl border border-charcoal-700">
-          <div className="p-4 lg:p-5 border-b border-charcoal-700 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <h2 className="text-base font-semibold text-white">Pending Change Orders</h2>
-              <span className="bg-warning/20 text-warning text-xs px-2 py-0.5 rounded-full">{pendingCOs.length}</span>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div>
+              <p className="text-xs text-gray-500 mb-1">Revenue</p>
+              <p className="text-xl font-bold text-success">{formatCurrency(thisMonthRevenue)}</p>
             </div>
-            <Link to="/app/change-orders" className="text-steel-400 text-sm hover:text-steel-300">View all</Link>
-          </div>
-          <div className="divide-y divide-charcoal-700">
-            {pendingCOs.slice(0, 3).map((co) => {
-              const daysPending = Math.floor((new Date() - new Date(co.created_at)) / (1000 * 60 * 60 * 24));
-              return (
-                <div key={co.id} className="p-4 lg:p-5 hover:bg-charcoal-700/50 transition-colors">
-                  <div className="flex items-start justify-between mb-1">
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs bg-charcoal-600 text-gray-300 px-2 py-0.5 rounded font-mono">{co.co_number}</span>
-                        <span className="text-xs text-gray-500">{co.projects?.name || 'Unknown Project'}</span>
-                      </div>
-                      <p className="text-sm text-white">{co.description}</p>
-                    </div>
-                    <span className="text-base font-semibold text-white whitespace-nowrap">{formatCurrency(co.total_value)}</span>
-                  </div>
-                  {daysPending > 7 && (
-                    <div className="flex items-center gap-2 text-xs mt-2">
-                      <AlertTriangle className="w-3 h-3 text-warning" />
-                      <span className="text-warning">{daysPending} days pending - follow up recommended</span>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* Milestone Summary Widget */}
-      {milestoneStats.total > 0 && (
-        <div className="bg-charcoal-800 rounded-xl border border-charcoal-700">
-          <div className="p-4 lg:p-5 border-b border-charcoal-700 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Target className="w-5 h-5 text-steel-400" />
-              <h2 className="text-base font-semibold text-white">Milestone Progress</h2>
+            <div>
+              <p className="text-xs text-gray-500 mb-1">Expenses</p>
+              <p className="text-xl font-bold text-risk">{formatCurrency(thisMonthExpenses)}</p>
             </div>
-            <Link to="/app/projects" className="text-steel-400 text-sm hover:text-steel-300">View projects</Link>
-          </div>
-          <div className="p-4 lg:p-5">
-            <div className="grid grid-cols-4 gap-3">
-              <div className="text-center">
-                <p className="text-lg font-bold text-white">{formatCurrency(milestoneStats.total)}</p>
-                <p className="text-xs text-gray-500">Total</p>
-              </div>
-              <div className="text-center">
-                <p className="text-lg font-bold text-steel-400">{formatCurrency(milestoneStats.pending)}</p>
-                <p className="text-xs text-gray-500">Pending</p>
-              </div>
-              <div className="text-center">
-                <p className="text-lg font-bold text-success">{formatCurrency(milestoneStats.approved)}</p>
-                <p className="text-xs text-gray-500">Approved</p>
-              </div>
-              <div className="text-center">
-                <p className="text-lg font-bold text-emerald-400">{formatCurrency(milestoneStats.paid)}</p>
-                <p className="text-xs text-gray-500">Paid</p>
-              </div>
+            <div>
+              <p className="text-xs text-gray-500 mb-1">Est. Tax Owing</p>
+              <p className="text-xl font-bold text-warning">{formatCurrency(estimatedTax)}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 mb-1">Recommended Set-Aside</p>
+              <p className="text-xl font-bold text-steel-400">{taxRate}%</p>
             </div>
           </div>
         </div>
-      )}
-
-      {/* Financial Health Panel - Project Level */}
-      {projects.length > 0 && (
-        <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 animate-fade-in-up animation-delay-400" data-testid="financial-health-panel">
-          <div className="p-4 lg:p-5 border-b border-charcoal-700 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-steel-400" />
-              <h2 className="text-base font-semibold text-white">Financial Health</h2>
-            </div>
-            <Link to="/app/reports" className="text-steel-400 text-sm hover:text-steel-300">View reports</Link>
-          </div>
-          <div className="p-4 lg:p-5">
-            {/* Overall Summary */}
-            <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-              <div className="bg-charcoal-700/50 rounded-lg p-3">
-                <p className="text-xs text-gray-500 mb-1">Contract Value</p>
-                <p className="text-lg font-bold text-white">{formatCurrency(totalContractValue)}</p>
-              </div>
-              <div className="bg-charcoal-700/50 rounded-lg p-3">
-                <p className="text-xs text-gray-500 mb-1">Approved COs</p>
-                <p className="text-lg font-bold text-warning">{formatCurrency(changeOrders.filter(co => co.status === 'approved').reduce((sum, co) => sum + (parseFloat(co.total_value) || 0), 0))}</p>
-              </div>
-              <div className="bg-charcoal-700/50 rounded-lg p-3">
-                <p className="text-xs text-gray-500 mb-1">Total Revenue</p>
-                <p className="text-lg font-bold text-steel-400">{formatCurrency(totalContractValue + changeOrders.filter(co => co.status === 'approved').reduce((sum, co) => sum + (parseFloat(co.total_value) || 0), 0))}</p>
-              </div>
-              <div className="bg-charcoal-700/50 rounded-lg p-3">
-                <p className="text-xs text-gray-500 mb-1">Gross Profit</p>
-                <p className={`text-lg font-bold ${avgMargin >= 15 ? 'text-success' : avgMargin >= 10 ? 'text-warning' : 'text-risk'}`}>
-                  {formatCurrency((totalContractValue + changeOrders.filter(co => co.status === 'approved').reduce((sum, co) => sum + (parseFloat(co.total_value) || 0), 0)) * (avgMargin / 100))}
-                </p>
-              </div>
-              <div className="bg-charcoal-700/50 rounded-lg p-3">
-                <p className="text-xs text-gray-500 mb-1">Avg Margin</p>
-                <div className="flex items-center gap-2">
-                  <p className={`text-lg font-bold ${avgMargin >= 15 ? 'text-success' : avgMargin >= 10 ? 'text-warning' : 'text-risk'}`}>
-                    {avgMargin.toFixed(1)}%
-                  </p>
-                  <span className={`text-xs px-2 py-0.5 rounded-full ${
-                    avgMargin >= 20 ? 'bg-success/20 text-success' : 
-                    avgMargin >= 15 ? 'bg-steel-500/20 text-steel-400' : 
-                    avgMargin >= 10 ? 'bg-warning/20 text-warning' : 
-                    'bg-risk/20 text-risk'
-                  }`}>
-                    {avgMargin >= 20 ? 'Excellent' : avgMargin >= 15 ? 'On Target' : avgMargin >= 10 ? 'Below' : 'At Risk'}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Project Health Breakdown */}
-            <div className="space-y-2">
-              <p className="text-xs text-gray-500 uppercase tracking-wide mb-3">Project Breakdown</p>
-              {projects.slice(0, 4).map((project) => {
-                const margin = parseFloat(project.forecast_margin) || 0;
-                const contractVal = parseFloat(project.contract_value) || 0;
-                const approvedCOsVal = parseFloat(project.approved_cos) || 0;
-                const totalRev = contractVal + approvedCOsVal;
-                const profit = totalRev * (margin / 100);
-                
-                return (
-                  <Link 
-                    key={project.id}
-                    to={`/app/projects/${project.id}`}
-                    className="flex items-center justify-between p-3 bg-charcoal-700/30 rounded-lg hover:bg-charcoal-700/50 transition-colors"
-                  >
-                    <div className="flex items-center gap-3 flex-1 min-w-0">
-                      <div className={`w-2 h-8 rounded-full ${
-                        margin >= 15 ? 'bg-success' : margin >= 10 ? 'bg-warning' : 'bg-risk'
-                      }`} />
-                      <div className="min-w-0">
-                        <p className="text-sm font-medium text-white truncate">{project.name}</p>
-                        <p className="text-xs text-gray-500">{formatCurrency(totalRev)} revenue</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className={`text-sm font-semibold ${margin >= 15 ? 'text-success' : margin >= 10 ? 'text-warning' : 'text-risk'}`}>
-                        {margin.toFixed(1)}%
-                      </p>
-                      <p className="text-xs text-gray-500">{formatCurrency(profit)} profit</p>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      )}
+      </section>
     </div>
   );
 };
