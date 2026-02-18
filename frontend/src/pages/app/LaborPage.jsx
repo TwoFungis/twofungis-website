@@ -132,10 +132,34 @@ const LaborPage = () => {
           <h1 className="text-2xl lg:text-3xl font-bold text-white">Labor Cost Engine</h1>
           <p className="text-gray-400">Calculate true labor costs and billable rates</p>
         </div>
-        <button className="bg-steel-500 hover:bg-steel-600 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 w-fit">
-          <Plus className="w-5 h-5" />
-          Save Profile
-        </button>
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            value={profileName}
+            onChange={(e) => setProfileName(e.target.value)}
+            className="bg-charcoal-700 border border-charcoal-600 rounded-lg px-3 py-2 text-white text-sm focus:border-steel-500 focus:ring-1 focus:ring-steel-500 w-40"
+            placeholder="Profile name"
+          />
+          <button 
+            onClick={handleSaveProfile}
+            disabled={isSaving}
+            className={`${saved ? 'bg-success' : 'bg-steel-500 hover:bg-steel-600'} text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 w-fit`}
+          >
+            {isSaving ? (
+              <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
+            ) : saved ? (
+              <>
+                <Check className="w-5 h-5" />
+                Saved
+              </>
+            ) : (
+              <>
+                <Save className="w-5 h-5" />
+                Save Profile
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
