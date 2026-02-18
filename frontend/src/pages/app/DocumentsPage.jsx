@@ -90,13 +90,13 @@ const DocumentsPage = () => {
       {/* Header with Shield */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <img src="/shield-icon.png" alt="" className="w-10 h-10 opacity-30 hidden lg:block" />
+          <img src="/shield-icon.png" alt="" className="w-8 h-8 opacity-80" />
           <div>
-            <h1 className="text-2xl font-bold text-white flex items-center gap-3">
+            <h1 className="text-2xl font-bold text-charcoal-800 flex items-center gap-3">
               <FolderOpen className="w-7 h-7 text-steel-500" />
               Document Vault
             </h1>
-            <p className="text-gray-400 text-sm mt-1">Securely store and organize project documents</p>
+            <p className="text-charcoal-600 text-sm mt-1">Securely store and organize project documents</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
