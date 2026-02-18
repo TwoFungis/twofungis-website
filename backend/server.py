@@ -32,6 +32,9 @@ from routes.expenses import router as expenses_router
 # Import Trial Emails routes
 from routes.trial_emails import router as trial_emails_router
 
+# Import Materials routes
+from routes.materials import router as materials_router
+
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env', override=False)
 
