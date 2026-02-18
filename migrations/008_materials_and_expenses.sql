@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS materials (
         ELSE (qty * unit_cost) + COALESCE(tax_amount, 0)
         END
     ) STORED,
-    receipt_document_id UUID REFERENCES documents(id) ON DELETE SET NULL,
+    receipt_document_id UUID,
     notes TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -65,33 +65,6 @@ ALTER TABLE expenses ADD COLUMN IF NOT EXISTS deductible_amount DECIMAL(12,2);
 ALTER TABLE expenses ADD COLUMN IF NOT EXISTS business_personal TEXT DEFAULT 'Business';
 ALTER TABLE expenses ADD COLUMN IF NOT EXISTS payment_method TEXT;
 
--- Add constraint for business_personal
-ALTER TABLE expenses ADD CONSTRAINT expenses_business_personal_check 
-CHECK (business_personal IN ('Business', 'Personal'));
-
--- Update category constraint to include contractor categories
--- First drop existing constraint if any
-ALTER TABLE expenses DROP CONSTRAINT IF EXISTS expenses_category_check;
-
--- Add new category constraint with contractor-focused categories
-ALTER TABLE expenses ADD CONSTRAINT expenses_category_check 
-CHECK (category IN (
-    'Materials',
-    'Consumables',
-    'Tools',
-    'Equipment',
-    'Vehicle & Fuel',
-    'Meals & Entertainment',
-    'Subcontractors',
-    'Insurance',
-    'Office/Admin',
-    'Phone/Internet',
-    'Travel/Lodging',
-    'Training/Certifications',
-    'Rent/Shop',
-    'Other'
-));
-
 -- ============================================
 -- 3. ROW LEVEL SECURITY
 -- ============================================
@@ -99,49 +72,42 @@ CHECK (category IN (
 ALTER TABLE materials ENABLE ROW LEVEL SECURITY;
 
 -- Policy: Users can only see their own materials
-CREATE POLICY "Users can view own materials" ON materials
+CREATE POLICY materials_select_policy ON materials
     FOR SELECT USING (auth.uid() = user_id);
 
 -- Policy: Users can insert their own materials
-CREATE POLICY "Users can insert own materials" ON materials
+CREATE POLICY materials_insert_policy ON materials
     FOR INSERT WITH CHECK (auth.uid() = user_id);
 
 -- Policy: Users can update their own materials
-CREATE POLICY "Users can update own materials" ON materials
+CREATE POLICY materials_update_policy ON materials
     FOR UPDATE USING (auth.uid() = user_id);
 
 -- Policy: Users can delete their own materials
-CREATE POLICY "Users can delete own materials" ON materials
+CREATE POLICY materials_delete_policy ON materials
     FOR DELETE USING (auth.uid() = user_id);
 
 -- ============================================
 -- 4. UPDATED_AT TRIGGER
 -- ============================================
 -- Create trigger function if not exists
-CREATE OR REPLACE FUNCTION update_updated_at_column()
+CREATE OR REPLACE FUNCTION update_materials_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN
     NEW.updated_at = NOW();
     RETURN NEW;
 END;
-$$ language 'plpgsql';
+$$ language plpgsql;
 
 -- Create trigger for materials
-DROP TRIGGER IF EXISTS update_materials_updated_at ON materials;
-CREATE TRIGGER update_materials_updated_at
+DROP TRIGGER IF EXISTS trigger_materials_updated_at ON materials;
+CREATE TRIGGER trigger_materials_updated_at
     BEFORE UPDATE ON materials
     FOR EACH ROW
-    EXECUTE FUNCTION update_updated_at_column();
+    EXECUTE FUNCTION update_materials_updated_at();
 
 -- ============================================
 -- 5. GRANT PERMISSIONS
 -- ============================================
 GRANT ALL ON materials TO authenticated;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO authenticated;
-
--- ============================================
--- VERIFICATION
--- ============================================
--- Run this to verify the tables were created:
--- SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name IN ('materials', 'expenses');
--- SELECT column_name, data_type FROM information_schema.columns WHERE table_name = 'materials';
