@@ -259,6 +259,14 @@ const AppLayout = () => {
 
       {/* Trial Expired Modal */}
       <TrialExpiredModal />
+
+      {/* Quick Add Expense Modal */}
+      {showQuickExpenseModal && (
+        <QuickAddExpenseModal 
+          onClose={() => setShowQuickExpenseModal(false)}
+          onSuccess={() => setShowQuickExpenseModal(false)}
+        />
+      )}
     </div>
   );
 };
