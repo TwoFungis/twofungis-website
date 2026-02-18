@@ -589,7 +589,6 @@ async def handle_payment_failed(invoice: dict):
     """Handle invoice.payment_failed event - only for subscriptions"""
     
     subscription_id = invoice.get("subscription")
-    customer_id = invoice.get("customer")
     
     if not subscription_id:
         logger.info("Payment failed for non-subscription, ignoring")
@@ -631,7 +630,6 @@ async def handle_subscription_deleted(subscription: dict):
     """Handle customer.subscription.deleted event"""
     
     subscription_id = subscription.get("id")
-    customer_id = subscription.get("customer")
     
     # Find user by subscription ID
     try:
@@ -671,7 +669,6 @@ async def handle_subscription_updated(subscription: dict):
     
     subscription_id = subscription.get("id")
     status = subscription.get("status")
-    customer_id = subscription.get("customer")
     
     # Determine plan from items
     items = subscription.get("items", {}).get("data", [])
