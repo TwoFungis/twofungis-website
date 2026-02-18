@@ -237,7 +237,7 @@ const SetupProgressChecklist = () => {
                     {isCompleted ? (
                       <CheckCircle2 className="w-5 h-5 text-success" />
                     ) : (
-                      <Icon className="w-4 h-4 text-slate-300" />
+                      <Icon className="w-4 h-4 text-gray-400" />
                     )}
                   </div>
                   <div className="min-w-0">
