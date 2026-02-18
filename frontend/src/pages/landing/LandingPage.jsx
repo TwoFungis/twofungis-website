@@ -354,6 +354,7 @@ const LandingPage = () => {
           <div className="absolute inset-0 bg-charcoal-900/90"></div>
         </div>
         <div className="relative max-w-3xl mx-auto text-center">
+          <img src="/shield-icon.png" alt="" className="w-16 h-16 mx-auto mb-6 opacity-30" />
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
             Take Control of Your Projects
           </h2>
@@ -377,9 +378,12 @@ const LandingPage = () => {
       <footer className="bg-charcoal-800 border-t border-charcoal-700 py-12 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-            <div>
-              <LogoLink size="sm" showText={false} />
-              <p className="text-gray-500 text-sm mt-2">Built for Builders.</p>
+            <div className="flex items-center gap-3">
+              <img src="/shield-icon.png" alt="TradeOS" className="h-10 w-auto" />
+              <div>
+                <span className="text-lg font-bold text-white">TRADEOS<span className="text-steel-400 align-super text-xs">™</span></span>
+                <p className="text-gray-500 text-sm">Built for Builders.</p>
+              </div>
             </div>
             <div className="flex items-center gap-8 text-sm">
               <Link to="/privacy" className="text-gray-400 hover:text-white transition-colors">Privacy</Link>
