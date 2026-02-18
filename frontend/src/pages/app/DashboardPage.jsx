@@ -424,13 +424,13 @@ const DashboardPage = () => {
 
             {/* Trial Expiring */}
             {trialExpiring && (
-              <div className="bg-gradient-to-r from-charcoal-800 to-slate-400/10 rounded-xl border border-slate-400/40 p-4 flex items-center gap-4">
-                <div className="w-10 h-10 bg-slate-300/30 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Clock className="w-5 h-5 text-slate-200" />
+              <div className="bg-charcoal-600 rounded-xl border border-charcoal-500 p-4 flex items-center gap-4">
+                <div className="w-10 h-10 bg-warning/20 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Clock className="w-5 h-5 text-warning" />
                 </div>
                 <div className="flex-1">
                   <p className="text-white font-medium">Trial Expiring Soon</p>
-                  <p className="text-sm text-slate-400">{daysUntilTrialExpires} day{daysUntilTrialExpires !== 1 ? 's' : ''} remaining</p>
+                  <p className="text-sm text-gray-400">{daysUntilTrialExpires} day{daysUntilTrialExpires !== 1 ? 's' : ''} remaining</p>
                 </div>
                 <Link 
                   to="/app/settings"
