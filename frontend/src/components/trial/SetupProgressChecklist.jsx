@@ -148,16 +148,16 @@ const SetupProgressChecklist = () => {
 
   return (
     <div 
-      className="bg-charcoal-700/50 rounded-xl border border-charcoal-700 overflow-hidden"
+      className="bg-charcoal-800 rounded-xl border border-charcoal-700 overflow-hidden"
       data-testid="setup-progress-checklist"
     >
-      {/* Header */}
+      {/* Header - Always Dark */}
       <div 
-        className="p-4 flex items-center justify-between cursor-pointer hover:bg-charcoal-700 transition-colors"
+        className="p-4 flex items-center justify-between cursor-pointer bg-charcoal-800 hover:bg-charcoal-700/50 transition-colors"
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-steel-500/20 rounded-full flex items-center justify-center">
+          <div className="w-10 h-10 bg-steel-500/30 rounded-full flex items-center justify-center">
             <Sparkles className="w-5 h-5 text-steel-400" />
           </div>
           <div>
