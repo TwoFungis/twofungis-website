@@ -450,7 +450,17 @@ const SettingsPage = () => {
       </div>
 
       {/* Subscription & Billing */}
-      <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6">
+      <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6 relative overflow-hidden">
+        {/* Shield watermark */}
+        <div 
+          className="absolute -right-8 -bottom-8 w-32 h-32 opacity-5 pointer-events-none"
+          style={{
+            backgroundImage: 'url(/shield.png)',
+            backgroundSize: 'contain',
+            backgroundRepeat: 'no-repeat'
+          }}
+        />
+        
         <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-4">
           <CreditCard className="w-5 h-5 text-steel-400" />
           Subscription & Billing
