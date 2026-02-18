@@ -459,6 +459,94 @@ const DashboardPage = () => {
           </div>
         </div>
       )}
+
+      {/* Financial Health Panel - Project Level */}
+      {projects.length > 0 && (
+        <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 animate-fade-in-up animation-delay-400" data-testid="financial-health-panel">
+          <div className="p-4 lg:p-5 border-b border-charcoal-700 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-steel-400" />
+              <h2 className="text-base font-semibold text-white">Financial Health</h2>
+            </div>
+            <Link to="/app/reports" className="text-steel-400 text-sm hover:text-steel-300">View reports</Link>
+          </div>
+          <div className="p-4 lg:p-5">
+            {/* Overall Summary */}
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+              <div className="bg-charcoal-700/50 rounded-lg p-3">
+                <p className="text-xs text-gray-500 mb-1">Contract Value</p>
+                <p className="text-lg font-bold text-white">{formatCurrency(totalContractValue)}</p>
+              </div>
+              <div className="bg-charcoal-700/50 rounded-lg p-3">
+                <p className="text-xs text-gray-500 mb-1">Approved COs</p>
+                <p className="text-lg font-bold text-warning">{formatCurrency(changeOrders.filter(co => co.status === 'approved').reduce((sum, co) => sum + (parseFloat(co.total_value) || 0), 0))}</p>
+              </div>
+              <div className="bg-charcoal-700/50 rounded-lg p-3">
+                <p className="text-xs text-gray-500 mb-1">Total Revenue</p>
+                <p className="text-lg font-bold text-steel-400">{formatCurrency(totalContractValue + changeOrders.filter(co => co.status === 'approved').reduce((sum, co) => sum + (parseFloat(co.total_value) || 0), 0))}</p>
+              </div>
+              <div className="bg-charcoal-700/50 rounded-lg p-3">
+                <p className="text-xs text-gray-500 mb-1">Gross Profit</p>
+                <p className={`text-lg font-bold ${avgMargin >= 15 ? 'text-success' : avgMargin >= 10 ? 'text-warning' : 'text-risk'}`}>
+                  {formatCurrency((totalContractValue + changeOrders.filter(co => co.status === 'approved').reduce((sum, co) => sum + (parseFloat(co.total_value) || 0), 0)) * (avgMargin / 100))}
+                </p>
+              </div>
+              <div className="bg-charcoal-700/50 rounded-lg p-3">
+                <p className="text-xs text-gray-500 mb-1">Avg Margin</p>
+                <div className="flex items-center gap-2">
+                  <p className={`text-lg font-bold ${avgMargin >= 15 ? 'text-success' : avgMargin >= 10 ? 'text-warning' : 'text-risk'}`}>
+                    {avgMargin.toFixed(1)}%
+                  </p>
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${
+                    avgMargin >= 20 ? 'bg-success/20 text-success' : 
+                    avgMargin >= 15 ? 'bg-steel-500/20 text-steel-400' : 
+                    avgMargin >= 10 ? 'bg-warning/20 text-warning' : 
+                    'bg-risk/20 text-risk'
+                  }`}>
+                    {avgMargin >= 20 ? 'Excellent' : avgMargin >= 15 ? 'On Target' : avgMargin >= 10 ? 'Below' : 'At Risk'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Project Health Breakdown */}
+            <div className="space-y-2">
+              <p className="text-xs text-gray-500 uppercase tracking-wide mb-3">Project Breakdown</p>
+              {projects.slice(0, 4).map((project) => {
+                const margin = parseFloat(project.forecast_margin) || 0;
+                const contractVal = parseFloat(project.contract_value) || 0;
+                const approvedCOsVal = parseFloat(project.approved_cos) || 0;
+                const totalRev = contractVal + approvedCOsVal;
+                const profit = totalRev * (margin / 100);
+                
+                return (
+                  <Link 
+                    key={project.id}
+                    to={`/app/projects/${project.id}`}
+                    className="flex items-center justify-between p-3 bg-charcoal-700/30 rounded-lg hover:bg-charcoal-700/50 transition-colors"
+                  >
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <div className={`w-2 h-8 rounded-full ${
+                        margin >= 15 ? 'bg-success' : margin >= 10 ? 'bg-warning' : 'bg-risk'
+                      }`} />
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-white truncate">{project.name}</p>
+                        <p className="text-xs text-gray-500">{formatCurrency(totalRev)} revenue</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className={`text-sm font-semibold ${margin >= 15 ? 'text-success' : margin >= 10 ? 'text-warning' : 'text-risk'}`}>
+                        {margin.toFixed(1)}%
+                      </p>
+                      <p className="text-xs text-gray-500">{formatCurrency(profit)} profit</p>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
