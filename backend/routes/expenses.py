@@ -17,15 +17,27 @@ logger = logging.getLogger(__name__)
 SUPABASE_URL = os.environ.get('SUPABASE_URL', '')
 SUPABASE_SERVICE_KEY = os.environ.get('SUPABASE_SERVICE_KEY', '')
 
-# Expense categories
-CATEGORIES = [
-    "materials", "labor", "equipment", "subcontractor", 
-    "fuel", "permits", "tools", "office", "other"
-]
+# Enhanced contractor expense categories with default deductibility
+CATEGORIES = {
+    "Materials": {"deductibility": 100, "label": "Materials (COGS)"},
+    "Consumables": {"deductibility": 100, "label": "Consumables"},
+    "Tools": {"deductibility": 100, "label": "Tools (<$500)"},
+    "Equipment": {"deductibility": 100, "label": "Equipment (Capital)"},
+    "Vehicle & Fuel": {"deductibility": 100, "label": "Vehicle & Fuel"},
+    "Meals & Entertainment": {"deductibility": 50, "label": "Meals & Entertainment"},
+    "Subcontractors": {"deductibility": 100, "label": "Subcontractors"},
+    "Insurance": {"deductibility": 100, "label": "Insurance"},
+    "Office/Admin": {"deductibility": 100, "label": "Office/Admin"},
+    "Phone/Internet": {"deductibility": 100, "label": "Phone/Internet"},
+    "Travel/Lodging": {"deductibility": 100, "label": "Travel/Lodging"},
+    "Training/Certifications": {"deductibility": 100, "label": "Training/Certifications"},
+    "Rent/Shop": {"deductibility": 100, "label": "Rent/Shop"},
+    "Other": {"deductibility": 100, "label": "Other"}
+}
 
 class ExpenseCreate(BaseModel):
     description: str
-    category: str = "other"
+    category: str = "Other"
     amount: float
     project_name: Optional[str] = None
     project_id: Optional[str] = None
@@ -35,6 +47,10 @@ class ExpenseCreate(BaseModel):
     receipt_url: Optional[str] = None
     tax_amount: Optional[float] = 0
     is_tax_deductible: bool = True
+    # New fields for enhanced tracking
+    deductibility_pct: Optional[float] = None  # Auto-set based on category if not provided
+    business_personal: str = "Business"  # Business or Personal
+    payment_method: Optional[str] = None
 
 class ExpenseUpdate(BaseModel):
     description: Optional[str] = None
@@ -47,6 +63,9 @@ class ExpenseUpdate(BaseModel):
     receipt_url: Optional[str] = None
     tax_amount: Optional[float] = None
     is_tax_deductible: Optional[bool] = None
+    deductibility_pct: Optional[float] = None
+    business_personal: Optional[str] = None
+    payment_method: Optional[str] = None
 
 
 def get_user_id_from_token(authorization: str) -> Optional[str]:
