@@ -229,7 +229,7 @@ const ProjectDetailPage = () => {
           <Link to="/app/projects" className="text-gray-400 hover:text-white text-sm flex items-center gap-1 mb-2">
             <ArrowLeft className="w-4 h-4" /> Back to Projects
           </Link>
-          <h1 className="text-2xl font-bold text-charcoal-800">{project.name}</h1>
+          <h1 className="text-2xl font-bold text-white">{project.name}</h1>
           <p className="text-gray-400">{project.client_gc || 'No client'}</p>
         </div>
         <div className="flex items-center gap-2">
@@ -255,7 +255,7 @@ const ProjectDetailPage = () => {
       {/* FINANCIAL HEALTH PANEL */}
       {/* ============================================ */}
       <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6" data-testid="financial-health-panel">
-        <h2 className="text-sm font-semibold text-charcoal-600 uppercase tracking-wider mb-4">Financial Health</h2>
+        <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Financial Health</h2>
         
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
           <div>
