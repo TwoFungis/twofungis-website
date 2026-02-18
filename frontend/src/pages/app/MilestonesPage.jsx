@@ -402,7 +402,7 @@ const MilestonesPage = () => {
 };
 
 // Create/Edit Milestone Modal Component
-const MilestoneModal = ({ milestone, onClose, onSuccess, user }) => {
+const MilestoneModal = ({ milestone, onClose, onSuccess }) => {
   const isEdit = !!milestone;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
@@ -413,6 +413,14 @@ const MilestoneModal = ({ milestone, onClose, onSuccess, user }) => {
     project_name: milestone?.project_name || '',
     notes: milestone?.notes || ''
   });
+
+  const getAuthHeaders = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    return {
+      'Authorization': `Bearer ${session?.access_token}`,
+      'Content-Type': 'application/json'
+    };
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -427,12 +435,10 @@ const MilestoneModal = ({ milestone, onClose, onSuccess, user }) => {
         ? `${API_URL}/api/milestones/${milestone.id}`
         : `${API_URL}/api/milestones`;
       
+      const headers = await getAuthHeaders();
       const response = await fetch(url, {
         method: isEdit ? 'PATCH' : 'POST',
-        headers: {
-          'Authorization': `Bearer ${user?.access_token}`,
-          'Content-Type': 'application/json'
-        },
+        headers,
         body: JSON.stringify({
           ...formData,
           amount: parseFloat(formData.amount)
