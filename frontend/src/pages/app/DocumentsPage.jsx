@@ -92,10 +92,7 @@ const DocumentsPage = () => {
         <div className="flex items-center gap-3">
           <img src="/shield-icon.png" alt="" className="w-8 h-8 opacity-80" />
           <div>
-            <h1 className="text-2xl font-bold text-charcoal-800 flex items-center gap-3">
-              <FolderOpen className="w-7 h-7 text-steel-500" />
-              Document Vault
-            </h1>
+            <h1 className="text-2xl font-bold text-charcoal-800">Document Vault</h1>
             <p className="text-charcoal-600 text-sm mt-1">Securely store and organize project documents</p>
           </div>
         </div>
