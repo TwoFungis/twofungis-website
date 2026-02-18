@@ -280,4 +280,162 @@ const ExpensesPage = () => {
   );
 };
 
+// New Expense Modal Component
+const NewExpenseModal = ({ onClose, onSuccess, user }) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    description: '',
+    category: 'materials',
+    amount: '',
+    project_name: '',
+    expense_date: new Date().toISOString().split('T')[0],
+    notes: ''
+  });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.description || !formData.amount) {
+      alert('Please fill in required fields');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const response = await fetch(`${API_URL}/api/expenses`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${user?.access_token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          ...formData,
+          amount: parseFloat(formData.amount)
+        })
+      });
+
+      if (response.ok) {
+        onSuccess();
+      } else {
+        alert('Failed to create expense');
+      }
+    } catch (error) {
+      console.error('Error creating expense:', error);
+      alert('Error creating expense');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" data-testid="new-expense-modal">
+      <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 w-full max-w-lg">
+        <div className="p-6 border-b border-charcoal-700 flex items-center justify-between">
+          <h2 className="text-xl font-bold text-white">Add Expense</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-white">
+            <span className="text-2xl">&times;</span>
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-400 mb-1">Description *</label>
+            <input
+              type="text"
+              required
+              value={formData.description}
+              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+              className="w-full bg-charcoal-900 border border-charcoal-700 rounded-lg px-4 py-2 text-white focus:border-steel-500 focus:outline-none"
+              placeholder="e.g., Lumber for framing"
+              data-testid="input-expense-description"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-1">Category</label>
+              <select
+                value={formData.category}
+                onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
+                className="w-full bg-charcoal-900 border border-charcoal-700 rounded-lg px-4 py-2 text-white focus:border-steel-500 focus:outline-none"
+              >
+                {Object.entries(CATEGORIES).map(([key, val]) => (
+                  <option key={key} value={key}>{val.label}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-1">Amount *</label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">$</span>
+                <input
+                  type="number"
+                  required
+                  min="0"
+                  step="0.01"
+                  value={formData.amount}
+                  onChange={(e) => setFormData(prev => ({ ...prev, amount: e.target.value }))}
+                  className="w-full bg-charcoal-900 border border-charcoal-700 rounded-lg pl-8 pr-4 py-2 text-white focus:border-steel-500 focus:outline-none"
+                  placeholder="0.00"
+                  data-testid="input-expense-amount"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-1">Project (optional)</label>
+              <input
+                type="text"
+                value={formData.project_name}
+                onChange={(e) => setFormData(prev => ({ ...prev, project_name: e.target.value }))}
+                className="w-full bg-charcoal-900 border border-charcoal-700 rounded-lg px-4 py-2 text-white focus:border-steel-500 focus:outline-none"
+                placeholder="Project name"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-400 mb-1">Date</label>
+              <input
+                type="date"
+                value={formData.expense_date}
+                onChange={(e) => setFormData(prev => ({ ...prev, expense_date: e.target.value }))}
+                className="w-full bg-charcoal-900 border border-charcoal-700 rounded-lg px-4 py-2 text-white focus:border-steel-500 focus:outline-none"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-400 mb-1">Notes</label>
+            <textarea
+              value={formData.notes}
+              onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
+              rows={2}
+              className="w-full bg-charcoal-900 border border-charcoal-700 rounded-lg px-4 py-2 text-white focus:border-steel-500 focus:outline-none resize-none"
+              placeholder="Additional notes..."
+            />
+          </div>
+
+          <div className="flex justify-end gap-3 pt-4 border-t border-charcoal-700">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 text-gray-400 hover:text-white transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="bg-steel-500 hover:bg-steel-600 text-white px-6 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
+              data-testid="submit-expense"
+            >
+              {isSubmitting ? 'Adding...' : 'Add Expense'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
 export default ExpensesPage;
