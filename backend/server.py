@@ -396,8 +396,18 @@ async def stripe_webhook(request: Request):
         
         webhook_response = await stripe_checkout.handle_webhook(body, signature)
         
+        # Get transaction from DB
+        transaction = await db.payment_transactions.find_one(
+            {"session_id": webhook_response.session_id},
+            {"_id": 0}
+        )
+        
         # Update transaction based on webhook event
         if webhook_response.payment_status == "paid":
+            plan_type = transaction.get("plan_type") if transaction else None
+            user_id = transaction.get("user_id") if transaction else None
+            payment_mode = transaction.get("payment_mode", "subscription") if transaction else "subscription"
+            
             await db.payment_transactions.update_one(
                 {"session_id": webhook_response.session_id},
                 {
@@ -408,12 +418,95 @@ async def stripe_webhook(request: Request):
                     }
                 }
             )
+            
+            # Handle Lifetime Elite purchase
+            if plan_type == "lifetime_elite" and user_id:
+                await process_lifetime_purchase(
+                    user_id=user_id,
+                    session_id=webhook_response.session_id,
+                    payment_intent_id=webhook_response.event_id
+                )
         
         return {"status": "received", "event_type": webhook_response.event_type}
         
     except Exception as e:
         logging.error(f"Webhook error: {str(e)}")
         raise HTTPException(status_code=400, detail=str(e))
+
+
+async def process_lifetime_purchase(user_id: str, session_id: str, payment_intent_id: str):
+    """Process a successful Lifetime Elite purchase"""
+    
+    try:
+        # 1. Atomically increment seat counter in Supabase
+        async with httpx.AsyncClient() as client:
+            # Call the increment function
+            response = await client.post(
+                f"{SUPABASE_URL}/rest/v1/rpc/increment_lifetime_seats",
+                headers={
+                    "apikey": SUPABASE_SERVICE_KEY,
+                    "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+                    "Content-Type": "application/json"
+                }
+            )
+            
+            if response.status_code != 200:
+                logging.error(f"Failed to increment seats: {response.text}")
+                return
+            
+            result = response.json()
+            if result and len(result) > 0 and not result[0].get("success", False):
+                logging.error(f"Seat increment failed: {result[0].get('error_message')}")
+                # TODO: Trigger refund process
+                return
+            
+            # 2. Update user's profile in Supabase
+            update_response = await client.patch(
+                f"{SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}",
+                headers={
+                    "apikey": SUPABASE_SERVICE_KEY,
+                    "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+                    "Content-Type": "application/json",
+                    "Prefer": "return=minimal"
+                },
+                json={
+                    "plan_type": "lifetime_elite",
+                    "plan_status": "active",
+                    "stripe_payment_intent_id": payment_intent_id,
+                    "lifetime_purchased_at": datetime.now(timezone.utc).isoformat(),
+                    "subscription_tier": "elite"  # For backward compatibility
+                }
+            )
+            
+            if update_response.status_code not in [200, 204]:
+                logging.error(f"Failed to update user profile: {update_response.text}")
+            
+            # 3. Create lifetime purchase record
+            purchase_response = await client.post(
+                f"{SUPABASE_URL}/rest/v1/lifetime_purchases",
+                headers={
+                    "apikey": SUPABASE_SERVICE_KEY,
+                    "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+                    "Content-Type": "application/json",
+                    "Prefer": "return=minimal"
+                },
+                json={
+                    "user_id": user_id,
+                    "stripe_payment_intent_id": payment_intent_id,
+                    "stripe_session_id": session_id,
+                    "amount": 599,
+                    "currency": "CAD",
+                    "country": "CA"
+                }
+            )
+            
+            if purchase_response.status_code not in [200, 201, 204]:
+                logging.error(f"Failed to create purchase record: {purchase_response.text}")
+            
+            logging.info(f"Successfully processed Lifetime Elite purchase for user {user_id}")
+            
+    except Exception as e:
+        logging.error(f"Error processing lifetime purchase: {str(e)}")
 
 
 # Get user's subscription status
