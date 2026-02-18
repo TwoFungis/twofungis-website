@@ -23,11 +23,11 @@ const VerificationBadge = ({ level, size = 'md' }) => {
   const sizeClasses = size === 'sm' ? 'w-4 h-4' : size === 'lg' ? 'w-6 h-6' : 'w-5 h-5';
 
   return (
-    <div className="group relative inline-flex items-center">
+    <div className="group/badge relative inline-flex items-center pointer-events-none">
       <div className={`${badge.bg} ${badge.color} p-1 rounded-full`}>
         <Icon className={sizeClasses} />
       </div>
-      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-charcoal-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
+      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-charcoal-900 text-white text-xs rounded-lg opacity-0 group-hover/badge:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
         {level === 4 ? 'TradeOS Verified Contractor' : `Level ${level}: ${badge.label} Verified`}
         <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-charcoal-900" />
       </div>
