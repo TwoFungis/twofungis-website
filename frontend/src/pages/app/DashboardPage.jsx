@@ -242,13 +242,13 @@ const DashboardPage = () => {
           </div>
 
           {/* Pending Change Orders */}
-          <div className="bg-gradient-to-br from-charcoal-800 to-slate-500/10 rounded-xl border border-slate-400/30">
-            <div className="p-5 border-b border-slate-400/20 flex items-center justify-between">
+          <div className="bg-charcoal-600 rounded-xl border border-charcoal-500">
+            <div className="p-5 border-b border-charcoal-500 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <FileText className="w-5 h-5 text-slate-300" />
+                <FileText className="w-5 h-5 text-warning" />
                 <h3 className="font-semibold text-white">Pending COs</h3>
               </div>
-              <span className="text-2xl font-bold text-slate-200">{pendingCOs.length}</span>
+              <span className="text-2xl font-bold text-warning">{pendingCOs.length}</span>
             </div>
             <div className="p-5">
               {pendingCOs.length === 0 ? (
@@ -258,13 +258,13 @@ const DashboardPage = () => {
                   {pendingCOs.slice(0, 4).map(co => (
                     <div 
                       key={co.id}
-                      className="flex items-center justify-between p-3 bg-slate-400/10 rounded-lg border border-slate-400/20"
+                      className="flex items-center justify-between p-3 bg-charcoal-700 rounded-lg"
                     >
                       <div className="min-w-0 flex-1">
                         <p className="text-sm font-medium text-white truncate">{co.title || `CO-${co.co_number}`}</p>
                         <p className="text-xs text-gray-500">{co.projects?.name || 'No project'}</p>
                       </div>
-                      <div className="text-sm font-semibold text-slate-200">
+                      <div className="text-sm font-semibold text-warning">
                         {formatCurrency(co.total_value)}
                       </div>
                     </div>
@@ -273,7 +273,7 @@ const DashboardPage = () => {
               )}
               <Link 
                 to="/app/change-orders"
-                className="mt-4 flex items-center justify-center gap-1 text-sm text-slate-300 hover:text-slate-200"
+                className="mt-4 flex items-center justify-center gap-1 text-sm text-steel-400 hover:text-steel-300"
               >
                 View all COs <ChevronRight className="w-4 h-4" />
               </Link>
