@@ -10,7 +10,7 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 // Invoice status configuration
 const STATUS_CONFIG = {
-  draft: { label: 'Draft', color: 'bg-gray-500/20 text-gray-400' },
+  draft: { label: 'Draft', color: 'bg-gray-500/20 text-charcoal-500' },
   sent: { label: 'Sent', color: 'bg-blue-500/20 text-blue-400' },
   viewed: { label: 'Viewed', color: 'bg-purple-500/20 text-purple-400' },
   paid: { label: 'Paid', color: 'bg-success/20 text-success' },
@@ -143,15 +143,15 @@ const InvoicesPage = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-3">
+          <h1 className="text-2xl font-bold text-charcoal-800 flex items-center gap-3">
             <Receipt className="w-7 h-7 text-steel-400" />
             Invoices
           </h1>
-          <p className="text-gray-400 text-sm mt-1">Create, send, and track invoices</p>
+          <p className="text-charcoal-500 text-sm mt-1">Create, send, and track invoices</p>
         </div>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="bg-steel-500 hover:bg-steel-600 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+          className="bg-steel-500 hover:bg-steel-600 text-charcoal-800 px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
           data-testid="new-invoice-btn"
         >
           <Plus className="w-4 h-4" />
@@ -161,53 +161,53 @@ const InvoicesPage = () => {
 
       {/* Receivables Dashboard Widget */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-4">
+        <div className="bg-white rounded-xl border border-cloud-300 p-4">
           <div className="flex items-center gap-2 mb-2">
             <DollarSign className="w-5 h-5 text-steel-400" />
-            <p className="text-gray-400 text-sm">Outstanding</p>
+            <p className="text-charcoal-500 text-sm">Outstanding</p>
           </div>
-          <p className="text-2xl font-bold text-white">${(stats.total_outstanding || 0).toLocaleString()}</p>
+          <p className="text-2xl font-bold text-charcoal-800">${(stats.total_outstanding || 0).toLocaleString()}</p>
         </div>
-        <div className="bg-charcoal-800 rounded-xl border border-risk/30 p-4">
+        <div className="bg-white rounded-xl border border-risk/30 p-4">
           <div className="flex items-center gap-2 mb-2">
             <AlertCircle className="w-5 h-5 text-risk" />
-            <p className="text-gray-400 text-sm">Overdue</p>
+            <p className="text-charcoal-500 text-sm">Overdue</p>
           </div>
           <p className="text-2xl font-bold text-risk">${(stats.total_overdue || 0).toLocaleString()}</p>
         </div>
-        <div className="bg-charcoal-800 rounded-xl border border-success/30 p-4">
+        <div className="bg-white rounded-xl border border-success/30 p-4">
           <div className="flex items-center gap-2 mb-2">
             <CheckCircle className="w-5 h-5 text-success" />
-            <p className="text-gray-400 text-sm">Paid (This Month)</p>
+            <p className="text-charcoal-500 text-sm">Paid (This Month)</p>
           </div>
           <p className="text-2xl font-bold text-success">${(stats.total_paid_this_month || 0).toLocaleString()}</p>
         </div>
-        <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-4">
+        <div className="bg-white rounded-xl border border-cloud-300 p-4">
           <div className="flex items-center gap-2 mb-2">
-            <Clock className="w-5 h-5 text-gray-400" />
-            <p className="text-gray-400 text-sm">Drafts</p>
+            <Clock className="w-5 h-5 text-charcoal-500" />
+            <p className="text-charcoal-500 text-sm">Drafts</p>
           </div>
-          <p className="text-2xl font-bold text-white">{stats.draft_count || 0}</p>
+          <p className="text-2xl font-bold text-charcoal-800">{stats.draft_count || 0}</p>
         </div>
       </div>
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-4">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-charcoal-500" />
           <input
             type="text"
             placeholder="Search invoices..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-charcoal-800 border border-charcoal-700 rounded-lg pl-10 pr-4 py-2 text-white placeholder-gray-400 focus:border-steel-500 focus:outline-none"
+            className="w-full bg-white border border-cloud-300 rounded-lg pl-10 pr-4 py-2 text-charcoal-800 placeholder-gray-400 focus:border-steel-500 focus:outline-none"
             data-testid="search-invoices"
           />
         </div>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="bg-charcoal-800 border border-charcoal-700 rounded-lg px-4 py-2 text-white focus:border-steel-500 focus:outline-none"
+          className="bg-white border border-cloud-300 rounded-lg px-4 py-2 text-charcoal-800 focus:border-steel-500 focus:outline-none"
           data-testid="filter-status"
         >
           <option value="all">All Status</option>
@@ -220,20 +220,20 @@ const InvoicesPage = () => {
       </div>
 
       {/* Invoices List */}
-      <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 overflow-hidden">
+      <div className="bg-white rounded-xl border border-cloud-300 overflow-hidden">
         {isLoading ? (
           <div className="p-8 text-center">
             <div className="w-8 h-8 border-2 border-steel-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-gray-400">Loading invoices...</p>
+            <p className="text-charcoal-500">Loading invoices...</p>
           </div>
         ) : filteredInvoices.length === 0 ? (
           <div className="p-8 text-center">
             <Receipt className="w-12 h-12 text-gray-600 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-white mb-2">No invoices found</h3>
-            <p className="text-gray-400 mb-4">Create your first invoice to start tracking payments.</p>
+            <h3 className="text-lg font-medium text-charcoal-800 mb-2">No invoices found</h3>
+            <p className="text-charcoal-500 mb-4">Create your first invoice to start tracking payments.</p>
             <button
               onClick={() => setShowCreateModal(true)}
-              className="bg-steel-500 hover:bg-steel-600 text-white px-4 py-2 rounded-lg font-medium transition-colors inline-flex items-center gap-2"
+              className="bg-steel-500 hover:bg-steel-600 text-charcoal-800 px-4 py-2 rounded-lg font-medium transition-colors inline-flex items-center gap-2"
             >
               <Plus className="w-4 h-4" />
               Create Invoice
@@ -242,15 +242,15 @@ const InvoicesPage = () => {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-charcoal-700/50">
+              <thead className="bg-cloud-200/50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Invoice #</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Client</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase hidden md:table-cell">Project</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Amount</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase hidden sm:table-cell">Due Date</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Status</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-400 uppercase">Actions</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-charcoal-500 uppercase">Invoice #</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-charcoal-500 uppercase">Client</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-charcoal-500 uppercase hidden md:table-cell">Project</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-charcoal-500 uppercase">Amount</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-charcoal-500 uppercase hidden sm:table-cell">Due Date</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-charcoal-500 uppercase">Status</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-charcoal-500 uppercase">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-charcoal-700">
@@ -258,19 +258,19 @@ const InvoicesPage = () => {
                   const config = STATUS_CONFIG[invoice.status] || STATUS_CONFIG.draft;
                   
                   return (
-                    <tr key={invoice.id} className="hover:bg-charcoal-700/30 transition-colors">
+                    <tr key={invoice.id} className="hover:bg-cloud-200/30 transition-colors">
                       <td className="px-6 py-4">
-                        <span className="text-white font-mono font-medium">{invoice.invoice_number}</span>
+                        <span className="text-charcoal-800 font-mono font-medium">{invoice.invoice_number}</span>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
-                          <Building2 className="w-4 h-4 text-gray-500" />
-                          <span className="text-white">{invoice.client_name}</span>
+                          <Building2 className="w-4 h-4 text-charcoal-400" />
+                          <span className="text-charcoal-800">{invoice.client_name}</span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-gray-400 hidden md:table-cell">{invoice.project_name || '—'}</td>
-                      <td className="px-6 py-4 text-white font-medium">${invoice.total?.toLocaleString()}</td>
-                      <td className="px-6 py-4 text-gray-400 hidden sm:table-cell">
+                      <td className="px-6 py-4 text-charcoal-500 hidden md:table-cell">{invoice.project_name || '—'}</td>
+                      <td className="px-6 py-4 text-charcoal-800 font-medium">${invoice.total?.toLocaleString()}</td>
+                      <td className="px-6 py-4 text-charcoal-500 hidden sm:table-cell">
                         {invoice.due_date ? new Date(invoice.due_date).toLocaleDateString() : '—'}
                       </td>
                       <td className="px-6 py-4">
@@ -282,7 +282,7 @@ const InvoicesPage = () => {
                         <div className="flex items-center justify-end gap-2">
                           <button 
                             onClick={() => { setSelectedInvoice(invoice); setShowViewModal(true); }}
-                            className="text-gray-400 hover:text-white p-1" 
+                            className="text-charcoal-500 hover:text-charcoal-800 p-1" 
                             title="View"
                             data-testid={`view-invoice-${invoice.id}`}
                           >
@@ -292,14 +292,14 @@ const InvoicesPage = () => {
                             <>
                               <button 
                                 onClick={() => handleSendInvoice(invoice.id)}
-                                className="bg-steel-500 hover:bg-steel-600 text-white px-3 py-1 rounded text-sm font-medium"
+                                className="bg-steel-500 hover:bg-steel-600 text-charcoal-800 px-3 py-1 rounded text-sm font-medium"
                                 data-testid={`send-invoice-${invoice.id}`}
                               >
                                 Send
                               </button>
                               <button 
                                 onClick={() => handleDeleteInvoice(invoice.id)}
-                                className="text-gray-400 hover:text-risk p-1" 
+                                className="text-charcoal-500 hover:text-risk p-1" 
                                 title="Delete"
                               >
                                 <Trash2 className="w-4 h-4" />
@@ -434,10 +434,10 @@ const CreateInvoiceModal = ({ onClose, onSuccess, user }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" data-testid="create-invoice-modal">
-      <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
-        <div className="p-6 border-b border-charcoal-700 flex items-center justify-between sticky top-0 bg-charcoal-800">
-          <h2 className="text-xl font-bold text-white">Create Invoice</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-white">
+      <div className="bg-white rounded-xl border border-cloud-300 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+        <div className="p-6 border-b border-cloud-300 flex items-center justify-between sticky top-0 bg-white">
+          <h2 className="text-xl font-bold text-charcoal-800">Create Invoice</h2>
+          <button onClick={onClose} className="text-charcoal-500 hover:text-charcoal-800">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -446,39 +446,39 @@ const CreateInvoiceModal = ({ onClose, onSuccess, user }) => {
           {/* Client Info */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">Client Name *</label>
+              <label className="block text-sm font-medium text-charcoal-500 mb-1">Client Name *</label>
               <input
                 type="text"
                 required
                 value={formData.client_name}
                 onChange={(e) => setFormData(prev => ({ ...prev, client_name: e.target.value }))}
-                className="w-full bg-charcoal-900 border border-charcoal-700 rounded-lg px-4 py-2 text-white focus:border-steel-500 focus:outline-none"
+                className="w-full bg-charcoal-900 border border-cloud-300 rounded-lg px-4 py-2 text-charcoal-800 focus:border-steel-500 focus:outline-none"
                 placeholder="Company or client name"
                 data-testid="input-client-name"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">Client Email</label>
+              <label className="block text-sm font-medium text-charcoal-500 mb-1">Client Email</label>
               <input
                 type="email"
                 value={formData.client_email}
                 onChange={(e) => setFormData(prev => ({ ...prev, client_email: e.target.value }))}
-                className="w-full bg-charcoal-900 border border-charcoal-700 rounded-lg px-4 py-2 text-white focus:border-steel-500 focus:outline-none"
+                className="w-full bg-charcoal-900 border border-cloud-300 rounded-lg px-4 py-2 text-charcoal-800 focus:border-steel-500 focus:outline-none"
                 placeholder="client@email.com"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">Project Name</label>
+              <label className="block text-sm font-medium text-charcoal-500 mb-1">Project Name</label>
               <input
                 type="text"
                 value={formData.project_name}
                 onChange={(e) => setFormData(prev => ({ ...prev, project_name: e.target.value }))}
-                className="w-full bg-charcoal-900 border border-charcoal-700 rounded-lg px-4 py-2 text-white focus:border-steel-500 focus:outline-none"
+                className="w-full bg-charcoal-900 border border-cloud-300 rounded-lg px-4 py-2 text-charcoal-800 focus:border-steel-500 focus:outline-none"
                 placeholder="Project or job name"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">Payment Terms</label>
+              <label className="block text-sm font-medium text-charcoal-500 mb-1">Payment Terms</label>
               <select
                 value={formData.payment_terms}
                 onChange={(e) => {
@@ -489,7 +489,7 @@ const CreateInvoiceModal = ({ onClose, onSuccess, user }) => {
                     payment_terms_days: term?.days || 30
                   }));
                 }}
-                className="w-full bg-charcoal-900 border border-charcoal-700 rounded-lg px-4 py-2 text-white focus:border-steel-500 focus:outline-none"
+                className="w-full bg-charcoal-900 border border-cloud-300 rounded-lg px-4 py-2 text-charcoal-800 focus:border-steel-500 focus:outline-none"
               >
                 {PAYMENT_TERMS_OPTIONS.map(opt => (
                   <option key={opt.label} value={opt.label}>{opt.label}</option>
@@ -500,7 +500,7 @@ const CreateInvoiceModal = ({ onClose, onSuccess, user }) => {
 
           {/* Line Items */}
           <div>
-            <label className="block text-sm font-medium text-gray-400 mb-3">Line Items</label>
+            <label className="block text-sm font-medium text-charcoal-500 mb-3">Line Items</label>
             <div className="space-y-3">
               {formData.line_items.map((item, index) => (
                 <div key={index} className="flex gap-3 items-start">
@@ -509,7 +509,7 @@ const CreateInvoiceModal = ({ onClose, onSuccess, user }) => {
                     placeholder="Description"
                     value={item.description}
                     onChange={(e) => updateLineItem(index, 'description', e.target.value)}
-                    className="flex-1 bg-charcoal-900 border border-charcoal-700 rounded-lg px-4 py-2 text-white focus:border-steel-500 focus:outline-none"
+                    className="flex-1 bg-charcoal-900 border border-cloud-300 rounded-lg px-4 py-2 text-charcoal-800 focus:border-steel-500 focus:outline-none"
                     data-testid={`line-item-desc-${index}`}
                   />
                   <input
@@ -519,7 +519,7 @@ const CreateInvoiceModal = ({ onClose, onSuccess, user }) => {
                     step="0.01"
                     value={item.quantity}
                     onChange={(e) => updateLineItem(index, 'quantity', e.target.value)}
-                    className="w-20 bg-charcoal-900 border border-charcoal-700 rounded-lg px-3 py-2 text-white focus:border-steel-500 focus:outline-none"
+                    className="w-20 bg-charcoal-900 border border-cloud-300 rounded-lg px-3 py-2 text-charcoal-800 focus:border-steel-500 focus:outline-none"
                   />
                   <input
                     type="number"
@@ -528,16 +528,16 @@ const CreateInvoiceModal = ({ onClose, onSuccess, user }) => {
                     step="0.01"
                     value={item.unit_price}
                     onChange={(e) => updateLineItem(index, 'unit_price', e.target.value)}
-                    className="w-32 bg-charcoal-900 border border-charcoal-700 rounded-lg px-3 py-2 text-white focus:border-steel-500 focus:outline-none"
+                    className="w-32 bg-charcoal-900 border border-cloud-300 rounded-lg px-3 py-2 text-charcoal-800 focus:border-steel-500 focus:outline-none"
                     data-testid={`line-item-price-${index}`}
                   />
-                  <div className="w-24 text-right py-2 text-white font-medium">
+                  <div className="w-24 text-right py-2 text-charcoal-800 font-medium">
                     ${((parseFloat(item.quantity) || 0) * (parseFloat(item.unit_price) || 0)).toLocaleString()}
                   </div>
                   <button
                     type="button"
                     onClick={() => removeLineItem(index)}
-                    className="text-gray-400 hover:text-risk p-2"
+                    className="text-charcoal-500 hover:text-risk p-2"
                     disabled={formData.line_items.length === 1}
                   >
                     <Trash2 className="w-4 h-4" />
@@ -557,12 +557,12 @@ const CreateInvoiceModal = ({ onClose, onSuccess, user }) => {
           {/* Tax & Totals */}
           <div className="flex justify-end">
             <div className="w-full max-w-xs space-y-2">
-              <div className="flex justify-between text-gray-400">
+              <div className="flex justify-between text-charcoal-500">
                 <span>Subtotal</span>
-                <span className="text-white">${subtotal.toLocaleString()}</span>
+                <span className="text-charcoal-800">${subtotal.toLocaleString()}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-gray-400">Tax Rate (%)</span>
+                <span className="text-charcoal-500">Tax Rate (%)</span>
                 <input
                   type="number"
                   min="0"
@@ -570,17 +570,17 @@ const CreateInvoiceModal = ({ onClose, onSuccess, user }) => {
                   step="0.01"
                   value={formData.tax_rate}
                   onChange={(e) => setFormData(prev => ({ ...prev, tax_rate: parseFloat(e.target.value) || 0 }))}
-                  className="w-20 bg-charcoal-900 border border-charcoal-700 rounded px-2 py-1 text-white text-right focus:border-steel-500 focus:outline-none"
+                  className="w-20 bg-charcoal-900 border border-cloud-300 rounded px-2 py-1 text-charcoal-800 text-right focus:border-steel-500 focus:outline-none"
                 />
               </div>
               {taxAmount > 0 && (
-                <div className="flex justify-between text-gray-400">
+                <div className="flex justify-between text-charcoal-500">
                   <span>Tax</span>
-                  <span className="text-white">${taxAmount.toLocaleString()}</span>
+                  <span className="text-charcoal-800">${taxAmount.toLocaleString()}</span>
                 </div>
               )}
-              <div className="flex justify-between pt-2 border-t border-charcoal-700 text-lg font-bold">
-                <span className="text-white">Total</span>
+              <div className="flex justify-between pt-2 border-t border-cloud-300 text-lg font-bold">
+                <span className="text-charcoal-800">Total</span>
                 <span className="text-steel-400">${total.toLocaleString()}</span>
               </div>
             </div>
@@ -588,29 +588,29 @@ const CreateInvoiceModal = ({ onClose, onSuccess, user }) => {
 
           {/* Notes */}
           <div>
-            <label className="block text-sm font-medium text-gray-400 mb-1">Notes (visible on invoice)</label>
+            <label className="block text-sm font-medium text-charcoal-500 mb-1">Notes (visible on invoice)</label>
             <textarea
               value={formData.notes}
               onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
               rows={2}
-              className="w-full bg-charcoal-900 border border-charcoal-700 rounded-lg px-4 py-2 text-white focus:border-steel-500 focus:outline-none resize-none"
+              className="w-full bg-charcoal-900 border border-cloud-300 rounded-lg px-4 py-2 text-charcoal-800 focus:border-steel-500 focus:outline-none resize-none"
               placeholder="Payment instructions, thank you message, etc."
             />
           </div>
 
           {/* Actions */}
-          <div className="flex justify-end gap-3 pt-4 border-t border-charcoal-700">
+          <div className="flex justify-end gap-3 pt-4 border-t border-cloud-300">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-gray-400 hover:text-white transition-colors"
+              className="px-4 py-2 text-charcoal-500 hover:text-charcoal-800 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="bg-steel-500 hover:bg-steel-600 text-white px-6 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
+              className="bg-steel-500 hover:bg-steel-600 text-charcoal-800 px-6 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 flex items-center gap-2"
               data-testid="submit-invoice"
             >
               {isSubmitting ? (
@@ -633,13 +633,13 @@ const CreateInvoiceModal = ({ onClose, onSuccess, user }) => {
 const ViewInvoiceModal = ({ invoice, onClose }) => {
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <div className="p-6 border-b border-charcoal-700 flex items-center justify-between sticky top-0 bg-charcoal-800">
+      <div className="bg-white rounded-xl border border-cloud-300 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="p-6 border-b border-cloud-300 flex items-center justify-between sticky top-0 bg-white">
           <div>
-            <h2 className="text-xl font-bold text-white">{invoice.invoice_number}</h2>
-            <p className="text-gray-400 text-sm">Created {new Date(invoice.created_at).toLocaleDateString()}</p>
+            <h2 className="text-xl font-bold text-charcoal-800">{invoice.invoice_number}</h2>
+            <p className="text-charcoal-500 text-sm">Created {new Date(invoice.created_at).toLocaleDateString()}</p>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-white">
+          <button onClick={onClose} className="text-charcoal-500 hover:text-charcoal-800">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -648,55 +648,55 @@ const ViewInvoiceModal = ({ invoice, onClose }) => {
           {/* Client & Project Info */}
           <div className="grid grid-cols-2 gap-6">
             <div>
-              <p className="text-gray-400 text-sm">Client</p>
-              <p className="text-white font-medium">{invoice.client_name}</p>
-              {invoice.client_email && <p className="text-gray-400 text-sm">{invoice.client_email}</p>}
+              <p className="text-charcoal-500 text-sm">Client</p>
+              <p className="text-charcoal-800 font-medium">{invoice.client_name}</p>
+              {invoice.client_email && <p className="text-charcoal-500 text-sm">{invoice.client_email}</p>}
             </div>
             <div>
-              <p className="text-gray-400 text-sm">Project</p>
-              <p className="text-white font-medium">{invoice.project_name || '—'}</p>
+              <p className="text-charcoal-500 text-sm">Project</p>
+              <p className="text-charcoal-800 font-medium">{invoice.project_name || '—'}</p>
             </div>
           </div>
 
           {/* Status & Dates */}
           <div className="grid grid-cols-3 gap-4">
             <div className="bg-charcoal-900 rounded-lg p-4">
-              <p className="text-gray-400 text-sm mb-1">Status</p>
+              <p className="text-charcoal-500 text-sm mb-1">Status</p>
               <span className={`px-2 py-1 rounded-full text-xs font-medium ${STATUS_CONFIG[invoice.status]?.color}`}>
                 {STATUS_CONFIG[invoice.status]?.label}
               </span>
             </div>
             <div className="bg-charcoal-900 rounded-lg p-4">
-              <p className="text-gray-400 text-sm mb-1">Issue Date</p>
-              <p className="text-white">{new Date(invoice.issue_date).toLocaleDateString()}</p>
+              <p className="text-charcoal-500 text-sm mb-1">Issue Date</p>
+              <p className="text-charcoal-800">{new Date(invoice.issue_date).toLocaleDateString()}</p>
             </div>
             <div className="bg-charcoal-900 rounded-lg p-4">
-              <p className="text-gray-400 text-sm mb-1">Due Date</p>
-              <p className="text-white">{invoice.due_date ? new Date(invoice.due_date).toLocaleDateString() : '—'}</p>
+              <p className="text-charcoal-500 text-sm mb-1">Due Date</p>
+              <p className="text-charcoal-800">{invoice.due_date ? new Date(invoice.due_date).toLocaleDateString() : '—'}</p>
             </div>
           </div>
 
           {/* Line Items */}
           {invoice.line_items && invoice.line_items.length > 0 && (
             <div>
-              <p className="text-gray-400 text-sm mb-2">Line Items</p>
+              <p className="text-charcoal-500 text-sm mb-2">Line Items</p>
               <div className="bg-charcoal-900 rounded-lg overflow-hidden">
                 <table className="w-full">
-                  <thead className="bg-charcoal-700/50">
+                  <thead className="bg-cloud-200/50">
                     <tr>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-400">Description</th>
-                      <th className="px-4 py-2 text-right text-xs font-medium text-gray-400">Qty</th>
-                      <th className="px-4 py-2 text-right text-xs font-medium text-gray-400">Price</th>
-                      <th className="px-4 py-2 text-right text-xs font-medium text-gray-400">Amount</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-charcoal-500">Description</th>
+                      <th className="px-4 py-2 text-right text-xs font-medium text-charcoal-500">Qty</th>
+                      <th className="px-4 py-2 text-right text-xs font-medium text-charcoal-500">Price</th>
+                      <th className="px-4 py-2 text-right text-xs font-medium text-charcoal-500">Amount</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-charcoal-700">
                     {invoice.line_items.map((item, idx) => (
                       <tr key={idx}>
-                        <td className="px-4 py-3 text-white">{item.description}</td>
-                        <td className="px-4 py-3 text-gray-400 text-right">{item.quantity}</td>
-                        <td className="px-4 py-3 text-gray-400 text-right">${item.unit_price?.toLocaleString()}</td>
-                        <td className="px-4 py-3 text-white text-right">${item.amount?.toLocaleString()}</td>
+                        <td className="px-4 py-3 text-charcoal-800">{item.description}</td>
+                        <td className="px-4 py-3 text-charcoal-500 text-right">{item.quantity}</td>
+                        <td className="px-4 py-3 text-charcoal-500 text-right">${item.unit_price?.toLocaleString()}</td>
+                        <td className="px-4 py-3 text-charcoal-800 text-right">${item.amount?.toLocaleString()}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -708,18 +708,18 @@ const ViewInvoiceModal = ({ invoice, onClose }) => {
           {/* Totals */}
           <div className="flex justify-end">
             <div className="w-64 space-y-2">
-              <div className="flex justify-between text-gray-400">
+              <div className="flex justify-between text-charcoal-500">
                 <span>Subtotal</span>
-                <span className="text-white">${invoice.subtotal?.toLocaleString()}</span>
+                <span className="text-charcoal-800">${invoice.subtotal?.toLocaleString()}</span>
               </div>
               {invoice.tax_amount > 0 && (
-                <div className="flex justify-between text-gray-400">
+                <div className="flex justify-between text-charcoal-500">
                   <span>Tax ({invoice.tax_rate}%)</span>
-                  <span className="text-white">${invoice.tax_amount?.toLocaleString()}</span>
+                  <span className="text-charcoal-800">${invoice.tax_amount?.toLocaleString()}</span>
                 </div>
               )}
-              <div className="flex justify-between pt-2 border-t border-charcoal-700 text-lg font-bold">
-                <span className="text-white">Total</span>
+              <div className="flex justify-between pt-2 border-t border-cloud-300 text-lg font-bold">
+                <span className="text-charcoal-800">Total</span>
                 <span className="text-steel-400">${invoice.total?.toLocaleString()}</span>
               </div>
               {invoice.paid_amount && (
@@ -734,8 +734,8 @@ const ViewInvoiceModal = ({ invoice, onClose }) => {
           {/* Notes */}
           {invoice.notes && (
             <div className="bg-charcoal-900 rounded-lg p-4">
-              <p className="text-gray-400 text-sm mb-1">Notes</p>
-              <p className="text-white">{invoice.notes}</p>
+              <p className="text-charcoal-500 text-sm mb-1">Notes</p>
+              <p className="text-charcoal-800">{invoice.notes}</p>
             </div>
           )}
         </div>

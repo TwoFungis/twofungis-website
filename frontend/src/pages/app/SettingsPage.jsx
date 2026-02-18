@@ -300,9 +300,9 @@ const SettingsPage = () => {
       )}
 
       {/* Profile Section */}
-      <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6">
+      <div className="bg-white rounded-xl border border-cloud-300 p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+          <h2 className="text-lg font-semibold text-charcoal-800 flex items-center gap-2">
             <User className="w-5 h-5 text-steel-400" />
             Profile Information
           </h2>
@@ -322,31 +322,31 @@ const SettingsPage = () => {
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1">Full Name</label>
+                <label className="block text-sm font-medium text-charcoal-500 mb-1">Full Name</label>
                 <input
                   type="text"
                   value={profileForm.full_name}
                   onChange={(e) => setProfileForm(prev => ({ ...prev, full_name: e.target.value }))}
-                  className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-4 py-2 text-white focus:border-steel-500 focus:outline-none"
+                  className="w-full bg-cloud-200 border border-charcoal-600 rounded-lg px-4 py-2 text-charcoal-800 focus:border-steel-500 focus:outline-none"
                   data-testid="input-full-name"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1">Company Name</label>
+                <label className="block text-sm font-medium text-charcoal-500 mb-1">Company Name</label>
                 <input
                   type="text"
                   value={profileForm.company_name}
                   onChange={(e) => setProfileForm(prev => ({ ...prev, company_name: e.target.value }))}
-                  className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-4 py-2 text-white focus:border-steel-500 focus:outline-none"
+                  className="w-full bg-cloud-200 border border-charcoal-600 rounded-lg px-4 py-2 text-charcoal-800 focus:border-steel-500 focus:outline-none"
                   data-testid="input-company-name"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1">Trade</label>
+                <label className="block text-sm font-medium text-charcoal-500 mb-1">Trade</label>
                 <select
                   value={profileForm.trade}
                   onChange={(e) => setProfileForm(prev => ({ ...prev, trade: e.target.value }))}
-                  className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-4 py-2 text-white focus:border-steel-500 focus:outline-none"
+                  className="w-full bg-cloud-200 border border-charcoal-600 rounded-lg px-4 py-2 text-charcoal-800 focus:border-steel-500 focus:outline-none"
                 >
                   <option value="">Select trade...</option>
                   <option value="General Contractor">General Contractor</option>
@@ -362,37 +362,37 @@ const SettingsPage = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1">Region</label>
+                <label className="block text-sm font-medium text-charcoal-500 mb-1">Region</label>
                 <input
                   type="text"
                   value={profileForm.region}
                   onChange={(e) => setProfileForm(prev => ({ ...prev, region: e.target.value }))}
-                  className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-4 py-2 text-white focus:border-steel-500 focus:outline-none"
+                  className="w-full bg-cloud-200 border border-charcoal-600 rounded-lg px-4 py-2 text-charcoal-800 focus:border-steel-500 focus:outline-none"
                   placeholder="e.g., Ontario, Canada"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1">Phone</label>
+                <label className="block text-sm font-medium text-charcoal-500 mb-1">Phone</label>
                 <input
                   type="tel"
                   value={profileForm.phone}
                   onChange={(e) => setProfileForm(prev => ({ ...prev, phone: e.target.value }))}
-                  className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-4 py-2 text-white focus:border-steel-500 focus:outline-none"
+                  className="w-full bg-cloud-200 border border-charcoal-600 rounded-lg px-4 py-2 text-charcoal-800 focus:border-steel-500 focus:outline-none"
                   placeholder="(555) 123-4567"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1">Email</label>
+                <label className="block text-sm font-medium text-charcoal-500 mb-1">Email</label>
                 <input
                   type="email"
                   value={user?.email || ''}
                   disabled
-                  className="w-full bg-charcoal-900 border border-charcoal-700 rounded-lg px-4 py-2 text-gray-500 cursor-not-allowed"
+                  className="w-full bg-charcoal-900 border border-cloud-300 rounded-lg px-4 py-2 text-charcoal-400 cursor-not-allowed"
                 />
-                <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
+                <p className="text-xs text-charcoal-400 mt-1">Email cannot be changed</p>
               </div>
             </div>
-            <div className="flex justify-end gap-3 pt-4 border-t border-charcoal-700">
+            <div className="flex justify-end gap-3 pt-4 border-t border-cloud-300">
               <button
                 onClick={() => {
                   setIsEditingProfile(false);
@@ -404,14 +404,14 @@ const SettingsPage = () => {
                     phone: profile?.phone || ''
                   });
                 }}
-                className="px-4 py-2 text-gray-400 hover:text-white transition-colors"
+                className="px-4 py-2 text-charcoal-500 hover:text-charcoal-800 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSaveProfile}
                 disabled={isSavingProfile}
-                className="bg-steel-500 hover:bg-steel-600 disabled:opacity-50 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+                className="bg-steel-500 hover:bg-steel-600 disabled:opacity-50 text-charcoal-800 px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
                 data-testid="save-profile-btn"
               >
                 {isSavingProfile ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
@@ -422,49 +422,49 @@ const SettingsPage = () => {
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <div>
-              <p className="text-gray-400 text-sm">Name</p>
-              <p className="text-white font-medium">{profile?.full_name || 'Not set'}</p>
+              <p className="text-charcoal-500 text-sm">Name</p>
+              <p className="text-charcoal-800 font-medium">{profile?.full_name || 'Not set'}</p>
             </div>
             <div>
-              <p className="text-gray-400 text-sm">Email</p>
-              <p className="text-white font-medium">{user?.email}</p>
+              <p className="text-charcoal-500 text-sm">Email</p>
+              <p className="text-charcoal-800 font-medium">{user?.email}</p>
             </div>
             <div>
-              <p className="text-gray-400 text-sm">Company</p>
-              <p className="text-white font-medium">{profile?.company_name || 'Not set'}</p>
+              <p className="text-charcoal-500 text-sm">Company</p>
+              <p className="text-charcoal-800 font-medium">{profile?.company_name || 'Not set'}</p>
             </div>
             <div>
-              <p className="text-gray-400 text-sm">Trade</p>
-              <p className="text-white font-medium">{profile?.trade || 'Not set'}</p>
+              <p className="text-charcoal-500 text-sm">Trade</p>
+              <p className="text-charcoal-800 font-medium">{profile?.trade || 'Not set'}</p>
             </div>
             <div>
-              <p className="text-gray-400 text-sm">Region</p>
-              <p className="text-white font-medium">{profile?.region || 'Not set'}</p>
+              <p className="text-charcoal-500 text-sm">Region</p>
+              <p className="text-charcoal-800 font-medium">{profile?.region || 'Not set'}</p>
             </div>
             <div>
-              <p className="text-gray-400 text-sm">Phone</p>
-              <p className="text-white font-medium">{profile?.phone || 'Not set'}</p>
+              <p className="text-charcoal-500 text-sm">Phone</p>
+              <p className="text-charcoal-800 font-medium">{profile?.phone || 'Not set'}</p>
             </div>
           </div>
         )}
       </div>
 
       {/* Subscription & Billing */}
-      <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6">
-        <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-4">
+      <div className="bg-white rounded-xl border border-cloud-300 p-6">
+        <h2 className="text-lg font-semibold text-charcoal-800 flex items-center gap-2 mb-4">
           <CreditCard className="w-5 h-5 text-steel-400" />
           Subscription & Billing
         </h2>
         
-        <div className="bg-charcoal-700/50 rounded-lg p-4 mb-6">
+        <div className="bg-cloud-200/50 rounded-lg p-4 mb-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-400 text-sm">Your current plan</p>
+              <p className="text-charcoal-500 text-sm">Your current plan</p>
               <p className={`text-xl font-bold ${planStatus.color}`}>{planStatus.name}</p>
             </div>
             <div className="text-right">
               {planStatus.endDate && (
-                <p className="text-gray-400 text-sm flex items-center gap-1">
+                <p className="text-charcoal-500 text-sm flex items-center gap-1">
                   <Clock className="w-4 h-4" />
                   {planStatus.name === 'Trial' ? 'Trial ends' : 'Renews'}: {planStatus.endDate}
                 </p>
@@ -483,10 +483,10 @@ const SettingsPage = () => {
             <div className={`rounded-lg border p-4 ${
               profile?.subscription_tier === 'pro' ? 'border-steel-500 bg-steel-500/10' : 'border-charcoal-600'
             }`}>
-              <h3 className="text-lg font-bold text-white">Pro</h3>
-              <p className="text-gray-400 text-sm mb-2">For growing trades getting organized.</p>
-              <p className="text-2xl font-bold text-white mb-4">
-                $49<span className="text-sm text-gray-400">/month</span>
+              <h3 className="text-lg font-bold text-charcoal-800">Pro</h3>
+              <p className="text-charcoal-500 text-sm mb-2">For growing trades getting organized.</p>
+              <p className="text-2xl font-bold text-charcoal-800 mb-4">
+                $49<span className="text-sm text-charcoal-500">/month</span>
               </p>
               <ul className="space-y-2 text-sm text-gray-300 mb-4">
                 <li className="flex items-center gap-2"><Check className="w-4 h-4 text-success" /> Unlimited projects</li>
@@ -498,7 +498,7 @@ const SettingsPage = () => {
                 <button
                   onClick={() => handleUpgrade('pro')}
                   disabled={isUpgrading}
-                  className="w-full bg-steel-500 hover:bg-steel-600 disabled:opacity-50 text-white py-2 rounded-lg font-medium transition-colors"
+                  className="w-full bg-steel-500 hover:bg-steel-600 disabled:opacity-50 text-charcoal-800 py-2 rounded-lg font-medium transition-colors"
                 >
                   {isUpgrading && upgradingPlan === 'pro' ? (
                     <Loader2 className="w-5 h-5 animate-spin mx-auto" />
@@ -517,12 +517,12 @@ const SettingsPage = () => {
               profile?.subscription_tier === 'elite' ? 'border-purple-500 bg-purple-500/10' : 'border-charcoal-600'
             }`}>
               <div className="flex items-center gap-2 mb-1">
-                <h3 className="text-lg font-bold text-white">Elite</h3>
+                <h3 className="text-lg font-bold text-charcoal-800">Elite</h3>
                 <Crown className="w-4 h-4 text-warning" />
               </div>
-              <p className="text-gray-400 text-sm mb-2">For contractors running serious operations.</p>
-              <p className="text-2xl font-bold text-white mb-4">
-                $99<span className="text-sm text-gray-400">/month</span>
+              <p className="text-charcoal-500 text-sm mb-2">For contractors running serious operations.</p>
+              <p className="text-2xl font-bold text-charcoal-800 mb-4">
+                $99<span className="text-sm text-charcoal-500">/month</span>
               </p>
               <ul className="space-y-2 text-sm text-gray-300 mb-4">
                 <li className="flex items-center gap-2"><Check className="w-4 h-4 text-success" /> Everything in Pro</li>
@@ -534,7 +534,7 @@ const SettingsPage = () => {
                 <button
                   onClick={() => handleUpgrade('elite')}
                   disabled={isUpgrading}
-                  className="w-full bg-purple-500 hover:bg-purple-600 disabled:opacity-50 text-white py-2 rounded-lg font-medium transition-colors"
+                  className="w-full bg-purple-500 hover:bg-purple-600 disabled:opacity-50 text-charcoal-800 py-2 rounded-lg font-medium transition-colors"
                 >
                   {isUpgrading && upgradingPlan === 'elite' ? (
                     <Loader2 className="w-5 h-5 animate-spin mx-auto" />
@@ -554,21 +554,21 @@ const SettingsPage = () => {
       </div>
 
       {/* Invoice Defaults */}
-      <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6">
-        <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-4">
+      <div className="bg-white rounded-xl border border-cloud-300 p-6">
+        <h2 className="text-lg font-semibold text-charcoal-800 flex items-center gap-2 mb-4">
           <FileText className="w-5 h-5 text-steel-400" />
           Invoice Defaults
         </h2>
         
         <div className="max-w-xs">
-          <label className="block text-sm font-medium text-gray-400 mb-2">
+          <label className="block text-sm font-medium text-charcoal-500 mb-2">
             Default Payment Terms (days)
           </label>
           <div className="flex items-center gap-3">
             <select
               value={defaultPaymentDays}
               onChange={(e) => setDefaultPaymentDays(parseInt(e.target.value))}
-              className="flex-1 bg-charcoal-700 border border-charcoal-600 rounded-lg px-4 py-2 text-white"
+              className="flex-1 bg-cloud-200 border border-charcoal-600 rounded-lg px-4 py-2 text-charcoal-800"
             >
               <option value={7}>Net 7</option>
               <option value={14}>Net 14</option>
@@ -580,7 +580,7 @@ const SettingsPage = () => {
             <button
               onClick={handleSaveDefaults}
               disabled={isSavingDefaults}
-              className="bg-steel-500 hover:bg-steel-600 disabled:opacity-50 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+              className="bg-steel-500 hover:bg-steel-600 disabled:opacity-50 text-charcoal-800 px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
             >
               {isSavingDefaults ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -595,23 +595,23 @@ const SettingsPage = () => {
       </div>
 
       {/* Labor Rate */}
-      <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6" id="labor-rate">
-        <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-4">
+      <div className="bg-white rounded-xl border border-cloud-300 p-6" id="labor-rate">
+        <h2 className="text-lg font-semibold text-charcoal-800 flex items-center gap-2 mb-4">
           <DollarSign className="w-5 h-5 text-steel-400" />
           Labor Rate
         </h2>
         
-        <p className="text-gray-400 text-sm mb-4">
+        <p className="text-charcoal-500 text-sm mb-4">
           Set your hourly labor rate for accurate estimate calculations. Include your overhead and desired profit margin.
         </p>
         
         <div className="max-w-xs">
-          <label className="block text-sm font-medium text-gray-400 mb-2">
+          <label className="block text-sm font-medium text-charcoal-500 mb-2">
             Hourly Rate ($/hr)
           </label>
           <div className="flex items-center gap-3">
             <div className="relative flex-1">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-charcoal-400">$</span>
               <input
                 type="number"
                 value={laborRate}
@@ -619,14 +619,14 @@ const SettingsPage = () => {
                 placeholder="75.00"
                 min="0"
                 step="0.01"
-                className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg pl-8 pr-4 py-2 text-white focus:border-steel-500 focus:outline-none"
+                className="w-full bg-cloud-200 border border-charcoal-600 rounded-lg pl-8 pr-4 py-2 text-charcoal-800 focus:border-steel-500 focus:outline-none"
                 data-testid="input-labor-rate"
               />
             </div>
             <button
               onClick={handleSaveLaborRate}
               disabled={!laborRate}
-              className="bg-steel-500 hover:bg-steel-600 disabled:opacity-50 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+              className="bg-steel-500 hover:bg-steel-600 disabled:opacity-50 text-charcoal-800 px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
               data-testid="save-labor-rate-btn"
             >
               {laborRateSaved ? (
@@ -636,15 +636,15 @@ const SettingsPage = () => {
               )}
             </button>
           </div>
-          <p className="text-xs text-gray-500 mt-2">
+          <p className="text-xs text-charcoal-400 mt-2">
             Tip: Your fully loaded labor cost should include wages, benefits, insurance, and overhead.
           </p>
         </div>
       </div>
 
       {/* Notifications */}
-      <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6">
-        <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-4">
+      <div className="bg-white rounded-xl border border-cloud-300 p-6">
+        <h2 className="text-lg font-semibold text-charcoal-800 flex items-center gap-2 mb-4">
           <Bell className="w-5 h-5 text-steel-400" />
           Notifications
         </h2>
@@ -657,13 +657,13 @@ const SettingsPage = () => {
           ].map(({ key, label, description }) => (
             <div key={key} className="flex items-center justify-between">
               <div>
-                <p className="text-white font-medium">{label}</p>
-                <p className="text-gray-400 text-sm">{description}</p>
+                <p className="text-charcoal-800 font-medium">{label}</p>
+                <p className="text-charcoal-500 text-sm">{description}</p>
               </div>
               <button
                 onClick={() => handleNotificationChange(key, !notifications[key])}
                 className={`w-12 h-6 rounded-full transition-colors ${
-                  notifications[key] ? 'bg-steel-500' : 'bg-charcoal-600'
+                  notifications[key] ? 'bg-steel-500' : 'bg-cloud-100'
                 }`}
               >
                 <div className={`w-5 h-5 bg-white rounded-full transition-transform ${
@@ -676,8 +676,8 @@ const SettingsPage = () => {
       </div>
 
       {/* Security Section */}
-      <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6">
-        <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-4">
+      <div className="bg-white rounded-xl border border-cloud-300 p-6">
+        <h2 className="text-lg font-semibold text-charcoal-800 flex items-center gap-2 mb-4">
           <Shield className="w-5 h-5 text-steel-400" />
           Security
         </h2>
@@ -685,40 +685,40 @@ const SettingsPage = () => {
         {isChangingPassword ? (
           <div className="space-y-4 max-w-md">
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">New Password</label>
+              <label className="block text-sm font-medium text-charcoal-500 mb-1">New Password</label>
               <div className="relative">
                 <input
                   type={showPasswords.new ? 'text' : 'password'}
                   value={passwordForm.newPassword}
                   onChange={(e) => setPasswordForm(prev => ({ ...prev, newPassword: e.target.value }))}
-                  className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-4 py-2 pr-10 text-white focus:border-steel-500 focus:outline-none"
+                  className="w-full bg-cloud-200 border border-charcoal-600 rounded-lg px-4 py-2 pr-10 text-charcoal-800 focus:border-steel-500 focus:outline-none"
                   placeholder="Enter new password"
                   data-testid="input-new-password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPasswords(prev => ({ ...prev, new: !prev.new }))}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-charcoal-500 hover:text-charcoal-800"
                 >
                   {showPasswords.new ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">Confirm New Password</label>
+              <label className="block text-sm font-medium text-charcoal-500 mb-1">Confirm New Password</label>
               <div className="relative">
                 <input
                   type={showPasswords.confirm ? 'text' : 'password'}
                   value={passwordForm.confirmPassword}
                   onChange={(e) => setPasswordForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                  className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-4 py-2 pr-10 text-white focus:border-steel-500 focus:outline-none"
+                  className="w-full bg-cloud-200 border border-charcoal-600 rounded-lg px-4 py-2 pr-10 text-charcoal-800 focus:border-steel-500 focus:outline-none"
                   placeholder="Confirm new password"
                   data-testid="input-confirm-password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPasswords(prev => ({ ...prev, confirm: !prev.confirm }))}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-charcoal-500 hover:text-charcoal-800"
                 >
                   {showPasswords.confirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -730,14 +730,14 @@ const SettingsPage = () => {
                   setIsChangingPassword(false);
                   setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
                 }}
-                className="px-4 py-2 text-gray-400 hover:text-white transition-colors"
+                className="px-4 py-2 text-charcoal-500 hover:text-charcoal-800 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleChangePassword}
                 disabled={isSavingPassword || !passwordForm.newPassword || !passwordForm.confirmPassword}
-                className="bg-steel-500 hover:bg-steel-600 disabled:opacity-50 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+                className="bg-steel-500 hover:bg-steel-600 disabled:opacity-50 text-charcoal-800 px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
                 data-testid="save-password-btn"
               >
                 {isSavingPassword ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
@@ -748,7 +748,7 @@ const SettingsPage = () => {
         ) : (
           <button
             onClick={() => setIsChangingPassword(true)}
-            className="text-gray-300 hover:text-white py-2 border-b border-charcoal-700 w-full text-left"
+            className="text-gray-300 hover:text-charcoal-800 py-2 border-b border-cloud-300 w-full text-left"
             data-testid="change-password-btn"
           >
             Change password
@@ -757,12 +757,12 @@ const SettingsPage = () => {
       </div>
 
       {/* Danger Zone */}
-      <div className="bg-charcoal-800 rounded-xl border border-risk/30 p-6">
+      <div className="bg-white rounded-xl border border-risk/30 p-6">
         <h2 className="text-lg font-semibold text-risk flex items-center gap-2 mb-4">
           <AlertTriangle className="w-5 h-5" />
           Danger Zone
         </h2>
-        <p className="text-gray-400 text-sm mb-4">
+        <p className="text-charcoal-500 text-sm mb-4">
           Once you delete your account, there is no going back. All your data including projects, invoices, and expenses will be permanently deleted.
         </p>
         <button 
@@ -778,21 +778,21 @@ const SettingsPage = () => {
       {/* Delete Account Modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 w-full max-w-md p-6">
+          <div className="bg-white rounded-xl border border-cloud-300 w-full max-w-md p-6">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 bg-risk/20 rounded-full flex items-center justify-center">
                 <AlertTriangle className="w-6 h-6 text-risk" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-white">Delete Account</h3>
-                <p className="text-gray-400 text-sm">This action cannot be undone</p>
+                <h3 className="text-lg font-semibold text-charcoal-800">Delete Account</h3>
+                <p className="text-charcoal-500 text-sm">This action cannot be undone</p>
               </div>
             </div>
             
             <p className="text-gray-300 mb-4">
               This will permanently delete your account and all associated data including:
             </p>
-            <ul className="text-gray-400 text-sm mb-6 space-y-1">
+            <ul className="text-charcoal-500 text-sm mb-6 space-y-1">
               <li>• All projects and milestones</li>
               <li>• All invoices and expenses</li>
               <li>• All change orders</li>
@@ -800,14 +800,14 @@ const SettingsPage = () => {
             </ul>
             
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-400 mb-1">
+              <label className="block text-sm font-medium text-charcoal-500 mb-1">
                 Type <span className="text-risk font-bold">DELETE</span> to confirm
               </label>
               <input
                 type="text"
                 value={deleteConfirmText}
                 onChange={(e) => setDeleteConfirmText(e.target.value)}
-                className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-4 py-2 text-white focus:border-risk focus:outline-none"
+                className="w-full bg-cloud-200 border border-charcoal-600 rounded-lg px-4 py-2 text-charcoal-800 focus:border-risk focus:outline-none"
                 placeholder="DELETE"
                 data-testid="delete-confirm-input"
               />
@@ -819,14 +819,14 @@ const SettingsPage = () => {
                   setShowDeleteModal(false);
                   setDeleteConfirmText('');
                 }}
-                className="flex-1 px-4 py-2 text-gray-400 hover:text-white transition-colors border border-charcoal-600 rounded-lg"
+                className="flex-1 px-4 py-2 text-charcoal-500 hover:text-charcoal-800 transition-colors border border-charcoal-600 rounded-lg"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDeleteAccount}
                 disabled={isDeleting || deleteConfirmText !== 'DELETE'}
-                className="flex-1 bg-risk hover:bg-risk/80 disabled:opacity-50 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+                className="flex-1 bg-risk hover:bg-risk/80 disabled:opacity-50 text-charcoal-800 px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
                 data-testid="confirm-delete-btn"
               >
                 {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
