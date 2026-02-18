@@ -186,7 +186,7 @@ const SetupProgressChecklist = () => {
                 stroke="currentColor"
                 strokeWidth="4"
                 fill="none"
-                className="text-slate-500/30"
+                className="text-charcoal-700"
               />
               <circle
                 cx="24"
@@ -196,7 +196,7 @@ const SetupProgressChecklist = () => {
                 strokeWidth="4"
                 fill="none"
                 strokeDasharray={`${progressPercent * 1.26} 126`}
-                className={isComplete ? 'text-success' : 'text-slate-200'}
+                className={isComplete ? 'text-success' : 'text-steel-400'}
               />
             </svg>
             <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white">
