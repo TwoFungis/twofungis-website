@@ -191,6 +191,7 @@ const ProjectDetailPage = () => {
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: ClipboardList },
+    { id: 'materials', label: 'Materials', icon: Package },
     { id: 'milestones', label: 'Milestones', icon: Flag, count: milestones.length },
     { id: 'invoices', label: 'Invoices', icon: Receipt, count: invoices.length },
     { id: 'change-orders', label: 'Change Orders', icon: FileText, count: changeOrders.length },
