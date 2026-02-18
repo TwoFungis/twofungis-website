@@ -185,9 +185,21 @@ const AppLayout = () => {
           </div>
         </header>
 
-        {/* Page Content */}
-        <main className="flex-1 p-4 lg:p-8 pb-20 lg:pb-8 overflow-auto">
-          <Outlet />
+        {/* Page Content with Shield Backdrop */}
+        <main className="flex-1 p-4 lg:p-8 pb-20 lg:pb-8 overflow-auto relative">
+          {/* Shield Watermark */}
+          <div 
+            className="fixed bottom-0 right-0 w-96 h-96 opacity-[0.02] pointer-events-none z-0"
+            style={{
+              backgroundImage: 'url(/logo.png)',
+              backgroundSize: 'contain',
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'bottom right'
+            }}
+          />
+          <div className="relative z-10">
+            <Outlet />
+          </div>
         </main>
 
         {/* Mobile Bottom Nav */}
