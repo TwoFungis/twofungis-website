@@ -295,11 +295,14 @@ const ReportsPage = () => {
 
   return (
     <div className="space-y-6" data-testid="reports-page">
-      {/* Header */}
+      {/* Header with Shield */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl lg:text-3xl font-bold text-white">Reports</h1>
-          <p className="text-gray-400">Advanced analytics and KPI tracking</p>
+        <div className="flex items-center gap-4">
+          <img src="/shield-icon.png" alt="" className="w-10 h-10 opacity-30 hidden lg:block" />
+          <div>
+            <h1 className="text-2xl lg:text-3xl font-bold text-charcoal-800">Reports</h1>
+            <p className="text-charcoal-600">Advanced analytics and KPI tracking</p>
+          </div>
         </div>
         <div className="flex items-center gap-3">
           <select
