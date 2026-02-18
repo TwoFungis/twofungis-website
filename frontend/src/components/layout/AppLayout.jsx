@@ -50,6 +50,7 @@ const AppLayout = () => {
   ];
 
   const quickActions = [
+    { label: 'Quick Expense', action: () => setShowQuickExpenseModal(true), icon: Wallet, highlight: true },
     { label: 'New Estimate', path: '/app/estimating?new=true', icon: FileSpreadsheet },
     { label: 'New Project', path: '/app/projects?new=true', icon: FolderKanban },
     { label: 'New Change Order', path: '/app/change-orders?new=true', icon: FileText },
