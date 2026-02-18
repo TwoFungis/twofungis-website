@@ -301,10 +301,34 @@ const ExpensesPage = () => {
                         </button>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-right">
-                      <button className="text-gray-400 hover:text-white p-1">
+                    <td className="px-6 py-4 text-right relative">
+                      <button 
+                        onClick={() => setActiveActionMenu(activeActionMenu === expense.id ? null : expense.id)}
+                        className="text-gray-400 hover:text-white p-1"
+                        data-testid={`expense-actions-${expense.id}`}
+                      >
                         <MoreVertical className="w-4 h-4" />
                       </button>
+                      
+                      {activeActionMenu === expense.id && (
+                        <>
+                          <div className="fixed inset-0 z-40" onClick={() => setActiveActionMenu(null)} />
+                          <div className="absolute right-0 mt-1 w-36 bg-charcoal-700 rounded-lg shadow-xl border border-charcoal-600 py-1 z-50">
+                            <button
+                              onClick={() => handleEditExpense(expense)}
+                              className="w-full px-4 py-2 text-left text-sm text-white hover:bg-charcoal-600 flex items-center gap-2"
+                            >
+                              <Edit2 className="w-4 h-4" /> Edit
+                            </button>
+                            <button
+                              onClick={() => handleDeleteExpense(expense.id)}
+                              className="w-full px-4 py-2 text-left text-sm text-risk hover:bg-charcoal-600 flex items-center gap-2"
+                            >
+                              <Trash2 className="w-4 h-4" /> Delete
+                            </button>
+                          </div>
+                        </>
+                      )}
                     </td>
                   </tr>
                 );
