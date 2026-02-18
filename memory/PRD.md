@@ -11,45 +11,30 @@
 
 ## What's Been Implemented (Feb 18, 2026)
 
-### ✅ Light Cloud Grey Theme (NEW - Completed)
-- Changed dark backdrop to light cloud grey (#f4f6f8)
-- Cards are white with light borders
-- Dark charcoal sidebar retained for contrast
-- White header with subtle shadow
-- All text colors adjusted for readability
+### ✅ Theme: Light Background + Dark Cards
+- Light cloud grey background (#f4f6f8)
+- Dark charcoal cards for content
+- Dark sidebar for contrast
+- Larger TRADEOS™ logo with text in sidebar
 
-### ✅ Materials System - Phase 1 (NEW - Completed)
+### ✅ Materials System (Phase 1 - Complete)
 **Materials Tab in Projects:**
 - Summary panel: Pre-Tax Total, Tax Total, Total w/ Tax, Billable, Non-Billable
-- Add Material form with all fields:
-  - Item Name, Category, Vendor
-  - Qty, Unit, Unit Cost
-  - Tax Type, Tax Amount
-  - Purchased Date, Paid Status
-  - Billable toggle, Markup %
-  - Notes
+- Full CRUD for materials with categories: Materials, Consumables, Tools, Equipment, Rental, Delivery
+- Units: Each, Box, Sheet, Linear Ft, Sq Ft, Hours, Days, Gallon, Pound, Other
+- Tax types: GST, PST, HST, Sales Tax, None
+- Billable toggle with markup percentage
 
-**Material Categories:**
-- Materials, Consumables, Tools, Equipment, Rental, Delivery
-
-**Units:**
-- Each, Box, Sheet, Linear Ft, Sq Ft, Hours, Days, Gallon, Pound, Other
-
-**Backend API:**
-- `/api/materials` - CRUD operations
-- `/api/materials/project/{id}/summary` - Project summary
-- `/api/materials/categories/list` - Category/unit lists
-
-### ✅ Enhanced Expense Categories (NEW - Completed)
-**Contractor-Focused Categories:**
-| Category | Deductibility |
-|----------|---------------|
+### ✅ Enhanced Expenses (Phase 2 - Complete)
+**14 Contractor-Focused Categories:**
+| Category | Default Deductibility |
+|----------|----------------------|
 | Materials (COGS) | 100% |
 | Consumables | 100% |
 | Tools (<$500) | 100% |
 | Equipment (Capital) | 100% |
 | Vehicle & Fuel | 100% |
-| Meals & Entertainment | **50%** |
+| **Meals & Entertainment** | **50%** |
 | Subcontractors | 100% |
 | Insurance | 100% |
 | Office/Admin | 100% |
@@ -59,28 +44,32 @@
 | Rent/Shop | 100% |
 | Other | 100% |
 
+**New API Endpoints:**
+- `/api/expenses/categories/list` - Returns categories with deductibility
+- `/api/expenses/summary/monthly` - Monthly expense summary
+- `/api/expenses/summary/quarterly` - Quarterly expense summary
+
+### ✅ Tax Summary Page (Phase 3 - Complete)
+**Features:**
+- Monthly / Quarterly / Yearly view toggle
+- Year and Month/Quarter selectors
+- Tax Rate selector (15%, 20%, 25%, 30%, 35%, 40%)
+- Summary cards: Revenue, Expenses, Deductible, Tax Paid
+- Tax Projection panel with:
+  - Estimated Tax Owing
+  - Net Income (Revenue - Expenses)
+  - Recommended Set-Aside
+- Expenses by Category breakdown with visual bars
+- Export CSV functionality
+- Disclaimer: "Estimates only — confirm with your accountant."
+
 ### ✅ Previous Implementations
 - Beta Trial Strategy (30-day trial, setup checklist, countdown)
 - Dashboard 3-Zone Layout
-- Project Page Financial Health Panel
+- Project Page with Financial Health Panel + Tabs
 - Invoicing System
 - Milestone Management
 - Expenses API
-
----
-
-## Database Migration Required
-
-**Run in Supabase SQL Editor:**
-```
-/app/migrations/008_materials_and_expenses.sql
-```
-
-This creates:
-- `materials` table with all columns
-- RLS policies for security
-- Indexes for performance
-- Enhanced `expenses` columns (deductibility, business/personal)
 
 ---
 
@@ -96,95 +85,101 @@ This creates:
 
 ## API Endpoints
 
-### Materials API (NEW)
+### Materials API
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/api/materials` | GET | List materials with filters |
-| `/api/materials` | POST | Create material |
-| `/api/materials/{id}` | GET | Get material |
-| `/api/materials/{id}` | PATCH | Update material |
-| `/api/materials/{id}` | DELETE | Delete material |
-| `/api/materials/project/{id}/summary` | GET | Project materials summary |
-| `/api/materials/categories/list` | GET | Get valid categories/units |
+| `/api/materials` | GET/POST | List/Create materials |
+| `/api/materials/{id}` | GET/PATCH/DELETE | CRUD operations |
+| `/api/materials/project/{id}/summary` | GET | Project summary |
+| `/api/materials/categories/list` | GET | Categories/units list |
+
+### Expenses API (Enhanced)
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/expenses` | GET/POST | List/Create expenses |
+| `/api/expenses/categories/list` | GET | Categories with deductibility |
+| `/api/expenses/summary/monthly` | GET | Monthly summary |
+| `/api/expenses/summary/quarterly` | GET | Quarterly summary |
+| `/api/expenses/summary/tax` | GET | Yearly tax summary |
 
 ### Other APIs
 - Invoices: `/api/invoices/*`
 - Milestones: `/api/milestones/*`
-- Expenses: `/api/expenses/*`
 - Trial: `/api/trial/*`
 
 ---
 
 ## Color System
 
-### Light Theme
 | Element | Color |
 |---------|-------|
-| Main Background | `cloud-100` (#f4f6f8) |
-| Cards/Header | `white` |
-| Card Borders | `cloud-300` (#dde2e8) |
-| Input Backgrounds | `cloud-100` |
-
-### Dark Accents
-| Element | Color |
-|---------|-------|
+| Background | `cloud-100` (#f4f6f8) |
+| Cards | `charcoal-800` (#1a1a1a) |
 | Sidebar | `charcoal-800` (#1a1a1a) |
-| Primary Text | `charcoal-800` (#1a1a1a) |
-| Secondary Text | `charcoal-500` |
+| Card Borders | `charcoal-700` |
+| Primary Button | `steel-500` |
+| Success | `success` (green) |
+| Warning | `warning` (amber) |
+| Risk | `risk` (red) |
 
-### Accent Colors
-| Color | Use |
-|-------|-----|
-| `steel-500` | Primary buttons, links |
-| `success` | Positive values, completed |
-| `warning` | Caution, pending |
-| `risk` | Errors, overdue |
+---
+
+## Navigation Structure
+1. Dashboard
+2. Projects
+3. Estimates
+4. Change Orders
+5. Milestones
+6. Invoices
+7. Expenses
+8. Document Vault
+9. **Tax Summary** (NEW)
+10. Reports
+11. Settings
+
+---
+
+## Testing Status
+- ✅ Theme (Light bg + Dark cards): 100%
+- ✅ Sidebar Logo: 100%
+- ✅ Materials Tab: 100%
+- ✅ Tax Summary Page: 100%
+- ✅ Enhanced Expenses API: 100%
 
 ---
 
 ## Backlog
 
-### Phase 2 - Enhanced Expenses (In Progress)
-- [x] Update expense categories for contractors
-- [ ] Add deductibility % field
-- [ ] Add business/personal toggle
-- [ ] Quick Add Expense from any page
-
-### Phase 3 - Tax Summary & Reports
-- [ ] Tax Summary page (Monthly/Quarterly)
-- [ ] Revenue, Expenses, Deductible totals
-- [ ] Reports: Materials by Project, Expenses by Category
-- [ ] PDF/CSV export
-
-### P0 - Invoice Hardening
-- [ ] Automatic overdue calculation
+### P0 - Invoice Hardening (Next)
+- [ ] Automatic overdue status calculation
 - [ ] Global Receivables Report
+
+### P1 - Reports Enhancement
+- [ ] Materials by Project report
+- [ ] PDF export for reports
+
+### P2 - Quick Add Expense
+- [ ] Global "Quick Add Expense" button
 
 ---
 
 ## Files Reference
 
-### Theme/Layout
-- `/app/frontend/tailwind.config.js` - Cloud colors
-- `/app/frontend/src/components/layout/AppLayout.jsx` - Light header
+### Tax Summary
+- `/app/frontend/src/pages/app/TaxSummaryPage.jsx`
 
-### Materials System
+### Materials
 - `/app/frontend/src/components/project/MaterialsTab.jsx`
 - `/app/backend/routes/materials.py`
+
+### Expenses
+- `/app/backend/routes/expenses.py`
+
+### Layout
+- `/app/frontend/src/components/layout/AppLayout.jsx`
+
+### Migrations
 - `/app/migrations/008_materials_and_expenses.sql`
-
-### Core Pages
-- `/app/frontend/src/pages/app/DashboardPage.jsx`
-- `/app/frontend/src/pages/app/ProjectDetailPage.jsx`
-- `/app/frontend/src/pages/app/ExpensesPage.jsx`
-
----
-
-## Testing Status
-- ✅ Light Theme: 100%
-- ✅ Materials Tab UI: 100%
-- ✅ Materials API: 100% (needs DB migration)
-- ✅ Enhanced Expense Categories: 100%
 
 ---
 
@@ -196,6 +191,7 @@ This creates:
 ## Version History
 | Date | Version | Changes |
 |------|---------|---------|
-| Feb 18, 2026 | 2.5 | **Light Cloud Grey Theme**, Materials System Phase 1, Enhanced Expense Categories |
+| Feb 18, 2026 | 2.6 | **Phase 2 & 3**: Enhanced Expenses (14 categories + deductibility), Tax Summary Page |
+| Feb 18, 2026 | 2.5 | Light background theme, Materials System Phase 1 |
 | Feb 18, 2026 | 2.4 | Beta Trial Strategy |
 | Feb 18, 2026 | 2.3 | Dashboard/Project restructure |
