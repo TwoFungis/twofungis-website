@@ -152,11 +152,14 @@ const TaxSummaryPage = () => {
 
   return (
     <div className="space-y-6" data-testid="tax-summary-page">
-      {/* Header */}
+      {/* Header with Shield */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-charcoal-800">Tax Summary</h1>
-          <p className="text-charcoal-500 text-sm mt-1">Track expenses, deductions, and tax obligations</p>
+        <div className="flex items-center gap-4">
+          <img src="/shield-icon.png" alt="" className="w-10 h-10 opacity-30 hidden lg:block" />
+          <div>
+            <h1 className="text-2xl font-bold text-charcoal-800">Tax Summary</h1>
+            <p className="text-charcoal-600 text-sm mt-1">Track expenses, deductions, and tax obligations</p>
+          </div>
         </div>
         
         <div className="flex items-center gap-3">
