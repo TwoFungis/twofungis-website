@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { User, CreditCard, Bell, Shield, ShieldCheck, Check, Loader2, Crown, FileText, Save, MapPin, X, Sparkles, ExternalLink, Clock, Users, Eye, EyeOff } from 'lucide-react';
+import { useSearchParams, Link } from 'react-router-dom';
+import { User, CreditCard, Bell, Shield, ShieldCheck, Check, Loader2, Crown, FileText, Save, MapPin, X, Sparkles, ExternalLink, Clock, Users, Eye, EyeOff, Edit2 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { supabase } from '../../lib/supabase';
 
@@ -366,10 +366,76 @@ const SettingsPage = () => {
                   <p className="text-white">{profile?.phone || 'Not set'}</p>
                 </div>
               </div>
-              <button className="bg-charcoal-700 hover:bg-charcoal-600 text-white px-4 py-2 rounded-lg font-medium transition-colors mt-4">
+              <Link 
+                to="/app/profile" 
+                className="bg-charcoal-700 hover:bg-charcoal-600 text-white px-4 py-2 rounded-lg font-medium transition-colors mt-4 inline-flex items-center gap-2"
+                data-testid="edit-profile-btn"
+              >
+                <Edit2 className="w-4 h-4" />
                 Edit Profile
-              </button>
+              </Link>
             </div>
+          </div>
+
+          {/* Verification Section */}
+          <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-steel-400" />
+                Marketplace Verification
+              </h2>
+              <div className="flex items-center gap-2">
+                {verificationStatus?.level > 0 ? (
+                  <span className={`px-2 py-1 rounded text-xs font-medium ${
+                    verificationStatus.level === 4 ? 'bg-warning/20 text-warning' :
+                    verificationStatus.level >= 3 ? 'bg-green-500/20 text-green-400' :
+                    verificationStatus.level >= 2 ? 'bg-teal-500/20 text-teal-400' :
+                    'bg-blue-500/20 text-blue-400'
+                  }`}>
+                    Level {verificationStatus.level}
+                  </span>
+                ) : (
+                  <span className="px-2 py-1 bg-gray-500/20 text-gray-400 rounded text-xs">Not Verified</span>
+                )}
+              </div>
+            </div>
+            
+            <p className="text-gray-400 text-sm mb-4">
+              Get verified to increase your visibility in the marketplace and build trust with potential clients.
+            </p>
+            
+            <div className="grid grid-cols-4 gap-3 mb-4">
+              {[
+                { level: 1, name: 'Identity', color: 'blue' },
+                { level: 2, name: 'Trade', color: 'teal' },
+                { level: 3, name: 'Insured', color: 'green' },
+                { level: 4, name: 'Full', color: 'warning' }
+              ].map(({ level, name, color }) => (
+                <div 
+                  key={level}
+                  className={`p-3 rounded-lg text-center ${
+                    (verificationStatus?.level || 0) >= level 
+                      ? `bg-${color === 'warning' ? 'warning' : color}-500/20 border border-${color === 'warning' ? 'warning' : color}-500/50` 
+                      : 'bg-charcoal-700'
+                  }`}
+                >
+                  <div className={`text-lg font-bold ${
+                    (verificationStatus?.level || 0) >= level ? `text-${color === 'warning' ? 'warning' : color}-400` : 'text-gray-500'
+                  }`}>{level}</div>
+                  <div className="text-xs text-gray-400">{name}</div>
+                </div>
+              ))}
+            </div>
+            
+            <Link 
+              to="/app/verification" 
+              className="bg-steel-500 hover:bg-steel-600 text-white px-4 py-2 rounded-lg font-medium transition-colors inline-flex items-center gap-2"
+              data-testid="verification-center-btn"
+            >
+              <ShieldCheck className="w-4 h-4" />
+              Get Verified
+              <ExternalLink className="w-3 h-3" />
+            </Link>
           </div>
 
           {/* Subscription Section */}
