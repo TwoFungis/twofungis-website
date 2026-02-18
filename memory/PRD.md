@@ -200,19 +200,49 @@ SENDER_EMAIL=invoices@yourdomain.com
 
 ### Critical
 1. **Run SQL Migration:** Execute `/app/migrations/003_stripe_lifetime_plan.sql` in Supabase SQL Editor
-2. **Add Real Stripe Keys:** Update `STRIPE_SECRET_KEY` in `/app/backend/.env`
-3. **Add Supabase Service Key:** Update `SUPABASE_SERVICE_KEY` in `/app/backend/.env`
-4. **Set Up Stripe Webhook:** Configure webhook URL in Stripe Dashboard pointing to `/api/stripe/webhook`
+2. **Run Marketplace V2 Migration:** Execute `/app/migrations/004_marketplace_v2.sql` in Supabase SQL Editor
+3. **Add Real Stripe Keys:** Update `STRIPE_SECRET_KEY` in `/app/backend/.env`
+4. **Add Supabase Service Key:** Update `SUPABASE_SERVICE_KEY` in `/app/backend/.env`
+5. **Set Up Stripe Webhook:** Configure webhook URL in Stripe Dashboard pointing to `/api/stripe/webhook`
+
+---
+
+## What's Been Implemented (February 18, 2026 - Latest)
+
+### ✅ Marketplace V2 - Enhanced Contractor Directory
+- **Clickable Contractor Cards:** Cards in `/contractors` now open a detail modal
+- **Contractor Detail Modal:** 4 tabs - About, Services, Jobs, Contact
+- **Contact Form:** Visitors can message contractors directly
+- **Navigation Links:** Marketplace link added to landing page header and app sidebar
+- **Backend APIs:** Full CRUD for job posts, services, and networking
+
+#### New API Endpoints
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/marketplace/contractor/{id}/full` | GET | Full profile with services & jobs |
+| `/api/marketplace/contractor/{id}/contact` | POST | Send contact message |
+| `/api/marketplace/jobs` | GET/POST | Browse/create job posts |
+| `/api/marketplace/services` | GET/POST | Browse/create service offerings |
+| `/api/marketplace/connections` | GET | View networking connections |
+| `/api/marketplace/my/jobs` | GET | User's own job posts |
+| `/api/marketplace/my/services` | GET | User's own services |
+| `/api/marketplace/my/inquiries` | GET | Received contact inquiries |
+
+#### Database Tables Created (Run migration!)
+- `marketplace_jobs` - Job postings
+- `contractor_services` - Service offerings
+- `contractor_connections` - Network connections
+- `contractor_inquiries` - Contact form submissions
 
 ---
 
 ## Future Tasks (Backlog)
-- [ ] Live Demo mode
-- [ ] Customer-facing marketplace
+- [ ] Contractor verification process (approve/manage levels)
+- [ ] Complete Settings page (Edit Profile, Security, Delete Account)
+- [ ] Magic Link error investigation
 - [ ] AI renovation visualization
 - [ ] Payment escrow
 - [ ] Payment reminders automation
-- [ ] Edit Profile / Delete Account functionality
 
 ---
 
