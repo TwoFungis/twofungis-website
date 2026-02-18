@@ -28,6 +28,7 @@ import MilestonesPage from './pages/app/MilestonesPage';
 import InvoicesPage from './pages/app/InvoicesPage';
 import ExpensesPage from './pages/app/ExpensesPage';
 import DocumentsPage from './pages/app/DocumentsPage';
+import TaxSummaryPage from './pages/app/TaxSummaryPage';
 
 // Layout
 import AppLayout from './components/layout/AppLayout';
