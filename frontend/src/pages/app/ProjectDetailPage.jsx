@@ -497,6 +497,11 @@ const ProjectDetailPage = () => {
           </div>
         )}
 
+        {/* Materials Tab */}
+        {activeTab === 'materials' && (
+          <MaterialsTab projectId={id} />
+        )}
+
         {/* Milestones Tab */}
         {activeTab === 'milestones' && (
           <div className="bg-white rounded-xl border border-cloud-300 p-6">
