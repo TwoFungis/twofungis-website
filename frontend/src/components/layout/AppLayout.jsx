@@ -314,6 +314,9 @@ const AppLayout = () => {
           onSuccess={() => setShowQuickExpenseModal(false)}
         />
       )}
+      
+      {/* AI Copilot */}
+      <AICopilot />
     </div>
   );
 };
