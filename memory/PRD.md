@@ -209,6 +209,7 @@ Three founding members have been granted lifetime Elite access:
 ## Version History
 | Date | Version | Changes |
 |------|---------|---------|
+| Feb 19, 2026 | 5.1 | **Critical Bug Fixes**: Fixed founder account Reports page access (email check uses user.email), fixed sidebar plan display for founders (shows 'Lifetime Elite Plan'), fixed Setup Progress visibility for all users, fixed expense date field mapping (expense_date not date), verified AI Copilot typeable input, verified Quick Expense standalone button, verified Expenses edit/delete functionality |
 | Feb 19, 2026 | 5.0 | **AI Copilot**: Added context-aware AI assistant with GPT-5.2, right-side drawer UI, suggested prompts per page, project context fetching, structured estimate generation, plan gating (Pro vs Elite), and AI logging |
 | Feb 19, 2026 | 4.0 | **Intelligence Layer Upgrade**: Added tagline branding site-wide, central Average Margin metric on dashboard, Profit Snapshot panel on projects, Margin Risk Alerts in estimates, AI Estimate Generator (GPT-5.2), QuickBooks Integration page (mocked), Integrations nav link |
 | Feb 18, 2026 | 3.2 | **Shield Headers Fixed**: Dark text with shield icons beside all app page headings, removed right shield from landing page, Reports page upgrade button fixed ($59/mo + link), Founder accounts API created and synced |
