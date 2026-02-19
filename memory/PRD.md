@@ -92,6 +92,18 @@
 - Quick "Send Reminder" links for overdue invoices
 - Summary: Total Outstanding and Total Overdue
 
+**5. "Activate Your Business" Flow (/activate)**
+- 5-step guided wizard completed in under 2 minutes:
+  1. Set Labor Rate (with burden rate tip)
+  2. Create First Project (name, client, contract value)
+  3. Add Milestone (auto-filled 50% of contract)
+  4. Generate Invoice (from milestone)
+  5. Upload Receipt/Expense (with category)
+- Success screen with metrics: Projected Profit, Margin %, Outstanding Receivables, 30-Day Cash Flow
+- Skip option with reminder banner on dashboard
+- Progress bar with step indicators
+- localStorage fallback for Supabase profile field limitations
+
 **New API Endpoints:**
 | Endpoint | Method | Description |
 |----------|--------|-------------|
