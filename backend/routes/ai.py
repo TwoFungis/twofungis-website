@@ -8,7 +8,8 @@ from pydantic import BaseModel
 from typing import Optional, List
 import logging
 import json
-from emergentintegrations.llm.chat import chat, Message
+import uuid
+from emergentintegrations.llm.chat import LlmChat, UserMessage
 
 router = APIRouter(prefix="/api/ai", tags=["ai"])
 logger = logging.getLogger(__name__)
@@ -74,22 +75,20 @@ Guidelines:
 
 Return ONLY valid JSON, no additional text."""
 
-        # Call GPT-5.2 via emergentintegrations
-        messages = [
-            Message(role="system", content="You are a professional construction estimator. Always respond with valid JSON only."),
-            Message(role="user", content=prompt)
-        ]
-        
-        response = await chat(
+        # Create LlmChat instance
+        session_id = str(uuid.uuid4())
+        llm = LlmChat(
             api_key=EMERGENT_LLM_KEY,
-            model="gpt-5.2",
-            messages=messages
-        )
+            session_id=session_id,
+            system_message="You are a professional construction estimator. Always respond with valid JSON only."
+        ).with_model("openai", "gpt-5.2")
         
-        # Parse the response
-        response_text = response.content.strip()
+        # Send message
+        user_msg = UserMessage(text=prompt)
+        response_text = await llm.send_message(user_msg)
         
         # Clean up response if it has markdown code blocks
+        response_text = response_text.strip()
         if response_text.startswith("```"):
             response_text = response_text.split("```")[1]
             if response_text.startswith("json"):
