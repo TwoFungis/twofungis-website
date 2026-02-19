@@ -209,6 +209,7 @@ Three founding members have been granted lifetime Elite access:
 ## Version History
 | Date | Version | Changes |
 |------|---------|---------|
+| Feb 19, 2026 | 5.0 | **AI Copilot**: Added context-aware AI assistant with GPT-5.2, right-side drawer UI, suggested prompts per page, project context fetching, structured estimate generation, plan gating (Pro vs Elite), and AI logging |
 | Feb 19, 2026 | 4.0 | **Intelligence Layer Upgrade**: Added tagline branding site-wide, central Average Margin metric on dashboard, Profit Snapshot panel on projects, Margin Risk Alerts in estimates, AI Estimate Generator (GPT-5.2), QuickBooks Integration page (mocked), Integrations nav link |
 | Feb 18, 2026 | 3.2 | **Shield Headers Fixed**: Dark text with shield icons beside all app page headings, removed right shield from landing page, Reports page upgrade button fixed ($59/mo + link), Founder accounts API created and synced |
 | Feb 18, 2026 | 3.1 | **Pricing & Founder Plan**: Fixed pricing (Pro $29, Elite $59), restored Lifetime Founder $599 plan with badging, darker subpage headers, more visible shield watermark (6%), shields on all subpages |
