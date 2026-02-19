@@ -82,8 +82,9 @@ const LoginPage = () => {
         </div>
 
         <div className="bg-charcoal-800 rounded-2xl p-8 border border-charcoal-700" data-testid="login-form">
-          <h2 className="text-2xl font-bold text-white mb-2 text-center italic">Welcome Back</h2>
-          <p className="text-gray-400 text-center mb-8">Sign in to your account</p>
+          <h2 className="text-2xl font-bold text-white mb-1 text-center italic">Welcome Back</h2>
+          <p className="text-gray-400 text-center text-sm mb-1">Sign in to your account</p>
+          <p className="text-steel-400 text-center text-xs font-medium mb-6">Built for Builders. Financial intelligence for small trades.</p>
 
           {error && (
             <div className="bg-risk/20 border border-risk/50 text-risk px-4 py-3 rounded-lg mb-6 text-sm" data-testid="login-error">
