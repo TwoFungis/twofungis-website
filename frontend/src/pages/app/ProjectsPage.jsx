@@ -325,7 +325,7 @@ const ProjectsPage = () => {
                 </div>
               </div>
             </div>
-          ))}
+          )})}
         </div>
       )}
 
