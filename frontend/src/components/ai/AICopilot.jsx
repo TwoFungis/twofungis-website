@@ -258,7 +258,7 @@ const AICopilot = () => {
       {/* Floating AI Button */}
       <button
         onClick={handleOpen}
-        className={`fixed bottom-6 right-6 z-[100] w-14 h-14 rounded-full shadow-xl transition-all duration-300 flex items-center justify-center ${
+        className={`fixed bottom-20 right-6 z-[100] w-14 h-14 rounded-full shadow-xl transition-all duration-300 flex items-center justify-center ${
           isOpen 
             ? 'bg-charcoal-700 scale-0 opacity-0' 
             : 'bg-gradient-to-br from-purple-500 to-steel-500 hover:from-purple-600 hover:to-steel-600 scale-100 opacity-100'
