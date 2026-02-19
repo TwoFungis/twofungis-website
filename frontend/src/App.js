@@ -100,6 +100,7 @@ function App() {
           <Route path="documents" element={<DocumentsPage />} />
           <Route path="tax-summary" element={<TaxSummaryPage />} />
           <Route path="reports" element={<ReportsPage />} />
+          <Route path="integrations" element={<IntegrationsPage />} />
           <Route path="settings" element={<SettingsPage />} />
           <Route path="profile" element={<ProfilePage />} />
         </Route>
