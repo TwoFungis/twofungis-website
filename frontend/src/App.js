@@ -55,8 +55,12 @@ const ProtectedRoute = ({ children }) => {
     return <Navigate to="/onboarding" replace />;
   }
 
+  // Check activation status from profile OR localStorage
+  const isActivated = profile?.business_activated || localStorage.getItem('tradeos_activation_completed') === 'true';
+  const isSkipped = profile?.business_activation_skipped || localStorage.getItem('tradeos_activation_skipped') === 'true';
+  
   // Redirect to activation flow if not completed and not skipped
-  if (user && profile && profile.onboarding_completed && !profile.business_activated && !profile.business_activation_skipped) {
+  if (user && profile && profile.onboarding_completed && !isActivated && !isSkipped) {
     return <Navigate to="/activate" replace />;
   }
 
