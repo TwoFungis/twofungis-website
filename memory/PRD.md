@@ -63,6 +63,43 @@
 - Export CSV functionality
 - Disclaimer: "Estimates only — confirm with your accountant."
 
+### ✅ TradeOS Refinement Pack Phase 1 (Complete - Feb 19, 2026)
+**Focus: Financial Clarity - Get contractors paid faster**
+
+**1. 30-Day Cash Flow Forecast (Dashboard)**
+- Expected Income: Open invoices + Milestones due within 30 days
+- Projected Expenses: Based on last 30 days spending pattern
+- Net Projected Balance with positive/negative styling
+- Cash flow status indicator (Positive Flow / Cash Gap / Neutral)
+- Quick links to View Invoices and Track Expenses
+
+**2. Profit Snapshot on Project Cards**
+- Margin % badge next to project name (color-coded)
+- New "Projected Profit" column: contract_value + approved_cos - cost_to_date
+- 5-column grid: Contract Value, Approved COs, % Complete, Cost to Date, Projected Profit
+
+**3. Receivables Page (/app/receivables)**
+- 4 summary cards: Total Outstanding, Overdue, Due This Week, Reminders Sent
+- Invoice table with client name, amount, due date, days_overdue
+- Send Reminder modal with 3 tone options:
+  - Friendly: "Hope you're doing well! Just a quick reminder..."
+  - Standard: "This is a reminder that invoice remains unpaid..."
+  - Firm: "URGENT: Immediate payment required..."
+- Uses Resend API for email delivery
+
+**4. Receivables at a Glance (Dashboard)**
+- Shows top 4 outstanding invoices with days overdue
+- Quick "Send Reminder" links for overdue invoices
+- Summary: Total Outstanding and Total Overdue
+
+**New API Endpoints:**
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/receivables/outstanding` | GET | List outstanding invoices with days_overdue |
+| `/api/receivables/cash-flow-forecast` | GET | 30-day income/expense projection |
+| `/api/receivables/reminder-templates` | GET | Get 3 reminder tone templates |
+| `/api/receivables/send-reminder` | POST | Send reminder email via Resend |
+
 ### ✅ Previous Implementations
 - Beta Trial Strategy (30-day trial, setup checklist, countdown)
 - Dashboard 3-Zone Layout
