@@ -46,6 +46,10 @@ const AppLayout = () => {
     { path: '/app/documents', icon: FolderOpen, label: 'Document Vault' },
     { path: '/app/tax-summary', icon: PieChart, label: 'Tax Summary' },
     { path: '/app/reports', icon: BarChart3, label: 'Reports' },
+  ];
+  
+  const bottomNavItems = [
+    { path: '/app/integrations', icon: Link, label: 'Integrations' },
     { path: '/app/settings', icon: Settings, label: 'Settings' },
   ];
 
