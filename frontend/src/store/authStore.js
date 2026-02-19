@@ -341,19 +341,31 @@ export const useAuthStore = create((set, get) => ({
       console.error('UpdateProfile error:', err);
       isUpdatingProfile = false;
       // Handle body stream error at top level too - check if update succeeded
-      if (err.message?.includes('body stream')) {
+      if (err.message?.includes('body stream') || String(err).includes('body stream')) {
         try {
+          console.log('Body stream error in catch, checking if update succeeded...');
           await new Promise(resolve => setTimeout(resolve, 500));
-          const { data: checkData } = await supabase
+          const { data: checkData, error: checkError } = await supabase
             .from('users_profile')
             .select('*')
             .eq('user_id', user.id)
             .single();
           
+          console.log('Check data (catch):', checkData, 'Error:', checkError);
+          
           if (checkData) {
             let updateSucceeded = true;
             for (const key of Object.keys(profileData)) {
-              if (checkData[key] !== profileData[key]) {
+              const dbValue = checkData[key];
+              const expectedValue = profileData[key];
+              if (typeof expectedValue === 'number' && typeof dbValue === 'number') {
+                if (Math.abs(dbValue - expectedValue) > 0.001) {
+                  updateSucceeded = false;
+                  console.log(`Field ${key} mismatch: ${dbValue} vs ${expectedValue}`);
+                  break;
+                }
+              } else if (String(dbValue) !== String(expectedValue)) {
+                console.log(`Field ${key} mismatch: ${dbValue} vs ${expectedValue}`);
                 updateSucceeded = false;
                 break;
               }
