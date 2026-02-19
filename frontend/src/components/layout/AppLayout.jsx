@@ -19,7 +19,8 @@ import {
   Crown,
   User,
   PieChart,
-  Briefcase
+  Briefcase,
+  Link2
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { Logo, LogoIcon } from '../ui/Logo';
