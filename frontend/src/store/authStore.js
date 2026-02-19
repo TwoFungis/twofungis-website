@@ -275,22 +275,35 @@ export const useAuthStore = create((set, get) => ({
       }
 
       // Handle body stream error specially - check if update actually succeeded
-      if (dbError && (dbError.message?.includes('body stream') || dbError.details?.message?.includes('body stream'))) {
+      if (dbError && (dbError.message?.includes('body stream') || dbError.details?.message?.includes('body stream') || String(dbError).includes('body stream'))) {
         console.log('Body stream error detected, checking if update succeeded...');
         await new Promise(resolve => setTimeout(resolve, 500));
         
         // Fetch the profile to see if update went through
-        const { data: checkData } = await supabase
+        const { data: checkData, error: checkError } = await supabase
           .from('users_profile')
           .select('*')
           .eq('user_id', user.id)
           .single();
         
+        console.log('Check data:', checkData, 'Error:', checkError);
+        
         if (checkData) {
-          // Check if the profileData fields were updated
+          // Check if the profileData fields were updated - use loose equality for numbers
           let updateSucceeded = true;
           for (const key of Object.keys(profileData)) {
-            if (checkData[key] !== profileData[key]) {
+            const dbValue = checkData[key];
+            const expectedValue = profileData[key];
+            // Handle number comparisons with tolerance
+            if (typeof expectedValue === 'number' && typeof dbValue === 'number') {
+              if (Math.abs(dbValue - expectedValue) > 0.001) {
+                updateSucceeded = false;
+                console.log(`Field ${key} mismatch: ${dbValue} vs ${expectedValue}`);
+                break;
+              }
+            } else if (String(dbValue) !== String(expectedValue)) {
+              // For non-numbers, compare as strings
+              console.log(`Field ${key} mismatch: ${dbValue} vs ${expectedValue}`);
               updateSucceeded = false;
               break;
             }
