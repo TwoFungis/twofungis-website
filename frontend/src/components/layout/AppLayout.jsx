@@ -150,14 +150,7 @@ const AppLayout = () => {
           <div className="bg-charcoal-700 rounded-lg p-4 mb-4">
             <p className="text-sm text-gray-400 truncate">{profile?.company_name || 'My Company'}</p>
             <p className="text-xs text-gray-500 capitalize">
-              {(() => {
-                const tier = (profile?.subscription_tier || '').toLowerCase();
-                const FOUNDER_EMAILS = ["info@twofungis.ca", "swdmarshall@gmail.com", "carpenterbeau@hotmail.com"];
-                const isFounder = FOUNDER_EMAILS.map(e => e.toLowerCase()).includes((profile?.email || '').toLowerCase());
-                if (isFounder || tier.includes('founding') || tier.includes('lifetime')) return 'Lifetime Elite';
-                if (tier === 'elite') return 'Elite';
-                return 'Pro';
-              })()} Plan
+              {displayPlan} Plan
             </p>
           </div>
           <button
