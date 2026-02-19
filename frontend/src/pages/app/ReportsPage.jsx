@@ -18,9 +18,19 @@ const ReportsPage = () => {
   const [expenses, setExpenses] = useState([]);
   const [activeTab, setActiveTab] = useState('overview');
   const [dateRange, setDateRange] = useState('ytd');
-  // Check for any elite tier variation (elite, lifetime, lifetime_elite, founding_lifetime, etc.)
-  const tier = profile?.subscription_tier?.toLowerCase() || '';
-  const isElite = tier === 'elite' || tier.includes('lifetime') || tier.includes('founding');
+  
+  // Founder emails get automatic Elite access
+  const FOUNDER_EMAILS = [
+    "info@twofungis.ca",
+    "swdmarshall@gmail.com", 
+    "carpenterbeau@hotmail.com"
+  ];
+  
+  // Check for any elite tier variation OR founder status
+  const tier = (profile?.subscription_tier || '').toLowerCase();
+  const userEmail = (user?.email || '').toLowerCase();
+  const isFounder = FOUNDER_EMAILS.map(e => e.toLowerCase()).includes(userEmail);
+  const isElite = tier === 'elite' || tier.includes('lifetime') || tier.includes('founding') || isFounder;
 
   useEffect(() => {
     const fetchData = async () => {
