@@ -30,6 +30,7 @@ import ExpensesPage from './pages/app/ExpensesPage';
 import DocumentsPage from './pages/app/DocumentsPage';
 import TaxSummaryPage from './pages/app/TaxSummaryPage';
 import IntegrationsPage from './pages/app/IntegrationsPage';
+import ReceivablesPage from './pages/app/ReceivablesPage';
 
 // Layout
 import AppLayout from './components/layout/AppLayout';
