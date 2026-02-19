@@ -288,7 +288,7 @@ const ExpensesPage = () => {
                     <td className="px-6 py-4 text-gray-400">{expense.project_name || '—'}</td>
                     <td className="px-6 py-4 text-white font-medium">${expense.amount?.toLocaleString()}</td>
                     <td className="px-6 py-4 text-gray-400">
-                      {expense.date ? new Date(expense.date).toLocaleDateString() : '—'}
+                      {expense.expense_date ? new Date(expense.expense_date).toLocaleDateString() : '—'}
                     </td>
                     <td className="px-6 py-4">
                       {expense.has_receipt ? (
