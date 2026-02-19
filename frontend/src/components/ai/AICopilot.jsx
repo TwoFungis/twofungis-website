@@ -255,17 +255,18 @@ const AICopilot = () => {
   
   return (
     <>
-      {/* Floating AI Button */}
+      {/* Floating AI Button with Shield Logo */}
       <button
         onClick={handleOpen}
-        className={`fixed bottom-20 right-6 z-[100] w-14 h-14 rounded-full shadow-xl transition-all duration-300 flex items-center justify-center ${
-          isOpen 
-            ? 'bg-charcoal-700 scale-0 opacity-0' 
-            : 'bg-gradient-to-br from-purple-500 to-steel-500 hover:from-purple-600 hover:to-steel-600 scale-100 opacity-100'
+        className={`fixed bottom-20 right-6 z-[100] flex flex-col items-center transition-all duration-300 ${
+          isOpen ? 'scale-0 opacity-0' : 'scale-100 opacity-100'
         }`}
         data-testid="ai-copilot-btn"
       >
-        <Sparkles className="w-6 h-6 text-white" />
+        <div className="w-14 h-14 rounded-full shadow-xl bg-charcoal-800 border-2 border-steel-500 flex items-center justify-center hover:border-steel-400 transition-colors">
+          <img src="/shield-icon.png" alt="AI Support" className="w-9 h-9" />
+        </div>
+        <span className="text-xs font-semibold text-steel-400 mt-1 tracking-wide">AI SUPPORT</span>
       </button>
       
       {/* Copilot Drawer */}
