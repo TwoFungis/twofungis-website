@@ -55,6 +55,11 @@ const ProtectedRoute = ({ children }) => {
     return <Navigate to="/onboarding" replace />;
   }
 
+  // Redirect to activation flow if not completed and not skipped
+  if (user && profile && profile.onboarding_completed && !profile.business_activated && !profile.business_activation_skipped) {
+    return <Navigate to="/activate" replace />;
+  }
+
   return <>{children}</>;
 };
 
