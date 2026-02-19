@@ -54,6 +54,16 @@ const EstimatingPage = () => {
     { id: 1, scope_item: '', description: '', qty: 1, unit: 'EA', unit_price: 0, line_total: 0 }
   ]);
 
+  // AI Estimate state
+  const [showAIModal, setShowAIModal] = useState(false);
+  const [aiGenerating, setAiGenerating] = useState(false);
+  const [aiForm, setAiForm] = useState({
+    project_type: '',
+    approx_size: '',
+    finish_level: 'Custom',
+    region: ''
+  });
+
   const fetchQuotes = useCallback(async () => {
     if (!user) return;
     
