@@ -56,6 +56,7 @@ const AppLayout = () => {
     { path: '/app/change-orders', icon: FileText, label: 'Change Orders' },
     { path: '/app/milestones', icon: Flag, label: 'Milestones' },
     { path: '/app/invoices', icon: Receipt, label: 'Invoices' },
+    { path: '/app/receivables', icon: DollarSign, label: 'Receivables' },
     { path: '/app/expenses', icon: Wallet, label: 'Expenses' },
     { path: '/app/documents', icon: FolderOpen, label: 'Document Vault' },
     { path: '/app/tax-summary', icon: PieChart, label: 'Tax Summary' },
