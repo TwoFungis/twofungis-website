@@ -734,6 +734,101 @@ const EstimatingPage = () => {
           </div>
         </>
       )}
+
+      {/* AI Estimate Generator Modal */}
+      {showAIModal && (
+        <>
+          <div className="fixed inset-0 bg-black/50 z-50" onClick={() => setShowAIModal(false)} />
+          <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-charcoal-800 rounded-xl border border-charcoal-700 z-50" data-testid="ai-modal">
+            <div className="p-6 border-b border-charcoal-700">
+              <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-purple-400" />
+                AI Estimate Generator
+              </h3>
+              <p className="text-gray-400 text-sm mt-1">Enter project details to generate a draft estimate</p>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Project Type *</label>
+                <select
+                  value={aiForm.project_type}
+                  onChange={(e) => setAiForm({ ...aiForm, project_type: e.target.value })}
+                  className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-4 py-3 text-white"
+                >
+                  <option value="">Select project type</option>
+                  <option value="Kitchen Renovation">Kitchen Renovation</option>
+                  <option value="Bathroom Renovation">Bathroom Renovation</option>
+                  <option value="Basement Finish">Basement Finish</option>
+                  <option value="Addition">Addition</option>
+                  <option value="Custom Home">Custom Home</option>
+                  <option value="Commercial Tenant Improvement">Commercial TI</option>
+                  <option value="Deck/Exterior">Deck/Exterior</option>
+                  <option value="Flooring">Flooring</option>
+                  <option value="Painting">Painting</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Approx. Size (sq ft) *</label>
+                <input
+                  type="text"
+                  value={aiForm.approx_size}
+                  onChange={(e) => setAiForm({ ...aiForm, approx_size: e.target.value })}
+                  className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-4 py-3 text-white"
+                  placeholder="e.g., 200, 1500, 3000"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Finish Level</label>
+                <select
+                  value={aiForm.finish_level}
+                  onChange={(e) => setAiForm({ ...aiForm, finish_level: e.target.value })}
+                  className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-4 py-3 text-white"
+                >
+                  <option value="Spec">Spec / Builder Grade</option>
+                  <option value="Custom">Custom / Mid-Range</option>
+                  <option value="Luxury">Luxury / High-End</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Region</label>
+                <input
+                  type="text"
+                  value={aiForm.region}
+                  onChange={(e) => setAiForm({ ...aiForm, region: e.target.value })}
+                  className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg px-4 py-3 text-white"
+                  placeholder="e.g., Vancouver BC, Toronto ON"
+                />
+              </div>
+            </div>
+            <div className="p-6 border-t border-charcoal-700 flex justify-end gap-3">
+              <button
+                onClick={() => setShowAIModal(false)}
+                className="px-4 py-2 text-gray-400 hover:text-white"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={generateAIEstimate}
+                disabled={aiGenerating}
+                className="bg-gradient-to-r from-purple-500 to-steel-500 hover:from-purple-600 hover:to-steel-600 text-white px-6 py-2 rounded-lg font-medium flex items-center gap-2 disabled:opacity-50"
+              >
+                {aiGenerating ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4" />
+                    Generate Estimate
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };
