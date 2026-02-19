@@ -30,11 +30,23 @@ import QuickAddExpenseModal from './QuickAddExpenseModal';
 import AICopilot from '../ai/AICopilot';
 
 const AppLayout = () => {
-  const { profile, signOut } = useAuthStore();
+  const { profile, signOut, user } = useAuthStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [quickActionOpen, setQuickActionOpen] = useState(false);
   const [showQuickExpenseModal, setShowQuickExpenseModal] = useState(false);
   const navigate = useNavigate();
+  
+  // Founder email check - use user.email from auth
+  const FOUNDER_EMAILS = ["info@twofungis.ca", "swdmarshall@gmail.com", "carpenterbeau@hotmail.com"];
+  const userEmail = (user?.email || '').toLowerCase();
+  const isFounder = FOUNDER_EMAILS.map(e => e.toLowerCase()).includes(userEmail);
+  const tier = (profile?.subscription_tier || '').toLowerCase();
+  const isElite = isFounder || tier.includes('elite') || tier.includes('lifetime') || tier.includes('founding');
+  const displayPlan = isFounder || tier.includes('lifetime') || tier.includes('founding') 
+    ? 'Lifetime Elite' 
+    : tier === 'elite' 
+      ? 'Elite' 
+      : 'Pro';
 
   // Focused navigation - Core business functions only
   const navItems = [
