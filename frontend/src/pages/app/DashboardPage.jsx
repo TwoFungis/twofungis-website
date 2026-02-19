@@ -596,6 +596,72 @@ const DashboardPage = () => {
             </div>
           </div>
         </div>
+
+        {/* Outstanding Receivables Quick View */}
+        {outstandingInvoicesData && outstandingInvoicesData.invoices?.length > 0 && (
+          <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-5 mt-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Receipt className="w-5 h-5 text-steel-400" />
+                <h3 className="font-semibold text-white">Receivables at a Glance</h3>
+              </div>
+              <Link 
+                to="/app/invoices"
+                className="text-sm text-steel-400 hover:text-steel-300 flex items-center gap-1"
+              >
+                View All <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+            
+            <div className="space-y-3">
+              {outstandingInvoicesData.invoices.slice(0, 4).map((inv) => (
+                <div 
+                  key={inv.id}
+                  className={`flex items-center justify-between p-3 rounded-lg ${
+                    inv.is_overdue ? 'bg-risk/10 border border-risk/20' : 'bg-charcoal-700/50'
+                  }`}
+                >
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-white font-medium text-sm">{inv.invoice_number}</span>
+                      {inv.is_overdue && (
+                        <span className="text-xs bg-risk/20 text-risk px-1.5 py-0.5 rounded">
+                          {inv.days_overdue}d overdue
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-gray-500 truncate">{inv.client_name}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className={`font-semibold ${inv.is_overdue ? 'text-risk' : 'text-white'}`}>
+                      {formatCurrency(inv.total)}
+                    </p>
+                    {inv.is_overdue && inv.client_email && (
+                      <Link 
+                        to={`/app/invoices?reminder=${inv.id}`}
+                        className="text-xs text-steel-400 hover:text-steel-300 flex items-center gap-1 justify-end mt-1"
+                      >
+                        <Send className="w-3 h-3" /> Reminder
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            {/* Summary */}
+            <div className="mt-4 pt-4 border-t border-charcoal-700 grid grid-cols-2 gap-4 text-center">
+              <div>
+                <p className="text-xs text-gray-500">Total Outstanding</p>
+                <p className="text-lg font-bold text-white">{formatCurrency(outstandingInvoicesData.summary?.total_outstanding || 0)}</p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500">Total Overdue</p>
+                <p className="text-lg font-bold text-risk">{formatCurrency(outstandingInvoicesData.summary?.total_overdue || 0)}</p>
+              </div>
+            </div>
+          </div>
+        )}
       </section>
 
       {/* ============================================ */}
