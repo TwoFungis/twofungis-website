@@ -38,6 +38,9 @@ from routes.materials import router as materials_router
 # Import Founders routes
 from routes.founders import router as founders_router
 
+# Import AI routes
+from routes.ai import router as ai_router
+
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env', override=False)
 
