@@ -14,6 +14,7 @@ import ClientReviewPage from './pages/public/ClientReviewPage';
 import LoginPage from './pages/auth/LoginPage';
 import SignUpPage from './pages/auth/SignUpPage';
 import OnboardingPage from './pages/auth/OnboardingPage';
+import ActivateBusinessFlow from './pages/auth/ActivateBusinessFlow';
 
 // App Pages
 import DashboardPage from './pages/app/DashboardPage';
