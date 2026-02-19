@@ -97,6 +97,7 @@ function App() {
           <Route path="change-orders" element={<ChangeOrdersPage />} />
           <Route path="milestones" element={<MilestonesPage />} />
           <Route path="invoices" element={<InvoicesPage />} />
+          <Route path="receivables" element={<ReceivablesPage />} />
           <Route path="expenses" element={<ExpensesPage />} />
           <Route path="documents" element={<DocumentsPage />} />
           <Route path="tax-summary" element={<TaxSummaryPage />} />
