@@ -184,7 +184,7 @@ const DashboardPage = () => {
             <h1 className="text-2xl lg:text-3xl font-bold text-charcoal-800">
               Welcome back, {profile?.full_name?.split(' ')[0] || profile?.name?.split(' ')[0] || 'Builder'}
             </h1>
-            <p className="text-charcoal-600 mt-1">Your business at a glance</p>
+            <p className="text-steel-500 text-sm font-medium">Built for Builders. Financial intelligence for small trades.</p>
           </div>
         </div>
       </div>
