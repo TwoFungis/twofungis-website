@@ -155,13 +155,17 @@ const LandingPage = () => {
         </div>
         
         <div className="relative max-w-4xl mx-auto text-center">
-          <div className="flex justify-center mb-8">
+          <div className="flex justify-center mb-6">
             <img 
               src="/logo.png" 
               alt="TradeOS - Built for Builders" 
               className="h-44 sm:h-56 lg:h-64 w-auto drop-shadow-2xl"
             />
           </div>
+          
+          <p className="text-steel-400 font-semibold text-lg mb-4 tracking-wide">
+            Built for Builders. Financial intelligence for small trades.
+          </p>
           
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-6">
             Know your margin. Control your projects. Get paid faster.
