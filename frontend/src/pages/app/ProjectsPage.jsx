@@ -224,7 +224,14 @@ const ProjectsPage = () => {
         </div>
       ) : (
         <div className="grid gap-4">
-          {filteredProjects.map((project) => (
+          {filteredProjects.map((project) => {
+            // Calculate profit based on contract value, COs, and cost
+            const totalRevenue = (parseFloat(project.contract_value) || 0) + (parseFloat(project.approved_cos) || 0);
+            const totalCost = parseFloat(project.cost_to_date) || 0;
+            const profit = totalRevenue - totalCost;
+            const margin = project.forecast_margin || 0;
+            
+            return (
             <div
               key={project.id}
               className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-4 lg:p-6 hover:border-charcoal-600 transition-colors"
@@ -235,10 +242,18 @@ const ProjectsPage = () => {
                   <div className="flex items-center gap-3 mb-2">
                     <h3 className="text-lg font-semibold text-white truncate">{project.name}</h3>
                     <div className={`w-3 h-3 rounded-full ${getRiskColor(project.risk_flag)}`} />
+                    {/* Margin Badge - Key Financial Indicator */}
+                    <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+                      margin >= 20 ? 'bg-success/20 text-success' : 
+                      margin >= 15 ? 'bg-steel-500/20 text-steel-400' :
+                      margin >= 10 ? 'bg-warning/20 text-warning' : 'bg-risk/20 text-risk'
+                    }`}>
+                      {margin}% margin
+                    </span>
                   </div>
                   <p className="text-gray-400 text-sm mb-4">{project.client_gc || 'No client specified'}</p>
                   
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+                  <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 text-sm">
                     <div>
                       <p className="text-gray-500">Contract Value</p>
                       <p className="text-white font-medium">{formatCurrency(project.contract_value)}</p>
@@ -252,9 +267,13 @@ const ProjectsPage = () => {
                       <p className="text-white font-medium">{project.percent_complete || 0}%</p>
                     </div>
                     <div>
-                      <p className="text-gray-500">Forecast Margin</p>
-                      <p className={`font-medium ${(project.forecast_margin || 0) >= 15 ? 'text-success' : (project.forecast_margin || 0) >= 10 ? 'text-warning' : 'text-risk'}`}>
-                        {project.forecast_margin || 0}%
+                      <p className="text-gray-500">Cost to Date</p>
+                      <p className="text-white font-medium">{formatCurrency(totalCost)}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500">Projected Profit</p>
+                      <p className={`font-bold ${profit >= 0 ? 'text-success' : 'text-risk'}`}>
+                        {profit >= 0 ? '+' : ''}{formatCurrency(profit)}
                       </p>
                     </div>
                   </div>
