@@ -171,6 +171,9 @@ app.include_router(materials_router)
 # Include Founders routes
 app.include_router(founders_router)
 
+# Include AI routes
+app.include_router(ai_router)
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
