@@ -20,6 +20,8 @@ const DashboardPage = () => {
   const [invoices, setInvoices] = useState([]);
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [cashFlowForecast, setCashFlowForecast] = useState(null);
+  const [outstandingInvoicesData, setOutstandingInvoicesData] = useState(null);
   
   // Founder emails list
   const FOUNDER_EMAILS = [
@@ -40,8 +42,18 @@ const DashboardPage = () => {
     parseInt(localStorage.getItem('tradeos_tax_rate') || '25')
   );
 
+  const getAuthHeaders = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    return {
+      'Authorization': `Bearer ${session?.access_token}`,
+      'Content-Type': 'application/json'
+    };
+  };
+
   useEffect(() => {
     fetchDashboardData();
+    fetchCashFlowForecast();
+    fetchOutstandingInvoices();
   }, [user]);
 
   const fetchDashboardData = async () => {
