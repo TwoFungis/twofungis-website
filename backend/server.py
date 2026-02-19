@@ -183,6 +183,9 @@ app.include_router(ai_router)
 # Include Copilot routes
 app.include_router(copilot_router)
 
+# Include Receivables routes
+app.include_router(receivables_router)
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
