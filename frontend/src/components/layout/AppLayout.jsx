@@ -50,7 +50,7 @@ const AppLayout = () => {
   ];
   
   const bottomNavItems = [
-    { path: '/app/integrations', icon: Link, label: 'Integrations' },
+    { path: '/app/integrations', icon: Link2, label: 'Integrations' },
     { path: '/app/settings', icon: Settings, label: 'Settings' },
   ];
 
