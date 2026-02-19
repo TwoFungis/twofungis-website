@@ -181,6 +181,17 @@ const AppLayout = () => {
             {/* Trial Countdown Badge */}
             <TrialCountdown />
             
+            {/* Quick Expense Button - Standalone */}
+            <button
+              onClick={() => setShowQuickExpenseModal(true)}
+              className="bg-success/20 hover:bg-success/30 text-success border border-success/30 px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+              data-testid="quick-expense-btn"
+            >
+              <Wallet className="w-5 h-5" />
+              <span className="hidden sm:inline">Quick Expense</span>
+            </button>
+            
+            {/* Quick Add Dropdown */}
             <div className="relative">
               <button
                 onClick={() => setQuickActionOpen(!quickActionOpen)}
@@ -195,7 +206,7 @@ const AppLayout = () => {
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setQuickActionOpen(false)} />
                   <div className="absolute right-0 mt-2 w-52 bg-charcoal-800 rounded-lg shadow-xl border border-charcoal-700 py-2 z-50">
-                    {quickActions.map((action, idx) => (
+                    {quickActions.filter(a => a.label !== 'Quick Expense').map((action, idx) => (
                       <button
                         key={action.label}
                         onClick={() => {
