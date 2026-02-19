@@ -4,11 +4,13 @@ import {
   TrendingUp, FolderKanban, FileText, AlertTriangle, DollarSign,
   ArrowUpRight, ArrowDownRight, Target, CheckCircle2, Clock,
   Receipt, AlertCircle, Bell, Calendar, ChevronRight, Settings,
-  Percent, Wallet, Flag, Crown
+  Percent, Wallet, Flag, Crown, TrendingDown, Banknote, Send
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { supabase } from '../../lib/supabase';
 import SetupProgressChecklist from '../../components/trial/SetupProgressChecklist';
+
+const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 const DashboardPage = () => {
   const { profile, user } = useAuthStore();
