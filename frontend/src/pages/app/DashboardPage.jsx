@@ -182,6 +182,9 @@ const DashboardPage = () => {
 
   // Alert count
   const alertCount = overdueInvoices.length + (trialExpiring ? 1 : 0) + lowMarginProjects.length;
+  
+  // Check if business activation was skipped
+  const activationSkipped = profile?.business_activation_skipped && !profile?.business_activated;
 
   if (loading) {
     return (
