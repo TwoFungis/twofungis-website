@@ -292,7 +292,18 @@ const ActivateBusinessFlow = () => {
       } else {
         // Complete activation
         calculateMetrics();
-        await updateProfile({ business_activated: true });
+        
+        // Save completion state to localStorage
+        localStorage.setItem('tradeos_activation_completed', 'true');
+        localStorage.removeItem('tradeos_activation_skipped');
+        
+        // Try to update Supabase but don't block on failure
+        try {
+          await updateProfile({ business_activated: true });
+        } catch (err) {
+          console.warn('Activation flag save failed:', err);
+        }
+        
         setShowSuccess(true);
       }
     }
