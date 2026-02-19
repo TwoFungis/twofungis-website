@@ -138,11 +138,13 @@ const SetupProgressChecklist = () => {
     setDismissed(true);
   };
 
-  // Don't show if dismissed or not on trial
+  // Don't show if dismissed or still loading
   if (dismissed || loading) return null;
   
-  // Don't show for paid users
-  if (profile?.subscription_tier && !['trial', 'free'].includes(profile.subscription_tier)) {
+  // Show for ALL users until setup is complete
+  // User requested: "The setup progress bar must be visible on all accounts until all milestones are completed"
+  if (isComplete) {
+    // Auto-dismiss completed checklists
     return null;
   }
 
