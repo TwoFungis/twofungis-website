@@ -630,7 +630,7 @@ const EditExpenseModal = ({ expense, onClose, onSuccess }) => {
     category: expense.category || 'Materials',
     amount: expense.amount?.toString() || '',
     project_name: expense.project_name || '',
-    expense_date: expense.date ? new Date(expense.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+    expense_date: expense.expense_date ? new Date(expense.expense_date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
     vendor: expense.vendor || '',
     notes: expense.notes || '',
     business_personal: expense.business_personal || 'Business',
