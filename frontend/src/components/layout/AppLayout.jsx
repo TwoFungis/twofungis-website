@@ -77,8 +77,30 @@ const AppLayout = () => {
           </Link>
         </div>
 
-        <nav className="flex-1 p-4 space-y-1">
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
           {navItems.map((item) => (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                  isActive
+                    ? 'bg-steel-500/20 text-steel-400'
+                    : 'text-gray-400 hover:text-white hover:bg-charcoal-700'
+                }`
+              }
+              data-testid={`nav-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
+            >
+              <item.icon className="w-5 h-5" />
+              <span className="font-medium">{item.label}</span>
+            </NavLink>
+          ))}
+          
+          {/* Separator */}
+          <div className="border-t border-charcoal-700 my-2"></div>
+          
+          {/* Bottom nav items */}
+          {bottomNavItems.map((item) => (
             <NavLink
               key={item.path}
               to={item.path}
