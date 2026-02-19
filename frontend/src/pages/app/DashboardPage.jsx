@@ -218,6 +218,30 @@ const DashboardPage = () => {
         </div>
       )}
 
+      {/* Activation Reminder Banner - Show if skipped */}
+      {activationSkipped && (
+        <div className="bg-charcoal-800 rounded-xl border border-steel-500/30 p-4" data-testid="activation-reminder">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-steel-500/20 rounded-full flex items-center justify-center">
+                <Flag className="w-5 h-5 text-steel-400" />
+              </div>
+              <div>
+                <h3 className="text-white font-medium">Complete Your Business Setup</h3>
+                <p className="text-gray-400 text-sm">Finish activation to unlock full financial tracking</p>
+              </div>
+            </div>
+            <a 
+              href="/activate"
+              className="bg-steel-500 hover:bg-steel-600 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors flex items-center gap-2"
+            >
+              Continue Setup
+              <ChevronRight className="w-4 h-4" />
+            </a>
+          </div>
+        </div>
+      )}
+
       {/* Setup Progress Checklist - Show for trial users */}
       <SetupProgressChecklist />
 
