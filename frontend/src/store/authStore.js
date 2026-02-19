@@ -274,15 +274,47 @@ export const useAuthStore = create((set, get) => ({
         dbError = result.error;
       }
 
+      // Handle body stream error specially - check if update actually succeeded
+      if (dbError && (dbError.message?.includes('body stream') || dbError.details?.message?.includes('body stream'))) {
+        console.log('Body stream error detected, checking if update succeeded...');
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Fetch the profile to see if update went through
+        const { data: checkData } = await supabase
+          .from('users_profile')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+        
+        if (checkData) {
+          // Check if the profileData fields were updated
+          let updateSucceeded = true;
+          for (const key of Object.keys(profileData)) {
+            if (checkData[key] !== profileData[key]) {
+              updateSucceeded = false;
+              break;
+            }
+          }
+          
+          if (updateSucceeded) {
+            console.log('Update succeeded despite body stream error');
+            set({ profile: checkData });
+            isUpdatingProfile = false;
+            return { error: null };
+          }
+        }
+        
+        // If we get here, update likely failed - return error
+        isUpdatingProfile = false;
+        return { error: { message: 'Connection error. Please try again.' } };
+      }
+
       if (dbError) {
         console.error('Profile operation error:', dbError);
         isUpdatingProfile = false;
         // Handle specific error types
         if (dbError.message?.includes('JWT') || dbError.code === 'PGRST301') {
           return { error: { message: 'Session expired. Please refresh the page.' } };
-        }
-        if (dbError.message?.includes('body stream')) {
-          return { error: { message: 'Connection error. Please try again.' } };
         }
         return { error: { message: dbError.message || 'Failed to update profile' } };
       }
@@ -295,8 +327,34 @@ export const useAuthStore = create((set, get) => ({
     } catch (err) {
       console.error('UpdateProfile error:', err);
       isUpdatingProfile = false;
-      // Handle body stream error at top level too
+      // Handle body stream error at top level too - check if update succeeded
       if (err.message?.includes('body stream')) {
+        try {
+          await new Promise(resolve => setTimeout(resolve, 500));
+          const { data: checkData } = await supabase
+            .from('users_profile')
+            .select('*')
+            .eq('user_id', user.id)
+            .single();
+          
+          if (checkData) {
+            let updateSucceeded = true;
+            for (const key of Object.keys(profileData)) {
+              if (checkData[key] !== profileData[key]) {
+                updateSucceeded = false;
+                break;
+              }
+            }
+            
+            if (updateSucceeded) {
+              console.log('Update succeeded despite body stream error (catch)');
+              set({ profile: checkData });
+              return { error: null };
+            }
+          }
+        } catch (checkErr) {
+          console.error('Error checking profile:', checkErr);
+        }
         return { error: { message: 'Connection error. Please try again.' } };
       }
       return { error: { message: err.message || 'Failed to update profile' } };
