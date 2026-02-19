@@ -81,6 +81,34 @@ const DashboardPage = () => {
     }
   };
 
+  const fetchCashFlowForecast = async () => {
+    if (!user) return;
+    try {
+      const headers = await getAuthHeaders();
+      const response = await fetch(`${API_URL}/api/receivables/cash-flow-forecast?days=30`, { headers });
+      if (response.ok) {
+        const data = await response.json();
+        setCashFlowForecast(data);
+      }
+    } catch (err) {
+      console.error('Error fetching cash flow forecast:', err);
+    }
+  };
+
+  const fetchOutstandingInvoices = async () => {
+    if (!user) return;
+    try {
+      const headers = await getAuthHeaders();
+      const response = await fetch(`${API_URL}/api/receivables/outstanding`, { headers });
+      if (response.ok) {
+        const data = await response.json();
+        setOutstandingInvoicesData(data);
+      }
+    } catch (err) {
+      console.error('Error fetching outstanding invoices:', err);
+    }
+  };
+
   // Save preferences
   const handleMarginChange = (val) => {
     setMarginThreshold(val);
