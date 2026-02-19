@@ -87,6 +87,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/onboarding" element={<OnboardingPage />} />
+        <Route path="/activate" element={<ActivateBusinessFlow />} />
         
         {/* App Routes - Core Business Functions */}
         <Route path="/app" element={
