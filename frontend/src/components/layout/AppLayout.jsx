@@ -20,7 +20,8 @@ import {
   User,
   PieChart,
   Briefcase,
-  Link2
+  Link2,
+  DollarSign
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { Logo, LogoIcon } from '../ui/Logo';
