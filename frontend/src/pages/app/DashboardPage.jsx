@@ -276,6 +276,95 @@ const DashboardPage = () => {
       </div>
 
       {/* ============================================ */}
+      {/* 30-DAY CASH FLOW FORECAST */}
+      {/* ============================================ */}
+      {cashFlowForecast && (
+        <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6" data-testid="cash-flow-forecast-panel">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-steel-500/20 rounded-lg flex items-center justify-center">
+                <Banknote className="w-5 h-5 text-steel-400" />
+              </div>
+              <div>
+                <h2 className="font-semibold text-white">30-Day Cash Flow Forecast</h2>
+                <p className="text-xs text-gray-500">Expected income vs expenses</p>
+              </div>
+            </div>
+            <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+              cashFlowForecast.cash_flow_status === 'positive' ? 'bg-success/20 text-success' :
+              cashFlowForecast.cash_flow_status === 'negative' ? 'bg-risk/20 text-risk' : 'bg-gray-500/20 text-gray-400'
+            }`}>
+              {cashFlowForecast.cash_flow_status === 'positive' ? 'Positive Flow' : 
+               cashFlowForecast.cash_flow_status === 'negative' ? 'Cash Gap' : 'Neutral'}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            {/* Expected Income */}
+            <div className="lg:col-span-1">
+              <div className="flex items-center gap-2 mb-2">
+                <ArrowUpRight className="w-4 h-4 text-success" />
+                <span className="text-sm text-gray-400">Expected Income</span>
+              </div>
+              <p className="text-2xl font-bold text-success">
+                {formatCurrency(cashFlowForecast.expected_income?.total || 0)}
+              </p>
+              <div className="mt-2 space-y-1 text-xs text-gray-500">
+                <p>{cashFlowForecast.expected_income?.invoices?.count || 0} invoices: {formatCurrency(cashFlowForecast.expected_income?.invoices?.total || 0)}</p>
+                <p>{cashFlowForecast.expected_income?.milestones?.count || 0} milestones: {formatCurrency(cashFlowForecast.expected_income?.milestones?.total || 0)}</p>
+              </div>
+            </div>
+
+            {/* Expected Expenses */}
+            <div className="lg:col-span-1">
+              <div className="flex items-center gap-2 mb-2">
+                <ArrowDownRight className="w-4 h-4 text-risk" />
+                <span className="text-sm text-gray-400">Projected Expenses</span>
+              </div>
+              <p className="text-2xl font-bold text-risk">
+                {formatCurrency(cashFlowForecast.expected_expenses?.projected_total || 0)}
+              </p>
+              <p className="mt-2 text-xs text-gray-500">
+                {cashFlowForecast.expected_expenses?.note || 'Based on recent spending'}
+              </p>
+            </div>
+
+            {/* Net Projected */}
+            <div className="lg:col-span-1">
+              <div className="flex items-center gap-2 mb-2">
+                <TrendingUp className="w-4 h-4 text-steel-400" />
+                <span className="text-sm text-gray-400">Net Projected</span>
+              </div>
+              <p className={`text-2xl font-bold ${
+                cashFlowForecast.net_projected >= 0 ? 'text-success' : 'text-risk'
+              }`}>
+                {cashFlowForecast.net_projected >= 0 ? '+' : ''}{formatCurrency(cashFlowForecast.net_projected || 0)}
+              </p>
+              <p className="mt-2 text-xs text-gray-500">Next 30 days</p>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="lg:col-span-1 flex flex-col justify-center gap-2">
+              <Link 
+                to="/app/invoices"
+                className="flex items-center justify-between px-3 py-2 bg-charcoal-700/50 rounded-lg hover:bg-charcoal-700 transition-colors text-sm"
+              >
+                <span className="text-gray-300">View Invoices</span>
+                <ChevronRight className="w-4 h-4 text-gray-500" />
+              </Link>
+              <Link 
+                to="/app/expenses"
+                className="flex items-center justify-between px-3 py-2 bg-charcoal-700/50 rounded-lg hover:bg-charcoal-700 transition-colors text-sm"
+              >
+                <span className="text-gray-300">Track Expenses</span>
+                <ChevronRight className="w-4 h-4 text-gray-500" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================ */}
       {/* ZONE A: EXECUTION */}
       {/* ============================================ */}
       <section data-testid="execution-zone">
