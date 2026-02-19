@@ -190,6 +190,50 @@ const DashboardPage = () => {
       </div>
 
       {/* ============================================ */}
+      {/* CENTRAL METRIC: AVERAGE MARGIN */}
+      {/* ============================================ */}
+      <div className="bg-gradient-to-br from-charcoal-800 to-charcoal-900 rounded-xl border border-charcoal-700 p-6" data-testid="average-margin-panel">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+          <div className="text-center lg:text-left">
+            <p className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-1">Your Current Average Margin</p>
+            <div className="flex items-baseline gap-2 justify-center lg:justify-start">
+              <span className={`text-5xl lg:text-6xl font-bold ${
+                forecastMargin >= marginThreshold ? 'text-success' : 
+                forecastMargin >= marginThreshold * 0.8 ? 'text-warning' : 'text-risk'
+              }`}>
+                {forecastMargin.toFixed(1)}%
+              </span>
+              <span className={`text-sm font-medium px-2 py-1 rounded ${
+                forecastMargin >= marginThreshold ? 'bg-success/20 text-success' : 
+                forecastMargin >= marginThreshold * 0.8 ? 'bg-warning/20 text-warning' : 'bg-risk/20 text-risk'
+              }`}>
+                {forecastMargin >= marginThreshold ? 'On Target' : 
+                 forecastMargin >= marginThreshold * 0.8 ? 'Near Target' : 'Below Target'}
+              </span>
+            </div>
+            <p className="text-gray-500 text-sm mt-2">Target: {marginThreshold}% | Based on {activeProjects.length} active projects</p>
+          </div>
+          
+          <div className="grid grid-cols-3 gap-4 lg:gap-8">
+            <div className="text-center">
+              <p className="text-gray-400 text-xs uppercase tracking-wider mb-1">Total Revenue</p>
+              <p className="text-xl font-bold text-white">{formatCurrency(totalRevenue)}</p>
+            </div>
+            <div className="text-center">
+              <p className="text-gray-400 text-xs uppercase tracking-wider mb-1">Total Expenses</p>
+              <p className="text-xl font-bold text-white">{formatCurrency(totalExpenses)}</p>
+            </div>
+            <div className="text-center">
+              <p className="text-gray-400 text-xs uppercase tracking-wider mb-1">Forecast Profit</p>
+              <p className={`text-xl font-bold ${forecastProfit >= 0 ? 'text-success' : 'text-risk'}`}>
+                {formatCurrency(forecastProfit)}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ============================================ */}
       {/* ZONE A: EXECUTION */}
       {/* ============================================ */}
       <section data-testid="execution-zone">
