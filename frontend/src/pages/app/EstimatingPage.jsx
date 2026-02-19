@@ -456,10 +456,37 @@ const EstimatingPage = () => {
             {/* Modal Header */}
             <div className="flex items-center justify-between p-4 lg:p-6 border-b border-charcoal-700">
               <h2 className="text-xl font-bold text-white">New Quote</h2>
-              <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-white">
-                <X className="w-6 h-6" />
-              </button>
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={() => setShowAIModal(true)}
+                  className="bg-gradient-to-r from-purple-500 to-steel-500 hover:from-purple-600 hover:to-steel-600 text-white px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2"
+                  data-testid="ai-generate-btn"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  Generate Draft Estimate
+                </button>
+                <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-white">
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
             </div>
+            
+            {/* Margin Risk Warnings */}
+            {warnings.length > 0 && (
+              <div className="mx-4 lg:mx-6 mt-4 space-y-2">
+                {warnings.map((warning, index) => (
+                  <div 
+                    key={index} 
+                    className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm ${
+                      warning.type === 'error' ? 'bg-risk/20 text-risk' : 'bg-warning/20 text-warning'
+                    }`}
+                  >
+                    <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+                    {warning.message}
+                  </div>
+                ))}
+              </div>
+            )}
             
             {/* Modal Content */}
             <div className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-6">
