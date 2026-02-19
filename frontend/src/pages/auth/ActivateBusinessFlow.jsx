@@ -300,7 +300,16 @@ const ActivateBusinessFlow = () => {
 
   // Skip activation flow
   const handleSkip = async () => {
-    await updateProfile({ business_activation_skipped: true });
+    // Save skip state to localStorage
+    localStorage.setItem('tradeos_activation_skipped', 'true');
+    
+    // Try to update Supabase but don't block on failure
+    try {
+      await updateProfile({ business_activation_skipped: true });
+    } catch (err) {
+      console.warn('Skip flag save failed:', err);
+    }
+    
     navigate('/app/dashboard');
   };
 
