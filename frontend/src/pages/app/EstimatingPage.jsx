@@ -100,6 +100,86 @@ const EstimatingPage = () => {
   const markupAmount = subtotal * (quoteForm.profit_target_pct / 100);
   const total = subtotal + markupAmount;
 
+  // Margin Risk Warnings
+  const warnings = [];
+  const targetMargin = profile?.margin_target || 25;
+  
+  // Check for contingency
+  const hasContingency = quoteLines.some(line => 
+    line.scope_item?.toLowerCase().includes('contingency') || 
+    line.description?.toLowerCase().includes('contingency')
+  );
+  if (!hasContingency && subtotal > 0) {
+    warnings.push({ type: 'warning', message: 'No contingency line item detected. Consider adding 5-10% contingency.' });
+  }
+  
+  // Check markup percentage
+  if (quoteForm.profit_target_pct < 10 && subtotal > 0) {
+    warnings.push({ type: 'error', message: `Material markup (${quoteForm.profit_target_pct}%) is below recommended 10% minimum.` });
+  } else if (quoteForm.profit_target_pct < 15 && subtotal > 0) {
+    warnings.push({ type: 'warning', message: `Material markup (${quoteForm.profit_target_pct}%) is lower than industry average (15-20%).` });
+  }
+  
+  // Check margin vs target
+  const effectiveMargin = total > 0 ? (markupAmount / total) * 100 : 0;
+  if (effectiveMargin < targetMargin && subtotal > 0) {
+    warnings.push({ type: 'error', message: `Margin ${effectiveMargin.toFixed(1)}% is below your target of ${targetMargin}%.` });
+  }
+
+  // Generate AI Estimate
+  const generateAIEstimate = async () => {
+    if (!aiForm.project_type || !aiForm.approx_size) {
+      toast.error('Please fill in project type and size');
+      return;
+    }
+
+    setAiGenerating(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const response = await fetch(`${API_URL}/api/ai/generate-estimate`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session?.access_token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(aiForm)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate estimate');
+      }
+
+      const data = await response.json();
+      
+      // Populate quote lines with AI-generated items
+      if (data.line_items && data.line_items.length > 0) {
+        setQuoteLines(data.line_items.map((item, index) => ({
+          id: Date.now() + index,
+          scope_item: item.scope_item,
+          description: item.description,
+          qty: item.qty,
+          unit: item.unit,
+          unit_price: item.unit_price,
+          line_total: item.qty * item.unit_price
+        })));
+        
+        // Update quote form with suggestions
+        if (data.suggested_markup) {
+          setQuoteForm(prev => ({ ...prev, profit_target_pct: data.suggested_markup }));
+        }
+        
+        toast.success('AI estimate generated! Review and adjust as needed.');
+      }
+      
+      setShowAIModal(false);
+    } catch (error) {
+      console.error('Error generating AI estimate:', error);
+      toast.error('Failed to generate estimate. Please try again.');
+    } finally {
+      setAiGenerating(false);
+    }
+  };
+
   const updateLineTotal = (index, field, value) => {
     const newLines = [...quoteLines];
     newLines[index][field] = value;
