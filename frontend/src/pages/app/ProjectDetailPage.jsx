@@ -258,41 +258,64 @@ const ProjectDetailPage = () => {
       </div>
 
       {/* ============================================ */}
-      {/* FINANCIAL HEALTH PANEL */}
+      {/* PROFIT SNAPSHOT PANEL */}
       {/* ============================================ */}
-      <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6" data-testid="financial-health-panel">
-        <h2 className="text-sm font-semibold text-charcoal-600 uppercase tracking-wider mb-4">Financial Health</h2>
+      <div className="bg-gradient-to-br from-charcoal-800 to-charcoal-900 rounded-xl border border-charcoal-700 p-6" data-testid="profit-snapshot-panel">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">Profit Snapshot</h2>
+          <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium ${
+            forecastMargin >= targetMargin ? 'bg-success/20 text-success' : 
+            forecastMargin >= targetMargin * 0.8 ? 'bg-warning/20 text-warning' : 'bg-risk/20 text-risk'
+          }`}>
+            <div className={`w-2 h-2 rounded-full ${
+              forecastMargin >= targetMargin ? 'bg-success' : 
+              forecastMargin >= targetMargin * 0.8 ? 'bg-warning' : 'bg-risk'
+            }`} />
+            {forecastMargin >= targetMargin ? 'Healthy Margin' : 
+             forecastMargin >= targetMargin * 0.8 ? 'Near Target' : 'Below Target'}
+          </div>
+        </div>
         
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
-          <div>
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
+          <div className="bg-charcoal-700/30 rounded-lg p-3">
             <p className="text-xs text-gray-500 mb-1">Original Contract</p>
-            <p className="text-xl font-bold text-white">{formatCurrency(originalContract)}</p>
+            <p className="text-lg font-bold text-white">{formatCurrency(originalContract)}</p>
           </div>
-          <div>
+          <div className="bg-charcoal-700/30 rounded-lg p-3">
             <p className="text-xs text-gray-500 mb-1">Approved COs</p>
-            <p className="text-xl font-bold text-warning">{formatCurrency(approvedCOsTotal)}</p>
+            <p className="text-lg font-bold text-warning">{formatCurrency(approvedCOsTotal)}</p>
           </div>
-          <div>
+          <div className="bg-charcoal-700/30 rounded-lg p-3">
             <p className="text-xs text-gray-500 mb-1">Total Revenue</p>
-            <p className="text-xl font-bold text-steel-400">{formatCurrency(totalRevenue)}</p>
+            <p className="text-lg font-bold text-steel-400">{formatCurrency(totalRevenue)}</p>
           </div>
-          <div>
+          <div className="bg-charcoal-700/30 rounded-lg p-3">
             <p className="text-xs text-gray-500 mb-1">Total Expenses</p>
-            <p className="text-xl font-bold text-risk">{formatCurrency(totalExpenses)}</p>
+            <p className="text-lg font-bold text-gray-300">{formatCurrency(totalExpenses)}</p>
           </div>
-          <div>
+          <div className="bg-charcoal-700/30 rounded-lg p-3">
             <p className="text-xs text-gray-500 mb-1">Total Labor</p>
-            <p className="text-xl font-bold text-gray-300">{formatCurrency(totalLabor)}</p>
+            <p className="text-lg font-bold text-gray-300">{formatCurrency(totalLabor)}</p>
           </div>
-          <div>
-            <p className="text-xs text-gray-500 mb-1">Gross Profit</p>
-            <p className={`text-xl font-bold ${forecastProfit >= 0 ? 'text-success' : 'text-risk'}`}>
+          <div className="bg-charcoal-700/30 rounded-lg p-3">
+            <p className="text-xs text-gray-500 mb-1">Forecast Cost</p>
+            <p className="text-lg font-bold text-gray-300">{formatCurrency(forecastCost)}</p>
+          </div>
+          <div className="bg-charcoal-700/30 rounded-lg p-3">
+            <p className="text-xs text-gray-500 mb-1">Projected Profit</p>
+            <p className={`text-lg font-bold ${forecastProfit >= 0 ? 'text-success' : 'text-risk'}`}>
               {formatCurrency(forecastProfit)}
             </p>
           </div>
-          <div>
-            <p className="text-xs text-gray-500 mb-1">Margin</p>
-            <p className={`text-xl font-bold ${forecastMargin >= 15 ? 'text-success' : forecastMargin >= 10 ? 'text-warning' : 'text-risk'}`}>
+          <div className={`rounded-lg p-3 ${
+            forecastMargin >= targetMargin ? 'bg-success/20' : 
+            forecastMargin >= targetMargin * 0.8 ? 'bg-warning/20' : 'bg-risk/20'
+          }`}>
+            <p className="text-xs text-gray-400 mb-1">Projected Margin</p>
+            <p className={`text-2xl font-bold ${
+              forecastMargin >= targetMargin ? 'text-success' : 
+              forecastMargin >= targetMargin * 0.8 ? 'text-warning' : 'text-risk'
+            }`}>
               {forecastMargin.toFixed(1)}%
             </p>
           </div>
@@ -302,11 +325,14 @@ const ProjectDetailPage = () => {
         <div className="mt-4">
           <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
             <span>Completion: {project.percent_complete || 0}%</span>
-            <span>{formatCurrency(totalRevenue)} total</span>
+            <span>Target margin: {targetMargin}%</span>
           </div>
           <div className="h-2 bg-charcoal-700 rounded-full overflow-hidden">
             <div 
-              className="h-full bg-steel-500 rounded-full transition-all"
+              className={`h-full rounded-full transition-all ${
+                forecastMargin >= targetMargin ? 'bg-success' : 
+                forecastMargin >= targetMargin * 0.8 ? 'bg-warning' : 'bg-risk'
+              }`}
               style={{ width: `${project.percent_complete || 0}%` }}
             />
           </div>
