@@ -27,6 +27,7 @@ import { Logo, LogoIcon } from '../ui/Logo';
 import TrialCountdown from '../trial/TrialCountdown';
 import TrialExpiredModal from '../trial/TrialExpiredModal';
 import QuickAddExpenseModal from './QuickAddExpenseModal';
+import AICopilot from '../ai/AICopilot';
 
 const AppLayout = () => {
   const { profile, signOut } = useAuthStore();
