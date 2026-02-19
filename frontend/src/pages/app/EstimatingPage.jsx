@@ -9,11 +9,17 @@ import {
   Save,
   X,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  AlertTriangle,
+  Sparkles,
+  Loader2
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuthStore } from '../../store/authStore';
 import { downloadQuotePDF } from '../../utils/pdfGenerator';
+import { toast } from 'sonner';
+
+const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 const EstimatingPage = () => {
   const { id } = useParams();
