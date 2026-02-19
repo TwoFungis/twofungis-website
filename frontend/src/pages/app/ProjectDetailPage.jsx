@@ -185,9 +185,12 @@ const ProjectDetailPage = () => {
   const approvedCOsTotal = changeOrders.filter(co => co.status === 'approved').reduce((sum, co) => sum + (parseFloat(co.total_value) || 0), 0);
   const totalRevenue = originalContract + approvedCOsTotal;
   const totalExpenses = expenses.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
-  const totalLabor = expenses.filter(e => e.category === 'labor').reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
-  const forecastProfit = totalRevenue - totalExpenses;
+  const totalLabor = expenses.filter(e => e.category === 'labor' || e.category === 'Subcontractors').reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+  const percentComplete = parseFloat(project?.percent_complete) || 0;
+  const forecastCost = percentComplete > 0 ? (totalExpenses / (percentComplete / 100)) : totalExpenses;
+  const forecastProfit = totalRevenue - forecastCost;
   const forecastMargin = totalRevenue > 0 ? (forecastProfit / totalRevenue) * 100 : 0;
+  const targetMargin = 25; // Default target margin
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: ClipboardList },
