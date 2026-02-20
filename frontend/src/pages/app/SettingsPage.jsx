@@ -13,7 +13,7 @@ import PWAInstallService from '../../services/PWAInstallService';
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 const SettingsPage = () => {
-  const { profile, user, updateProfile, signOut } = useAuthStore();
+  const { profile, user, updateProfile, signOut, markSetupComplete } = useAuthStore();
   const [searchParams] = useSearchParams();
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [paymentMessage, setPaymentMessage] = useState(null);
