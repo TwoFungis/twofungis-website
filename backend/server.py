@@ -198,6 +198,12 @@ app.include_router(receivables_router)
 # Include Profile routes
 app.include_router(profile_router)
 
+# Include Projects routes
+app.include_router(projects_router)
+
+# Include Quotes routes
+app.include_router(quotes_router)
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
