@@ -296,6 +296,7 @@ Three founding members have been granted lifetime Elite access:
 ## Version History
 | Date | Version | Changes |
 |------|---------|---------|
+| Feb 20, 2026 | 7.0 | **Quick Add + Offline Queue**: Floating "+" FAB on all pages, 3-tap expense flows (Fuel/Meal/Tool/Material), offline queue with localStorage, sync indicator in header, Today's Activity dashboard panel (4 metrics), receipt photo capture |
 | Feb 19, 2026 | 6.1 | **Activate Your Business Flow**: 5-step guided wizard (Labor Rate → Project → Milestone → Invoice → Expense), success screen with calculated metrics (Profit, Margin, Receivables, Cash Flow), skip option with dashboard reminder, localStorage fallback for Supabase limitations |
 | Feb 19, 2026 | 6.0 | **TradeOS Refinement Pack Phase 1**: 30-Day Cash Flow Forecast on dashboard (Expected Income, Projected Expenses, Net Projected), Profit Snapshot on project cards (Margin % badge + Projected Profit column), Receivables page with Send Reminder feature (3 tone templates via Resend), Receivables at a Glance on dashboard, Outstanding/Overdue invoice tracking with days_overdue |
 | Feb 19, 2026 | 5.1 | **Critical Bug Fixes**: Fixed founder account Reports page access (email check uses user.email), fixed sidebar plan display for founders (shows 'Lifetime Elite Plan'), fixed Setup Progress visibility for all users, fixed expense date field mapping (expense_date not date), verified AI Copilot typeable input, verified Quick Expense standalone button, verified Expenses edit/delete functionality |
