@@ -276,7 +276,7 @@ async def send_quote(
         if not quotes:
             raise HTTPException(status_code=404, detail="Quote not found")
         
-        quote = quotes[0]
+        # quotes[0] confirms quote exists and belongs to user
         
         # Update quote status to sent
         now = datetime.now(timezone.utc).isoformat()
