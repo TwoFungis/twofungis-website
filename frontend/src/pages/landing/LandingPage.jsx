@@ -1,5 +1,5 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   TrendingUp, 
   FileText, 
@@ -16,6 +16,9 @@ import {
   Download
 } from 'lucide-react';
 import { LogoLink } from '../../components/ui/Logo';
+import { useAuthStore } from '../../store/authStore';
+import PWAInstallModal from '../../components/app/PWAInstallModal';
+import PWAInstallService from '../../services/PWAInstallService';
 
 // Background images
 const IMAGES = {
