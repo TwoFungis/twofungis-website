@@ -23,6 +23,60 @@ export const useAuthStore = create((set, get) => ({
   profile: null,
   loading: true,
   initialized: false,
+  
+  // Setup progress tracking - for real-time updates
+  setupProgress: {
+    has_project: false,
+    has_labor_rate: false,
+    has_quote: false,
+    has_expense: false,
+    has_milestone: false,
+    has_invoice: false
+  },
+  setupProgressLoading: false,
+
+  // Refresh setup progress - can be called by any component after creating items
+  refreshSetupProgress: async () => {
+    const { user, profile } = get();
+    if (!user) return;
+    
+    set({ setupProgressLoading: true });
+    
+    try {
+      const [projectsRes, quotesRes, expensesRes, milestonesRes, invoicesRes] = await Promise.all([
+        supabase.from('projects').select('id').eq('user_id', user.id).limit(1),
+        supabase.from('estimates').select('id').eq('user_id', user.id).limit(1),
+        supabase.from('expenses').select('id').eq('user_id', user.id).limit(1),
+        supabase.from('project_milestones').select('id').eq('user_id', user.id).limit(1),
+        supabase.from('invoices').select('id').eq('user_id', user.id).limit(1)
+      ]);
+
+      set({
+        setupProgress: {
+          has_project: projectsRes.data?.length > 0,
+          has_labor_rate: !!profile?.labor_rate,
+          has_quote: quotesRes.data?.length > 0,
+          has_expense: expensesRes.data?.length > 0,
+          has_milestone: milestonesRes.data?.length > 0,
+          has_invoice: invoicesRes.data?.length > 0
+        },
+        setupProgressLoading: false
+      });
+    } catch (err) {
+      console.error('Error refreshing setup progress:', err);
+      set({ setupProgressLoading: false });
+    }
+  },
+
+  // Mark a specific setup item as complete (for immediate UI update)
+  markSetupComplete: (item) => {
+    set((state) => ({
+      setupProgress: {
+        ...state.setupProgress,
+        [item]: true
+      }
+    }));
+  },
 
   initialize: async () => {
     // Prevent duplicate initialization
