@@ -114,6 +114,44 @@ def get_route_prompts(route: str) -> List[str]:
             return prompts
     return ROUTE_PROMPTS.get("/app/dashboard", [])
 
+
+async def fetch_project_context_pack(project_id: str) -> Optional[Dict[str, Any]]:
+    """
+    Fetch a lightweight project context pack for the AI.
+    Single query, minimal data.
+    """
+    try:
+        import httpx
+        
+        headers = {
+            "apikey": SUPABASE_SERVICE_KEY,
+            "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+            "Content-Type": "application/json"
+        }
+        
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            response = await client.get(
+                f"{SUPABASE_URL}/rest/v1/projects?id=eq.{project_id}&select=name,client_gc,status,notes,contract_value,region",
+                headers=headers
+            )
+            
+            if response.status_code != 200 or not response.json():
+                return None
+            
+            project = response.json()[0]
+            
+            return {
+                "project_name": project.get("name"),
+                "client_name": project.get("client_gc"),
+                "status": project.get("status"),
+                "notes": project.get("notes"),
+                "contract_value": project.get("contract_value"),
+                "region": project.get("region")
+            }
+    except Exception as e:
+        logger.warning(f"Failed to fetch project context: {e}")
+        return None
+
 def build_system_prompt(context: CopilotContext, mode: str) -> str:
     """Build context-aware system prompt"""
     
