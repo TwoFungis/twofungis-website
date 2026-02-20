@@ -240,6 +240,7 @@ export const useAuthStore = create((set, get) => ({
     }
 
     isUpdatingProfile = true;
+    const API_URL = process.env.REACT_APP_BACKEND_URL;
 
     try {
       // Ensure we have a valid session first
@@ -258,7 +259,40 @@ export const useAuthStore = create((set, get) => ({
         await new Promise(resolve => setTimeout(resolve, 300));
       }
 
-      // Perform the database operation
+      // Get fresh session for auth header
+      const { data: { session: currentSession } } = await supabase.auth.getSession();
+      
+      // Try backend API first (more reliable, uses service key)
+      try {
+        const response = await fetch(`${API_URL}/api/profile/update`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${currentSession?.access_token}`
+          },
+          body: JSON.stringify(profileData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          console.log('Profile updated via backend API');
+          if (data.profile) {
+            set({ profile: data.profile });
+          } else {
+            await get().fetchProfile();
+          }
+          isUpdatingProfile = false;
+          return { error: null };
+        } else {
+          console.warn('Backend API update failed:', data.message);
+          // Fall through to try direct Supabase
+        }
+      } catch (apiError) {
+        console.warn('Backend API error, trying direct Supabase:', apiError.message);
+      }
+
+      // Fallback: Perform direct Supabase database operation
       let dbError = null;
       
       if (profile) {
