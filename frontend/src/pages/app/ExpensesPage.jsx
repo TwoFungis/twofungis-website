@@ -342,7 +342,7 @@ const ExpensesPage = () => {
       {showNewModal && (
         <NewExpenseModal 
           onClose={() => setShowNewModal(false)}
-          onSuccess={() => { setShowNewModal(false); fetchExpenses(); }}
+          onSuccess={() => { setShowNewModal(false); fetchExpenses(); markSetupComplete('has_expense'); }}
         />
       )}
 
