@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Mail, Lock, ArrowRight, Check } from 'lucide-react';
+import { Mail, Lock, ArrowRight, Check, Download } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { LogoLink } from '../../components/ui/Logo';
+import PWAInstallModal from '../../components/app/PWAInstallModal';
+import PWAInstallService from '../../services/PWAInstallService';
 
 const SignUpPage = () => {
   const [searchParams] = useSearchParams();
@@ -14,8 +16,14 @@ const SignUpPage = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPWAModal, setShowPWAModal] = useState(false);
   const { signUp } = useAuthStore();
   const navigate = useNavigate();
+
+  // Initialize PWA service
+  useEffect(() => {
+    PWAInstallService.init();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -43,9 +51,9 @@ const SignUpPage = () => {
       } else {
         // If user data is returned, they're automatically signed in
         if (result?.data?.user) {
-          console.log('User created, redirecting to onboarding');
-          // Redirect to onboarding
-          navigate('/onboarding');
+          console.log('User created, showing PWA install prompt');
+          // Show PWA install prompt before redirecting
+          setShowPWAModal(true);
         } else {
           console.log('No user data, showing success message');
           setSuccess(true);
@@ -57,6 +65,12 @@ const SignUpPage = () => {
       setError(err.message || 'An unexpected error occurred');
       setIsSubmitting(false);
     }
+  };
+
+  const handlePWAModalClose = () => {
+    setShowPWAModal(false);
+    // Redirect to onboarding after PWA modal
+    navigate('/onboarding');
   };
 
   if (success) {
@@ -83,6 +97,9 @@ const SignUpPage = () => {
 
   return (
     <div className="min-h-screen bg-charcoal-900 flex items-center justify-center px-4 py-12 relative">
+      {/* PWA Install Modal */}
+      <PWAInstallModal isOpen={showPWAModal} onClose={handlePWAModalClose} />
+      
       {/* Background Shield Watermark */}
       <div 
         className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-[0.03]"
@@ -98,8 +115,8 @@ const SignUpPage = () => {
         </div>
 
         <div className="bg-charcoal-800 rounded-2xl p-8 border border-charcoal-700" data-testid="signup-form">
-          <h2 className="text-2xl font-bold text-white mb-2 text-center italic">Start Your Free Trial</h2>
-          <p className="text-gray-400 text-center mb-2">30 days free, no credit card required</p>
+          <h2 className="text-2xl font-bold text-white mb-2 text-center italic">Download Free App</h2>
+          <p className="text-gray-400 text-center mb-2">30 days free trial included</p>
           <p className="text-steel-400 text-center text-sm mb-8 capitalize">
             Selected Plan: <strong>{selectedPlan}</strong>
           </p>
@@ -169,7 +186,8 @@ const SignUpPage = () => {
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
                 <>
-                  Create Account
+                  <Download className="w-5 h-5" />
+                  Create Account & Download
                   <ArrowRight className="w-5 h-5" />
                 </>
               )}
