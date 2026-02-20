@@ -82,7 +82,7 @@ const AICopilot = () => {
     }
   }, [location.pathname, isOpen]);
   
-  // Fetch project context if on project page
+  // Fetch project context banner info if on project page
   useEffect(() => {
     const fetchProjectContext = async () => {
       if (!projectId) {
@@ -106,11 +106,14 @@ const AICopilot = () => {
         }
       } catch (error) {
         console.error('Error fetching project context:', error);
+        setProjectContext(null);
       }
     };
     
     if (isOpen && projectId) {
       fetchProjectContext();
+    } else if (!projectId) {
+      setProjectContext(null);
     }
   }, [projectId, isOpen]);
   
