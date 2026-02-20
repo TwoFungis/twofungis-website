@@ -195,17 +195,7 @@ const AppLayout = () => {
             {/* Trial Countdown Badge */}
             <TrialCountdown />
             
-            {/* Quick Expense Button - Standalone */}
-            <button
-              onClick={() => setShowQuickExpenseModal(true)}
-              className="bg-success/20 hover:bg-success/30 text-success border border-success/30 px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
-              data-testid="quick-expense-btn"
-            >
-              <Wallet className="w-5 h-5" />
-              <span className="hidden sm:inline">Quick Expense</span>
-            </button>
-            
-            {/* Quick Add Dropdown */}
+            {/* Quick Add Dropdown - includes Quick Expense */}
             <div className="relative">
               <button
                 onClick={() => setQuickActionOpen(!quickActionOpen)}
@@ -220,7 +210,19 @@ const AppLayout = () => {
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setQuickActionOpen(false)} />
                   <div className="absolute right-0 mt-2 w-52 bg-charcoal-800 rounded-lg shadow-xl border border-charcoal-700 py-2 z-50">
-                    {quickActions.filter(a => a.label !== 'Quick Expense').map((action, idx) => (
+                    {/* Quick Expense at top with highlight */}
+                    <button
+                      onClick={() => {
+                        setShowQuickExpenseModal(true);
+                        setQuickActionOpen(false);
+                      }}
+                      className="flex items-center gap-3 w-full px-4 py-2 text-success hover:text-success hover:bg-success/10 font-medium border-b border-charcoal-700 pb-2 mb-1"
+                      data-testid="quick-action-quick-expense"
+                    >
+                      <Wallet className="w-4 h-4" />
+                      Quick Expense
+                    </button>
+                    {quickActions.filter(a => a.label !== 'Quick Expense').map((action) => (
                       <button
                         key={action.label}
                         onClick={() => {
@@ -231,11 +233,7 @@ const AppLayout = () => {
                           }
                           setQuickActionOpen(false);
                         }}
-                        className={`flex items-center gap-3 w-full px-4 py-2 transition-colors ${
-                          action.highlight 
-                            ? 'text-steel-400 hover:text-steel-300 hover:bg-steel-500/10 font-medium' 
-                            : 'text-gray-300 hover:text-white hover:bg-charcoal-700'
-                        } ${idx === 0 ? 'border-b border-charcoal-700 pb-2 mb-1' : ''}`}
+                        className="flex items-center gap-3 w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-charcoal-700 transition-colors"
                         data-testid={`quick-action-${action.label.toLowerCase().replace(/\s+/g, '-')}`}
                       >
                         <action.icon className="w-4 h-4" />
