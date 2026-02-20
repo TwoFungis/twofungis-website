@@ -332,6 +332,7 @@ const LandingPage = () => {
                 </ul>
                 <Link
                   to="/signup"
+                  onClick={handleCTAClick}
                   className={`block w-full py-3 rounded-lg font-semibold text-center transition-colors flex items-center justify-center gap-2 ${
                     plan.popular
                       ? 'bg-steel-500 hover:bg-steel-600 text-white'
