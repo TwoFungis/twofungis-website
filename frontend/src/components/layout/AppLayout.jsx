@@ -357,6 +357,9 @@ const AppLayout = () => {
       
       {/* Update Banner - Shows when service worker update is available */}
       <UpdateBanner />
+      
+      {/* PWA Redirect Modal - Shows when user opens in browser but has app installed */}
+      <PWARedirectModal />
     </div>
   );
 };
