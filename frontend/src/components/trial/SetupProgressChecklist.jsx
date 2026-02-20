@@ -188,7 +188,7 @@ const SetupProgressChecklist = () => {
         <div className="px-4 pb-4 border-t border-charcoal-700">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-4">
             {CHECKLIST_ITEMS.map((item) => {
-              const isCompleted = progress[item.checkField];
+              const isCompleted = setupProgress[item.checkField];
               const Icon = item.icon;
               
               return (
