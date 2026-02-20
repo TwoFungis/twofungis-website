@@ -98,6 +98,7 @@ async def supabase_request(method: str, table: str, data: Dict = None, params: D
 async def get_user_profile(user_id: str) -> Optional[Dict]:
     """Fetch user profile for access control checks"""
     try:
+        # First try with new columns
         profiles = await supabase_request(
             "GET",
             "users_profile",
@@ -107,6 +108,25 @@ async def get_user_profile(user_id: str) -> Optional[Dict]:
             }
         )
         return profiles[0] if profiles else None
+    except HTTPException as e:
+        # If columns don't exist, fall back to basic query
+        if '42703' in str(e.detail) or 'does not exist' in str(e.detail):
+            logger.info("Trial columns not found in projects, using basic profile query")
+            try:
+                profiles = await supabase_request(
+                    "GET",
+                    "users_profile",
+                    params={
+                        "user_id": f"eq.{user_id}",
+                        "select": "subscription_tier"
+                    }
+                )
+                return profiles[0] if profiles else None
+            except Exception as e2:
+                logger.warning(f"Failed to fetch basic profile: {e2}")
+                return None
+        logger.warning(f"Failed to fetch profile: {e}")
+        return None
     except Exception as e:
         logger.warning(f"Failed to fetch profile: {e}")
         return None
