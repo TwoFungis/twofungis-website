@@ -79,7 +79,7 @@ async def verify_jwt_token(authorization: str) -> str:
 
 @router.get("/me")
 async def get_my_profile(authorization: str = Header(...)):
-    """Get current user's profile"""
+    """Get current user's profile with access state"""
     user_id = await verify_jwt_token(authorization)
     
     try:
@@ -99,13 +99,21 @@ async def get_my_profile(authorization: str = Header(...)):
                 return ProfileResponse(
                     success=False,
                     message="Profile not found",
-                    profile=None
+                    profile=None,
+                    access_state="LOCKED"
                 )
+            
+            profile = profiles[0]
+            
+            # Compute access state
+            access_info = compute_access_state(profile)
             
             return ProfileResponse(
                 success=True,
                 message="Profile found",
-                profile=profiles[0]
+                profile=profile,
+                access_state=access_info.state,
+                trial_days_remaining=access_info.trial_days_remaining
             )
             
     except HTTPException:
