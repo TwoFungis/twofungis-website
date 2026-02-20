@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, ArrowRight } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { LogoLink } from '../../components/ui/Logo';
+import PWARedirectModal from '../../components/app/PWARedirectModal';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
