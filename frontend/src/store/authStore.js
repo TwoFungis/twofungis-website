@@ -99,13 +99,19 @@ export const useAuthStore = create((set, get) => ({
     const paidTiers = ['pro', 'elite', 'lifetime', 'founding', 'founding_lifetime', 'lifetime_elite'];
     const tier = (profile.subscription_tier || '').toLowerCase().trim();
     
-    // Check for paid tier
+    // Check for paid tier FIRST
     if (paidTiers.includes(tier)) {
       return { state: 'ACTIVE', daysRemaining: null, restrictions: {} };
     }
     
     // Check for grandfathered status
     if (profile.grandfathered_active === true) {
+      return { state: 'ACTIVE', daysRemaining: null, restrictions: {} };
+    }
+    
+    // Pre-migration compatibility: if grandfathered_active column doesn't exist
+    // and no trial_ends_at, treat as grandfathered (ACTIVE)
+    if (profile.grandfathered_active === undefined && !profile.trial_ends_at) {
       return { state: 'ACTIVE', daysRemaining: null, restrictions: {} };
     }
     
