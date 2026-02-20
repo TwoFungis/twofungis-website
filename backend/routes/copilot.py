@@ -118,38 +118,67 @@ def get_route_prompts(route: str) -> List[str]:
 async def fetch_project_context_pack(project_id: str) -> Optional[Dict[str, Any]]:
     """
     Fetch a lightweight project context pack for the AI.
-    Single query, minimal data.
+    Single query, minimal data, fail-fast with timeout.
+    Returns None on any failure - copilot continues in General Mode.
     """
+    import httpx
+    
+    # Field size caps
+    MAX_NOTES_LENGTH = 1500
+    MAX_FIELD_LENGTH = 500
+    TIMEOUT_SECONDS = 3.0  # Fail fast - don't block AI reply
+    
+    def truncate(value: Any, max_len: int) -> Optional[str]:
+        """Safely truncate a field value"""
+        if value is None:
+            return None
+        s = str(value)
+        if len(s) > max_len:
+            return s[:max_len] + "..."
+        return s
+    
     try:
-        import httpx
-        
         headers = {
             "apikey": SUPABASE_SERVICE_KEY,
             "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
             "Content-Type": "application/json"
         }
         
-        async with httpx.AsyncClient(timeout=5.0) as client:
+        async with httpx.AsyncClient(timeout=TIMEOUT_SECONDS) as client:
             response = await client.get(
                 f"{SUPABASE_URL}/rest/v1/projects?id=eq.{project_id}&select=name,client_gc,status,notes,contract_value,region",
                 headers=headers
             )
             
-            if response.status_code != 200 or not response.json():
+            if response.status_code != 200:
+                logger.warning(f"Copilot context fetch failed for project_id={project_id} reason=HTTP {response.status_code}")
                 return None
             
-            project = response.json()[0]
+            data = response.json()
+            if not data:
+                logger.warning(f"Copilot context fetch failed for project_id={project_id} reason=Project not found")
+                return None
             
+            project = data[0]
+            
+            # Return context with capped field sizes
             return {
-                "project_name": project.get("name"),
-                "client_name": project.get("client_gc"),
-                "status": project.get("status"),
-                "notes": project.get("notes"),
-                "contract_value": project.get("contract_value"),
-                "region": project.get("region")
+                "project_name": truncate(project.get("name"), MAX_FIELD_LENGTH),
+                "client_name": truncate(project.get("client_gc"), MAX_FIELD_LENGTH),
+                "status": truncate(project.get("status"), MAX_FIELD_LENGTH),
+                "notes": truncate(project.get("notes"), MAX_NOTES_LENGTH),
+                "contract_value": project.get("contract_value"),  # Numeric, no truncation
+                "region": truncate(project.get("region"), MAX_FIELD_LENGTH)
             }
+            
+    except httpx.TimeoutException:
+        logger.warning(f"Copilot context fetch failed for project_id={project_id} reason=Timeout after {TIMEOUT_SECONDS}s")
+        return None
+    except httpx.ConnectError as e:
+        logger.warning(f"Copilot context fetch failed for project_id={project_id} reason=Connection error: {e}")
+        return None
     except Exception as e:
-        logger.warning(f"Failed to fetch project context: {e}")
+        logger.warning(f"Copilot context fetch failed for project_id={project_id} reason={type(e).__name__}: {e}")
         return None
 
 def build_system_prompt(context: CopilotContext, mode: str, project_context: Optional[Dict[str, Any]] = None) -> str:
