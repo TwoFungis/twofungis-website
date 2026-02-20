@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { 
   User, CreditCard, Bell, Shield, Check, Loader2, Crown, FileText, Save, X, 
-  Clock, Edit2, Eye, EyeOff, AlertTriangle, Trash2, DollarSign
+  Clock, Edit2, Eye, EyeOff, AlertTriangle, Trash2, DollarSign, RefreshCw, Smartphone, Download
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
+import ServiceWorkerUpdateService from '../../services/ServiceWorkerUpdateService';
+import PWAInstallService from '../../services/PWAInstallService';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
