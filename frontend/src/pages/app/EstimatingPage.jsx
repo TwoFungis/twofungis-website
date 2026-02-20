@@ -26,7 +26,7 @@ const EstimatingPage = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const showNewModal = searchParams.get('new') === 'true';
-  const { user, profile } = useAuthStore();
+  const { user, profile, markSetupComplete } = useAuthStore();
   
   const [quotes, setQuotes] = useState([]);
   const [loading, setLoading] = useState(true);
