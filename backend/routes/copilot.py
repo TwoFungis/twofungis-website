@@ -371,11 +371,39 @@ Help users navigate TradeOS and understand features. When giving instructions:
     return base_prompt
 
 @router.post("/copilot", response_model=CopilotResponse)
-async def copilot_chat(request: CopilotRequest):
+async def copilot_chat(request: CopilotRequest, authorization: str = Header(None)):
     """
     Main Copilot endpoint - context-aware AI assistant
+    With Trial/Locked mode enforcement
     """
     try:
+        # Get user_id for access control (optional - falls back to tier check)
+        user_id = get_user_id_from_token(authorization) if authorization else None
+        profile = None
+        access_state = "ACTIVE"  # Default for unauthenticated/missing profile
+        is_locked = False
+        ai_needs_reset = False
+        
+        # Check access control if we have a user
+        if user_id:
+            profile = await get_user_profile_for_ai(user_id)
+            if profile:
+                access_info = compute_access_state(profile)
+                access_state = access_info.state
+                is_locked = access_state == "LOCKED"
+                
+                # Check AI daily limit for locked users
+                if is_locked:
+                    can_use, error_msg, ai_needs_reset = check_ai_daily_limit(profile)
+                    if not can_use:
+                        return CopilotResponse(
+                            assistant_message=f"**{error_msg}**\n\nYou've reached your daily AI limit. Upgrade to PRO or Elite for unlimited AI assistance.\n\nGo to **Settings > Subscription** to upgrade.",
+                            action_suggestions=[
+                                ActionSuggestion(label="Upgrade Now", action="navigate", route="/app/settings")
+                            ],
+                            mode="restricted"
+                        )
+        
         # Determine mode from message content or explicit mode
         mode = request.mode
         message_lower = request.message.lower()
