@@ -303,3 +303,85 @@ async def update_activation_status(
             "message": str(e),
             "error": "EXCEPTION"
         }
+
+
+@router.get("/access-state")
+async def get_access_state(authorization: str = Header(...)):
+    """
+    Get the current user's access state (ACTIVE, TRIAL, or LOCKED).
+    Used by frontend to determine UI restrictions.
+    """
+    user_id = await verify_jwt_token(authorization)
+    
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                f"{SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}&select=subscription_tier,grandfathered_active,trial_started_at,trial_ends_at,locked_project_created,locked_quote_created,locked_invoice_created,ai_daily_usage,ai_usage_reset_at",
+                headers=await get_service_headers()
+            )
+            
+            if response.status_code != 200:
+                logger.error(f"Failed to fetch profile for access state: {response.text}")
+                return {
+                    "state": "LOCKED",
+                    "trial_days_remaining": None,
+                    "restrictions": {
+                        "can_create_project": False,
+                        "can_create_quote": False,
+                        "can_create_invoice": False,
+                        "can_send": False,
+                        "ai_remaining": 0
+                    }
+                }
+            
+            profiles = response.json()
+            
+            if not profiles:
+                return {
+                    "state": "LOCKED",
+                    "trial_days_remaining": None,
+                    "restrictions": {
+                        "can_create_project": False,
+                        "can_create_quote": False,
+                        "can_create_invoice": False,
+                        "can_send": False,
+                        "ai_remaining": 0
+                    }
+                }
+            
+            profile = profiles[0]
+            access_info = compute_access_state(profile)
+            
+            # Calculate specific restrictions for LOCKED mode
+            if access_info.state == "LOCKED":
+                restrictions = {
+                    "can_create_project": not profile.get('locked_project_created', False),
+                    "can_create_quote": not profile.get('locked_quote_created', False),
+                    "can_create_invoice": not profile.get('locked_invoice_created', False),
+                    "can_send": False,
+                    "ai_remaining": max(0, 3 - (profile.get('ai_daily_usage', 0) or 0))
+                }
+            else:
+                restrictions = {
+                    "can_create_project": True,
+                    "can_create_quote": True,
+                    "can_create_invoice": True,
+                    "can_send": True,
+                    "ai_remaining": -1  # Unlimited
+                }
+            
+            return {
+                "state": access_info.state,
+                "trial_days_remaining": access_info.trial_days_remaining,
+                "is_grandfathered": access_info.is_grandfathered,
+                "restrictions": restrictions
+            }
+            
+    except Exception as e:
+        logger.error(f"Error getting access state: {e}")
+        return {
+            "state": "LOCKED",
+            "trial_days_remaining": None,
+            "error": str(e)
+        }
+
