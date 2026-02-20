@@ -171,17 +171,17 @@ const QuickAddFab = () => {
 
   return (
     <>
-      {/* Floating Quick Add Button - Positioned above AI Support (bottom-20 + spacing) */}
+      {/* Floating Quick Expense Button - Positioned above AI Support */}
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-36 right-6 z-40 flex flex-col items-center transition-all hover:scale-105"
+        className="fixed bottom-40 right-6 z-40 flex flex-col items-center transition-all hover:scale-105"
         data-testid="quick-add-fab"
-        aria-label="Quick Add"
+        aria-label="Quick Expense"
       >
         <div className="w-14 h-14 rounded-full shadow-xl bg-charcoal-800 border-2 border-amber-500 flex items-center justify-center hover:border-amber-400 transition-colors">
           <Shield className="w-7 h-7 text-amber-400" />
         </div>
-        <span className="text-xs font-semibold text-amber-400 mt-1 tracking-wide">QUICK ADD</span>
+        <span className="text-[10px] font-semibold text-amber-400 mt-1.5 tracking-wide whitespace-nowrap">QUICK EXPENSE</span>
       </button>
 
       {/* Quick Add Panel */}
