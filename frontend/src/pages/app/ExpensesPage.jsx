@@ -248,7 +248,7 @@ const ExpensesPage = () => {
       </div>
 
       {/* Expenses List */}
-      <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 overflow-hidden">
+      <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 overflow-x-auto overflow-y-visible">
         {isLoading ? (
           <div className="p-8 text-center">
             <div className="w-8 h-8 border-2 border-steel-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
