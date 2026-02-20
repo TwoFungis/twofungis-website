@@ -435,6 +435,9 @@ const LandingPage = () => {
           </div>
         </div>
       </footer>
+
+      {/* PWA Install Modal - Shown when logged-in user clicks CTA */}
+      <PWAInstallModal isOpen={showPWAModal} onClose={handlePWAModalClose} />
     </div>
   );
 };
