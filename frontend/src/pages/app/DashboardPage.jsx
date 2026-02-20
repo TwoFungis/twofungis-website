@@ -199,6 +199,9 @@ const DashboardPage = () => {
 
   return (
     <div className="space-y-8" data-testid="dashboard-page">
+      {/* Trial/Locked Banner - Show for non-active users (except founders) */}
+      {!isFounder && <TrialLockedBanner />}
+      
       {/* Gold Founder Badge - Show for founding lifetime users */}
       {isFounder && (
         <div className="bg-gradient-to-r from-warning/20 via-warning/10 to-warning/20 rounded-xl border border-warning/40 p-4" data-testid="founder-badge">
