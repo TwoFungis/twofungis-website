@@ -47,7 +47,7 @@ const QUICK_CATEGORIES = [
 ];
 
 const QuickAddFab = () => {
-  const { user } = useAuthStore();
+  const { user, markSetupComplete } = useAuthStore();
   const [isOpen, setIsOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
