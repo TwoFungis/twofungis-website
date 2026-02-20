@@ -184,7 +184,8 @@ const LandingPage = () => {
               className="group bg-steel-500 hover:bg-steel-400 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all hover:shadow-xl hover:shadow-steel-500/30 flex items-center justify-center gap-2"
               data-testid="hero-cta-btn"
             >
-              Start Free Month Trial
+              <Download className="w-5 h-5" />
+              Download Free App
               <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
             <a 
