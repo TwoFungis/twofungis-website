@@ -123,6 +123,94 @@ def get_route_prompts(route: str) -> List[str]:
     return ROUTE_PROMPTS.get("/app/dashboard", [])
 
 
+def get_user_id_from_token(authorization: str) -> Optional[str]:
+    """Extract user_id from JWT token"""
+    if not authorization or not authorization.startswith('Bearer '):
+        return None
+    try:
+        token = authorization.replace('Bearer ', '')
+        parts = token.split('.')
+        if len(parts) != 3:
+            return None
+        payload = parts[1]
+        padding = 4 - len(payload) % 4
+        if padding != 4:
+            payload += '=' * padding
+        decoded = base64.urlsafe_b64decode(payload)
+        data = json.loads(decoded)
+        return data.get('sub')
+    except Exception as e:
+        logger.error(f"Token decode error: {e}")
+        return None
+
+
+async def get_user_profile_for_ai(user_id: str) -> Optional[Dict[str, Any]]:
+    """Fetch user profile for AI access control"""
+    try:
+        headers = {
+            "apikey": SUPABASE_SERVICE_KEY,
+            "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+            "Content-Type": "application/json"
+        }
+        
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            response = await client.get(
+                f"{SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}&select=subscription_tier,grandfathered_active,trial_started_at,trial_ends_at,ai_daily_usage,ai_usage_reset_at",
+                headers=headers
+            )
+            
+            if response.status_code == 200:
+                profiles = response.json()
+                return profiles[0] if profiles else None
+    except Exception as e:
+        logger.warning(f"Failed to fetch profile for AI access: {e}")
+    return None
+
+
+async def update_ai_usage(user_id: str, needs_reset: bool):
+    """Update AI usage counter for locked users"""
+    try:
+        headers = {
+            "apikey": SUPABASE_SERVICE_KEY,
+            "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+            "Content-Type": "application/json",
+            "Prefer": "return=minimal"
+        }
+        
+        now = datetime.now(timezone.utc).isoformat()
+        
+        if needs_reset:
+            # Reset counter and set new reset time
+            update_data = {
+                "ai_daily_usage": 1,
+                "ai_usage_reset_at": now
+            }
+        else:
+            # Use RPC for atomic increment
+            async with httpx.AsyncClient(timeout=5.0) as client:
+                # Simple approach: fetch, increment, update
+                response = await client.get(
+                    f"{SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}&select=ai_daily_usage",
+                    headers=headers
+                )
+                if response.status_code == 200:
+                    profiles = response.json()
+                    current = profiles[0].get('ai_daily_usage', 0) or 0 if profiles else 0
+                    update_data = {"ai_daily_usage": current + 1}
+                else:
+                    update_data = {"ai_daily_usage": 1}
+        
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            await client.patch(
+                f"{SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}",
+                headers=headers,
+                json=update_data
+            )
+            logger.info(f"Updated AI usage for user {user_id}: {update_data}")
+    except Exception as e:
+        logger.error(f"Failed to update AI usage for user {user_id}: {e}")
+
+
 async def fetch_project_context_pack(project_id: str) -> Optional[Dict[str, Any]]:
     """
     Fetch a lightweight project context pack for the AI.
