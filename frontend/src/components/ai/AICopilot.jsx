@@ -295,15 +295,15 @@ const AICopilot = () => {
           </button>
         </div>
         
-        {/* Project Context Banner */}
-        {projectContext && (
-          <div className="px-4 py-2 bg-steel-500/10 border-b border-charcoal-700">
-            <p className="text-xs text-gray-400">
-              <span className="text-steel-400 font-medium">{projectContext.project_name}</span>
-              {' '}&bull;{' '}Margin: <span className={parseFloat(projectContext.projected_margin) >= 15 ? 'text-success' : 'text-warning'}>{projectContext.projected_margin}</span>
-            </p>
-          </div>
-        )}
+        {/* Context Mode Indicator */}
+        <div className="px-4 py-1.5 bg-charcoal-800/50 border-b border-charcoal-700/50">
+          <p className="text-[10px] text-gray-500 tracking-wide">
+            {projectId && projectContext 
+              ? "Using: Project Context" 
+              : "General Mode"
+            }
+          </p>
+        </div>
         
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4" style={{ height: 'calc(100vh - 200px)' }}>
