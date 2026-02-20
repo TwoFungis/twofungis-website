@@ -26,7 +26,7 @@ SUPABASE_SERVICE_KEY = os.environ.get('SUPABASE_SERVICE_KEY', '')
 
 class ProjectCreate(BaseModel):
     name: str
-    client_name: Optional[str] = None
+    client_gc: Optional[str] = None
     description: Optional[str] = None
     status: str = "active"
     start_date: Optional[str] = None
@@ -35,6 +35,7 @@ class ProjectCreate(BaseModel):
     labor_rate: Optional[float] = None
     tax_type: Optional[str] = None
     tax_rate: Optional[float] = None
+    region: Optional[str] = None
 
 
 def get_user_id_from_token(authorization: str) -> Optional[str]:
