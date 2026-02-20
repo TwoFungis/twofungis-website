@@ -63,6 +63,44 @@
 - Export CSV functionality
 - Disclaimer: "Estimates only — confirm with your accountant."
 
+### ✅ TradeOS Refinement Pack Phase 2 (Complete - Feb 20, 2026)
+**Focus: Speed, Clarity, Zero Friction - Jobsite usability**
+
+**1. Quick Add Floating Action Button (FAB)**
+- Blue floating "+" button (bottom-right, z-40) on all authenticated pages
+- Opens minimal quick-entry panel with 4 category buttons:
+  - **Fuel** (orange): Vehicle & Fuel, 100% deductible
+  - **Meal** (amber): Meals & Entertainment, 50% deductible
+  - **Tool** (blue): Tools (<$500), 100% deductible  
+  - **Material** (green): Materials, 100% deductible
+- 3-tap flow: Category → Amount + Vendor → Submit
+- Receipt photo capture with camera input
+- Success animation and auto-close
+
+**2. Offline Queue Service**
+- localStorage-based queue for offline entries
+- Queue item structure: id, type, data, createdAt, status
+- Auto-sync when connection restored
+- Event-based status updates
+
+**3. Sync Indicator (Header)**
+- Shows sync status: Syncing, Pending, Synced, Offline
+- Click to manually trigger sync
+- Hidden when all synced and online
+- Pending count badge
+
+**4. Today's Activity Panel (Dashboard)**
+- 4 metrics: Expenses logged, Invoices sent, Reminders sent, Projects updated
+- Each metric links to respective page
+- Expense and invoice totals shown
+- Empty state with Quick Add hint
+
+**New Files Created:**
+- `/app/frontend/src/services/OfflineQueueService.js`
+- `/app/frontend/src/components/app/QuickAddFab.jsx`
+- `/app/frontend/src/components/app/SyncIndicator.jsx`
+- `/app/frontend/src/components/app/TodaysActivityPanel.jsx`
+
 ### ✅ TradeOS Refinement Pack Phase 1 (Complete - Feb 19, 2026)
 **Focus: Financial Clarity - Get contractors paid faster**
 
