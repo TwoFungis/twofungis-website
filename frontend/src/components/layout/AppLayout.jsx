@@ -346,6 +346,9 @@ const AppLayout = () => {
       
       {/* AI Copilot */}
       <AICopilot />
+      
+      {/* Quick Add FAB (Floating Action Button) */}
+      <QuickAddFab />
     </div>
   );
 };
