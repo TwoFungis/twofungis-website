@@ -303,13 +303,14 @@ const LandingPage = () => {
                 </ul>
                 <Link
                   to="/signup"
-                  className={`block w-full py-3 rounded-lg font-semibold text-center transition-colors ${
+                  className={`block w-full py-3 rounded-lg font-semibold text-center transition-colors flex items-center justify-center gap-2 ${
                     plan.popular
                       ? 'bg-steel-500 hover:bg-steel-600 text-white'
                       : 'bg-charcoal-700 hover:bg-charcoal-600 text-white'
                   }`}
                 >
-                  Start Free Trial
+                  <Download className="w-4 h-4" />
+                  Download Free App
                 </Link>
               </div>
             ))}
