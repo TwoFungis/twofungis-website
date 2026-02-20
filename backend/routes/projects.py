@@ -178,15 +178,10 @@ async def create_project(
         project_data = {
             "user_id": user_id,
             "name": data.name,
-            "client_name": data.client_name,
-            "description": data.description,
+            "client_gc": data.client_gc,
+            "region": data.region,
             "status": data.status,
-            "start_date": data.start_date,
-            "end_date": data.end_date,
             "contract_value": data.contract_value,
-            "labor_rate": data.labor_rate,
-            "tax_type": data.tax_type,
-            "tax_rate": data.tax_rate,
             "created_at": datetime.now(timezone.utc).isoformat()
         }
         
