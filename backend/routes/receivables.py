@@ -427,11 +427,13 @@ async def get_cash_flow_forecast(
         # Calculate expected income from invoices
         invoice_income = []
         for inv in invoices:
-            due_date = inv.get('due_date')
+            due_date_str = inv.get('due_date')
             total = float(inv.get('total', 0) or 0)
             is_in_period = True
-            if due_date:
-                due = datetime.fromisoformat(due_date.replace('Z', '+00:00'))
+            
+            # Use safe datetime parsing
+            due = parse_datetime_safe(due_date_str)
+            if due:
                 is_in_period = due <= forecast_end
             
             if is_in_period:
@@ -440,7 +442,7 @@ async def get_cash_flow_forecast(
                     "id": inv.get('id'),
                     "description": f"Invoice {inv.get('invoice_number')} - {inv.get('client_name')}",
                     "amount": total,
-                    "due_date": due_date,
+                    "due_date": due_date_str,
                     "status": inv.get('status')
                 })
         
@@ -505,7 +507,26 @@ async def get_cash_flow_forecast(
         raise
     except Exception as e:
         logger.error(f"Error calculating cash flow forecast: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        # Return empty result instead of crashing
+        return {
+            "period_days": days,
+            "forecast_start": datetime.now(timezone.utc).isoformat(),
+            "forecast_end": (datetime.now(timezone.utc) + timedelta(days=days)).isoformat(),
+            "expected_income": {
+                "invoices": {"total": 0, "count": 0, "items": []},
+                "milestones": {"total": 0, "count": 0, "items": []},
+                "total": 0
+            },
+            "expected_expenses": {
+                "projected_total": 0,
+                "daily_average": 0,
+                "by_category": {},
+                "note": "Unable to calculate forecast"
+            },
+            "net_projected": 0,
+            "cash_flow_status": "neutral",
+            "error": "Unable to calculate cash flow forecast"
+        }
 
 
 @router.get("/reminder-templates")
