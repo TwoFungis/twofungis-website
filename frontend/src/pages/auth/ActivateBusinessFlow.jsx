@@ -336,15 +336,14 @@ const ActivateBusinessFlow = () => {
     // Use localStorage only as fallback if DB save failed
     if (!dbSaveSuccess) {
       localStorage.setItem('tradeos_activation_skipped', 'true');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[Activation] Skip state saved to localStorage (fallback)');
+      }
     } else {
       localStorage.removeItem('tradeos_activation_skipped');
-    }
-    
-    // Try to update Supabase but don't block on failure
-    try {
-      await updateProfile({ business_activation_skipped: true });
-    } catch (err) {
-      console.warn('Skip flag save failed:', err);
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[Activation] Skip state saved to DB');
+      }
     }
     
     navigate('/app/dashboard');
