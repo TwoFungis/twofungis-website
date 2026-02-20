@@ -110,6 +110,8 @@ const ProjectsPage = () => {
         setFormData({ name: '', client_gc: '', region: '', contract_value: '', notes: '' });
         setIsModalOpen(false);
         fetchProjects();
+        // Update setup progress
+        markSetupComplete('has_project');
       }
     } catch (err) {
       console.error('Error creating project:', err);
