@@ -273,7 +273,7 @@ const ExpensesPage = () => {
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-400 uppercase">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-charcoal-700">
+            <tbody className="divide-y divide-charcoal-700 overflow-visible">
               {filteredExpenses.map((expense) => {
                 const catConfig = CATEGORIES[expense.category] || CATEGORIES['Other'];
                 
