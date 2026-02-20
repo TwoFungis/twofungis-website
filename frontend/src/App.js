@@ -56,7 +56,10 @@ const ProtectedRoute = ({ children }) => {
   }
 
   // Check activation status from profile OR localStorage
-  const isActivated = profile?.business_activated || localStorage.getItem('tradeos_activation_completed') === 'true';
+  // Founders (lifetime plans) are considered pre-activated
+  const isFounder = profile?.subscription_tier?.toLowerCase()?.includes('lifetime') || 
+                    profile?.subscription_tier?.toLowerCase()?.includes('founding');
+  const isActivated = isFounder || profile?.business_activated || localStorage.getItem('tradeos_activation_completed') === 'true';
   const isSkipped = profile?.business_activation_skipped || localStorage.getItem('tradeos_activation_skipped') === 'true';
   
   // Redirect to activation flow if not completed and not skipped
