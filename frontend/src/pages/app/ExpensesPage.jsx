@@ -29,7 +29,7 @@ const CATEGORIES = {
 };
 
 const ExpensesPage = () => {
-  const { user } = useAuthStore();
+  const { user, markSetupComplete } = useAuthStore();
   const [expenses, setExpenses] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
