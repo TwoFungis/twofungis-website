@@ -313,7 +313,7 @@ const ExpensesPage = () => {
                       {activeActionMenu === expense.id && (
                         <>
                           <div className="fixed inset-0 z-40" onClick={() => setActiveActionMenu(null)} />
-                          <div className="absolute right-0 mt-1 w-36 bg-charcoal-700 rounded-lg shadow-xl border border-charcoal-600 py-1 z-50">
+                          <div className="absolute right-0 bottom-full mb-1 w-36 bg-charcoal-700 rounded-lg shadow-xl border border-charcoal-600 py-1 z-50">
                             <button
                               onClick={() => handleEditExpense(expense)}
                               className="w-full px-4 py-2 text-left text-sm text-white hover:bg-charcoal-600 flex items-center gap-2"
