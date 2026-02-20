@@ -271,13 +271,14 @@ const AICopilot = () => {
       
       {/* Copilot Drawer */}
       <div 
-        className={`fixed inset-y-0 right-0 z-50 w-full sm:w-96 lg:w-[420px] bg-charcoal-900 border-l border-charcoal-700 shadow-2xl transform transition-transform duration-300 ease-out ${
+        className={`fixed inset-y-0 right-0 z-50 w-full sm:w-96 lg:w-[420px] bg-charcoal-900 border-l border-charcoal-700 shadow-2xl transform transition-transform duration-300 ease-out flex flex-col ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
+        style={{ maxHeight: '100dvh' }}
         data-testid="ai-copilot-drawer"
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-charcoal-700 bg-charcoal-800">
+        <div className="flex-shrink-0 flex items-center justify-between p-4 border-b border-charcoal-700 bg-charcoal-800">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-steel-500 flex items-center justify-center">
               <Bot className="w-5 h-5 text-white" />
@@ -296,7 +297,7 @@ const AICopilot = () => {
         </div>
         
         {/* Context Mode Indicator */}
-        <div className="px-4 py-1.5 bg-charcoal-800/50 border-b border-charcoal-700/50">
+        <div className="flex-shrink-0 px-4 py-1.5 bg-charcoal-800/50 border-b border-charcoal-700/50">
           <p className="text-[10px] text-gray-500 tracking-wide">
             {projectId && projectContext 
               ? "Using: Project Context" 
@@ -305,8 +306,8 @@ const AICopilot = () => {
           </p>
         </div>
         
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4" style={{ height: 'calc(100vh - 200px)' }}>
+        {/* Messages - flexible height */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
           {messages.map((msg, i) => (
             <div 
               key={i} 
