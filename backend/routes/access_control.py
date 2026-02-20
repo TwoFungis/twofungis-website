@@ -33,19 +33,28 @@ def compute_access_state(profile: Optional[Dict[str, Any]]) -> AccessInfo:
     - LOCKED if: not ACTIVE and trial_ends_at <= now (or no trial set for new logic)
     
     Returns AccessInfo with state and metadata.
+    
+    Note: Handles missing trial/grandfathered columns gracefully (for pre-migration profiles).
     """
     if not profile:
         return AccessInfo(state="LOCKED", restrictions=get_locked_restrictions())
     
     now = datetime.now(timezone.utc)
     
-    # Check for paid subscription tier
+    # Check for paid subscription tier FIRST (this works even without migration)
     subscription_tier = (profile.get('subscription_tier') or '').lower().strip()
     if subscription_tier in PAID_TIERS:
         return AccessInfo(state="ACTIVE", is_grandfathered=False)
     
-    # Check for grandfathered status
-    if profile.get('grandfathered_active') is True:
+    # Check for grandfathered status (may not exist if migration not run)
+    grandfathered = profile.get('grandfathered_active')
+    if grandfathered is True:
+        return AccessInfo(state="ACTIVE", is_grandfathered=True)
+    
+    # If migration hasn't been run (no grandfathered_active column), 
+    # treat existing users without trial dates as ACTIVE (temporary compatibility)
+    if 'grandfathered_active' not in profile and profile.get('trial_ends_at') is None:
+        # Existing user without trial columns = grandfathered
         return AccessInfo(state="ACTIVE", is_grandfathered=True)
     
     # Check trial status
