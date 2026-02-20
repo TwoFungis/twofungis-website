@@ -44,10 +44,9 @@ const AICopilot = () => {
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   
-  const { getContext, location } = useCopilotContext();
+  const { getContext, location, projectId } = useCopilotContext();
   const { profile } = useAuthStore();
   const navigate = useNavigate();
-  const { id: projectId } = useParams();
   
   // Check if user has Elite access
   const tier = (profile?.subscription_tier || '').toLowerCase();
