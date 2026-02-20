@@ -1,121 +1,79 @@
 # TradeOS - Product Requirements Document
 
 ## Original Problem Statement
-Build "TradeOS," a financial tracking tool for contractors/tradespeople. Features include project management, invoicing, expense tracking, milestones, estimates, and an "Intelligence Layer" with AI copilot. The app should function as a PWA with offline capabilities.
+Build "TradeOS," a financial tracking tool for contractors. The application includes:
+- Profit Snapshot dashboard
+- Receivables/reminder system
+- "Activate Your Business" onboarding flow
+- "Quick Add" functionality for expenses
+- PWA installation support
+- Trial + Locked access monetization model (pending implementation)
 
 ## User Personas
-- **Small Trade Contractors**: Electricians, plumbers, carpenters who need to track projects, invoices, and expenses
-- **Growing Trades Businesses**: Contractors scaling up who need financial intelligence and forecasting
+- **Primary:** Independent contractors and small trade businesses
+- **Secondary:** Founding/Elite lifetime members with premium access
 
-## Core Requirements
-1. Project Management with margin tracking
-2. Invoicing with PDF generation and reminders
-3. Expense tracking with tax categorization
-4. Milestone tracking tied to projects
-5. Estimates/Quotes system
-6. PWA with offline support
-7. Financial dashboard with real-time metrics
+## Tech Stack
+- **Frontend:** React, TailwindCSS, Zustand, shadcn/ui
+- **Backend:** FastAPI (Python)
+- **Database:** Supabase (Postgres)
+- **Auth:** Supabase Auth
+- **Integrations:** Stripe (payments), Resend (email), OpenAI GPT-5.2 (AI Copilot via emergentintegrations)
 
----
+## Core Features Implemented
+1. ✅ User authentication (Supabase)
+2. ✅ Profit Snapshot dashboard
+3. ✅ Project management with quotes/invoices
+4. ✅ Expense tracking with Quick Add
+5. ✅ AI Copilot (project-aware, GPT-5.2 powered)
+6. ✅ Receivables system with reminders
+7. ✅ Setup Progress / Activation flow
+8. ✅ PWA support with service worker
+9. ✅ Subscription tiers (free, pro, elite, lifetime)
 
-## What's Been Implemented
+## Recent Fixes (Feb 20, 2026)
+### UI Issues Fixed:
+1. **AI Copilot Mobile Height** - Fixed drawer height for mobile viewports with safe area support
+2. **PWA Re-Install Detection** - Improved detection logic to properly reset when app is uninstalled  
+3. **Quick Add Button** - Restyled with Shield icon (amber) and repositioned above AI Support
 
-### P0-1: CTA & PWA Update (COMPLETED - Feb 20, 2026)
-- Added `UpdateBanner` component to `AppLayout.jsx` - shows when service worker update is available
-- Added "App" section to `SettingsPage.jsx` with:
-  - "Update App" button to check for updates
-  - "Install App" button for non-PWA users
-  - "Installed" badge for PWA users
-- Created `/app/frontend/public/sw.js` service worker
-- Created `/app/frontend/public/manifest.json` for PWA support
-- Updated `index.html` with PWA meta tags
+## Pending Implementation (P0)
+### Trial + Locked Access Model
+- 30-day PRO trial for new users
+- Database columns: `trial_started_at`, `trial_ends_at` on users_profile
+- Access states: `ACTIVE`, `TRIAL`, `LOCKED`
+- TRIAL mode: Dashboard banner "PRO Trial — X days left"
+- LOCKED mode:
+  - Banner: "Trial ended — Subscribe to keep sending invoices and using AI"
+  - View all existing data
+  - Create only 1 new project, 1 quote, 1 invoice (total)
+  - Disable sending/issuing
+  - AI Copilot: 3 messages/day, no Project Context mode
+- Server-side enforcement required
 
-### P0-2: Supabase Profile Update Fix (COMPLETED - Feb 20, 2026)
-- Created `/app/backend/routes/profile.py` with:
-  - `PATCH /api/profile/update` - reliable profile updates using service key
-  - `GET /api/profile/me` - fetch current user profile
-  - `POST /api/profile/activation-status` - update activation flow status
-- Updated `authStore.js` to use backend API as primary method, Supabase as fallback
-- **REQUIRES USER ACTION**: Run migration `/app/migrations/009_activation_columns.sql` in Supabase
+## Upcoming Tasks
+- **(P1)** Post-signup PWA install prompt enhancement
+- **(P1)** Estimate Templates + Production Rates
+- **(P1)** QuickBooks Sync (Sandbox-Ready)
 
-### P0-3: Setup Progress Real-Time Updates (COMPLETED - Feb 20, 2026)
-- Added `setupProgress` state to `authStore.js` tracking:
-  - has_project, has_labor_rate, has_quote, has_expense, has_milestone, has_invoice
-- Added `refreshSetupProgress()` function for full refresh
-- Added `markSetupComplete(item)` function for immediate UI updates
-- Updated `SetupProgressChecklist.jsx` to use authStore state
-- Added `markSetupComplete` calls to:
-  - `ProjectsPage.jsx` - when project created
-  - `InvoicesPage.jsx` - when invoice created
-  - `ExpensesPage.jsx` - when expense created
-  - `EstimatingPage.jsx` - when estimate created
-  - `MilestonesPage.jsx` - when milestone created
-  - `SettingsPage.jsx` - when labor rate saved
-  - `QuickAddFab.jsx` - when quick expense added
+## Future/Backlog
+- **(P2)** Trust Pack Settings Tab
+- **(P2)** Complete AI Copilot (plan gating, interaction logging)
+- **(P2)** Delete Account functionality
+- **(P2)** Performance optimization
 
-### Previous Phase Completions
-- **Financial Clarity (Phase 1)**: Profit Snapshot, Receivables page, Cash Flow Forecast
-- **Activate Your Business Flow**: 5-step onboarding wizard with skip option
-- **Quick Add + Offline Queue**: Floating action button with offline support
-- **Today's Activity Panel**: Dashboard summary of daily activities
-
----
-
-## Prioritized Backlog
-
-### P0 - Critical (User Action Required)
-- [ ] **Run Database Migration**: User must run `/app/migrations/009_activation_columns.sql` in Supabase SQL Editor to add missing columns (labor_rate, business_activated, etc.)
-
-### P1 - High Priority
-- [ ] Estimate Templates + Production Rates
-- [ ] QuickBooks Sync (Sandbox-Ready)
-
-### P2 - Medium Priority
-- [ ] Trust Pack Settings Tab (Contractor Packet PDF)
-- [ ] Complete AI Copilot (context injection, plan gating)
-- [ ] Delete Account functionality
-- [ ] Performance optimization (lazy loading)
-
-### P3 - Future
-- [ ] Full QuickBooks production integration
-- [ ] Multi-user team support
-- [ ] Client portal
-
----
-
-## Key Technical Architecture
-
-### Backend (FastAPI)
-- `/app/backend/server.py` - Main entry point
-- `/app/backend/routes/` - API route modules
-  - `profile.py` - Profile updates (NEW)
-  - `receivables.py` - Invoice reminders, cash flow
-  - `copilot.py` - AI assistance
-  - `founders.py` - Founder account management
-
-### Frontend (React)
-- `/app/frontend/src/store/authStore.js` - Global state with Zustand
-  - User auth, profile, setupProgress tracking
-- `/app/frontend/src/components/` - Reusable components
-- `/app/frontend/src/pages/` - Page components
-
-### Database (Supabase/Postgres)
-- `users_profile` - User settings and preferences
-- `projects`, `milestones`, `invoices`, `expenses` - Core business data
-
-### PWA
-- Service worker at `/app/frontend/public/sw.js`
-- Manifest at `/app/frontend/public/manifest.json`
-
----
+## Known Issues
+- Backend receivables API has datetime comparison bug (offset-naive vs offset-aware)
+- Setup Progress milestones need user verification
 
 ## Test Credentials
-- **Founder Account**: info@twofungis.ca / Marshall!31
+- **Founder Account:** info@twofungis.ca / Marshall!31
 
-## Version History
-| Date | Version | Changes |
-|------|---------|---------|
-| Feb 20, 2026 | 2.5 | P0-1/2/3: PWA updates, Profile API, Real-time progress |
-| Feb 18, 2026 | 2.4 | Quick Add, Today's Activity, CTA updates |
-| Feb 18, 2026 | 2.3 | Activate Your Business flow |
-| Feb 17, 2026 | 2.2 | Financial Clarity phase |
+## Key Files
+- `/app/frontend/src/components/ai/AICopilot.jsx`
+- `/app/frontend/src/components/app/QuickAddFab.jsx`
+- `/app/frontend/src/services/PWAInstallService.js`
+- `/app/frontend/src/components/app/PWARedirectModal.jsx`
+- `/app/frontend/src/store/authStore.js`
+- `/app/backend/routes/users.py`
+- `/app/backend/supabase_client.py`
