@@ -152,7 +152,7 @@ async def fetch_project_context_pack(project_id: str) -> Optional[Dict[str, Any]
         logger.warning(f"Failed to fetch project context: {e}")
         return None
 
-def build_system_prompt(context: CopilotContext, mode: str) -> str:
+def build_system_prompt(context: CopilotContext, mode: str, project_context: Optional[Dict[str, Any]] = None) -> str:
     """Build context-aware system prompt"""
     
     base_prompt = """You are the TradeOS AI Copilot powered by GPT-5.2.
@@ -187,14 +187,26 @@ USER CONTEXT:
         base_prompt += f"- Region: {context.region}\n"
     if context.subscription_tier:
         base_prompt += f"- Plan: {context.subscription_tier}\n"
-    base_prompt += f"- Current Page: {context.route}\n"
+    base_prompt += f"- Current Page: {context.page}\n"
     
-    # Add computed data if available
-    if context.computed:
-        base_prompt += "\nFINANCIAL DATA (USE THESE EXACT NUMBERS):\n"
-        for key, value in context.computed.items():
-            if value is not None:
-                base_prompt += f"- {key}: {value}\n"
+    # Add project context if available (TRADEOS_CONTEXT block)
+    if project_context:
+        base_prompt += """
+TRADEOS_CONTEXT (READ-ONLY - Use these exact values when answering about this project):
+"""
+        if project_context.get("project_name"):
+            base_prompt += f"- Project Name: {project_context['project_name']}\n"
+        if project_context.get("client_name"):
+            base_prompt += f"- Client: {project_context['client_name']}\n"
+        if project_context.get("status"):
+            base_prompt += f"- Status: {project_context['status']}\n"
+        if project_context.get("contract_value"):
+            base_prompt += f"- Contract Value: ${float(project_context['contract_value']):,.2f}\n"
+        if project_context.get("region"):
+            base_prompt += f"- Project Region: {project_context['region']}\n"
+        if project_context.get("notes"):
+            base_prompt += f"- Notes: {project_context['notes'][:200]}...\n" if len(project_context.get("notes", "")) > 200 else f"- Notes: {project_context['notes']}\n"
+        base_prompt += "\nUse this project data when the user asks about 'this project' or references the current project.\n"
     
     # Mode-specific instructions
     if mode == "estimate":
