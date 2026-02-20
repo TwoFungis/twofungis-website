@@ -1,9 +1,16 @@
 /**
  * TradeOS PWA Install Service
  * Handles PWA installation prompts and detection
+ * 
+ * Installation detection strategy:
+ * 1. Primary: Check if running in standalone mode (display-mode: standalone)
+ * 2. Secondary: Check iOS standalone mode (navigator.standalone)
+ * 3. The beforeinstallprompt event indicates app is NOT installed
+ * 4. localStorage flag is set on appinstalled event but cleared when prompt fires
  */
 
 let deferredPrompt = null;
+let installPromptFired = false;
 
 export const PWAInstallService = {
   // Store the deferred prompt event
@@ -14,46 +21,74 @@ export const PWAInstallService = {
         e.preventDefault();
         // Stash the event so it can be triggered later
         deferredPrompt = e;
-        console.log('PWA install prompt ready');
+        installPromptFired = true;
+        console.log('[PWA] Install prompt ready - app is NOT installed');
+        
+        // Clear any stale "installed" flag since prompt firing proves it's not installed
+        localStorage.removeItem('tradeos_pwa_installed');
+        
         // Dispatch custom event for components to listen
         window.dispatchEvent(new CustomEvent('pwa-install-available'));
       });
 
       window.addEventListener('appinstalled', () => {
-        console.log('PWA was installed');
+        console.log('[PWA] App was installed');
         deferredPrompt = null;
+        installPromptFired = false;
         localStorage.setItem('tradeos_pwa_installed', 'true');
+        localStorage.setItem('tradeos_pwa_install_time', Date.now().toString());
         window.dispatchEvent(new CustomEvent('pwa-installed'));
       });
     }
   },
 
-  // Check if PWA install is available
+  // Check if PWA install prompt is available
   isInstallAvailable: () => {
     return deferredPrompt !== null;
   },
 
-  // Check if already installed
-  isInstalled: () => {
-    // Check if in standalone mode (PWA)
+  // Check if currently running as PWA (standalone mode)
+  isRunningAsStandalone: () => {
+    // Check CSS media query for standalone mode
     if (window.matchMedia('(display-mode: standalone)').matches) {
       return true;
     }
-    // Check iOS standalone
+    // Check iOS Safari standalone
     if (window.navigator.standalone === true) {
-      return true;
-    }
-    // Check localStorage flag
-    if (localStorage.getItem('tradeos_pwa_installed') === 'true') {
       return true;
     }
     return false;
   },
 
+  // Check if PWA is installed - use multiple signals
+  isInstalled: () => {
+    // If currently running in standalone mode, definitely installed
+    if (PWAInstallService.isRunningAsStandalone()) {
+      return true;
+    }
+    
+    // If beforeinstallprompt fired this session, app is NOT installed
+    if (installPromptFired || deferredPrompt !== null) {
+      return false;
+    }
+    
+    // Fallback to localStorage flag (set on appinstalled event)
+    // This is less reliable as user may have uninstalled
+    return localStorage.getItem('tradeos_pwa_installed') === 'true';
+  },
+
+  // Clear installed status (when user indicates they uninstalled)
+  clearInstalledStatus: () => {
+    localStorage.removeItem('tradeos_pwa_installed');
+    localStorage.removeItem('tradeos_pwa_install_time');
+    installPromptFired = false;
+    console.log('[PWA] Install status cleared');
+  },
+
   // Trigger the install prompt
   promptInstall: async () => {
     if (!deferredPrompt) {
-      console.log('No install prompt available');
+      console.log('[PWA] No install prompt available');
       // For iOS or when prompt is not available, show manual instructions
       return { outcome: 'not-available', showManualInstructions: true };
     }
@@ -65,14 +100,18 @@ export const PWAInstallService = {
       // Wait for the user to respond to the prompt
       const { outcome } = await deferredPrompt.userChoice;
       
-      console.log(`User response to install prompt: ${outcome}`);
+      console.log(`[PWA] User response to install prompt: ${outcome}`);
       
       // Clear the prompt (can only be used once)
       deferredPrompt = null;
       
+      if (outcome === 'accepted') {
+        installPromptFired = false;
+      }
+      
       return { outcome, showManualInstructions: false };
     } catch (err) {
-      console.error('Error showing install prompt:', err);
+      console.error('[PWA] Error showing install prompt:', err);
       return { outcome: 'error', showManualInstructions: true };
     }
   },
