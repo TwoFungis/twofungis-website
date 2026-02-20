@@ -32,6 +32,7 @@ import AICopilot from '../ai/AICopilot';
 import QuickAddFab from '../app/QuickAddFab';
 import SyncIndicator from '../app/SyncIndicator';
 import UpdateBanner from '../app/UpdateBanner';
+import PWARedirectModal from '../app/PWARedirectModal';
 
 const AppLayout = () => {
   const { profile, signOut, user } = useAuthStore();
