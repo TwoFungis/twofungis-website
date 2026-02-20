@@ -380,8 +380,22 @@ export const useAuthStore = create((set, get) => ({
             console.log('[Auth] Activation state hydrated from DB');
           }
         }
+        
+        // Compute access state from profile data
+        const accessInfo = get().computeAccessState(data);
+        set({
+          accessState: accessInfo.state,
+          trialDaysRemaining: accessInfo.daysRemaining,
+          accessRestrictions: {
+            canCreateProject: accessInfo.restrictions?.canCreateProject ?? true,
+            canCreateQuote: accessInfo.restrictions?.canCreateQuote ?? true,
+            canCreateInvoice: accessInfo.restrictions?.canCreateInvoice ?? true,
+            canSend: accessInfo.restrictions?.canSend ?? true,
+            aiRemaining: accessInfo.restrictions?.aiRemaining ?? -1
+          }
+        });
       } else {
-        set({ profile: null });
+        set({ profile: null, accessState: 'LOCKED' });
       }
     } catch (err) {
       // Ignore body stream errors
