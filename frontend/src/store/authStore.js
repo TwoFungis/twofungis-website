@@ -24,6 +24,17 @@ export const useAuthStore = create((set, get) => ({
   loading: true,
   initialized: false,
   
+  // Access state for trial/locked mode
+  accessState: 'ACTIVE', // 'ACTIVE', 'TRIAL', 'LOCKED'
+  trialDaysRemaining: null,
+  accessRestrictions: {
+    canCreateProject: true,
+    canCreateQuote: true,
+    canCreateInvoice: true,
+    canSend: true,
+    aiRemaining: -1 // -1 = unlimited
+  },
+  
   // Setup progress tracking - for real-time updates
   setupProgress: {
     has_project: false,
