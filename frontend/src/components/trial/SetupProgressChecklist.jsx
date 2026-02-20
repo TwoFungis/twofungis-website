@@ -59,15 +59,15 @@ const CHECKLIST_ITEMS = [
 ];
 
 const SetupProgressChecklist = () => {
-  const { user, profile } = useAuthStore();
-  const [progress, setProgress] = useState({});
-  const [loading, setLoading] = useState(true);
+  const { user, profile, setupProgress, setupProgressLoading, refreshSetupProgress } = useAuthStore();
   const [isExpanded, setIsExpanded] = useState(false); // Start minimized
   const [dismissed, setDismissed] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
 
+  // Initial load
   useEffect(() => {
     if (user) {
-      checkProgress();
+      refreshSetupProgress().finally(() => setInitialLoading(false));
     }
   }, [user]);
 
@@ -79,41 +79,10 @@ const SetupProgressChecklist = () => {
     }
   }, []);
 
-  const checkProgress = async () => {
-    if (!user) return;
-    setLoading(true);
-
-    try {
-      const [projectsRes, quotesRes, expensesRes, milestonesRes, invoicesRes] = await Promise.all([
-        supabase.from('projects').select('id').eq('user_id', user.id).limit(1),
-        supabase.from('estimates').select('id').eq('user_id', user.id).limit(1),
-        supabase.from('expenses').select('id').eq('user_id', user.id).limit(1),
-        supabase.from('project_milestones').select('id').eq('user_id', user.id).limit(1),
-        supabase.from('invoices').select('id').eq('user_id', user.id).limit(1)
-      ]);
-
-      setProgress({
-        has_project: projectsRes.data?.length > 0,
-        has_labor_rate: !!profile?.labor_rate,
-        has_quote: quotesRes.data?.length > 0,
-        has_expense: expensesRes.data?.length > 0,
-        has_milestone: milestonesRes.data?.length > 0,
-        has_invoice: invoicesRes.data?.length > 0
-      });
-    } catch (err) {
-      console.error('Error checking setup progress:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Re-check when profile changes (for labor rate)
+  // Update labor rate progress when profile changes
   useEffect(() => {
-    if (profile) {
-      setProgress(prev => ({
-        ...prev,
-        has_labor_rate: !!profile?.labor_rate
-      }));
+    if (profile?.labor_rate) {
+      useAuthStore.getState().markSetupComplete('has_labor_rate');
     }
   }, [profile?.labor_rate]);
 
