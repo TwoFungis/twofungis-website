@@ -108,7 +108,7 @@ const SetupProgressChecklist = () => {
   };
 
   // Don't show if dismissed or still loading
-  if (dismissed || loading) return null;
+  if (dismissed || initialLoading) return null;
   
   // Show for ALL users until setup is complete
   // User requested: "The setup progress bar must be visible on all accounts until all milestones are completed"
