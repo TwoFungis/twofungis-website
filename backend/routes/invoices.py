@@ -256,7 +256,7 @@ async def list_invoices(
                     params={"invoice_id": f"eq.{invoice['id']}", "order": "sort_order.asc"}
                 )
                 invoice['line_items'] = line_items if isinstance(line_items, list) else []
-            except:
+            except Exception:
                 invoice['line_items'] = []
         
         # Calculate stats
