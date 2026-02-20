@@ -29,6 +29,8 @@ import TrialCountdown from '../trial/TrialCountdown';
 import TrialExpiredModal from '../trial/TrialExpiredModal';
 import QuickAddExpenseModal from './QuickAddExpenseModal';
 import AICopilot from '../ai/AICopilot';
+import QuickAddFab from '../app/QuickAddFab';
+import SyncIndicator from '../app/SyncIndicator';
 
 const AppLayout = () => {
   const { profile, signOut, user } = useAuthStore();
