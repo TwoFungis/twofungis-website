@@ -273,8 +273,15 @@ async def copilot_chat(request: CopilotRequest):
                 mode="restricted"
             )
         
+        # Fetch project context if project_id is provided
+        project_context = None
+        if request.context.project_id:
+            project_context = await fetch_project_context_pack(request.context.project_id)
+            if project_context:
+                logger.info(f"Copilot context attached: project_id={request.context.project_id}")
+        
         # Build system prompt with context
-        system_prompt = build_system_prompt(request.context, mode)
+        system_prompt = build_system_prompt(request.context, mode, project_context)
         
         # Create LLM chat instance
         session_id = str(uuid.uuid4())
