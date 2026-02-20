@@ -256,6 +256,8 @@ export const useAuthStore = create((set, get) => ({
     const { user } = get();
     if (!user) return;
 
+    let profileFetchSuccess = false;
+    
     try {
       const { data, error } = await supabase
         .from('users_profile')
@@ -270,13 +272,38 @@ export const useAuthStore = create((set, get) => ({
         }
       }
 
-      set({ profile: data || null });
+      if (data) {
+        profileFetchSuccess = true;
+        set({ profile: data });
+        
+        // DB is source of truth - clear any stale localStorage activation keys
+        // when we have valid DB values
+        if (data.business_activated !== null || data.business_activation_skipped !== null) {
+          localStorage.removeItem('tradeos_activation_completed');
+          localStorage.removeItem('tradeos_activation_skipped');
+          localStorage.removeItem('tradeos_activation_labor_rate');
+          if (process.env.NODE_ENV === 'development') {
+            console.log('[Auth] Activation state hydrated from DB');
+          }
+        }
+      } else {
+        set({ profile: null });
+      }
     } catch (err) {
       // Ignore body stream errors
       if (!err.message?.includes('body stream')) {
         console.error('FetchProfile error:', err);
       }
       set({ profile: null });
+    }
+    
+    // Log fallback scenario (dev only)
+    if (!profileFetchSuccess && process.env.NODE_ENV === 'development') {
+      const hasLocalStorage = localStorage.getItem('tradeos_activation_completed') || 
+                              localStorage.getItem('tradeos_activation_skipped');
+      if (hasLocalStorage) {
+        console.log('[Auth] Fallback to localStorage due to fetch failure');
+      }
     }
   },
 
