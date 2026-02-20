@@ -164,6 +164,9 @@ const LoginPage = () => {
           </div>
         </div>
       </div>
+      
+      {/* PWA Redirect Modal */}
+      <PWARedirectModal />
     </div>
   );
 };
