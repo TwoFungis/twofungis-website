@@ -45,7 +45,7 @@ export const useAuthStore = create((set, get) => ({
     try {
       const [projectsRes, quotesRes, expensesRes, milestonesRes, invoicesRes] = await Promise.all([
         supabase.from('projects').select('id').eq('user_id', user.id).limit(1),
-        supabase.from('estimates').select('id').eq('user_id', user.id).limit(1),
+        supabase.from('quotes').select('id').eq('user_id', user.id).limit(1),
         supabase.from('expenses').select('id').eq('user_id', user.id).limit(1),
         supabase.from('project_milestones').select('id').eq('user_id', user.id).limit(1),
         supabase.from('invoices').select('id').eq('user_id', user.id).limit(1)
