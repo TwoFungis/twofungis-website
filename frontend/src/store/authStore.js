@@ -89,6 +89,89 @@ export const useAuthStore = create((set, get) => ({
     }));
   },
 
+  // Compute access state from profile data
+  computeAccessState: (profile) => {
+    if (!profile) {
+      return { state: 'LOCKED', daysRemaining: null, restrictions: {} };
+    }
+
+    const now = new Date();
+    const paidTiers = ['pro', 'elite', 'lifetime', 'founding', 'founding_lifetime', 'lifetime_elite'];
+    const tier = (profile.subscription_tier || '').toLowerCase().trim();
+    
+    // Check for paid tier
+    if (paidTiers.includes(tier)) {
+      return { state: 'ACTIVE', daysRemaining: null, restrictions: {} };
+    }
+    
+    // Check for grandfathered status
+    if (profile.grandfathered_active === true) {
+      return { state: 'ACTIVE', daysRemaining: null, restrictions: {} };
+    }
+    
+    // Check trial status
+    const trialEndsAt = profile.trial_ends_at;
+    if (trialEndsAt) {
+      const trialEnd = new Date(trialEndsAt);
+      if (now < trialEnd) {
+        const daysRemaining = Math.ceil((trialEnd - now) / (1000 * 60 * 60 * 24));
+        return { state: 'TRIAL', daysRemaining: Math.max(0, daysRemaining), restrictions: {} };
+      } else {
+        // Trial expired
+        return { 
+          state: 'LOCKED', 
+          daysRemaining: 0,
+          restrictions: {
+            canCreateProject: !profile.locked_project_created,
+            canCreateQuote: !profile.locked_quote_created,
+            canCreateInvoice: !profile.locked_invoice_created,
+            canSend: false,
+            aiRemaining: Math.max(0, 3 - (profile.ai_daily_usage || 0))
+          }
+        };
+      }
+    }
+    
+    // No trial set and not grandfathered -> LOCKED
+    return { state: 'LOCKED', daysRemaining: null, restrictions: {} };
+  },
+
+  // Refresh access state from server
+  refreshAccessState: async () => {
+    const API_URL = process.env.REACT_APP_BACKEND_URL;
+    const { user } = get();
+    
+    if (!user) return;
+    
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) return;
+      
+      const response = await fetch(`${API_URL}/api/profile/access-state`, {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        set({
+          accessState: data.state || 'ACTIVE',
+          trialDaysRemaining: data.trial_days_remaining,
+          accessRestrictions: {
+            canCreateProject: data.restrictions?.can_create_project ?? true,
+            canCreateQuote: data.restrictions?.can_create_quote ?? true,
+            canCreateInvoice: data.restrictions?.can_create_invoice ?? true,
+            canSend: data.restrictions?.can_send ?? true,
+            aiRemaining: data.restrictions?.ai_remaining ?? -1
+          }
+        });
+      }
+    } catch (err) {
+      console.error('Error refreshing access state:', err);
+    }
+  },
+
   initialize: async () => {
     // Prevent duplicate initialization
     if (isInitializing || get().initialized) {
