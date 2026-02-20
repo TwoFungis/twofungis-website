@@ -329,12 +329,21 @@ async def create_invoice(
     data: InvoiceCreate,
     authorization: str = Header(None)
 ):
-    """Create a new invoice"""
+    """Create a new invoice with locked mode enforcement"""
     user_id = get_user_id_from_token(authorization)
     if not user_id:
         raise HTTPException(status_code=401, detail="Unauthorized")
     
     try:
+        # Check access control - LOCKED mode enforcement
+        profile = await get_user_profile(user_id)
+        access_info = compute_access_state(profile)
+        
+        if access_info.state == "LOCKED":
+            can_create, error_msg = can_create_in_locked_mode(profile, "invoice")
+            if not can_create:
+                raise HTTPException(status_code=403, detail=error_msg)
+        
         # Get next invoice number
         invoice_number = await get_next_invoice_number(user_id)
         
