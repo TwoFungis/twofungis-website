@@ -302,14 +302,19 @@ async def copilot_chat(request: CopilotRequest):
                 mode="restricted"
             )
         
-        # Fetch project context if project_id is provided
+        # Fetch project context if project_id is provided (fail-safe: never blocks AI reply)
         project_context = None
         if request.context.project_id:
-            project_context = await fetch_project_context_pack(request.context.project_id)
-            if project_context:
-                logger.info(f"Copilot context attached: project_id={request.context.project_id}")
+            try:
+                project_context = await fetch_project_context_pack(request.context.project_id)
+                if project_context:
+                    logger.info(f"Copilot context attached: project_id={request.context.project_id}")
+            except Exception as e:
+                # Extra safety net - should never reach here but ensures AI always replies
+                logger.error(f"Copilot context fetch unexpected error for project_id={request.context.project_id} reason={e}")
+                project_context = None
         
-        # Build system prompt with context
+        # Build system prompt with context (or None for General Mode)
         system_prompt = build_system_prompt(request.context, mode, project_context)
         
         # Create LLM chat instance
