@@ -64,15 +64,22 @@ const ActivateBusinessFlow = () => {
     
     setIsSubmitting(true);
     try {
-      // Try to update profile in Supabase
+      // Try to save to DB first (source of truth)
       const result = await updateProfile({ labor_rate: parseFloat(laborRate) });
+      const dbSaveSuccess = !result?.error;
       
-      // Even if Supabase fails, save to localStorage as fallback
-      localStorage.setItem('tradeos_labor_rate', laborRate);
-      
-      if (result?.error && !result.error.message?.includes('body stream')) {
-        console.warn('Labor rate save may have failed:', result.error);
-        // Continue anyway - we have localStorage backup
+      if (dbSaveSuccess) {
+        // Clear localStorage since DB is authoritative
+        localStorage.removeItem('tradeos_labor_rate');
+        if (process.env.NODE_ENV === 'development') {
+          console.log('[Activation] Labor rate saved to DB');
+        }
+      } else {
+        // Use localStorage only as fallback if DB save failed
+        localStorage.setItem('tradeos_labor_rate', laborRate);
+        if (process.env.NODE_ENV === 'development') {
+          console.log('[Activation] Labor rate saved to localStorage (fallback)');
+        }
       }
       
       toast.success('Labor rate saved!');
