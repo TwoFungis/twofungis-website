@@ -55,14 +55,25 @@ const ProtectedRoute = ({ children }) => {
     return <Navigate to="/onboarding" replace />;
   }
 
-  // Check activation status from profile OR localStorage
+  // Check activation status - DB is source of truth, localStorage is fallback only
   // Founders and Elite users are considered pre-activated
   const tierLower = (profile?.subscription_tier || '').toLowerCase();
   const isFounderOrElite = tierLower.includes('lifetime') || 
                            tierLower.includes('founding') ||
                            tierLower === 'elite';
-  const isActivated = isFounderOrElite || profile?.business_activated || localStorage.getItem('tradeos_activation_completed') === 'true';
-  const isSkipped = profile?.business_activation_skipped || localStorage.getItem('tradeos_activation_skipped') === 'true';
+  
+  // DB values take precedence when available (not null/undefined)
+  const dbActivated = profile?.business_activated;
+  const dbSkipped = profile?.business_activation_skipped;
+  
+  // Only use localStorage as fallback when DB values are null/undefined
+  const localActivated = localStorage.getItem('tradeos_activation_completed') === 'true';
+  const localSkipped = localStorage.getItem('tradeos_activation_skipped') === 'true';
+  
+  // Final activation state: DB wins when available, otherwise fallback to localStorage
+  const isActivated = isFounderOrElite || 
+                      (dbActivated !== null && dbActivated !== undefined ? dbActivated : localActivated);
+  const isSkipped = dbSkipped !== null && dbSkipped !== undefined ? dbSkipped : localSkipped;
   
   // Redirect to activation flow if not completed and not skipped
   if (user && profile && profile.onboarding_completed && !isActivated && !isSkipped) {
