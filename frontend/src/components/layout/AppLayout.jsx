@@ -210,17 +210,17 @@ const AppLayout = () => {
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setQuickActionOpen(false)} />
                   <div className="absolute right-0 mt-2 w-52 bg-charcoal-800 rounded-lg shadow-xl border border-charcoal-700 py-2 z-50">
-                    {/* Quick Expense at top with highlight */}
+                    {/* New Expense */}
                     <button
                       onClick={() => {
                         setShowQuickExpenseModal(true);
                         setQuickActionOpen(false);
                       }}
-                      className="flex items-center gap-3 w-full px-4 py-2 text-success hover:text-success hover:bg-success/10 font-medium border-b border-charcoal-700 pb-2 mb-1"
-                      data-testid="quick-action-quick-expense"
+                      className="flex items-center gap-3 w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-charcoal-700 transition-colors"
+                      data-testid="quick-action-new-expense"
                     >
                       <Wallet className="w-4 h-4" />
-                      Quick Expense
+                      New Expense
                     </button>
                     {quickActions.filter(a => a.label !== 'Quick Expense').map((action) => (
                       <button
