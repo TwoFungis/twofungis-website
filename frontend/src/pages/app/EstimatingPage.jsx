@@ -292,6 +292,8 @@ const EstimatingPage = () => {
       setQuoteLines([{ id: 1, scope_item: '', description: '', qty: 1, unit: 'EA', unit_price: 0, line_total: 0 }]);
       setIsModalOpen(false);
       fetchQuotes();
+      // Update setup progress
+      markSetupComplete('has_quote');
 
     } catch (err) {
       console.error('Error saving quote:', err);
