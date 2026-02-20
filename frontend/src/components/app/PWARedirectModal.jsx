@@ -1,14 +1,43 @@
 import React, { useState, useEffect } from 'react';
-import { X, Smartphone, Globe, ExternalLink } from 'lucide-react';
+import { X, Smartphone, Globe, ExternalLink, Trash2 } from 'lucide-react';
 
 /**
  * PWA Redirect Modal
  * Shows when user opens the site in browser but has PWA installed
- * Offers choice to continue in browser or open in installed app
+ * Includes verification that PWA is actually still installed
  */
 const PWARedirectModal = () => {
   const [showModal, setShowModal] = useState(false);
   const [justInstalled, setJustInstalled] = useState(false);
+
+  // Verify PWA is actually installed by checking related apps API
+  const verifyPWAInstalled = async () => {
+    try {
+      // Method 1: Check if getInstalledRelatedApps is available (Chrome 80+)
+      if ('getInstalledRelatedApps' in navigator) {
+        const relatedApps = await navigator.getInstalledRelatedApps();
+        if (relatedApps.length > 0) {
+          return true;
+        }
+      }
+      
+      // Method 2: Check if beforeinstallprompt was NOT fired recently
+      // If the prompt fires, app is not installed
+      // This is tracked via a flag we set when the prompt fires
+      const promptFiredRecently = sessionStorage.getItem('tradeos_install_prompt_fired');
+      if (promptFiredRecently === 'true') {
+        // Prompt fired means app is NOT installed - clear the localStorage flag
+        localStorage.removeItem('tradeos_pwa_installed');
+        return false;
+      }
+      
+      // If we have localStorage flag and no prompt fired, assume still installed
+      return localStorage.getItem('tradeos_pwa_installed') === 'true';
+    } catch (e) {
+      console.debug('[PWA] Install check error:', e);
+      return localStorage.getItem('tradeos_pwa_installed') === 'true';
+    }
+  };
 
   useEffect(() => {
     // Don't show if already in standalone mode (PWA)
@@ -16,8 +45,19 @@ const PWARedirectModal = () => {
                          window.navigator.standalone === true;
     
     if (isStandalone) {
+      // We're in the PWA, clear any stale flags
+      sessionStorage.removeItem('tradeos_pwa_redirect_dismissed');
       return;
     }
+
+    // Listen for install prompt (means app is NOT installed)
+    const handleBeforeInstall = (e) => {
+      sessionStorage.setItem('tradeos_install_prompt_fired', 'true');
+      // Clear the installed flag since prompt fired
+      localStorage.removeItem('tradeos_pwa_installed');
+    };
+    
+    window.addEventListener('beforeinstallprompt', handleBeforeInstall);
 
     // Check if PWA was just installed
     const handleInstalled = () => {
@@ -25,13 +65,13 @@ const PWARedirectModal = () => {
       setShowModal(true);
       localStorage.setItem('tradeos_pwa_installed', 'true');
       localStorage.setItem('tradeos_pwa_install_time', Date.now().toString());
+      sessionStorage.removeItem('tradeos_install_prompt_fired');
     };
 
     window.addEventListener('appinstalled', handleInstalled);
 
     // Check if PWA is installed and user is in browser
-    const checkPWAInstalled = () => {
-      const pwaInstalled = localStorage.getItem('tradeos_pwa_installed') === 'true';
+    const checkPWAInstalled = async () => {
       const dismissedTime = localStorage.getItem('tradeos_pwa_redirect_dismissed');
       const sessionDismissed = sessionStorage.getItem('tradeos_pwa_redirect_dismissed');
       
@@ -48,50 +88,49 @@ const PWARedirectModal = () => {
         }
       }
 
-      if (pwaInstalled) {
+      // Verify PWA is actually installed
+      const isInstalled = await verifyPWAInstalled();
+      
+      if (isInstalled) {
         // Small delay to let page load
         setTimeout(() => setShowModal(true), 1000);
       }
     };
 
-    checkPWAInstalled();
+    // Delay check to allow beforeinstallprompt to fire first
+    setTimeout(checkPWAInstalled, 500);
 
     return () => {
       window.removeEventListener('appinstalled', handleInstalled);
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
     };
   }, []);
 
   const handleOpenApp = () => {
-    // Try to open the PWA
-    // On most platforms, opening the same URL when PWA is installed will open the PWA
     const currentUrl = window.location.href;
-    
-    // Mark that user chose app
     sessionStorage.setItem('tradeos_opening_pwa', 'true');
-    
-    // Open in new window (which should trigger PWA on supported platforms)
-    // Then close this browser tab
     window.open(currentUrl, '_blank');
-    
-    // Close current window after short delay
     setTimeout(() => {
       window.close();
-      // If window.close() doesn't work (security restrictions), show message
       setShowModal(false);
-      // Show a toast or update UI to indicate they can close manually
     }, 500);
   };
 
   const handleStayInBrowser = () => {
-    // Mark as dismissed for this session
     sessionStorage.setItem('tradeos_pwa_redirect_dismissed', 'true');
-    // Also save timestamp for longer-term dismissal
     localStorage.setItem('tradeos_pwa_redirect_dismissed', Date.now().toString());
     setShowModal(false);
   };
 
   const handleRemindLater = () => {
-    // Just dismiss for this session
+    sessionStorage.setItem('tradeos_pwa_redirect_dismissed', 'true');
+    setShowModal(false);
+  };
+
+  const handleNotInstalled = () => {
+    // User says app is not installed - clear flag and dismiss
+    localStorage.removeItem('tradeos_pwa_installed');
+    localStorage.removeItem('tradeos_pwa_install_time');
     sessionStorage.setItem('tradeos_pwa_redirect_dismissed', 'true');
     setShowModal(false);
   };
@@ -146,6 +185,17 @@ const PWARedirectModal = () => {
             <Globe className="w-5 h-5" />
             Continue in Browser
           </button>
+          
+          {/* Option to indicate app was uninstalled */}
+          {!justInstalled && (
+            <button
+              onClick={handleNotInstalled}
+              className="w-full flex items-center justify-center gap-2 text-gray-500 hover:text-gray-400 text-sm py-2 transition-colors"
+            >
+              <Trash2 className="w-4 h-4" />
+              I uninstalled the app
+            </button>
+          )}
         </div>
 
         {/* Footer hint */}
