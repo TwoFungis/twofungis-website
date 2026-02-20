@@ -213,6 +213,8 @@ const SettingsPage = () => {
       }
       setLaborRateSaved(true);
       toast.success('Labor rate saved');
+      // Update setup progress
+      markSetupComplete('has_labor_rate');
       setTimeout(() => setLaborRateSaved(false), 3000);
     } catch (error) {
       console.error('Error saving labor rate:', error);
