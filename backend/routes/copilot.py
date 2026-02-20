@@ -388,9 +388,8 @@ async def log_copilot_interaction(request: CopilotRequest, response: str, mode: 
         }
         
         log_data = {
-            "route": request.context.route,
+            "route": request.context.page,
             "project_id": request.context.project_id,
-            "quote_id": request.context.quote_id,
             "user_message": request.message[:500],  # Truncate long messages
             "ai_response": response[:1000],  # Truncate long responses
             "mode": mode,
