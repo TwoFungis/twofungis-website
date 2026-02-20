@@ -15,7 +15,7 @@ import TrialLockedBanner from '../../components/app/TrialLockedBanner';
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 const DashboardPage = () => {
-  const { profile, user } = useAuthStore();
+  const { profile, user, accessState } = useAuthStore();
   const [projects, setProjects] = useState([]);
   const [changeOrders, setChangeOrders] = useState([]);
   const [milestones, setMilestones] = useState([]);
