@@ -269,12 +269,15 @@ const AICopilot = () => {
         <span className="text-xs font-semibold text-steel-400 mt-1 tracking-wide">AI SUPPORT</span>
       </button>
       
-      {/* Copilot Drawer */}
+      {/* Copilot Drawer - Mobile optimized with safe area support */}
       <div 
-        className={`fixed inset-y-0 right-0 z-50 w-full sm:w-96 lg:w-[420px] bg-charcoal-900 border-l border-charcoal-700 shadow-2xl transform transition-transform duration-300 ease-out flex flex-col ${
+        className={`fixed right-0 z-50 w-full sm:w-96 lg:w-[420px] bg-charcoal-900 border-l border-charcoal-700 shadow-2xl transform transition-transform duration-300 ease-out flex flex-col ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
-        }`}
-        style={{ maxHeight: '100dvh' }}
+        } top-0 bottom-0 sm:inset-y-0`}
+        style={{ 
+          height: 'calc(100dvh - env(safe-area-inset-bottom, 0px))',
+          maxHeight: '-webkit-fill-available'
+        }}
         data-testid="ai-copilot-drawer"
       >
         {/* Header */}
@@ -306,8 +309,8 @@ const AICopilot = () => {
           </p>
         </div>
         
-        {/* Messages - flexible height */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
+        {/* Messages - flexible height with proper mobile scrolling */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0 overscroll-contain">
           {messages.map((msg, i) => (
             <div 
               key={i} 
@@ -386,8 +389,12 @@ const AICopilot = () => {
           </div>
         )}
         
-        {/* Input - fixed at bottom */}
-        <form onSubmit={handleSubmit} className="flex-shrink-0 p-3 sm:p-4 border-t border-charcoal-700 bg-charcoal-800 safe-area-bottom">
+        {/* Input - fixed at bottom with iOS safe area */}
+        <form 
+          onSubmit={handleSubmit} 
+          className="flex-shrink-0 p-3 sm:p-4 border-t border-charcoal-700 bg-charcoal-800"
+          style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom, 12px))' }}
+        >
           <div className="flex items-center gap-2">
             <input
               ref={inputRef}
@@ -401,7 +408,7 @@ const AICopilot = () => {
             <button
               type="submit"
               disabled={isLoading || !inputValue.trim()}
-              className="bg-steel-500 hover:bg-steel-600 disabled:bg-charcoal-600 disabled:cursor-not-allowed text-white p-2.5 sm:p-3 rounded-xl transition-colors"
+              className="bg-steel-500 hover:bg-steel-600 disabled:bg-charcoal-600 disabled:cursor-not-allowed text-white p-2.5 sm:p-3 rounded-xl transition-colors flex-shrink-0"
             >
               <Send className="w-5 h-5" />
             </button>
