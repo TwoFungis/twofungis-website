@@ -12,7 +12,8 @@ import {
   Flag,
   Receipt,
   Calculator,
-  Star
+  Star,
+  Download
 } from 'lucide-react';
 import { LogoLink } from '../../components/ui/Logo';
 
