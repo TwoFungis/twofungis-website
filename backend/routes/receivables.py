@@ -309,14 +309,13 @@ async def send_payment_reminder(
         )
         company_name = profiles[0].get('company_name', 'TradeOS User') if profiles else 'TradeOS User'
         
-        # Calculate days overdue
+        # Calculate days overdue using safe parsing
         now = datetime.now(timezone.utc)
-        due_date = invoice.get('due_date')
+        due_date_str = invoice.get('due_date')
         days_overdue = 0
-        if due_date:
-            due = datetime.fromisoformat(due_date.replace('Z', '+00:00'))
-            if now > due:
-                days_overdue = (now - due).days
+        due = parse_datetime_safe(due_date_str)
+        if due and now > due:
+            days_overdue = (now - due).days
         
         # Get template
         template = EMAIL_TEMPLATES.get(request.tone, EMAIL_TEMPLATES["standard"])
