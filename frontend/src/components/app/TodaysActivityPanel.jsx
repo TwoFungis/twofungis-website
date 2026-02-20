@@ -50,19 +50,18 @@ const TodaysActivityPanel = () => {
         .gte('created_at', todayISO);
 
       // Fetch today's reminders sent (via invoices with last_reminder_sent today)
-      // Wrapped in try-catch as the column may not exist in older schemas
+      // The last_reminder_sent column may not exist in older schemas - check for error
       let reminders = [];
-      try {
-        const { data: reminderData } = await supabase
-          .from('invoices')
-          .select('id')
-          .eq('user_id', user.id)
-          .gte('last_reminder_sent', todayISO);
+      const { data: reminderData, error: reminderError } = await supabase
+        .from('invoices')
+        .select('id')
+        .eq('user_id', user.id)
+        .gte('last_reminder_sent', todayISO);
+      
+      if (!reminderError) {
         reminders = reminderData || [];
-      } catch (e) {
-        // Column may not exist - silently ignore
-        console.debug('last_reminder_sent column not available');
       }
+      // Silently ignore if column doesn't exist (400 error)
 
       // Fetch today's project updates
       const { data: projects } = await supabase
