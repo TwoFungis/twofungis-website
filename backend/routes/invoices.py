@@ -545,6 +545,12 @@ async def send_invoice(
         raise HTTPException(status_code=401, detail="Unauthorized")
     
     try:
+        # Check access control - LOCKED mode cannot send
+        profile = await get_user_profile(user_id)
+        can_send, error_msg = can_send_in_locked_mode(profile)
+        if not can_send:
+            raise HTTPException(status_code=403, detail=error_msg)
+        
         # Get invoice with line items
         invoices = await supabase_request(
             "GET",
