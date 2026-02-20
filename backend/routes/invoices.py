@@ -1,6 +1,7 @@
 """
 TradeOS Invoicing API Routes
 Handles invoice creation, management, and tracking
+With Trial/Locked mode enforcement
 """
 from fastapi import APIRouter, HTTPException, Request, Header
 from pydantic import BaseModel, Field
@@ -10,6 +11,12 @@ import httpx
 import os
 import logging
 import json
+
+from routes.access_control import (
+    compute_access_state,
+    can_create_in_locked_mode,
+    can_send_in_locked_mode
+)
 
 router = APIRouter(prefix="/api/invoices", tags=["invoices"])
 logger = logging.getLogger(__name__)
