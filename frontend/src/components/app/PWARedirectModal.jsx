@@ -1,78 +1,39 @@
 import React, { useState, useEffect } from 'react';
 import { X, Smartphone, Globe, ExternalLink, Trash2 } from 'lucide-react';
+import PWAInstallService from '../../services/PWAInstallService';
 
 /**
  * PWA Redirect Modal
  * Shows when user opens the site in browser but has PWA installed
- * Includes verification that PWA is actually still installed
+ * Uses PWAInstallService for reliable detection
  */
 const PWARedirectModal = () => {
   const [showModal, setShowModal] = useState(false);
   const [justInstalled, setJustInstalled] = useState(false);
 
-  // Verify PWA is actually installed by checking related apps API
-  const verifyPWAInstalled = async () => {
-    try {
-      // Method 1: Check if getInstalledRelatedApps is available (Chrome 80+)
-      if ('getInstalledRelatedApps' in navigator) {
-        const relatedApps = await navigator.getInstalledRelatedApps();
-        if (relatedApps.length > 0) {
-          return true;
-        }
-      }
-      
-      // Method 2: Check if beforeinstallprompt was NOT fired recently
-      // If the prompt fires, app is not installed
-      // This is tracked via a flag we set when the prompt fires
-      const promptFiredRecently = sessionStorage.getItem('tradeos_install_prompt_fired');
-      if (promptFiredRecently === 'true') {
-        // Prompt fired means app is NOT installed - clear the localStorage flag
-        localStorage.removeItem('tradeos_pwa_installed');
-        return false;
-      }
-      
-      // If we have localStorage flag and no prompt fired, assume still installed
-      return localStorage.getItem('tradeos_pwa_installed') === 'true';
-    } catch (e) {
-      console.debug('[PWA] Install check error:', e);
-      return localStorage.getItem('tradeos_pwa_installed') === 'true';
-    }
-  };
-
   useEffect(() => {
-    // Don't show if already in standalone mode (PWA)
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
-                         window.navigator.standalone === true;
-    
-    if (isStandalone) {
-      // We're in the PWA, clear any stale flags
-      sessionStorage.removeItem('tradeos_pwa_redirect_dismissed');
+    // Don't show if already running in standalone mode (PWA)
+    if (PWAInstallService.isRunningAsStandalone()) {
       return;
     }
 
-    // Listen for install prompt (means app is NOT installed)
-    const handleBeforeInstall = (e) => {
-      sessionStorage.setItem('tradeos_install_prompt_fired', 'true');
-      // Clear the installed flag since prompt fired
-      localStorage.removeItem('tradeos_pwa_installed');
-    };
-    
-    window.addEventListener('beforeinstallprompt', handleBeforeInstall);
-
-    // Check if PWA was just installed
+    // Listen for when app is installed
     const handleInstalled = () => {
       setJustInstalled(true);
       setShowModal(true);
-      localStorage.setItem('tradeos_pwa_installed', 'true');
-      localStorage.setItem('tradeos_pwa_install_time', Date.now().toString());
-      sessionStorage.removeItem('tradeos_install_prompt_fired');
     };
 
-    window.addEventListener('appinstalled', handleInstalled);
+    // Listen for install prompt (means app is NOT installed)
+    const handleInstallAvailable = () => {
+      // App is not installed, close modal if showing
+      setShowModal(false);
+    };
 
-    // Check if PWA is installed and user is in browser
-    const checkPWAInstalled = async () => {
-      const dismissedTime = localStorage.getItem('tradeos_pwa_redirect_dismissed');
+    window.addEventListener('pwa-installed', handleInstalled);
+    window.addEventListener('pwa-install-available', handleInstallAvailable);
+
+    // Check if PWA appears to be installed
+    const checkPWAInstalled = () => {
       const sessionDismissed = sessionStorage.getItem('tradeos_pwa_redirect_dismissed');
       
       // Don't show if dismissed this session
@@ -80,7 +41,8 @@ const PWARedirectModal = () => {
         return;
       }
 
-      // Don't show if dismissed within last 24 hours
+      // Check localStorage dismiss time
+      const dismissedTime = localStorage.getItem('tradeos_pwa_redirect_dismissed');
       if (dismissedTime) {
         const hoursSinceDismissed = (Date.now() - parseInt(dismissedTime)) / (1000 * 60 * 60);
         if (hoursSinceDismissed < 24) {
@@ -88,21 +50,20 @@ const PWARedirectModal = () => {
         }
       }
 
-      // Verify PWA is actually installed
-      const isInstalled = await verifyPWAInstalled();
-      
-      if (isInstalled) {
-        // Small delay to let page load
-        setTimeout(() => setShowModal(true), 1000);
-      }
+      // Use service to check if installed
+      // Wait a bit for beforeinstallprompt to fire first
+      setTimeout(() => {
+        if (PWAInstallService.isInstalled()) {
+          setShowModal(true);
+        }
+      }, 1500);
     };
 
-    // Delay check to allow beforeinstallprompt to fire first
-    setTimeout(checkPWAInstalled, 500);
+    checkPWAInstalled();
 
     return () => {
-      window.removeEventListener('appinstalled', handleInstalled);
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
+      window.removeEventListener('pwa-installed', handleInstalled);
+      window.removeEventListener('pwa-install-available', handleInstallAvailable);
     };
   }, []);
 
