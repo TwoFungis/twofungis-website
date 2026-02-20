@@ -146,11 +146,6 @@ const AICopilot = () => {
       const { data: { session } } = await supabase.auth.getSession();
       const context = getContext();
       
-      // Add computed data if available
-      if (projectContext) {
-        context.computed = projectContext;
-      }
-      
       const response = await fetch(`${API_URL}/api/ai/copilot`, {
         method: 'POST',
         headers: {
