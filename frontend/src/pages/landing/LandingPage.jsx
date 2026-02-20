@@ -29,6 +29,25 @@ const IMAGES = {
 };
 
 const LandingPage = () => {
+  const { user } = useAuthStore();
+  const navigate = useNavigate();
+  const [showPWAModal, setShowPWAModal] = useState(false);
+
+  // Handle CTA click - if logged in, show PWA prompt; otherwise go to signup
+  const handleCTAClick = (e) => {
+    if (user) {
+      e.preventDefault();
+      // User is logged in, trigger PWA install
+      setShowPWAModal(true);
+    }
+    // If not logged in, Link will navigate to /signup naturally
+  };
+
+  const handlePWAModalClose = () => {
+    setShowPWAModal(false);
+    // Stay on current page after PWA modal closes
+  };
+
   const features = [
     {
       icon: TrendingUp,
