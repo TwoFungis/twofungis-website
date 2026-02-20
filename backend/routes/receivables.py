@@ -221,16 +221,16 @@ async def get_outstanding_invoices(authorization: str = Header(None)):
             total = float(inv.get('total', 0) or 0)
             total_outstanding += total
             
-            due_date = inv.get('due_date')
+            due_date_str = inv.get('due_date')
             days_overdue = 0
             is_overdue = False
             
-            if due_date:
-                due = datetime.fromisoformat(due_date.replace('Z', '+00:00'))
-                if now > due:
-                    days_overdue = (now - due).days
-                    is_overdue = True
-                    total_overdue += total
+            # Use safe datetime parsing
+            due = parse_datetime_safe(due_date_str)
+            if due and now > due:
+                days_overdue = (now - due).days
+                is_overdue = True
+                total_overdue += total
             
             outstanding.append({
                 **inv,
@@ -255,7 +255,17 @@ async def get_outstanding_invoices(authorization: str = Header(None)):
         raise
     except Exception as e:
         logger.error(f"Error fetching outstanding invoices: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        # Return empty result instead of crashing
+        return {
+            "invoices": [],
+            "summary": {
+                "total_outstanding": 0,
+                "total_overdue": 0,
+                "count": 0,
+                "overdue_count": 0
+            },
+            "error": "Unable to fetch outstanding invoices"
+        }
 
 
 @router.post("/send-reminder")
