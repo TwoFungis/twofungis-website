@@ -89,9 +89,8 @@ const PWARedirectModal = () => {
   };
 
   const handleNotInstalled = () => {
-    // User says app is not installed - clear flag and dismiss
-    localStorage.removeItem('tradeos_pwa_installed');
-    localStorage.removeItem('tradeos_pwa_install_time');
+    // User says app is not installed - use service to clear status
+    PWAInstallService.clearInstalledStatus();
     sessionStorage.setItem('tradeos_pwa_redirect_dismissed', 'true');
     setShowModal(false);
   };
