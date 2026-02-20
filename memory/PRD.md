@@ -296,6 +296,7 @@ Three founding members have been granted lifetime Elite access:
 ## Version History
 | Date | Version | Changes |
 |------|---------|---------|
+| Feb 20, 2026 | 7.1 | **CTA Strategy Update**: Replaced all "Start Free Trial" buttons with "Download Free App", PWA install service & modal, platform-specific install instructions (iOS/Android/Desktop), download icons on all CTAs |
 | Feb 20, 2026 | 7.0 | **Quick Add + Offline Queue**: Floating "+" FAB on all pages, 3-tap expense flows (Fuel/Meal/Tool/Material), offline queue with localStorage, sync indicator in header, Today's Activity dashboard panel (4 metrics), receipt photo capture |
 | Feb 19, 2026 | 6.1 | **Activate Your Business Flow**: 5-step guided wizard (Labor Rate → Project → Milestone → Invoice → Expense), success screen with calculated metrics (Profit, Margin, Receivables, Cash Flow), skip option with dashboard reminder, localStorage fallback for Supabase limitations |
 | Feb 19, 2026 | 6.0 | **TradeOS Refinement Pack Phase 1**: 30-Day Cash Flow Forecast on dashboard (Expected Income, Projected Expenses, Net Projected), Profit Snapshot on project cards (Margin % badge + Projected Profit column), Receivables page with Send Reminder feature (3 tone templates via Resend), Receivables at a Glance on dashboard, Outstanding/Overdue invoice tracking with days_overdue |
