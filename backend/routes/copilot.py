@@ -427,8 +427,9 @@ async def copilot_chat(request: CopilotRequest, authorization: str = Header(None
             )
         
         # Fetch project context if project_id is provided (fail-safe: never blocks AI reply)
+        # LOCKED mode: No project context injection (General Mode only)
         project_context = None
-        if request.context.project_id:
+        if request.context.project_id and not is_locked:
             try:
                 project_context = await fetch_project_context_pack(request.context.project_id)
                 if project_context:
@@ -437,6 +438,8 @@ async def copilot_chat(request: CopilotRequest, authorization: str = Header(None
                 # Extra safety net - should never reach here but ensures AI always replies
                 logger.error(f"Copilot context fetch unexpected error for project_id={request.context.project_id} reason={e}")
                 project_context = None
+        elif is_locked and request.context.project_id:
+            logger.info(f"Copilot skipping project context for LOCKED user: project_id={request.context.project_id}")
         
         # Build system prompt with context (or None for General Mode)
         system_prompt = build_system_prompt(request.context, mode, project_context)
@@ -452,6 +455,10 @@ async def copilot_chat(request: CopilotRequest, authorization: str = Header(None
         # Send message
         user_msg = UserMessage(text=request.message)
         response_text = await llm.send_message(user_msg)
+        
+        # Update AI usage for locked users after successful response
+        if is_locked and user_id:
+            await update_ai_usage(user_id, ai_needs_reset)
         
         # Parse structured output for estimate mode
         structured_output = None
