@@ -9,12 +9,13 @@ from typing import Optional, List
 import logging
 import json
 import uuid
+import os
 from emergentintegrations.llm.chat import LlmChat, UserMessage
 
 router = APIRouter(prefix="/api/ai", tags=["ai"])
 logger = logging.getLogger(__name__)
 
-EMERGENT_LLM_KEY = "sk-emergent-0813c02F97f4c435dF"
+EMERGENT_LLM_KEY = os.environ.get("EMERGENT_LLM_KEY", "")
 
 class EstimateRequest(BaseModel):
     project_type: str
