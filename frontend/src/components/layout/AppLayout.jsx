@@ -31,6 +31,7 @@ import QuickAddExpenseModal from './QuickAddExpenseModal';
 import AICopilot from '../ai/AICopilot';
 import QuickAddFab from '../app/QuickAddFab';
 import SyncIndicator from '../app/SyncIndicator';
+import UpdateBanner from '../app/UpdateBanner';
 
 const AppLayout = () => {
   const { profile, signOut, user } = useAuthStore();
@@ -352,6 +353,9 @@ const AppLayout = () => {
       
       {/* Quick Add FAB (Floating Action Button) */}
       <QuickAddFab />
+      
+      {/* Update Banner - Shows when service worker update is available */}
+      <UpdateBanner />
     </div>
   );
 };
