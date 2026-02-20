@@ -1,17 +1,25 @@
 """
 TradeOS AI Copilot Routes
 Context-aware AI assistant for contractors
+With Trial/Locked mode enforcement
 """
 
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, HTTPException, Request, Header
 from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
 import logging
 import json
 import uuid
+import base64
 from datetime import datetime, timezone
 import os
+import httpx
 from emergentintegrations.llm.chat import LlmChat, UserMessage
+
+from routes.access_control import (
+    compute_access_state,
+    check_ai_daily_limit
+)
 
 router = APIRouter(prefix="/api/ai", tags=["ai-copilot"])
 logger = logging.getLogger(__name__)
