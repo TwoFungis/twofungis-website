@@ -330,7 +330,7 @@ async def send_payment_reminder(
             client_name=invoice.get('client_name', 'Valued Customer'),
             invoice_number=invoice.get('invoice_number', 'N/A'),
             amount=f"{float(invoice.get('total', 0)):,.2f}",
-            due_date=due_date[:10] if due_date else 'N/A',
+            due_date=due_date_str[:10] if due_date_str else 'N/A',
             days_overdue=days_overdue,
             project_name=invoice.get('project_name', 'N/A'),
             company_name=company_name
