@@ -157,6 +157,44 @@ async def supabase_request(method: str, endpoint: str, data: Optional[Dict] = No
         return {}
 
 
+async def get_user_profile(user_id: str) -> Optional[Dict]:
+    """Fetch user profile for access control checks"""
+    try:
+        profiles = await supabase_request(
+            "GET",
+            "users_profile",
+            params={
+                "user_id": f"eq.{user_id}",
+                "select": "subscription_tier,grandfathered_active,trial_started_at,trial_ends_at,locked_project_created,locked_quote_created,locked_invoice_created"
+            }
+        )
+        return profiles[0] if profiles else None
+    except Exception as e:
+        logger.warning(f"Failed to fetch profile for access check: {e}")
+        return None
+
+
+async def mark_locked_entity_created(user_id: str, entity_type: str):
+    """Mark that a locked user has used their one free entity creation"""
+    field_map = {
+        "project": "locked_project_created",
+        "quote": "locked_quote_created",
+        "invoice": "locked_invoice_created"
+    }
+    field = field_map.get(entity_type)
+    if field:
+        try:
+            await supabase_request(
+                "PATCH",
+                "users_profile",
+                data={field: True},
+                params={"user_id": f"eq.{user_id}"}
+            )
+            logger.info(f"Marked {field}=true for user {user_id}")
+        except Exception as e:
+            logger.error(f"Failed to mark {field} for user {user_id}: {e}")
+
+
 async def get_next_invoice_number(user_id: str) -> str:
     """Get the next invoice number for a user using RPC"""
     try:
