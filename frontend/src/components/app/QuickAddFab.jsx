@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Plus, X, Fuel, UtensilsCrossed, Wrench, Package, 
-  Camera, Check, Loader2, DollarSign, ChevronRight
+  Camera, Check, Loader2, DollarSign, ChevronRight, Shield
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { supabase } from '../../lib/supabase';
@@ -171,17 +171,17 @@ const QuickAddFab = () => {
 
   return (
     <>
-      {/* Floating Quick Add Button - Positioned above AI Support */}
+      {/* Floating Quick Add Button - Positioned above AI Support (bottom-20 + spacing) */}
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-40 right-6 z-40 flex flex-col items-center transition-all"
+        className="fixed bottom-36 right-6 z-40 flex flex-col items-center transition-all hover:scale-105"
         data-testid="quick-add-fab"
         aria-label="Quick Add"
       >
-        <div className="w-14 h-14 rounded-full shadow-xl bg-charcoal-800 border-2 border-steel-500 flex items-center justify-center hover:border-steel-400 transition-colors">
-          <img src="/shield-icon.png" alt="Quick Add" className="w-9 h-9" />
+        <div className="w-14 h-14 rounded-full shadow-xl bg-charcoal-800 border-2 border-amber-500 flex items-center justify-center hover:border-amber-400 transition-colors">
+          <Shield className="w-7 h-7 text-amber-400" />
         </div>
-        <span className="text-xs font-semibold text-steel-400 mt-1 tracking-wide">QUICK ADD</span>
+        <span className="text-xs font-semibold text-amber-400 mt-1 tracking-wide">QUICK ADD</span>
       </button>
 
       {/* Quick Add Panel */}
