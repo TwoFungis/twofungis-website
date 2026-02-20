@@ -315,22 +315,31 @@ async def get_access_state(authorization: str = Header(...)):
     
     try:
         async with httpx.AsyncClient() as client:
+            # First try fetching with new columns, fall back to basic query if columns don't exist
             response = await client.get(
                 f"{SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}&select=subscription_tier,grandfathered_active,trial_started_at,trial_ends_at,locked_project_created,locked_quote_created,locked_invoice_created,ai_daily_usage,ai_usage_reset_at",
                 headers=await get_service_headers()
             )
             
+            # If columns don't exist yet, fall back to basic query
+            if response.status_code == 400 and 'does not exist' in response.text:
+                logger.info("Trial columns not found, falling back to basic query")
+                response = await client.get(
+                    f"{SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}&select=subscription_tier",
+                    headers=await get_service_headers()
+                )
+            
             if response.status_code != 200:
                 logger.error(f"Failed to fetch profile for access state: {response.text}")
                 return {
-                    "state": "LOCKED",
+                    "state": "ACTIVE",  # Default to ACTIVE if we can't fetch (pre-migration)
                     "trial_days_remaining": None,
                     "restrictions": {
-                        "can_create_project": False,
-                        "can_create_quote": False,
-                        "can_create_invoice": False,
-                        "can_send": False,
-                        "ai_remaining": 0
+                        "can_create_project": True,
+                        "can_create_quote": True,
+                        "can_create_invoice": True,
+                        "can_send": True,
+                        "ai_remaining": -1
                     }
                 }
             
