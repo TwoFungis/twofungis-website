@@ -22,7 +22,7 @@ const ProjectsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [error, setError] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
-  const { user } = useAuthStore();
+  const { user, markSetupComplete } = useAuthStore();
 
   const [formData, setFormData] = useState({
     name: '',
