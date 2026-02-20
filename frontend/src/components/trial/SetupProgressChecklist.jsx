@@ -4,7 +4,6 @@ import {
   CheckCircle2, Circle, FolderKanban, DollarSign, FileText, 
   Receipt, Flag, Wallet, ChevronDown, ChevronUp, Sparkles
 } from 'lucide-react';
-import { supabase } from '../../lib/supabase';
 import { useAuthStore } from '../../store/authStore';
 
 const CHECKLIST_ITEMS = [
