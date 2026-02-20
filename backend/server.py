@@ -50,6 +50,12 @@ from routes.receivables import router as receivables_router
 # Import Profile routes
 from routes.profile import router as profile_router
 
+# Import Projects routes
+from routes.projects import router as projects_router
+
+# Import Quotes routes
+from routes.quotes import router as quotes_router
+
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env', override=False)
 
