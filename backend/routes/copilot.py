@@ -22,14 +22,12 @@ SUPABASE_SERVICE_KEY = os.environ.get('SUPABASE_SERVICE_KEY', '')
 
 # Context models
 class CopilotContext(BaseModel):
-    route: str
+    page: str
     project_id: Optional[str] = None
-    quote_id: Optional[str] = None
     region: Optional[str] = None
     trade: Optional[str] = None
     plan_type: Optional[str] = None
     subscription_tier: Optional[str] = None
-    computed: Optional[Dict[str, Any]] = None
 
 class CopilotRequest(BaseModel):
     message: str
