@@ -171,14 +171,17 @@ const QuickAddFab = () => {
 
   return (
     <>
-      {/* Floating Action Button */}
+      {/* Floating Quick Add Button - Positioned above AI Support */}
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-40 w-14 h-14 bg-steel-500 hover:bg-steel-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all flex items-center justify-center group"
+        className="fixed bottom-40 right-6 z-40 flex flex-col items-center transition-all"
         data-testid="quick-add-fab"
         aria-label="Quick Add"
       >
-        <Plus className="w-7 h-7 group-hover:rotate-90 transition-transform duration-200" />
+        <div className="w-14 h-14 rounded-full shadow-xl bg-charcoal-800 border-2 border-steel-500 flex items-center justify-center hover:border-steel-400 transition-colors">
+          <img src="/shield-icon.png" alt="Quick Add" className="w-9 h-9" />
+        </div>
+        <span className="text-xs font-semibold text-steel-400 mt-1 tracking-wide">QUICK ADD</span>
       </button>
 
       {/* Quick Add Panel */}
