@@ -187,6 +187,9 @@ const AppLayout = () => {
           <div className="hidden lg:block" />
 
           <div className="flex items-center gap-3">
+            {/* Sync Indicator */}
+            <SyncIndicator />
+            
             {/* Trial Countdown Badge */}
             <TrialCountdown />
             
