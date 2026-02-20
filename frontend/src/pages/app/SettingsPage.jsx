@@ -852,6 +852,83 @@ const SettingsPage = () => {
         )}
       </div>
 
+      {/* App Section - PWA Updates */}
+      <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6" id="app-settings">
+        <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-4">
+          <Smartphone className="w-5 h-5 text-steel-400" />
+          App
+        </h2>
+        
+        <div className="space-y-4">
+          {/* Update App */}
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-white font-medium">Check for Updates</p>
+              <p className="text-gray-400 text-sm">Make sure you're running the latest version</p>
+            </div>
+            <button
+              onClick={async () => {
+                const result = await ServiceWorkerUpdateService.checkForUpdate();
+                if (result.updateAvailable) {
+                  toast.success('Update available! Click Refresh to install.');
+                  // Dispatch event so UpdateBanner shows
+                  window.dispatchEvent(new CustomEvent('sw-update-available'));
+                } else if (result.error) {
+                  toast.error('Could not check for updates');
+                } else {
+                  toast.info('You\'re running the latest version');
+                }
+              }}
+              className="bg-steel-500 hover:bg-steel-600 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+              data-testid="check-update-btn"
+            >
+              <RefreshCw className="w-4 h-4" />
+              Update App
+            </button>
+          </div>
+          
+          {/* Install App */}
+          {!PWAInstallService.isInstalled() && (
+            <div className="flex items-center justify-between border-t border-charcoal-700 pt-4">
+              <div>
+                <p className="text-white font-medium">Install App</p>
+                <p className="text-gray-400 text-sm">Add TradeOS to your home screen for quick access</p>
+              </div>
+              <button
+                onClick={async () => {
+                  const result = await PWAInstallService.promptInstall();
+                  if (result.outcome === 'accepted') {
+                    toast.success('TradeOS installed successfully!');
+                  } else if (result.showManualInstructions) {
+                    const instructions = PWAInstallService.getInstallInstructions();
+                    toast.info(instructions.steps[0], { duration: 5000 });
+                  }
+                }}
+                className="bg-charcoal-700 hover:bg-charcoal-600 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+                data-testid="install-app-btn"
+              >
+                <Download className="w-4 h-4" />
+                Install
+              </button>
+            </div>
+          )}
+          
+          {/* Show installed badge if PWA */}
+          {PWAInstallService.isInstalled() && (
+            <div className="flex items-center justify-between border-t border-charcoal-700 pt-4">
+              <div>
+                <p className="text-white font-medium">App Status</p>
+                <p className="text-gray-400 text-sm">TradeOS is installed on your device</p>
+              </div>
+              <div className="bg-success/20 text-success px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2">
+                <Check className="w-4 h-4" />
+                Installed
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Danger Zone */}
       <div className="bg-charcoal-800 rounded-xl border border-risk/30 p-6">
         <h2 className="text-lg font-semibold text-risk flex items-center gap-2 mb-4">
