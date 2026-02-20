@@ -10,6 +10,7 @@ import { useAuthStore } from '../../store/authStore';
 import { supabase } from '../../lib/supabase';
 import SetupProgressChecklist from '../../components/trial/SetupProgressChecklist';
 import TodaysActivityPanel from '../../components/app/TodaysActivityPanel';
+import TrialLockedBanner from '../../components/app/TrialLockedBanner';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
