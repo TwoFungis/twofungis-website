@@ -4,6 +4,35 @@ import "@/index.css";
 import App from "@/App";
 import { Toaster } from "@/components/ui/toaster";
 
+// Register Service Worker for PWA support
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then((registration) => {
+        console.log('[PWA] Service Worker registered:', registration.scope);
+        
+        // Check for updates on page load
+        registration.update();
+        
+        // Listen for updates
+        registration.addEventListener('updatefound', () => {
+          const newWorker = registration.installing;
+          if (newWorker) {
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                // New content available, dispatch event for UpdateBanner
+                window.dispatchEvent(new CustomEvent('sw-update-available'));
+              }
+            });
+          }
+        });
+      })
+      .catch((error) => {
+        console.error('[PWA] Service Worker registration failed:', error);
+      });
+  });
+}
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
