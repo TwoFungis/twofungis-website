@@ -15,20 +15,23 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 const useCopilotContext = () => {
   const location = useLocation();
   const { profile, user } = useAuthStore();
-  const { id: projectId } = useParams();
+  
+  // Extract project_id from URL pattern: /app/projects/<uuid>
+  const extractProjectId = () => {
+    const match = location.pathname.match(/\/app\/projects\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/i);
+    return match ? match[1] : null;
+  };
   
   const getContext = () => ({
-    route: location.pathname,
-    project_id: projectId || null,
-    quote_id: null, // Can be extracted from URL if needed
+    page: location.pathname,
+    project_id: extractProjectId(),
     region: profile?.region || null,
     trade: profile?.trade || null,
     plan_type: profile?.plan_type || null,
-    subscription_tier: profile?.subscription_tier || null,
-    computed: null // Will be fetched server-side
+    subscription_tier: profile?.subscription_tier || null
   });
   
-  return { getContext, location };
+  return { getContext, location, projectId: extractProjectId() };
 };
 
 const AICopilot = () => {
