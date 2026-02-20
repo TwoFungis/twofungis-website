@@ -383,7 +383,7 @@ const MilestonesPage = () => {
       {showCreateModal && (
         <MilestoneModal 
           onClose={() => setShowCreateModal(false)}
-          onSuccess={() => { setShowCreateModal(false); fetchMilestones(); }}
+          onSuccess={() => { setShowCreateModal(false); fetchMilestones(); markSetupComplete('has_milestone'); }}
         />
       )}
 
