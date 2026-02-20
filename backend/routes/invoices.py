@@ -433,6 +433,10 @@ async def create_invoice(
             except Exception as e:
                 logger.warning(f"Failed to update milestone status: {e}")
         
+        # If user is in LOCKED mode, mark their one free invoice as used
+        if access_info.state == "LOCKED":
+            await mark_locked_entity_created(user_id, "invoice")
+        
         return invoice
     
     except HTTPException:
