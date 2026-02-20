@@ -28,7 +28,7 @@ const STATUS_TRANSITIONS = {
 };
 
 const MilestonesPage = () => {
-  const { user } = useAuthStore();
+  const { user, markSetupComplete } = useAuthStore();
   const [milestones, setMilestones] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
