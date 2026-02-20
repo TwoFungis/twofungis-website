@@ -152,6 +152,7 @@ const LandingPage = () => {
               <Link to="/login" className="text-gray-400 hover:text-white transition-colors text-sm font-medium">Login</Link>
               <Link 
                 to="/signup" 
+                onClick={handleCTAClick}
                 className="bg-steel-500 hover:bg-steel-600 text-white px-5 py-2.5 rounded-lg font-medium transition-all hover:shadow-lg hover:shadow-steel-500/25 flex items-center gap-2"
                 data-testid="download-app-btn"
               >
@@ -161,7 +162,11 @@ const LandingPage = () => {
             </nav>
             <div className="md:hidden flex items-center gap-2">
               <Link to="/login" className="text-gray-400 hover:text-white px-3 py-2 text-sm">Login</Link>
-              <Link to="/signup" className="bg-steel-500 hover:bg-steel-600 text-white px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-1.5">
+              <Link 
+                to="/signup" 
+                onClick={handleCTAClick}
+                className="bg-steel-500 hover:bg-steel-600 text-white px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-1.5"
+              >
                 <Download className="w-4 h-4" />
                 Download App
               </Link>
