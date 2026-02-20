@@ -44,6 +44,8 @@ class ProfileResponse(BaseModel):
     success: bool
     message: str
     profile: Optional[dict] = None
+    access_state: Optional[str] = None
+    trial_days_remaining: Optional[int] = None
 
 async def get_service_headers():
     """Get headers for Supabase service role requests"""
