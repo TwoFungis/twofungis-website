@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { 
   Sparkles, X, Send, ChevronRight, Loader2, 
   MessageSquare, Lightbulb, AlertTriangle, FileText,
