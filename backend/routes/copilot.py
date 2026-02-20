@@ -69,36 +69,42 @@ ROUTE_PROMPTS = {
         "Show me projects with margin concerns.",
         "How do I improve my average margin?",
         "What expenses am I missing for tax writeoffs?",
-        "Walk me through the app features."
+        "Walk me through the app features.",
+        "How do I bid on a job competitively?"
     ],
     "/app/projects": [
         "How do I create a profitable project?",
         "What makes a good project setup?",
         "Explain the project workflow.",
-        "Help me understand change orders."
+        "Help me understand change orders.",
+        "What's the typical markup for residential work?"
     ],
     "/app/estimating": [
         "Generate a draft estimate for a kitchen renovation.",
         "What markup should I use for custom work?",
         "How do I add contingency properly?",
-        "Explain the estimate builder features."
+        "Explain the estimate builder features.",
+        "What's a fair price per square foot for flooring?"
     ],
     "/app/expenses": [
         "What am I missing for writeoffs this month?",
         "How should I categorize materials vs labor?",
         "Explain the tax deduction categories.",
-        "Help me track business vs personal expenses."
+        "Help me track business vs personal expenses.",
+        "What can I write off as a contractor?"
     ],
     "/app/invoices": [
         "How do I get paid faster?",
         "What's the best payment terms to use?",
         "Help me create a professional invoice.",
-        "Explain the invoice workflow."
+        "Explain the invoice workflow.",
+        "How do I handle a client who won't pay?"
     ],
     "/app/milestones": [
         "How do milestone payments work?",
         "When should I invoice a milestone?",
-        "Explain milestone approval process."
+        "Explain milestone approval process.",
+        "What's a typical payment schedule for a renovation?"
     ]
 }
 
