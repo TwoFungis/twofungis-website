@@ -400,6 +400,7 @@ const LandingPage = () => {
           </p>
           <Link
             to="/signup"
+            onClick={handleCTAClick}
             className="inline-flex items-center gap-2 bg-steel-500 hover:bg-steel-400 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all hover:shadow-xl hover:shadow-steel-500/30"
           >
             <Download className="w-5 h-5" />
