@@ -293,16 +293,29 @@ const ActivateBusinessFlow = () => {
         // Complete activation
         calculateMetrics();
         
-        // Save completion state to localStorage
-        localStorage.setItem('tradeos_activation_completed', 'true');
-        localStorage.removeItem('tradeos_activation_skipped');
-        
-        // Try to update Supabase but don't block on failure
+        // Try to save to DB first (source of truth)
+        let dbSaveSuccess = false;
         try {
-          await updateProfile({ business_activated: true });
+          const result = await updateProfile({ business_activated: true });
+          dbSaveSuccess = !result?.error;
+          if (dbSaveSuccess && process.env.NODE_ENV === 'development') {
+            console.log('[Activation] Saved to DB successfully');
+          }
         } catch (err) {
-          console.warn('Activation flag save failed:', err);
+          console.warn('Activation DB save failed:', err);
         }
+        
+        // Use localStorage only as fallback if DB save failed
+        if (!dbSaveSuccess) {
+          localStorage.setItem('tradeos_activation_completed', 'true');
+          if (process.env.NODE_ENV === 'development') {
+            console.log('[Activation] Fallback to localStorage');
+          }
+        } else {
+          // Clear any stale localStorage since DB is now authoritative
+          localStorage.removeItem('tradeos_activation_completed');
+        }
+        localStorage.removeItem('tradeos_activation_skipped');
         
         setShowSuccess(true);
       }
@@ -311,8 +324,21 @@ const ActivateBusinessFlow = () => {
 
   // Skip activation flow
   const handleSkip = async () => {
-    // Save skip state to localStorage
-    localStorage.setItem('tradeos_activation_skipped', 'true');
+    // Try to save to DB first (source of truth)
+    let dbSaveSuccess = false;
+    try {
+      const result = await updateProfile({ business_activation_skipped: true });
+      dbSaveSuccess = !result?.error;
+    } catch (err) {
+      console.warn('Skip flag DB save failed:', err);
+    }
+    
+    // Use localStorage only as fallback if DB save failed
+    if (!dbSaveSuccess) {
+      localStorage.setItem('tradeos_activation_skipped', 'true');
+    } else {
+      localStorage.removeItem('tradeos_activation_skipped');
+    }
     
     // Try to update Supabase but don't block on failure
     try {
