@@ -15,6 +15,41 @@ import resend
 router = APIRouter(prefix="/api/receivables", tags=["receivables"])
 logger = logging.getLogger(__name__)
 
+
+def parse_datetime_safe(date_str: Optional[str]) -> Optional[datetime]:
+    """
+    Safely parse a datetime string to a timezone-aware datetime (UTC).
+    Handles various formats and ensures offset-aware datetimes.
+    Returns None if parsing fails or date_str is None/empty.
+    """
+    if not date_str:
+        return None
+    
+    try:
+        # Handle ISO format with Z suffix
+        if date_str.endswith('Z'):
+            date_str = date_str[:-1] + '+00:00'
+        
+        # Try parsing as ISO format
+        try:
+            dt = datetime.fromisoformat(date_str)
+        except ValueError:
+            # Try parsing as date-only format
+            try:
+                dt = datetime.strptime(date_str[:10], '%Y-%m-%d')
+            except ValueError:
+                logger.warning(f"Unable to parse datetime: {date_str}")
+                return None
+        
+        # Ensure timezone-aware (convert naive to UTC)
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        
+        return dt
+    except Exception as e:
+        logger.warning(f"Error parsing datetime '{date_str}': {e}")
+        return None
+
 SUPABASE_URL = os.environ.get('SUPABASE_URL', '')
 SUPABASE_SERVICE_KEY = os.environ.get('SUPABASE_SERVICE_KEY', '')
 RESEND_API_KEY = os.environ.get('RESEND_API_KEY', '')
