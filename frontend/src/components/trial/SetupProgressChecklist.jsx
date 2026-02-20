@@ -86,7 +86,7 @@ const SetupProgressChecklist = () => {
     }
   }, [profile?.labor_rate]);
 
-  const completedCount = Object.values(progress).filter(Boolean).length;
+  const completedCount = Object.values(setupProgress).filter(Boolean).length;
   const totalCount = CHECKLIST_ITEMS.length;
   const progressPercent = Math.round((completedCount / totalCount) * 100);
   const isComplete = completedCount === totalCount;
