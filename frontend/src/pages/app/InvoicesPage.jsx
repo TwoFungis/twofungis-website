@@ -27,7 +27,7 @@ const PAYMENT_TERMS_OPTIONS = [
 ];
 
 const InvoicesPage = () => {
-  const { user } = useAuthStore();
+  const { user, markSetupComplete } = useAuthStore();
   const [invoices, setInvoices] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
