@@ -159,8 +159,17 @@ async def update_profile(
             profiles = check_response.json() if check_response.status_code == 200 else []
             
             if not profiles:
-                # Create profile if doesn't exist
-                create_data = {"user_id": user_id, **update_data}
+                # Create profile if doesn't exist - NEW USER gets trial
+                trial_start, trial_end = get_trial_dates()
+                create_data = {
+                    "user_id": user_id, 
+                    "trial_started_at": trial_start,
+                    "trial_ends_at": trial_end,
+                    "grandfathered_active": False,
+                    **update_data
+                }
+                logger.info(f"Creating new profile with 30-day trial for user {user_id}")
+                
                 response = await client.post(
                     f"{SUPABASE_URL}/rest/v1/users_profile",
                     headers=await get_service_headers(),
