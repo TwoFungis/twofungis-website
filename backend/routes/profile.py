@@ -1,6 +1,7 @@
 """
 TradeOS Profile Management Routes
 Handles user profile updates with proper error handling
+Includes access state computation for trial/locked mode
 """
 
 from fastapi import APIRouter, HTTPException, Request, Header
@@ -10,6 +11,13 @@ import os
 import logging
 import httpx
 import jwt
+from datetime import datetime, timezone, timedelta
+
+from routes.access_control import (
+    compute_access_state, 
+    get_trial_dates,
+    AccessInfo
+)
 
 router = APIRouter(prefix="/api/profile", tags=["profile"])
 logger = logging.getLogger(__name__)
