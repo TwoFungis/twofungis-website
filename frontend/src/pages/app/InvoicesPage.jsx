@@ -338,7 +338,7 @@ const InvoicesPage = () => {
       {showCreateModal && (
         <CreateInvoiceModal 
           onClose={() => setShowCreateModal(false)} 
-          onSuccess={() => { setShowCreateModal(false); fetchInvoices(); }}
+          onSuccess={() => { setShowCreateModal(false); fetchInvoices(); markSetupComplete('has_invoice'); }}
           user={user}
         />
       )}
