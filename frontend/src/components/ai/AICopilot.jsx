@@ -386,8 +386,8 @@ const AICopilot = () => {
           </div>
         )}
         
-        {/* Input */}
-        <form onSubmit={handleSubmit} className="p-4 border-t border-charcoal-700 bg-charcoal-800">
+        {/* Input - fixed at bottom */}
+        <form onSubmit={handleSubmit} className="flex-shrink-0 p-3 sm:p-4 border-t border-charcoal-700 bg-charcoal-800 safe-area-bottom">
           <div className="flex items-center gap-2">
             <input
               ref={inputRef}
@@ -395,13 +395,13 @@ const AICopilot = () => {
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               placeholder={isElite ? "Ask anything..." : "Ask about the app..."}
-              className="flex-1 bg-charcoal-700 border border-charcoal-600 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-steel-500 text-sm"
+              className="flex-1 bg-charcoal-700 border border-charcoal-600 rounded-xl px-4 py-2.5 sm:py-3 text-white placeholder-gray-500 focus:outline-none focus:border-steel-500 text-sm"
               disabled={isLoading}
             />
             <button
               type="submit"
               disabled={isLoading || !inputValue.trim()}
-              className="bg-steel-500 hover:bg-steel-600 disabled:bg-charcoal-600 disabled:cursor-not-allowed text-white p-3 rounded-xl transition-colors"
+              className="bg-steel-500 hover:bg-steel-600 disabled:bg-charcoal-600 disabled:cursor-not-allowed text-white p-2.5 sm:p-3 rounded-xl transition-colors"
             >
               <Send className="w-5 h-5" />
             </button>
