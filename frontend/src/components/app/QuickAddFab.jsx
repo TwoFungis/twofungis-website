@@ -130,6 +130,8 @@ const QuickAddFab = () => {
         }
 
         toast.success(`${selectedCategory.name} expense saved!`);
+        // Update setup progress
+        markSetupComplete('has_expense');
       } else {
         // Queue for later when offline
         OfflineQueueService.addToQueue('expense', expenseData);
