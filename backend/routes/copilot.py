@@ -337,7 +337,7 @@ def generate_action_suggestions(context: CopilotContext, mode: str, response: st
     """Generate contextual action suggestions"""
     suggestions = []
     
-    if mode == "estimate" and context.route.startswith("/app/estimating"):
+    if mode == "estimate" and context.page.startswith("/app/estimating"):
         suggestions.append(ActionSuggestion(
             label="Open Estimate Builder",
             action="navigate",
