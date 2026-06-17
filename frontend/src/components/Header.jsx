@@ -57,7 +57,7 @@ const Header = () => {
           {/* Logo */}
           <div className="flex-shrink-0">
             <img
-              src="https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/afq4qky8_ChatGPT%20Image%20Jun%2017%2C%202026%2C%2012_03_36%20PM.png"
+              src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png"
               alt="Two Fungis Ltd"
               className="h-20 md:h-24 w-auto cursor-pointer"
               onClick={() => navigateToSection('home')}

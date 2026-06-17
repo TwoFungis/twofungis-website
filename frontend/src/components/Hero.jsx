@@ -11,17 +11,16 @@ const Hero = () => {
   };
 
   return (
-    <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black">
+    <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black pt-32 sm:pt-36 md:pt-40">
       {/* Content */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-        <div className="max-w-4xl mx-auto">
-          {/* Logo Image Above Title - 50% larger */}
-          <div className="mb-8 flex justify-center">
+        <div className="max-w-6xl mx-auto">
+          {/* Logo Image Above Title - Large, responsive */}
+          <div className="mb-10 flex justify-center">
             <img
               src="https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/afq4qky8_ChatGPT%20Image%20Jun%2017%2C%202026%2C%2012_03_36%20PM.png"
               alt="Two Fungis Ltd"
-              className="h-72 md:h-84 w-auto drop-shadow-2xl"
-              style={{ height: 'clamp(18rem, 25vw, 21rem)' }}
+              className="w-full max-w-5xl h-auto drop-shadow-2xl"
             />
           </div>
           
