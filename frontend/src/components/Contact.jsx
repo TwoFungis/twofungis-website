@@ -3,7 +3,7 @@ import { Mail, Phone } from 'lucide-react';
 
 const Contact = () => {
   return (
-    <section id="contact" className="py-12 bg-gray-50">
+    <section className="py-12 bg-gray-50">
       {/* Full-width marketing banner above */}
       <div className="w-full mb-10">
         <img
@@ -13,7 +13,7 @@ const Contact = () => {
         />
       </div>
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div id="contact" className="container mx-auto px-4 sm:px-6 lg:px-8 scroll-mt-32">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="text-center mb-10">
