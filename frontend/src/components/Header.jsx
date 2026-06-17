@@ -98,14 +98,6 @@ const Header = () => {
             >
               Portfolio
             </button>
-            <button
-              onClick={() => navigateToSection('contact')}
-              className="text-white transition-colors duration-200 font-medium"
-              onMouseEnter={(e) => e.target.style.color='#228B22'}
-              onMouseLeave={(e) => e.target.style.color='white'}
-            >
-              Contact
-            </button>
             <Button
               onClick={() => navigateToSection('contact')}
               className="text-white px-6 py-2 transition-colors duration-200"
@@ -163,14 +155,6 @@ const Header = () => {
                 onMouseLeave={(e) => e.target.style.color='white'}
               >
                 Portfolio
-              </button>
-              <button
-                onClick={() => navigateToSection('contact')}
-                className="text-white transition-colors duration-200 font-medium text-left"
-                onMouseEnter={(e) => e.target.style.color='#228B22'}
-                onMouseLeave={(e) => e.target.style.color='white'}
-              >
-                Contact
               </button>
               <Button
                 onClick={() => navigateToSection('contact')}

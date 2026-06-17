@@ -28,7 +28,7 @@ const Hero = () => {
             Premium Interior <span className="text-red-600">Finishing & Carpentry</span>
           </h1>
           <p className="text-xl sm:text-2xl text-gray-200 mb-8 max-w-2xl mx-auto" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-            Specializing in high end residential & commercial finishing, including high-rise & multi-family projects across the Okanagan & Vancouver Island regions since 2017
+            Specializing in high end residential & commercial finishing, including high-rise & multi-unit projects across the Okanagan to Vancouver Island regions since 2017
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button
