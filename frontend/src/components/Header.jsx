@@ -48,56 +48,63 @@ const Header = () => {
 
   return (
     <header
-      className={`fixed left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-black/95 backdrop-blur-sm shadow-lg top-0' : 'bg-transparent top-[40px]'
+      className={`fixed left-0 right-0 top-[40px] z-50 transition-all duration-300 ${
+        isScrolled ? 'bg-black/95 backdrop-blur-sm shadow-lg' : 'bg-transparent'
       }`}
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-24">
-          {/* Logo */}
-          <div className="flex-shrink-0">
-            <img
-              src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png"
-              alt="Two Fungis Ltd"
-              className="h-20 md:h-24 w-auto cursor-pointer"
-              onClick={() => navigateToSection('home')}
-            />
+          {/* Logo + Nav Group */}
+          <div className="flex items-center gap-6 lg:gap-10">
+            {/* Logo */}
+            <div className="flex-shrink-0">
+              <img
+                src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png"
+                alt="Two Fungis Ltd"
+                className="h-20 md:h-24 w-auto cursor-pointer"
+                onClick={() => navigateToSection('home')}
+              />
+            </div>
+
+            {/* Desktop Navigation Tabs */}
+            <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
+              <button
+                onClick={() => navigateToSection('home')}
+                className="text-white transition-colors duration-200 font-medium"
+                onMouseEnter={(e) => e.target.style.color='#228B22'}
+                onMouseLeave={(e) => e.target.style.color='white'}
+              >
+                Home
+              </button>
+              <button
+                onClick={() => navigateToSection('about')}
+                className="text-white transition-colors duration-200 font-medium"
+                onMouseEnter={(e) => e.target.style.color='#228B22'}
+                onMouseLeave={(e) => e.target.style.color='white'}
+              >
+                About
+              </button>
+              <button
+                onClick={() => navigateToSection('services')}
+                className="text-white transition-colors duration-200 font-medium"
+                onMouseEnter={(e) => e.target.style.color='#228B22'}
+                onMouseLeave={(e) => e.target.style.color='white'}
+              >
+                Services
+              </button>
+              <button
+                onClick={() => navigateToSection('portfolio')}
+                className="text-white transition-colors duration-200 font-medium"
+                onMouseEnter={(e) => e.target.style.color='#228B22'}
+                onMouseLeave={(e) => e.target.style.color='white'}
+              >
+                Portfolio
+              </button>
+            </nav>
           </div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
-            <button
-              onClick={() => navigateToSection('home')}
-              className="text-white transition-colors duration-200 font-medium"
-              onMouseEnter={(e) => e.target.style.color='#228B22'}
-              onMouseLeave={(e) => e.target.style.color='white'}
-            >
-              Home
-            </button>
-            <button
-              onClick={() => navigateToSection('about')}
-              className="text-white transition-colors duration-200 font-medium"
-              onMouseEnter={(e) => e.target.style.color='#228B22'}
-              onMouseLeave={(e) => e.target.style.color='white'}
-            >
-              About
-            </button>
-            <button
-              onClick={() => navigateToSection('services')}
-              className="text-white transition-colors duration-200 font-medium"
-              onMouseEnter={(e) => e.target.style.color='#228B22'}
-              onMouseLeave={(e) => e.target.style.color='white'}
-            >
-              Services
-            </button>
-            <button
-              onClick={() => navigateToSection('portfolio')}
-              className="text-white transition-colors duration-200 font-medium"
-              onMouseEnter={(e) => e.target.style.color='#228B22'}
-              onMouseLeave={(e) => e.target.style.color='white'}
-            >
-              Portfolio
-            </button>
+          {/* Contact Us Button - Right side */}
+          <div className="hidden md:block">
             <Button
               onClick={() => navigateToSection('contact')}
               className="text-white px-6 py-2 transition-colors duration-200"
@@ -107,7 +114,7 @@ const Header = () => {
             >
               Contact Us
             </Button>
-          </nav>
+          </div>
 
           {/* Mobile Menu Button */}
           <button
