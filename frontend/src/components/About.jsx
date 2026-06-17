@@ -32,9 +32,12 @@ const About = () => {
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="text-center mb-16">
-            <h2 className="text-4xl sm:text-5xl font-bold text-black mb-4" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
-              About <span className="text-red-600">Two Fungis Ltd</span>
-            </h2>
+            <div className="flex items-center justify-center gap-4 mb-4 flex-wrap">
+              <img src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png" alt="Two Fungis Ltd" className="h-12 md:h-16 w-auto" />
+              <h2 className="text-4xl sm:text-5xl font-bold text-black" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
+                About <span className="text-red-600">Two Fungis Ltd</span>
+              </h2>
+            </div>
             <div className="w-24 h-1 bg-red-600 mx-auto mb-6"></div>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto" style={{ fontFamily: 'Open Sans, sans-serif' }}>
               We are a premier interior finishing company serving Okanagan to Vancouver Island regions, specializing in residential, commercial millwork, multi-unit residential, and high-rise commercial projects.

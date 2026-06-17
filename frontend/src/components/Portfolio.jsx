@@ -114,9 +114,12 @@ const Portfolio = () => {
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="text-center mb-16">
-            <h2 className="text-4xl sm:text-5xl font-bold text-white mb-4" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
-              Our <span className="text-red-600">Portfolio</span>
-            </h2>
+            <div className="flex items-center justify-center gap-4 mb-4 flex-wrap">
+              <img src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png" alt="Two Fungis Ltd" className="h-12 md:h-16 w-auto" />
+              <h2 className="text-4xl sm:text-5xl font-bold text-white" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
+                Our <span className="text-red-600">Portfolio</span>
+              </h2>
+            </div>
             <div className="w-24 h-1 bg-red-600 mx-auto mb-6"></div>
             <p className="text-lg text-gray-300 max-w-2xl mx-auto" style={{ fontFamily: 'Open Sans, sans-serif' }}>
               Showcasing our commitment to quality craftsmanship and attention to detail

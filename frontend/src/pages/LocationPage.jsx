@@ -57,7 +57,8 @@ const LocationPage = () => {
               />
             </div>
             
-            <div className="flex items-center justify-center gap-2 mb-4">
+            <div className="flex items-center justify-center gap-3 mb-4 flex-wrap">
+              <img src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png" alt="Two Fungis Ltd" className="h-12 md:h-16 w-auto" />
               <MapPin className="text-red-600" size={28} />
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
                 Interior Finishing in <span className="text-red-600">{location.city}</span>
@@ -112,9 +113,12 @@ const LocationPage = () => {
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl sm:text-4xl font-bold text-black mb-6" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
-              Premier Interior Finishing Services in {location.city}, {location.region}
-            </h2>
+            <div className="flex items-center gap-3 mb-6 flex-wrap">
+              <img src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png" alt="Two Fungis Ltd" className="h-10 md:h-12 w-auto" />
+              <h2 className="text-3xl sm:text-4xl font-bold text-black" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
+                Premier Interior Finishing Services in {location.city}, {location.region}
+              </h2>
+            </div>
             
             <div className="prose prose-lg max-w-none">
               <p className="text-gray-700 leading-relaxed mb-4" style={{ fontFamily: 'Open Sans, sans-serif' }}>
