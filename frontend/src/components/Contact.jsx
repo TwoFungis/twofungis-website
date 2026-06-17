@@ -36,33 +36,50 @@ const Contact = () => {
                 Contact Two Fungis Ltd
               </h3>
               
-              <div className="grid md:grid-cols-2 gap-8 mb-8">
-                {/* Phone - WHITE box */}
-                <a 
+              <div className="grid md:grid-cols-2 gap-6 mb-6">
+                {/* Phone 1 - Scott */}
+                <a
                   href="tel:778-268-4920"
                   className="flex flex-col items-center p-6 bg-white rounded-lg hover:bg-gray-100 transition-colors group"
+                  data-testid="phone-scott"
                 >
                   <div className="p-4 rounded-full mb-4 group-hover:scale-110 transition-transform" style={{ backgroundColor: '#228B22' }}>
                     <Phone className="text-white" size={32} />
                   </div>
-                  <h4 className="font-bold text-black mb-2 text-xl" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>Call Us</h4>
                   <p className="text-2xl font-bold text-red-600 mb-1">778-268-4920</p>
-                  <p className="text-gray-500 text-sm">Scott Marshall</p>
+                  <p className="font-bold text-black" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>Scott Marshall</p>
+                  <p className="text-gray-500 text-sm">Thompson / Okanagan</p>
                 </a>
 
-                {/* Email - WHITE box */}
-                <a 
-                  href="mailto:inbox@twofungis.ca"
+                {/* Phone 2 - Beau */}
+                <a
+                  href="tel:250-327-8202"
                   className="flex flex-col items-center p-6 bg-white rounded-lg hover:bg-gray-100 transition-colors group"
+                  data-testid="phone-beau"
                 >
                   <div className="p-4 rounded-full mb-4 group-hover:scale-110 transition-transform" style={{ backgroundColor: '#228B22' }}>
-                    <Mail className="text-white" size={32} />
+                    <Phone className="text-white" size={32} />
                   </div>
-                  <h4 className="font-bold text-black mb-2 text-xl" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>Email Us</h4>
-                  <p className="text-xl font-bold text-red-600 break-all">inbox@twofungis.ca</p>
-                  <p className="text-gray-500 text-sm mt-1">We respond within 24 hours</p>
+                  <p className="text-2xl font-bold text-red-600 mb-1">250-327-8202</p>
+                  <p className="font-bold text-black" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>Beau Suprun</p>
+                  <p className="text-gray-500 text-sm">Vancouver Island / Lower Mainland</p>
                 </a>
               </div>
+
+              {/* Email - slim elongated row spanning full width */}
+              <a
+                href="mailto:inbox@twofungis.ca"
+                className="flex items-center justify-center gap-4 p-4 bg-white rounded-lg hover:bg-gray-100 transition-colors group mb-8"
+                data-testid="email-link"
+              >
+                <div className="p-3 rounded-full group-hover:scale-110 transition-transform flex-shrink-0" style={{ backgroundColor: '#228B22' }}>
+                  <Mail className="text-white" size={24} />
+                </div>
+                <div className="text-left">
+                  <p className="text-xl font-bold text-red-600 break-all">inbox@twofungis.ca</p>
+                  <p className="text-gray-500 text-sm">We respond within 24 hours</p>
+                </div>
+              </a>
 
               {/* RED insurance box */}
               <div className="bg-red-600 text-white p-6 rounded-lg mb-8">
