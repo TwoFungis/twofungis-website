@@ -60,7 +60,17 @@ const Footer = () => {
                 </li>
                 <li className="flex items-start">
                   <Phone className="text-red-600 mr-2 flex-shrink-0 mt-1" size={18} />
-                  <a href="tel:778-268-4920" className="text-gray-400 transition-colors" onMouseEnter={(e) => e.target.style.color='#228B22'} onMouseLeave={(e) => e.target.style.color='#9ca3af'}>778-268-4920</a>
+                  <div>
+                    <a href="tel:778-268-4920" className="text-gray-400 transition-colors block" onMouseEnter={(e) => e.target.style.color='#228B22'} onMouseLeave={(e) => e.target.style.color='#9ca3af'}>778-268-4920</a>
+                    <span className="text-gray-500 text-xs">Scott Marshall — Thompson / Okanagan / Fraser Valley</span>
+                  </div>
+                </li>
+                <li className="flex items-start">
+                  <Phone className="text-red-600 mr-2 flex-shrink-0 mt-1" size={18} />
+                  <div>
+                    <a href="tel:250-327-8202" className="text-gray-400 transition-colors block" onMouseEnter={(e) => e.target.style.color='#228B22'} onMouseLeave={(e) => e.target.style.color='#9ca3af'}>250-327-8202</a>
+                    <span className="text-gray-500 text-xs">Beau Suprun — Vancouver Island / Lower Mainland</span>
+                  </div>
                 </li>
                 <li className="flex items-start">
                   <Mail className="text-red-600 mr-2 flex-shrink-0 mt-1" size={18} />
