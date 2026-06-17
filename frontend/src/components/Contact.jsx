@@ -1,6 +1,5 @@
 import React from 'react';
-import { Button } from './ui/button';
-import { Mail, Phone, MapPin } from 'lucide-react';
+import { Mail, Phone } from 'lucide-react';
 
 const Contact = () => {
   return (
@@ -73,54 +72,6 @@ const Contact = () => {
                 <p className="text-sm" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                   Fully insured for your peace of mind
                 </p>
-              </div>
-            </div>
-
-            {/* Additional Info Grid - GREEN icons */}
-            <div className="grid md:grid-cols-3 gap-6">
-              <div className="bg-white p-6 rounded-lg shadow-lg text-center">
-                <MapPin style={{ color: '#228B22' }} className="mx-auto mb-3" size={32} />
-                <h4 className="font-bold text-black mb-2" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>Service Area</h4>
-                <p className="text-gray-600 text-sm" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                  Okanagan to Vancouver Island
-                </p>
-              </div>
-
-              <div className="bg-white p-6 rounded-lg shadow-lg text-center">
-                <div className="text-3xl font-bold mb-2" style={{ fontFamily: 'Bebas Neue, sans-serif', color: '#228B22' }}>20+</div>
-                <h4 className="font-bold text-black mb-2" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>Years Experience</h4>
-                <p className="text-gray-600 text-sm" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                  Expert craftsmanship since 1999
-                </p>
-              </div>
-
-              <div className="bg-white p-6 rounded-lg shadow-lg text-center">
-                <div className="text-3xl font-bold mb-2" style={{ fontFamily: 'Bebas Neue, sans-serif', color: '#228B22' }}>24hr</div>
-                <h4 className="font-bold text-black mb-2" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>Response Time</h4>
-                <p className="text-gray-600 text-sm" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                  Quick replies to all inquiries
-                </p>
-              </div>
-            </div>
-
-            {/* Business Hours */}
-            <div className="mt-8 bg-black text-white p-8 rounded-lg text-center">
-              <h4 className="text-2xl font-bold mb-4" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
-                Business Hours
-              </h4>
-              <div className="grid sm:grid-cols-3 gap-4 text-sm" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                <div>
-                  <p className="font-semibold text-red-600">Monday - Friday</p>
-                  <p className="text-gray-300">7:00 AM - 5:00 PM</p>
-                </div>
-                <div>
-                  <p className="font-semibold text-red-600">Saturday</p>
-                  <p className="text-gray-300">8:00 AM - 2:00 PM</p>
-                </div>
-                <div>
-                  <p className="font-semibold text-red-600">Sunday</p>
-                  <p className="text-gray-300">Closed</p>
-                </div>
               </div>
             </div>
           </div>
