@@ -10,22 +10,107 @@ import TradeOSBanner from '../components/TradeOSBanner';
 import { Button } from '../components/ui/button';
 import { MapPin, Phone, Mail, CheckCircle2 } from 'lucide-react';
 
+// Determine which founder primarily covers a given region
+const getPrimaryContact = (region) => {
+  const r = (region || '').toLowerCase();
+  if (r.includes('okanagan') || r.includes('thompson') || r.includes('fraser')) {
+    return {
+      name: 'Scott Marshall',
+      phone: '778-268-4920',
+      phoneHref: 'tel:778-268-4920',
+      area: 'Thompson / Okanagan / Fraser Valley',
+    };
+  }
+  // Vancouver Island & Coastal BC (Lower Mainland) -> Beau
+  return {
+    name: 'Beau Suprun',
+    phone: '250-327-8202',
+    phoneHref: 'tel:250-327-8202',
+    area: 'Vancouver Island / Lower Mainland',
+  };
+};
+
+const upsertMeta = (selector, attr, value) => {
+  let el = document.querySelector(selector);
+  if (!el) {
+    el = document.createElement('meta');
+    const [name, val] = selector.replace('meta[', '').replace(']', '').split('=');
+    el.setAttribute(name, val.replace(/"/g, ''));
+    document.head.appendChild(el);
+  }
+  el.setAttribute(attr, value);
+};
+
 const LocationPage = () => {
   const { city } = useParams();
   const navigate = useNavigate();
   const location = locations.find(loc => loc.slug === city);
+  const primary = location ? getPrimaryContact(location.region) : null;
 
   useEffect(() => {
     if (location) {
-      document.title = `${location.city} Interior Finishing & Millwork | Two Fungis Ltd | ${location.region}`;
-      
-      // Update meta description
-      const metaDescription = document.querySelector('meta[name="description"]');
-      if (metaDescription) {
-        metaDescription.setAttribute('content', location.description);
+      const title = `${location.city} Interior Finishing, Millwork & Carpentry | Two Fungis Ltd`;
+      const desc = `${location.description} Serving ${location.city}, ${location.region}. Free quotes, $5M insured, 20+ years combined experience. Call ${primary.name} at ${primary.phone}.`;
+      const url = `https://twofungis.ca/locations/${location.slug}`;
+      const keywords = `interior finishing ${location.city}, millwork ${location.city}, finishing carpentry ${location.city}, cabinet installation ${location.city}, trim ${location.city}, multi-unit ${location.region}, commercial millwork ${location.city}, residential finishing ${location.region}, Two Fungis ${location.city}`;
+
+      document.title = title;
+      upsertMeta('meta[name="description"]', 'content', desc);
+      upsertMeta('meta[name="keywords"]', 'content', keywords);
+      upsertMeta('meta[property="og:title"]', 'content', title);
+      upsertMeta('meta[property="og:description"]', 'content', desc);
+      upsertMeta('meta[property="og:url"]', 'content', url);
+      upsertMeta('meta[property="twitter:title"]', 'content', title);
+      upsertMeta('meta[property="twitter:description"]', 'content', desc);
+      upsertMeta('meta[property="twitter:url"]', 'content', url);
+
+      // Canonical
+      let canonical = document.querySelector('link[rel="canonical"]');
+      if (!canonical) {
+        canonical = document.createElement('link');
+        canonical.setAttribute('rel', 'canonical');
+        document.head.appendChild(canonical);
       }
+      canonical.setAttribute('href', url);
+
+      // Per-location JSON-LD (LocalBusiness)
+      const ldId = 'ld-location';
+      let ld = document.getElementById(ldId);
+      if (!ld) {
+        ld = document.createElement('script');
+        ld.type = 'application/ld+json';
+        ld.id = ldId;
+        document.head.appendChild(ld);
+      }
+      ld.textContent = JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'LocalBusiness',
+        name: `Two Fungis Ltd — ${location.city}`,
+        description: desc,
+        url,
+        telephone: `+1-${primary.phone}`,
+        email: 'inbox@twofungis.ca',
+        priceRange: '$$',
+        address: {
+          '@type': 'PostalAddress',
+          addressLocality: location.city,
+          addressRegion: 'BC',
+          addressCountry: 'CA',
+        },
+        areaServed: { '@type': 'City', name: location.city },
+        founder: [
+          { '@type': 'Person', name: 'Scott Marshall' },
+          { '@type': 'Person', name: 'Beau Suprun' },
+        ],
+        foundingDate: '2017',
+      });
     }
-  }, [location]);
+
+    return () => {
+      const ld = document.getElementById('ld-location');
+      if (ld) ld.remove();
+    };
+  }, [location, primary]);
 
   if (!location) {
     navigate('/');
@@ -87,12 +172,23 @@ const LocationPage = () => {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <a
+                href={primary.phoneHref}
+                className="inline-flex items-center justify-center gap-2 text-white px-8 py-4 text-lg font-semibold rounded-md transition-colors"
+                style={{ backgroundColor: '#228B22' }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor='#1e7b1e'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor='#228B22'}
+                data-testid="primary-call-btn"
+              >
+                <Phone size={20} />
+                Call {primary.name}: {primary.phone}
+              </a>
               <Button
                 onClick={() => scrollToSection('contact')}
                 className="text-white px-8 py-6 text-lg font-semibold"
-                style={{ backgroundColor: '#228B22' }}
-                onMouseEnter={(e) => e.target.style.backgroundColor='#1e7b1e'}
-                onMouseLeave={(e) => e.target.style.backgroundColor='#228B22'}
+                style={{ backgroundColor: '#dc2626' }}
+                onMouseEnter={(e) => e.target.style.backgroundColor='#b91c1c'}
+                onMouseLeave={(e) => e.target.style.backgroundColor='#dc2626'}
               >
                 Get a Free Quote in {location.city}
               </Button>
@@ -107,6 +203,11 @@ const LocationPage = () => {
                 View Our Work
               </Button>
             </div>
+
+            {/* Local Primary Contact Caption */}
+            <p className="mt-4 text-sm text-gray-400" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+              Your local contact for {location.city}: <span className="font-semibold text-white">{primary.name}</span> — {primary.area}
+            </p>
           </div>
         </div>
       </section>
@@ -202,9 +303,9 @@ const LocationPage = () => {
                   Contact us today for a free consultation and quote. We're fully insured with $5 million liability coverage and ready to bring your vision to life.
                 </p>
                 <div className="flex flex-wrap gap-4">
-                  <a href="tel:778-268-4920" className="flex items-center font-semibold" style={{ color: '#228B22' }}>
+                  <a href={primary.phoneHref} className="flex items-center font-semibold" style={{ color: '#228B22' }}>
                     <Phone size={20} className="mr-2" />
-                    778-268-4920
+                    {primary.phone} — {primary.name}
                   </a>
                   <a href="mailto:inbox@twofungis.ca" className="flex items-center font-semibold" style={{ color: '#228B22' }}>
                     <Mail size={20} className="mr-2" />
