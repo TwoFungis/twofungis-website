@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://twofungis.ca/sitemap.xml
+
+# Disallow admin or private pages if any
+# Disallow: /admin/
