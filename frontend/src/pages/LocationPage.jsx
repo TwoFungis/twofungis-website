@@ -45,16 +45,15 @@ const LocationPage = () => {
       <Header />
       
       {/* Location Hero */}
-      <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden pt-20 bg-black">
+      <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden pt-32 sm:pt-36 md:pt-40 pb-12 bg-black">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="max-w-4xl mx-auto text-center">
-            {/* Logo - Larger to match homepage */}
-            <div className="mb-6 flex justify-center">
+          <div className="max-w-6xl mx-auto text-center">
+            {/* Logo - Large, responsive */}
+            <div className="mb-8 flex justify-center">
               <img
                 src="https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/afq4qky8_ChatGPT%20Image%20Jun%2017%2C%202026%2C%2012_03_36%20PM.png"
                 alt="Two Fungis Ltd"
-                className="h-72 md:h-84 w-auto drop-shadow-2xl"
-                style={{ height: 'clamp(18rem, 25vw, 21rem)' }}
+                className="w-full max-w-5xl h-auto drop-shadow-2xl"
               />
             </div>
             

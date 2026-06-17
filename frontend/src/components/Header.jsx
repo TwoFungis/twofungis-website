@@ -113,7 +113,7 @@ const Header = () => {
               onMouseEnter={(e) => e.target.style.backgroundColor='#1e7b1e'}
               onMouseLeave={(e) => e.target.style.backgroundColor='#228B22'}
             >
-              Get a Quote
+              Contact Us
             </Button>
           </nav>
 
@@ -179,7 +179,7 @@ const Header = () => {
                 onMouseEnter={(e) => e.target.style.backgroundColor='#1e7b1e'}
                 onMouseLeave={(e) => e.target.style.backgroundColor='#228B22'}
               >
-                Get a Quote
+                Contact Us
               </Button>
             </nav>
           </div>
