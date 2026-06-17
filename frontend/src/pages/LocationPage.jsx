@@ -58,7 +58,7 @@ const LocationPage = () => {
             </div>
             
             <div className="flex flex-col items-center justify-center gap-3 mb-4">
-              <img src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png" alt="Two Fungis Ltd" className="h-12 md:h-16 w-auto" />
+              <img src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png" alt="Two Fungis Ltd" className="h-20 md:h-24 w-auto" />
               <div className="flex items-center justify-center gap-3 flex-wrap">
                 <MapPin className="text-red-600" size={28} />
                 <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>

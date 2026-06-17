@@ -19,7 +19,7 @@ const Contact = () => {
           {/* Header */}
           <div className="text-center mb-16">
             <div className="flex flex-col items-center justify-center gap-3 mb-4">
-              <img src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png" alt="Two Fungis Ltd" className="h-12 md:h-16 w-auto" />
+              <img src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png" alt="Two Fungis Ltd" className="h-20 md:h-24 w-auto" />
               <h2 className="text-4xl sm:text-5xl font-bold text-black" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
                 Get in <span className="text-red-600">Touch</span>
               </h2>

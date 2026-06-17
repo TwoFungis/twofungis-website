@@ -1,31 +1,6 @@
 import React from 'react';
-import { Award, Users, TrendingUp, Shield } from 'lucide-react';
-import { Card } from './ui/card';
 
 const About = () => {
-  const highlights = [
-    {
-      icon: Award,
-      title: '20+ Years Combined Experience',
-      description: 'Over two decades of hands-on expertise in millwork and finishing carpentry'
-    },
-    {
-      icon: Shield,
-      title: '$5M Coverage',
-      description: 'Comprehensive liability insurance'
-    },
-    {
-      icon: TrendingUp,
-      title: 'Master Craftsmanship',
-      description: 'Precision finishing, cabinet install, flooring, and machinist expertise'
-    },
-    {
-      icon: Users,
-      title: 'Expert Founders',
-      description: 'Led by Scott Marshall & Beau Suprun - unparalleled industry expertise'
-    }
-  ];
-
   return (
     <section id="about" className="py-20 bg-white">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -33,7 +8,7 @@ const About = () => {
           {/* Header */}
           <div className="text-center mb-16">
             <div className="flex flex-col items-center justify-center gap-3 mb-4">
-              <img src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png" alt="Two Fungis Ltd" className="h-12 md:h-16 w-auto" />
+              <img src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png" alt="Two Fungis Ltd" className="h-20 md:h-24 w-auto" />
               <h2 className="text-4xl sm:text-5xl font-bold text-black" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
                 About <span className="text-red-600">Two Fungis Ltd</span>
               </h2>
@@ -77,26 +52,6 @@ const About = () => {
                 <p className="text-sm" style={{ fontFamily: 'Open Sans, sans-serif' }}>Years Experience</p>
               </div>
             </div>
-          </div>
-
-          {/* Highlights Grid */}
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {highlights.map((item, index) => {
-              const IconComponent = item.icon;
-              return (
-                <Card key={index} className="p-6 hover:shadow-xl transition-shadow duration-300 border-t-4 border-red-600">
-                  <div className="w-14 h-14 rounded-full flex items-center justify-center mb-4" style={{ backgroundColor: 'rgba(34, 139, 34, 0.1)' }}>
-                    <IconComponent style={{ color: '#228B22' }} size={28} />
-                  </div>
-                  <h4 className="text-xl font-bold text-black mb-2" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
-                    {item.title}
-                  </h4>
-                  <p className="text-gray-600" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                    {item.description}
-                  </p>
-                </Card>
-              );
-            })}
           </div>
         </div>
       </div>
