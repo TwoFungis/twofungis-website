@@ -5,11 +5,20 @@ import { Mail, Phone, MapPin } from 'lucide-react';
 const Contact = () => {
   return (
     <section id="contact" className="py-20 bg-gray-50">
+      {/* Full-width marketing banner above */}
+      <div className="w-full mb-16">
+        <img
+          src="https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/xl34d4lz_ChatGPT%20Image%20Jun%2017%2C%202026%2C%2012_07_03%20PM.png"
+          alt="Two Fungis Ltd - From Frame to Finish"
+          className="w-full h-auto block"
+        />
+      </div>
+
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="text-center mb-16">
-            <div className="flex items-center justify-center gap-4 mb-4 flex-wrap">
+            <div className="flex flex-col items-center justify-center gap-3 mb-4">
               <img src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png" alt="Two Fungis Ltd" className="h-12 md:h-16 w-auto" />
               <h2 className="text-4xl sm:text-5xl font-bold text-black" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
                 Get in <span className="text-red-600">Touch</span>

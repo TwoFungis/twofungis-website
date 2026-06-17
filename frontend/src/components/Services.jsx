@@ -36,7 +36,7 @@ const Services = () => {
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="text-center mb-16">
-            <div className="flex items-center justify-center gap-4 mb-4 flex-wrap">
+            <div className="flex flex-col items-center justify-center gap-3 mb-4">
               <img src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png" alt="Two Fungis Ltd" className="h-12 md:h-16 w-auto" />
               <h2 className="text-4xl sm:text-5xl font-bold text-black" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
                 Our <span className="text-red-600">Services</span>
