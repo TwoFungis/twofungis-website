@@ -48,7 +48,7 @@ const Contact = () => {
                   </div>
                   <p className="text-2xl font-bold text-red-600 mb-1">778-268-4920</p>
                   <p className="font-bold text-black" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>Scott Marshall</p>
-                  <p className="text-gray-500 text-sm">Thompson / Okanagan</p>
+                  <p className="text-gray-500 text-sm">Thompson / Okanagan / Fraser Valley</p>
                 </a>
 
                 {/* Phone 2 - Beau */}
