@@ -70,7 +70,7 @@ const Contact = () => {
                 <MapPin style={{ color: '#228B22' }} className="mx-auto mb-3" size={32} />
                 <h4 className="font-bold text-black mb-2" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>Service Area</h4>
                 <p className="text-gray-600 text-sm" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                  Coastal B.C and Vancouver Island
+                  Okanagan to Vancouver Island
                 </p>
               </div>
 

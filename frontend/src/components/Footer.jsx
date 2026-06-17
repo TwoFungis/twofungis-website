@@ -20,7 +20,7 @@ const Footer = () => {
                 />
               </Link>
               <p className="text-gray-400 mb-4" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                Premium interior finishing services for residential, commercial, and high-rise projects across Coastal B.C and Vancouver Island.
+                Premium interior finishing services for residential, commercial, and high-rise projects across Okanagan to Vancouver Island.
               </p>
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full" style={{ backgroundColor: 'rgba(34, 139, 34, 0.2)', border: '1px solid rgba(34, 139, 34, 0.5)' }}>
                 <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#228B22' }}></div>
@@ -56,7 +56,7 @@ const Footer = () => {
               <ul className="space-y-3" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                 <li className="flex items-start">
                   <MapPin style={{ color: '#228B22' }} className="mr-2 flex-shrink-0 mt-1" size={18} />
-                  <span className="text-gray-400">Coastal B.C and Vancouver Island</span>
+                  <span className="text-gray-400">Okanagan to Vancouver Island</span>
                 </li>
                 <li className="flex items-start">
                   <Phone className="text-red-600 mr-2 flex-shrink-0 mt-1" size={18} />
@@ -73,7 +73,7 @@ const Footer = () => {
           {/* Bottom Bar */}
           <div className="border-t border-gray-800 pt-8 text-center">
             <p className="text-gray-400" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-              © {currentYear} Two Fungis Ltd. All rights reserved. | Serving Coastal B.C and Vancouver Island since 2017
+              © {currentYear} Two Fungis Ltd. All rights reserved. | Serving Okanagan to Vancouver Island since 2017
             </p>
           </div>
         </div>

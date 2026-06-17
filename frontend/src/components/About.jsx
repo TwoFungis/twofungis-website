@@ -37,7 +37,7 @@ const About = () => {
             </h2>
             <div className="w-24 h-1 bg-red-600 mx-auto mb-6"></div>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-              We are a premier interior finishing company serving Coastal B.C and Vancouver Island regions, specializing in residential, commercial millwork, multi-unit residential, and high-rise commercial projects.
+              We are a premier interior finishing company serving Okanagan to Vancouver Island regions, specializing in residential, commercial millwork, multi-unit residential, and high-rise commercial projects.
             </p>
           </div>
 
@@ -57,7 +57,7 @@ const About = () => {
                 Beau Suprun, master craftsman, exceptional carpenter, and machinist, brings an unparalleled eye for detail and perfection that is second to none in the finishing world. With extensive experience in multi-unit finishing management and installation, his meticulous approach guarantees flawless execution on every project.
               </p>
               <p className="text-gray-700 mb-4 leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                With our $5 million liability insurance and proven track record, we continue to secure large-scale contracts throughout Coastal B.C and Vancouver Island. Our commitment to excellence and professional service has made us a trusted partner for projects of all sizes.
+                With our $5 million liability insurance and proven track record, we continue to secure large-scale contracts throughout Okanagan to Vancouver Island. Our commitment to excellence and professional service has made us a trusted partner for projects of all sizes.
               </p>
               <p className="text-gray-700 leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                 Together, Scott and Beau lead a team dedicated to precision craftsmanship and innovative solutions. From intimate residential spaces to expansive high-rise commercial developments, our combined expertise ensures every detail is executed to perfection.
