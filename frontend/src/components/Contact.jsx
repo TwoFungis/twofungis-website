@@ -75,7 +75,7 @@ const Contact = () => {
               </div>
 
               <div className="bg-white p-6 rounded-lg shadow-lg text-center">
-                <div className="text-3xl font-bold mb-2" style={{ fontFamily: 'Bebas Neue, sans-serif', color: '#228B22' }}>25+</div>
+                <div className="text-3xl font-bold mb-2" style={{ fontFamily: 'Bebas Neue, sans-serif', color: '#228B22' }}>20+</div>
                 <h4 className="font-bold text-black mb-2" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>Years Experience</h4>
                 <p className="text-gray-600 text-sm" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                   Expert craftsmanship since 1999

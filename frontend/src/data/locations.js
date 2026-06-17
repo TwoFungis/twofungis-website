@@ -67,7 +67,7 @@ export const locations = [
     city: 'Langley',
     region: 'Fraser Valley',
     slug: 'langley',
-    description: 'Premier finishing carpentry in Langley. Serving residential and commercial clients with 25+ years expertise.',
+    description: 'Premier finishing carpentry in Langley. Serving residential and commercial clients with 20+ years expertise.',
     population: '150,000+',
     keyProjects: ['Custom homes', 'Equestrian facilities', 'Business parks']
   },

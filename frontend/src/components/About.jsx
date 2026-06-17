@@ -6,7 +6,7 @@ const About = () => {
   const highlights = [
     {
       icon: Award,
-      title: '25+ Years Combined Experience',
+      title: '20+ Years Combined Experience',
       description: 'Over two decades of hands-on expertise in millwork and finishing carpentry'
     },
     {
@@ -48,7 +48,7 @@ const About = () => {
                 Our Story
               </h3>
               <p className="text-gray-700 mb-4 leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                Established in 2017, Two Fungis Ltd brings over 25 years of combined hands-on expertise to every project. Founded by Scott Marshall and Beau Suprun, our company represents the perfect union of experience and precision craftsmanship.
+                Established in 2017, Two Fungis Ltd brings over 20 years of combined hands-on expertise to every project. Founded by Scott Marshall and Beau Suprun, our company represents the perfect union of experience and precision craftsmanship.
               </p>
               <p className="text-gray-700 mb-4 leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                 Scott Marshall has built a distinguished career spanning 15 years in millwork, finishing carpentry, cabinet installation, and flooring. His expertise ensures exceptional craftsmanship across all project types.
@@ -70,7 +70,7 @@ const About = () => {
                 className="rounded-lg shadow-2xl w-full h-auto object-cover"
               />
               <div className="absolute -bottom-6 -left-6 text-white p-6 rounded-lg shadow-xl" style={{ backgroundColor: '#228B22' }}>
-                <p className="text-4xl font-bold" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>25+</p>
+                <p className="text-4xl font-bold" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>20+</p>
                 <p className="text-sm" style={{ fontFamily: 'Open Sans, sans-serif' }}>Years Experience</p>
               </div>
             </div>

@@ -71,7 +71,7 @@ const LocationPage = () => {
             <div className="flex flex-wrap gap-3 justify-center mb-8 text-gray-400">
               <span className="flex items-center gap-2">
                 <CheckCircle2 size={20} style={{ color: '#228B22' }} />
-                25+ Years Combined Experience
+                20+ Years Combined Experience
               </span>
               <span className="flex items-center gap-2">
                 <CheckCircle2 size={20} style={{ color: '#228B22' }} />
@@ -118,7 +118,7 @@ const LocationPage = () => {
             
             <div className="prose prose-lg max-w-none">
               <p className="text-gray-700 leading-relaxed mb-4" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                Two Fungis Ltd is proud to serve {location.city} and surrounding areas in {location.region}. With over 25 years of combined experience, our founders Scott Marshall and Beau Suprun bring unparalleled expertise in interior finishing, commercial millwork, and precision carpentry to every project.
+                Two Fungis Ltd is proud to serve {location.city} and surrounding areas in {location.region}. With over 20 years of combined experience, our founders Scott Marshall and Beau Suprun bring unparalleled expertise in interior finishing, commercial millwork, and precision carpentry to every project.
               </p>
               
               <h3 className="text-2xl font-bold text-black mb-4 mt-8" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
@@ -169,7 +169,7 @@ const LocationPage = () => {
               </h3>
               
               <p className="text-gray-700 leading-relaxed mb-4" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                We're not just contractors – we're craftsmen who take pride in every detail. Our team brings together Scott Marshall's 25 years of hands-on experience in millwork and finishing carpentry, and Beau Suprun's exceptional eye for detail as a master craftsman and machinist. This combination of experience and precision ensures your project in {location.city} exceeds expectations.
+                We're not just contractors – we're craftsmen who take pride in every detail. Our team brings together Scott Marshall's 20 years of hands-on experience in millwork and finishing carpentry, and Beau Suprun's exceptional eye for detail as a master craftsman and machinist. This combination of experience and precision ensures your project in {location.city} exceeds expectations.
               </p>
 
               {location.keyProjects && location.keyProjects.length > 0 && (
