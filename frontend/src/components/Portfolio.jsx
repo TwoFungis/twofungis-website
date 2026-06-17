@@ -109,11 +109,11 @@ const Portfolio = () => {
   const [selectedImage, setSelectedImage] = useState(null);
 
   return (
-    <section id="portfolio" className="py-20 bg-black">
+    <section id="portfolio" className="py-12 bg-black">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
-          <div className="text-center mb-16">
+          <div className="text-center mb-10">
             <div className="flex flex-col items-center justify-center gap-3 mb-4">
               <img src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png" alt="Two Fungis Ltd" className="h-20 md:h-24 w-auto" />
               <h2 className="text-4xl sm:text-5xl font-bold text-white" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>

@@ -26,11 +26,11 @@ const WhyChooseUs = () => {
   ];
 
   return (
-    <section className="py-20 bg-white">
+    <section className="py-12 bg-white">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
-          <div className="text-center mb-16">
+          <div className="text-center mb-10">
             <div className="flex flex-col items-center justify-center gap-3 mb-4">
               <img src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png" alt="Two Fungis Ltd" className="h-20 md:h-24 w-auto" />
               <h2 className="text-4xl sm:text-5xl font-bold text-black" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
@@ -41,7 +41,7 @@ const WhyChooseUs = () => {
           </div>
 
           {/* Reasons Grid */}
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
             {reasons.map((reason, index) => {
               const IconComponent = reason.icon;
               return (

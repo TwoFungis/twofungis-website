@@ -45,7 +45,7 @@ const LocationPage = () => {
       <Header />
       
       {/* Location Hero */}
-      <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden pt-32 sm:pt-36 md:pt-40 pb-12 bg-black">
+      <section className="relative min-h-[50vh] flex items-center justify-center overflow-hidden pt-28 sm:pt-32 md:pt-36 pb-8 bg-black">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="max-w-6xl mx-auto text-center">
             {/* Logo - Large, responsive */}
@@ -112,7 +112,7 @@ const LocationPage = () => {
       </section>
 
       {/* Location-Specific Content */}
-      <section className="py-16 bg-white">
+      <section className="py-10 bg-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto">
             <div className="flex flex-col items-start gap-3 mb-6">
