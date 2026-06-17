@@ -71,7 +71,7 @@ const LocationPage = () => {
             <div className="flex flex-wrap gap-3 justify-center mb-8 text-gray-400">
               <span className="flex items-center gap-2">
                 <CheckCircle2 size={20} style={{ color: '#228B22' }} />
-                25+ Years Experience
+                25+ Years Combined Experience
               </span>
               <span className="flex items-center gap-2">
                 <CheckCircle2 size={20} style={{ color: '#228B22' }} />

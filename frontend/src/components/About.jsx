@@ -6,7 +6,7 @@ const About = () => {
   const highlights = [
     {
       icon: Award,
-      title: '25+ Years Experience',
+      title: '25+ Years Combined Experience',
       description: 'Over two decades of hands-on expertise in millwork and finishing carpentry'
     },
     {
@@ -51,7 +51,7 @@ const About = () => {
                 Established in 2017, Two Fungis Ltd brings over 25 years of combined hands-on expertise to every project. Founded by Scott Marshall and Beau Suprun, our company represents the perfect union of experience and precision craftsmanship.
               </p>
               <p className="text-gray-700 mb-4 leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                Scott Marshall has built a distinguished career spanning 25 years in millwork, finishing carpentry, cabinet installation, and flooring. His expertise ensures exceptional craftsmanship across all project types.
+                Scott Marshall has built a distinguished career spanning 15 years in millwork, finishing carpentry, cabinet installation, and flooring. His expertise ensures exceptional craftsmanship across all project types.
               </p>
               <p className="text-gray-700 mb-4 leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                 Beau Suprun, master craftsman, exceptional carpenter, and machinist, brings an unparalleled eye for detail and perfection that is second to none in the finishing world. With extensive experience in multi-unit finishing management and installation, his meticulous approach guarantees flawless execution on every project.

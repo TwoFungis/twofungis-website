@@ -31,7 +31,7 @@ const Portfolio = () => {
     },
     {
       image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/futuvp4y_IMG_20200211_140913.jpg',
-      title: 'Diagonal Wood Feature Wall',
+      title: 'Post and Beam Deck and Railings',
       category: 'Commercial'
     },
     {
