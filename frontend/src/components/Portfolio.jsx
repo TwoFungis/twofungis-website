@@ -20,8 +20,8 @@ const Portfolio = () => {
       category: 'Multi-Unit'
     },
     {
-      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/mme4t8iz_20211023_172224.jpg',
-      title: 'Kitchen Cabinet Installation',
+      image: 'https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/q64sa5sh_20221115_145141.jpg',
+      title: 'Custom Bathroom Vanity & Tile Finishing',
       category: 'Residential'
     },
     {
@@ -30,9 +30,9 @@ const Portfolio = () => {
       category: 'Residential'
     },
     {
-      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/futuvp4y_IMG_20200211_140913.jpg',
-      title: 'Post and Beam Deck and Railings',
-      category: 'Commercial'
+      image: 'https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/8b6defpa_20221115_113241.jpg',
+      title: 'Stone Fireplace & Custom Mantel',
+      category: 'Residential'
     },
     {
       image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/j7f9wan6_IMG_20191217_163614.jpg',
@@ -85,7 +85,7 @@ const Portfolio = () => {
       category: 'Multi-Unit'
     },
     {
-      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/xcihx4pi_20220128_182318.jpg',
+      image: 'https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/7ezj60zh_20221115_145127.jpg',
       title: 'Custom Kitchen Design & Installation',
       category: 'Residential'
     },
