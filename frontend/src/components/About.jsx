@@ -50,21 +50,6 @@ const About = () => {
                 <p className="text-4xl font-bold" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>20+</p>
                 <p className="text-sm" style={{ fontFamily: 'Open Sans, sans-serif' }}>Years Experience</p>
               </div>
-              {/* Procore Network Partner Badge */}
-              <a
-                href="https://network.procore.com/p/two-fungis-ltd-penticton"
-                target="_blank"
-                rel="noopener noreferrer dofollow"
-                className="absolute -bottom-6 -right-6 bg-white p-3 rounded-lg shadow-xl hover:scale-105 transition-transform"
-                data-testid="procore-badge-top"
-                aria-label="Two Fungis Ltd on the Procore Construction Network"
-              >
-                <img
-                  src="https://network.procore.com/assets/static/procore-black-badge.svg"
-                  alt="Procore Construction Network — Two Fungis Ltd"
-                  className="h-16 w-auto"
-                />
-              </a>
             </div>
           </div>
         </div>

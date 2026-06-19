@@ -53,10 +53,22 @@ const Hero = () => {
             </Button>
           </div>
           
-          {/* Trust Badge */}
-          <div className="mt-12 inline-flex items-center gap-2 px-6 py-3 rounded-full" style={{ backgroundColor: 'rgba(34, 139, 34, 0.2)', borderColor: 'rgba(34, 139, 34, 0.5)', borderWidth: '1px', borderStyle: 'solid' }}>
-            <div className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: '#228B22' }}></div>
-            <span className="font-medium" style={{ color: '#32CD32' }}>$5M Liability Insurance</span>
+          {/* Procore Network Partner Badge */}
+          <div className="mt-12 flex justify-center">
+            <a
+              href="https://network.procore.com/p/two-fungis-ltd-penticton"
+              target="_blank"
+              rel="noopener noreferrer dofollow"
+              className="bg-white p-3 rounded-lg shadow-2xl hover:scale-105 transition-transform"
+              data-testid="procore-badge-top"
+              aria-label="Two Fungis Ltd on the Procore Construction Network"
+            >
+              <img
+                src="https://network.procore.com/assets/static/procore-black-badge.svg"
+                alt="Procore Construction Network — Two Fungis Ltd"
+                className="h-16 md:h-20 w-auto"
+              />
+            </a>
           </div>
         </div>
       </div>
