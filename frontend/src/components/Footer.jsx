@@ -80,6 +80,27 @@ const Footer = () => {
             </div>
           </div>
 
+          {/* Trust Badges Row */}
+          <div className="border-t border-gray-800 pt-8 pb-6 flex flex-col sm:flex-row items-center justify-center gap-6">
+            <span className="text-gray-500 text-sm uppercase tracking-wider" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+              Verified Member of
+            </span>
+            <a
+              href="https://network.procore.com/p/two-fungis-ltd-penticton"
+              target="_blank"
+              rel="noopener noreferrer dofollow"
+              className="bg-white p-3 rounded-md hover:scale-105 transition-transform"
+              data-testid="procore-badge-footer"
+              aria-label="Two Fungis Ltd on the Procore Construction Network"
+            >
+              <img
+                src="https://network.procore.com/assets/static/procore-black-badge.svg"
+                alt="Procore Construction Network — Two Fungis Ltd"
+                className="h-14 w-auto"
+              />
+            </a>
+          </div>
+
           {/* Bottom Bar */}
           <div className="border-t border-gray-800 pt-8 text-center">
             <p className="text-gray-400" style={{ fontFamily: 'Open Sans, sans-serif' }}>
