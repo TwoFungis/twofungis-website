@@ -42,8 +42,8 @@ const About = () => {
             </div>
             <div className="relative">
               <img
-                src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/d422l0sp_20211103_163344.jpg"
-                alt="Custom kitchen cabinetry and millwork"
+                src="https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/4kayqebz_20221022_100810.jpg"
+                alt="Custom kitchen with quartz waterfall island and stainless steel appliances by Two Fungis Ltd"
                 className="rounded-lg shadow-2xl w-full h-auto object-cover"
               />
               <div className="absolute -bottom-6 -left-6 text-white p-6 rounded-lg shadow-xl" style={{ backgroundColor: '#228B22' }}>
