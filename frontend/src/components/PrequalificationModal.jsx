@@ -26,11 +26,6 @@ const PrequalificationModal = ({ open, onClose }) => {
 
   if (!open) return null;
 
-  const encode = (data) =>
-    Object.keys(data)
-      .map((k) => encodeURIComponent(k) + '=' + encodeURIComponent(data[k]))
-      .join('&');
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
@@ -38,12 +33,25 @@ const PrequalificationModal = ({ open, onClose }) => {
     const formData = new FormData(e.target);
     const data = Object.fromEntries(formData.entries());
     try {
-      const res = await fetch('/', {
+      const res = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: encode({ 'form-name': 'prequalification', ...data }),
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({
+          access_key: '85b188c7-6082-495f-9907-7402dc0d4455',
+          subject: `New Prequalification Package Request – ${data.company || 'Unknown Company'}`,
+          from_name: 'Two Fungis Finishing Website',
+          fullName:    data.fullName,
+          company:     data.company,
+          position:    data.position,
+          email:       data.email,
+          phone:       data.phone,
+          projectName: data.projectName || '—',
+          city:        data.city,
+          message:     data.message || '—',
+        }),
       });
-      if (!res.ok) throw new Error('Submission failed');
+      const json = await res.json();
+      if (!json.success) throw new Error(json.message || 'Submission failed');
       setSubmitted(true);
     } catch (err) {
       setError('Something went wrong. Please email inbox@twofungis.ca directly.');
