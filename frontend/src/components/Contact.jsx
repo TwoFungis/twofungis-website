@@ -24,9 +24,22 @@ const Contact = () => {
               </h2>
             </div>
             <div className="w-24 h-1 bg-red-600 mx-auto mb-6"></div>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-              Ready to start your project? Contact us for a free consultation and quote
+            <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+              For tender invitations, project consultations, commercial pricing, site meetings or general inquiries — please reach out.
             </p>
+            <div className="flex flex-wrap justify-center gap-2 mt-5 max-w-3xl mx-auto">
+              {[
+                'Tender Invitations',
+                'Project Consultations',
+                'Commercial Pricing',
+                'Site Meetings',
+                'General Inquiries',
+              ].map((t) => (
+                <span key={t} className="px-3 py-1 rounded-full text-xs uppercase tracking-wider text-gray-700 bg-white border border-gray-200" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+                  {t}
+                </span>
+              ))}
+            </div>
           </div>
 
           <div className="max-w-4xl mx-auto">

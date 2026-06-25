@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from './ui/button';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Phone } from 'lucide-react';
 
 const Hero = () => {
   const scrollToSection = (id) => {
@@ -12,10 +12,9 @@ const Hero = () => {
 
   return (
     <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black pt-28 sm:pt-32 md:pt-36 pb-12">
-      {/* Content */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
         <div className="max-w-6xl mx-auto">
-          {/* Logo Image Above Title - Large, responsive */}
+          {/* Marketing Logo */}
           <div className="mb-6 flex justify-center">
             <img
               src="https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/afq4qky8_ChatGPT%20Image%20Jun%2017%2C%202026%2C%2012_03_36%20PM.png"
@@ -23,52 +22,48 @@ const Hero = () => {
               className="w-full max-w-5xl h-auto drop-shadow-2xl"
             />
           </div>
-          
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-6 animate-fade-in" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
-            British Columbia Commercial <span className="text-red-600">Finish Carpentry &amp; Millwork</span>
+
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-6" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
+            Commercial &amp; Multifamily <span className="text-red-600">Interior Finishing</span>
           </h1>
-          <p className="text-xl sm:text-2xl text-gray-200 mb-6 max-w-3xl mx-auto" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-            Two Fungis Finishing is a British Columbia finishing contractor — supporting commercial and multifamily projects throughout Southern BC. Serving British Columbia from Vancouver to the Okanagan and Vancouver Island.
+
+          <p className="text-lg sm:text-xl text-gray-200 mb-8 max-w-3xl mx-auto leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+            Providing finish carpentry, architectural millwork, doors &amp; hardware, deficiency completion, and interior finishing services throughout British Columbia.
           </p>
-          {/* Service Pillars */}
-          <div className="flex flex-wrap justify-center gap-2 mb-8 max-w-3xl mx-auto" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-            {[
-              'Commercial Finish Carpentry',
-              'Multi-Family Construction',
-              'Architectural Millwork',
-              'Doors & Hardware',
-              'Deficiency Completion',
-            ].map((p) => (
-              <span key={p} className="px-3 py-1 rounded-full text-sm text-white border" style={{ borderColor: 'rgba(34,139,34,0.6)', backgroundColor: 'rgba(34,139,34,0.15)' }}>
-                {p}
-              </span>
-            ))}
-          </div>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-10">
             <Button
               onClick={() => scrollToSection('contact')}
-              className="text-white px-8 py-6 text-lg font-semibold transition-all duration-200 hover:scale-105"
-              style={{ backgroundColor: '#228B22', hover: { backgroundColor: '#1e7b1e' } }}
-              onMouseEnter={(e) => e.target.style.backgroundColor = '#1e7b1e'}
-              onMouseLeave={(e) => e.target.style.backgroundColor = '#228B22'}
+              className="text-white px-8 py-6 text-base font-semibold inline-flex items-center"
+              style={{ backgroundColor: '#228B22' }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor='#1e7b1e'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor='#228B22'}
+              data-testid="hero-tender-btn"
             >
-              Request a Quote
-              <ChevronRight className="ml-2" size={20} />
+              Request a Tender Invitation
+              <ChevronRight size={18} className="ml-1" />
             </Button>
             <Button
-              onClick={() => scrollToSection('portfolio')}
+              onClick={() => scrollToSection('contact')}
               variant="outline"
-              className="text-white px-8 py-6 text-lg font-semibold transition-all duration-200"
-              style={{ borderColor: '#228B22', borderWidth: '2px' }}
-              onMouseEnter={(e) => { e.target.style.backgroundColor = '#228B22'; e.target.style.color = 'black'; }}
-              onMouseLeave={(e) => { e.target.style.backgroundColor = 'transparent'; e.target.style.color = 'white'; }}
+              className="text-white px-8 py-6 text-base font-semibold inline-flex items-center"
+              style={{ borderColor: '#ffffff', borderWidth: '1px', backgroundColor: 'transparent' }}
+              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#000000'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#ffffff'; }}
+              data-testid="hero-consult-btn"
             >
-              View Our Work
+              Request a Consultation
             </Button>
           </div>
-          
-          {/* Procore Network Partner Badge */}
-          <div className="mt-12 flex justify-center">
+
+          {/* Subtle service strip */}
+          <p className="text-xs uppercase tracking-[0.2em] text-gray-400 mb-8" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+            Finish Carpentry · Architectural Millwork · Doors &amp; Hardware · Multifamily · Commercial Interiors · Deficiency Completion
+          </p>
+
+          {/* Procore Badge */}
+          <div className="flex justify-center">
             <a
               href="https://network.procore.com/p/two-fungis-ltd-penticton"
               target="_blank"
@@ -80,17 +75,10 @@ const Hero = () => {
               <img
                 src="https://network.procore.com/assets/static/procore-black-badge.svg"
                 alt="Procore Construction Network — Two Fungis Finishing"
-                className="h-16 md:h-20 w-auto"
+                className="h-14 md:h-16 w-auto"
               />
             </a>
           </div>
-        </div>
-      </div>
-
-      {/* Scroll Indicator */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-        <div className="w-6 h-10 border-2 border-white/30 rounded-full flex items-start justify-center p-2">
-          <div className="w-1 h-3 rounded-full" style={{ backgroundColor: '#228B22' }}></div>
         </div>
       </div>
     </section>

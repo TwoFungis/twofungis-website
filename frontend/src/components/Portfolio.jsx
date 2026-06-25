@@ -109,7 +109,7 @@ const Portfolio = () => {
   const [selectedImage, setSelectedImage] = useState(null);
 
   return (
-    <section id="portfolio" className="py-12 bg-black">
+    <section id="portfolio" className="py-12 bg-black scroll-mt-32">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
           {/* Header */}

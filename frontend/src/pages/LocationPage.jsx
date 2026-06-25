@@ -55,7 +55,7 @@ const LocationPage = () => {
   useEffect(() => {
     if (location) {
       const title = `${location.city} Commercial Finish Carpentry & Architectural Millwork | Two Fungis Finishing | British Columbia`;
-      const desc = `Two Fungis Finishing in ${location.city} — commercial finish carpentry, architectural millwork, doors & hardware, multi-family construction and deficiency completion. ${location.description} Call ${primary.name} at ${primary.phone}.`;
+      const desc = `Two Fungis Finishing in ${location.city} — commercial and multifamily finishing contractor. ${location.description} Tender invitations and consultations welcome. Call ${primary.name} at ${primary.phone}.`;
       const url = `https://twofungis.ca/locations/${location.slug}`;
       const keywords = `finish carpentry ${location.city}, architectural millwork ${location.city}, doors and hardware ${location.city}, multi-family construction ${location.city}, commercial interiors ${location.city}, deficiency completion ${location.city}, tenant improvements ${location.city}, finishing contractor ${location.region}, Two Fungis Finishing ${location.city}, Two Fungis ${location.city}, finish carpenter Okanagan`;
 

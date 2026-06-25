@@ -2,7 +2,7 @@ import React from 'react';
 
 const About = () => {
   return (
-    <section id="about" className="py-12 bg-white">
+    <section id="about" className="py-12 bg-white scroll-mt-32">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
@@ -14,8 +14,8 @@ const About = () => {
               </h2>
             </div>
             <div className="w-24 h-1 bg-red-600 mx-auto mb-6"></div>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-              We are a British Columbia finishing contractor — supporting commercial and multifamily projects throughout Southern BC. Two Fungis Finishing serves clients from Vancouver and the Fraser Valley through the Okanagan to Vancouver Island, specializing in commercial finish carpentry, architectural millwork, doors &amp; hardware, multi-family construction and deficiency completion.
+            <p className="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+              A professional commercial and multifamily finishing contractor supporting projects throughout British Columbia.
             </p>
           </div>
 
@@ -23,32 +23,30 @@ const About = () => {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
               <h3 className="text-3xl font-bold text-black mb-6" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
-                Our Story
-              </h3>              <p className="text-gray-700 mb-4 leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                Established in 2017, Two Fungis Finishing brings over 20 years of combined hands-on expertise to every project. Founded by Scott Marshall and Beau Suprun, our company represents the perfect union of experience and precision craftsmanship.
+                Our Approach
+              </h3>
+              <p className="text-gray-700 mb-4 leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+                Two Fungis Finishing partners with developers, general contractors and construction managers to deliver finish carpentry, architectural millwork, doors &amp; hardware, deficiency completion and interior finishing on commercial and multifamily projects across British Columbia.
               </p>
               <p className="text-gray-700 mb-4 leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                Scott Marshall has built a distinguished career spanning 15 years in millwork, finishing carpentry, cabinet installation, and flooring. His expertise ensures exceptional craftsmanship across all project types.
+                Established in 2017 and led by Scott Marshall and Beau Suprun, the company is built around quiet professionalism — clear communication, careful scope review, transparent inclusions, reliable scheduling and clean documented closeout. We take the time to understand the project, integrate with the GC&apos;s schedule, and leave a finished building that reflects well on the entire team.
               </p>
               <p className="text-gray-700 mb-4 leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                Beau Suprun, master craftsman, exceptional carpenter, and machinist, brings an unparalleled eye for detail and perfection that is second to none in the finishing world. With extensive experience in multi-unit finishing management and installation, his meticulous approach guarantees flawless execution on every project.
-              </p>
-              <p className="text-gray-700 mb-4 leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                With our $5 million liability insurance and proven track record, we continue to secure commercial finish carpentry, multi-family and architectural millwork contracts throughout British Columbia. Our commitment to excellence and professional service has made us a trusted partner for developers, GCs, and homeowners alike.
+                Our crews carry $5 million liability coverage, are WorkSafeBC compliant, and operate with the documentation and coordination that commercial work demands. We&apos;d rather earn long-term relationships with a handful of well-run developers and GCs than chase volume.
               </p>
               <p className="text-gray-700 leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                Together, Scott and Beau lead a team dedicated to precision craftsmanship and reliable schedule performance. From multi-family developments and commercial tenant improvements to bespoke architectural millwork, our combined Okanagan expertise ensures every detail is executed to perfection.
+                If you are tendering a project in BC and want a finishing contractor that takes scope, schedule and communication seriously — we&apos;d like to be on your bid list.
               </p>
             </div>
             <div className="relative">
               <img
                 src="https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/4kayqebz_20221022_100810.jpg"
-                alt="Custom kitchen with quartz waterfall island and stainless steel appliances by Two Fungis Finishing"
+                alt="Multifamily kitchen finishing by Two Fungis Finishing — British Columbia"
                 className="rounded-lg shadow-2xl w-full h-auto object-cover"
               />
               <div className="absolute -bottom-6 -left-6 text-white p-6 rounded-lg shadow-xl" style={{ backgroundColor: '#228B22' }}>
-                <p className="text-4xl font-bold" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>20+</p>
-                <p className="text-sm" style={{ fontFamily: 'Open Sans, sans-serif' }}>Years Experience</p>
+                <p className="text-4xl font-bold" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>$5M</p>
+                <p className="text-sm" style={{ fontFamily: 'Open Sans, sans-serif' }}>Liability Coverage</p>
               </div>
             </div>
           </div>

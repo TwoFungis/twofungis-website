@@ -1,28 +1,18 @@
 import React from 'react';
-import { CheckCircle2, Clock, Target, Wrench } from 'lucide-react';
+import { FileText, ClipboardList, CalendarCheck, Wrench, Users, MessageCircle, ShieldCheck, HardHat, Handshake } from 'lucide-react';
+import { Card } from './ui/card';
 
 const WhyChooseUs = () => {
   const reasons = [
-    {
-      icon: CheckCircle2,
-      title: 'Proven Expertise',
-      description: 'Years of successful projects across residential and commercial sectors'
-    },
-    {
-      icon: Target,
-      title: 'Precision Craftsmanship',
-      description: 'Meticulous attention to detail on every project, large or small'
-    },
-    {
-      icon: Clock,
-      title: 'Reliable Timeline',
-      description: 'Committed to delivering projects on schedule without compromising quality'
-    },
-    {
-      icon: Wrench,
-      title: 'Full-Service Solutions',
-      description: 'Comprehensive interior finishing services from concept to completion'
-    }
+    { icon: FileText,      title: 'Professional Tendering',     description: 'Clean, documented bids with scope clarity that estimators and PMs can actually rely on.' },
+    { icon: ClipboardList, title: 'Detailed Scope Review',      description: 'We review drawings, specs and exclusions carefully before contract — no surprises at closeout.' },
+    { icon: Handshake,     title: 'Transparent Inclusions',     description: 'Inclusions and exclusions are written plainly. What you see in the bid is what you get on site.' },
+    { icon: CalendarCheck, title: 'Reliable Scheduling',        description: 'Crews integrate with the GC schedule, hit milestones, and communicate early when conditions change.' },
+    { icon: Wrench,        title: 'Quality Workmanship',        description: 'Finish work that holds up to deficiency reviews, owner walkthroughs and long-term occupancy.' },
+    { icon: Users,         title: 'Project Coordination',       description: 'Coordination with site supers, trades and consultants — we work with the team, not around it.' },
+    { icon: MessageCircle, title: 'Responsive Communication',   description: 'Fast replies, clear documentation, and a single point of contact through to closeout.' },
+    { icon: ShieldCheck,   title: 'Safety & Compliance',    description: 'WorkSafeBC compliant, $5M liability coverage, and the documentation commercial work requires.' },
+    { icon: HardHat,       title: 'Relationship-Driven',        description: 'We&apos;d rather earn repeat work from well-run developers and GCs than chase volume.' }
   ];
 
   return (
@@ -34,48 +24,29 @@ const WhyChooseUs = () => {
             <div className="flex flex-col items-center justify-center gap-3 mb-4">
               <img src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png" alt="Two Fungis Finishing" className="h-20 md:h-24 w-auto" />
               <h2 className="text-4xl sm:text-5xl font-bold text-black" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
-                Why Choose <span className="text-red-600">Two Fungis Finishing</span>
+                Why Work With <span className="text-red-600">Two Fungis Finishing</span>
               </h2>
             </div>
             <div className="w-24 h-1 bg-red-600 mx-auto mb-6"></div>
+            <p className="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+              Built around how developers and general contractors actually want finishing trades to operate.
+            </p>
           </div>
 
           {/* Reasons Grid */}
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
-            {reasons.map((reason, index) => {
-              const IconComponent = reason.icon;
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {reasons.map((r, i) => {
+              const Icon = r.icon;
               return (
-                <div key={index} className="text-center">
-                  <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 hover:scale-110 transition-transform duration-300" style={{ backgroundColor: '#228B22' }}>
-                    <IconComponent className="text-white" size={36} />
+                <Card key={i} className="p-6 bg-white border-t-4 border-red-600 hover:shadow-xl transition-shadow duration-300">
+                  <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4" style={{ backgroundColor: 'rgba(34,139,34,0.12)' }}>
+                    <Icon style={{ color: '#228B22' }} size={24} />
                   </div>
-                  <h3 className="text-xl font-bold text-black mb-3" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
-                    {reason.title}
-                  </h3>
-                  <p className="text-gray-600" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                    {reason.description}
-                  </p>
-                </div>
+                  <h3 className="text-xl font-bold text-black mb-2" style={{ fontFamily: 'Bebas Neue, sans-serif' }} dangerouslySetInnerHTML={{ __html: r.title }} />
+                  <p className="text-gray-600 text-sm leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }} dangerouslySetInnerHTML={{ __html: r.description }} />
+                </Card>
               );
             })}
-          </div>
-
-          {/* Stats Section */}
-          <div className="bg-black rounded-xl p-12">
-            <div className="grid sm:grid-cols-3 gap-8 text-center">
-              <div>
-                <p className="text-5xl font-bold mb-2" style={{ fontFamily: 'Bebas Neue, sans-serif', color: '#228B22' }}>20+</p>
-                <p className="text-white text-lg" style={{ fontFamily: 'Open Sans, sans-serif' }}>Years Combined Experience</p>
-              </div>
-              <div>
-                <p className="text-5xl font-bold text-red-600 mb-2" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>$5M</p>
-                <p className="text-white text-lg" style={{ fontFamily: 'Open Sans, sans-serif' }}>Liability Insurance</p>
-              </div>
-              <div>
-                <p className="text-5xl font-bold mb-2" style={{ fontFamily: 'Bebas Neue, sans-serif', color: '#228B22' }}>100%</p>
-                <p className="text-white text-lg" style={{ fontFamily: 'Open Sans, sans-serif' }}>Quality Guarantee</p>
-              </div>
-            </div>
           </div>
         </div>
       </div>

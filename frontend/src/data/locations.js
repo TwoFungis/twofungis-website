@@ -1,157 +1,47 @@
-// BC-wide service area — Two Fungis Finishing
-// Each city page provides local SEO targeting while company messaging stays broad.
+// British Columbia service area — Two Fungis Finishing
+// Local SEO targeting via dedicated municipal pages; one consistent BC-wide identity.
+const make = (city, slug, region, lead) => ({
+  city,
+  slug,
+  region,
+  description: `${lead} Two Fungis Finishing supports commercial and multifamily projects in ${city} with finish carpentry, architectural millwork, doors & hardware and deficiency completion.`,
+  services: ['Commercial finish carpentry', 'Architectural millwork', 'Doors & hardware', 'Multi-family construction', 'Deficiency completion', 'Tenant improvements'],
+  projectTypes: ['Multi-family residential', 'Commercial interiors', 'Institutional projects', 'Tenant improvements']
+});
+
 export const locations = [
-  // ─── Okanagan ────────────────────────────────────────────────
-  {
-    city: 'Penticton',
-    slug: 'penticton',
-    region: 'South Okanagan',
-    description: 'Two Fungis Finishing supports Penticton with commercial finish carpentry, architectural millwork, doors & hardware, multi-family construction and deficiency completion.',
-    services: ['Commercial finish carpentry', 'Architectural millwork', 'Multi-family construction', 'Doors & hardware', 'Deficiency completion'],
-    projectTypes: ['Commercial fit-outs', 'Multi-family residential', 'Architectural millwork installations', 'Doors & hardware packages']
-  },
-  {
-    city: 'Kelowna',
-    slug: 'kelowna',
-    region: 'Central Okanagan',
-    description: 'Trusted BC finishing contractor serving Kelowna with commercial finish carpentry, architectural millwork and large-scale multi-family construction.',
-    services: ['Commercial finish carpentry', 'Architectural millwork', 'Doors & hardware', 'Multi-family construction', 'Deficiency completion'],
-    projectTypes: ['High-rise multi-family', 'Commercial offices', 'Hospitality interiors', 'Retail fit-outs']
-  },
-  {
-    city: 'West Kelowna',
-    slug: 'west-kelowna',
-    region: 'Central Okanagan',
-    description: 'Finish carpentry, millwork and commercial finishing for West Kelowna developments, mixed-use projects and tenant improvements.',
-    services: ['Commercial finish carpentry', 'Architectural millwork', 'Multi-family construction', 'Deficiency completion'],
-    projectTypes: ['Multi-family developments', 'Mixed-use projects', 'Commercial fit-outs']
-  },
-  {
-    city: 'Vernon',
-    slug: 'vernon',
-    region: 'North Okanagan',
-    description: 'North Okanagan finish carpentry and architectural millwork in Vernon — commercial finishing, doors & hardware and multi-family deficiency completion.',
-    services: ['Commercial finish carpentry', 'Architectural millwork', 'Doors & hardware', 'Multi-family construction', 'Deficiency completion'],
-    projectTypes: ['Multi-family developments', 'Commercial interiors', 'Tenant improvements']
-  },
-  {
-    city: 'Summerland',
-    slug: 'summerland',
-    region: 'South Okanagan',
-    description: 'Finishing contractor for Summerland — architectural millwork, finish carpentry, doors & hardware and deficiency completion for commercial and multi-family builds.',
-    services: ['Commercial finish carpentry', 'Architectural millwork', 'Doors & hardware', 'Deficiency completion'],
-    projectTypes: ['Wineries & hospitality', 'Custom residences', 'Commercial buildings']
-  },
+  // ─── Lower Mainland ─────────────────────────────────────────
+  make('Vancouver',      'vancouver',      'Lower Mainland', 'Vancouver finishing contractor serving developers, GCs and construction managers across Metro Vancouver.'),
+  make('Burnaby',        'burnaby',        'Lower Mainland', 'Burnaby commercial and multifamily finishing — supporting Lower Mainland general contractors and developers.'),
+  make('Richmond',       'richmond',       'Lower Mainland', 'Richmond architectural millwork, finish carpentry and tenant improvement specialists.'),
+  make('Surrey',         'surrey',         'Lower Mainland', 'Surrey finish carpentry, multifamily construction support and commercial fit-outs.'),
 
-  // ─── Fraser Valley ───────────────────────────────────────────
-  {
-    city: 'Abbotsford',
-    slug: 'abbotsford',
-    region: 'Fraser Valley',
-    description: 'Fraser Valley commercial finish carpentry and architectural millwork in Abbotsford — multi-family construction, doors & hardware and deficiency completion.',
-    services: ['Commercial finish carpentry', 'Architectural millwork', 'Doors & hardware', 'Multi-family construction', 'Deficiency completion'],
-    projectTypes: ['Multi-family developments', 'Commercial fit-outs', 'Tenant improvements']
-  },
-  {
-    city: 'Langley',
-    slug: 'langley',
-    region: 'Fraser Valley',
-    description: 'Langley finishing contractor — commercial finish carpentry, architectural millwork and multi-family construction across the Fraser Valley.',
-    services: ['Commercial finish carpentry', 'Architectural millwork', 'Doors & hardware', 'Multi-family construction'],
-    projectTypes: ['Multi-family residential', 'Commercial buildings', 'Tenant improvements']
-  },
-  {
-    city: 'Chilliwack',
-    slug: 'chilliwack',
-    region: 'Fraser Valley',
-    description: 'Chilliwack architectural millwork and finish carpentry — multi-family, commercial and deficiency completion services across the Fraser Valley.',
-    services: ['Commercial finish carpentry', 'Architectural millwork', 'Multi-family construction', 'Deficiency completion'],
-    projectTypes: ['Multi-family residential', 'Commercial buildings', 'Renovations']
-  },
+  // ─── Fraser Valley ──────────────────────────────────────────
+  make('Langley',        'langley',        'Fraser Valley',  'Langley commercial finish carpentry and architectural millwork for Fraser Valley developments.'),
+  make('Abbotsford',     'abbotsford',     'Fraser Valley',  'Abbotsford finishing contractor — multifamily, commercial and institutional finishing across the Fraser Valley.'),
+  make('Chilliwack',     'chilliwack',     'Fraser Valley',  'Chilliwack finish carpentry, doors & hardware, and deficiency completion for commercial and multifamily projects.'),
 
-  // ─── Thompson ────────────────────────────────────────────────
-  {
-    city: 'Kamloops',
-    slug: 'kamloops',
-    region: 'Thompson',
-    description: 'Kamloops commercial finish carpentry, architectural millwork, doors & hardware and multi-family construction across the Thompson region.',
-    services: ['Commercial finish carpentry', 'Architectural millwork', 'Doors & hardware', 'Multi-family construction', 'Deficiency completion'],
-    projectTypes: ['Multi-family residential', 'Commercial interiors', 'Tenant improvements']
-  },
+  // ─── Okanagan / Thompson ────────────────────────────────────
+  make('Kelowna',        'kelowna',        'Okanagan',       'Kelowna commercial finishing contractor — multifamily, hospitality, institutional and tenant improvement finishing.'),
+  make('West Kelowna',   'west-kelowna',   'Okanagan',       'West Kelowna finish carpentry, architectural millwork and multifamily finishing.'),
+  make('Penticton',      'penticton',      'Okanagan',       'Penticton finish carpentry, architectural millwork and multifamily project finishing.'),
+  make('Summerland',     'summerland',     'Okanagan',       'Summerland commercial finish carpentry, architectural millwork and deficiency completion.'),
+  make('Lake Country',   'lake-country',   'Okanagan',       'Lake Country commercial and multifamily finishing services.'),
+  make('Vernon',         'vernon',         'Okanagan',       'Vernon finish carpentry, architectural millwork and multifamily construction support.'),
+  make('Oliver',         'oliver',         'Okanagan',       'Oliver finish carpentry, doors & hardware and commercial finishing.'),
+  make('Osoyoos',        'osoyoos',        'Okanagan',       'Osoyoos finish carpentry, architectural millwork and hospitality finishing.'),
+  make('Okanagan Falls', 'okanagan-falls', 'Okanagan',       'Okanagan Falls commercial and residential finishing services.'),
+  make('Kamloops',       'kamloops',       'Thompson',       'Kamloops commercial finish carpentry, multifamily construction support and tenant improvements.'),
+  make('Salmon Arm',     'salmon-arm',     'Thompson',       'Salmon Arm commercial finishing — finish carpentry, architectural millwork and deficiency completion.'),
 
-  // ─── Lower Mainland / Coastal BC ─────────────────────────────
-  {
-    city: 'Vancouver',
-    slug: 'vancouver',
-    region: 'Lower Mainland',
-    description: 'Vancouver commercial finish carpentry and architectural millwork specialists — multi-family construction, doors & hardware and deficiency completion across Metro Vancouver.',
-    services: ['Commercial finish carpentry', 'Architectural millwork', 'Doors & hardware', 'Multi-family construction', 'Deficiency completion'],
-    projectTypes: ['High-rise multi-family', 'Commercial offices', 'Hospitality interiors', 'Tenant improvements']
-  },
-  {
-    city: 'Burnaby',
-    slug: 'burnaby',
-    region: 'Lower Mainland',
-    description: 'Burnaby architectural millwork and commercial finish carpentry — multi-family and tenant improvement specialists across the Lower Mainland.',
-    services: ['Commercial finish carpentry', 'Architectural millwork', 'Doors & hardware', 'Multi-family construction'],
-    projectTypes: ['Multi-family developments', 'Commercial fit-outs', 'Office interiors']
-  },
-  {
-    city: 'Surrey',
-    slug: 'surrey',
-    region: 'Lower Mainland',
-    description: 'Surrey commercial finishing contractor — finish carpentry, architectural millwork, multi-family construction and deficiency completion across Metro Vancouver.',
-    services: ['Commercial finish carpentry', 'Architectural millwork', 'Doors & hardware', 'Multi-family construction', 'Deficiency completion'],
-    projectTypes: ['Multi-family residential', 'Commercial buildings', 'Retail fit-outs']
-  },
-  {
-    city: 'Richmond',
-    slug: 'richmond',
-    region: 'Lower Mainland',
-    description: 'Richmond finish carpentry, architectural millwork and commercial finishing — multi-family and tenant improvement specialists.',
-    services: ['Commercial finish carpentry', 'Architectural millwork', 'Doors & hardware', 'Multi-family construction'],
-    projectTypes: ['Multi-family residential', 'Commercial interiors', 'Retail']
-  },
-  {
-    city: 'Coquitlam',
-    slug: 'coquitlam',
-    region: 'Lower Mainland',
-    description: 'Coquitlam commercial finish carpentry and architectural millwork — multi-family construction and deficiency completion across the Tri-Cities.',
-    services: ['Commercial finish carpentry', 'Architectural millwork', 'Doors & hardware', 'Multi-family construction', 'Deficiency completion'],
-    projectTypes: ['Multi-family developments', 'Commercial buildings', 'Tenant improvements']
-  },
-
-  // ─── Vancouver Island ────────────────────────────────────────
-  {
-    city: 'Victoria',
-    slug: 'victoria',
-    region: 'Vancouver Island',
-    description: 'Victoria commercial finish carpentry, architectural millwork and multi-family construction — South Island finishing contractor.',
-    services: ['Commercial finish carpentry', 'Architectural millwork', 'Doors & hardware', 'Multi-family construction', 'Deficiency completion'],
-    projectTypes: ['Multi-family residential', 'Commercial interiors', 'Heritage millwork']
-  },
-  {
-    city: 'Nanaimo',
-    slug: 'nanaimo',
-    region: 'Vancouver Island',
-    description: 'Nanaimo architectural millwork, finish carpentry, doors & hardware and multi-family construction — Central Vancouver Island specialists.',
-    services: ['Commercial finish carpentry', 'Architectural millwork', 'Doors & hardware', 'Multi-family construction'],
-    projectTypes: ['Multi-family residential', 'Commercial buildings', 'Tenant improvements']
-  },
-  {
-    city: 'Courtenay',
-    slug: 'courtenay',
-    region: 'Vancouver Island',
-    description: 'Courtenay & Comox Valley finish carpentry, architectural millwork, doors & hardware and multi-family construction.',
-    services: ['Commercial finish carpentry', 'Architectural millwork', 'Doors & hardware', 'Multi-family construction'],
-    projectTypes: ['Multi-family residential', 'Commercial interiors', 'Hospitality']
-  },
-  {
-    city: 'Duncan',
-    slug: 'duncan',
-    region: 'Vancouver Island',
-    description: 'Duncan & Cowichan Valley commercial finish carpentry, architectural millwork and deficiency completion services.',
-    services: ['Commercial finish carpentry', 'Architectural millwork', 'Doors & hardware', 'Deficiency completion'],
-    projectTypes: ['Commercial buildings', 'Multi-family residential', 'Renovations']
-  }
+  // ─── Vancouver Island ───────────────────────────────────────
+  make('Victoria',       'victoria',       'Vancouver Island', 'Victoria finish carpentry, architectural millwork and commercial interior finishing.'),
+  make('Langford',       'langford',       'Vancouver Island', 'Langford commercial and multifamily finishing across the West Shore.'),
+  make('Nanaimo',        'nanaimo',        'Vancouver Island', 'Nanaimo finish carpentry, architectural millwork and multifamily construction services.'),
+  make('Duncan',         'duncan',         'Vancouver Island', 'Duncan and Cowichan Valley commercial finish carpentry and deficiency completion.'),
+  make('Courtenay',      'courtenay',      'Vancouver Island', 'Courtenay finish carpentry, architectural millwork and multifamily finishing.'),
+  make('Campbell River', 'campbell-river', 'Vancouver Island', 'Campbell River commercial and institutional finishing services.'),
+  make('Comox',          'comox',          'Vancouver Island', 'Comox Valley commercial finish carpentry and architectural millwork.'),
+  make('Parksville',     'parksville',     'Vancouver Island', 'Parksville commercial finishing and architectural millwork.'),
+  make('Qualicum Beach', 'qualicum-beach', 'Vancouver Island', 'Qualicum Beach finish carpentry, architectural millwork and hospitality finishing.'),
 ];
