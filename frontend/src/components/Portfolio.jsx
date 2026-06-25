@@ -3,11 +3,16 @@ import { Plus, X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 // Portfolio images — alt text is for accessibility & SEO only (not shown on the card)
 const photos = [
-  { src: 'https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/uj0cmrlu_scott16.jpg',  alt: 'Basement framing & stair build — Two Fungis Finishing' },
-  { src: 'https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/3uhpnl5a_scott15.jpg',  alt: 'Custom kitchen with granite island & shaker cabinetry — Two Fungis Finishing' },
-  { src: 'https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/010ubehg_scott12.jpeg', alt: 'Custom coffered ceiling detail — Two Fungis Finishing' },
-  { src: 'https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/bkyow0po_scott2.jpg',   alt: 'Modern kitchen with quartz waterfall island — Two Fungis Finishing' },
-  { src: 'https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/ih07eflu_20211006_132459.jpg', alt: 'Custom interior stairs & railing — Two Fungis Finishing' },
+  { src: 'https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/uj0cmrlu_scott16.jpg',          alt: 'Custom stair landing & railing — Two Fungis Finishing' },
+  { src: 'https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/3uhpnl5a_scott15.jpg',          alt: 'Custom kitchen with granite island & shaker cabinetry — Two Fungis Finishing' },
+  { src: 'https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/010ubehg_scott12.jpeg',         alt: 'Custom coffered ceiling detail — Two Fungis Finishing' },
+  { src: 'https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/bkyow0po_scott2.jpg',           alt: 'Modern kitchen with quartz waterfall island — Two Fungis Finishing' },
+  { src: 'https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/ih07eflu_20211006_132459.jpg',  alt: 'Custom interior stairs & railing — Two Fungis Finishing' },
+  { src: 'https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/9vmtdeai_beau1.jpg',            alt: 'Built-in entertainment wall millwork — Two Fungis Finishing' },
+  { src: 'https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/34afn4gi_20221024_141952.jpg',  alt: 'Custom bathroom vanity with vessel sinks — Two Fungis Finishing' },
+  { src: 'https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/5jjo8hpb_20220909_152047.jpg',  alt: 'Stair build with custom posts &amp; handrails — Two Fungis Finishing' },
+  { src: 'https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/oglnnseg_20220114_223756.jpg',  alt: 'White stair railing with iron spindles — Two Fungis Finishing' },
+  { src: 'https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/wl2hjvkn_beau10.jpg',           alt: 'Custom butler pantry &amp; wine cabinetry — Two Fungis Finishing' },
 ];
 
 const THUMB_LOGO = 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png';
@@ -67,12 +72,22 @@ const Portfolio = () => {
                   loading="lazy"
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
-                {/* Hover overlay: logo + plus */}
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/55 transition-colors duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                  <div className="flex items-center gap-3 bg-white/95 px-4 py-2 rounded-full shadow-lg">
-                    <img src={THUMB_LOGO} alt="" className="h-8 w-auto" />
-                    <Plus size={20} className="text-black" strokeWidth={2.5} />
-                  </div>
+                {/* Subtle hover wash */}
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
+
+                {/* Persistent logo + plus badge (bottom-right) */}
+                <div className="absolute bottom-3 right-3 flex items-center gap-1.5 transition-all duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_12px_rgba(34,139,34,0.85)]">
+                  <img
+                    src={THUMB_LOGO}
+                    alt=""
+                    className="h-10 md:h-12 w-auto drop-shadow-[0_2px_6px_rgba(0,0,0,0.85)]"
+                  />
+                  <span
+                    className="flex items-center justify-center w-6 h-6 rounded-full text-white text-lg font-bold leading-none"
+                    style={{ backgroundColor: '#228B22' }}
+                  >
+                    <Plus size={14} strokeWidth={3} />
+                  </span>
                 </div>
               </button>
             ))}
