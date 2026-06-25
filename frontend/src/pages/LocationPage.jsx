@@ -10,23 +10,24 @@ import TradeOSBanner from '../components/TradeOSBanner';
 import { Button } from '../components/ui/button';
 import { MapPin, Phone, Mail, CheckCircle2 } from 'lucide-react';
 
-// Determine which founder primarily covers a given region
+// Determine which founder primarily covers a given region within the Okanagan
 const getPrimaryContact = (region) => {
   const r = (region || '').toLowerCase();
-  if (r.includes('okanagan') || r.includes('thompson') || r.includes('fraser')) {
+  // Scott Marshall — South Okanagan (Penticton, Summerland, Oliver, Osoyoos, Okanagan Falls)
+  if (r.includes('south')) {
     return {
       name: 'Scott Marshall',
       phone: '778-268-4920',
       phoneHref: 'tel:778-268-4920',
-      area: 'Thompson / Okanagan / Fraser Valley',
+      area: 'Penticton & South Okanagan',
     };
   }
-  // Vancouver Island & Coastal BC (Lower Mainland) -> Beau
+  // Beau Suprun — Central / North Okanagan (Kelowna, West Kelowna, Lake Country, Peachland, Vernon)
   return {
     name: 'Beau Suprun',
     phone: '250-327-8202',
     phoneHref: 'tel:250-327-8202',
-    area: 'Vancouver Island / Lower Mainland',
+    area: 'Kelowna & Central / North Okanagan',
   };
 };
 
@@ -49,10 +50,10 @@ const LocationPage = () => {
 
   useEffect(() => {
     if (location) {
-      const title = `${location.city} Interior Finishing, Millwork & Carpentry | Two Fungis Ltd`;
-      const desc = `${location.description} Serving ${location.city}, ${location.region}. Free quotes, $5M insured, 20+ years combined experience. Call ${primary.name} at ${primary.phone}.`;
+      const title = `${location.city} Finish Carpentry & Architectural Millwork | Two Fungis Finishing | Okanagan BC`;
+      const desc = `Two Fungis Finishing — ${location.city}'s commercial finish carpentry, architectural millwork, doors & hardware, multi-family and deficiency completion specialists. ${location.description} Free quotes. Call ${primary.name} at ${primary.phone}.`;
       const url = `https://twofungis.ca/locations/${location.slug}`;
-      const keywords = `interior finishing ${location.city}, millwork ${location.city}, finishing carpentry ${location.city}, cabinet installation ${location.city}, trim ${location.city}, multi-unit ${location.region}, commercial millwork ${location.city}, residential finishing ${location.region}, Two Fungis ${location.city}`;
+      const keywords = `finish carpentry ${location.city}, architectural millwork ${location.city}, doors and hardware ${location.city}, multi-family construction ${location.city}, commercial interiors ${location.city}, deficiency completion ${location.city}, tenant improvements ${location.city}, finishing contractor ${location.region}, Two Fungis Finishing ${location.city}, Two Fungis ${location.city}, finish carpenter Okanagan`;
 
       document.title = title;
       upsertMeta('meta[name="description"]', 'content', desc);
@@ -84,8 +85,8 @@ const LocationPage = () => {
       }
       ld.textContent = JSON.stringify({
         '@context': 'https://schema.org',
-        '@type': 'LocalBusiness',
-        name: `Two Fungis Ltd — ${location.city}`,
+        '@type': 'GeneralContractor',
+        name: `Two Fungis Finishing — ${location.city}`,
         description: desc,
         url,
         telephone: `+1-${primary.phone}`,
@@ -137,13 +138,13 @@ const LocationPage = () => {
             <div className="mb-8 flex justify-center">
               <img
                 src="https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/afq4qky8_ChatGPT%20Image%20Jun%2017%2C%202026%2C%2012_03_36%20PM.png"
-                alt="Two Fungis Ltd"
+                alt="Two Fungis Finishing"
                 className="w-full max-w-5xl h-auto drop-shadow-2xl"
               />
             </div>
             
             <div className="flex flex-col items-center justify-center gap-3 mb-4">
-              <img src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png" alt="Two Fungis Ltd" className="h-20 md:h-24 w-auto" />
+              <img src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png" alt="Two Fungis Finishing" className="h-20 md:h-24 w-auto" />
               <div className="flex items-center justify-center gap-3 flex-wrap">
                 <MapPin className="text-red-600" size={28} />
                 <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
@@ -217,7 +218,7 @@ const LocationPage = () => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto">
             <div className="flex flex-col items-start gap-3 mb-6">
-              <img src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png" alt="Two Fungis Ltd" className="h-10 md:h-12 w-auto" />
+              <img src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png" alt="Two Fungis Finishing" className="h-10 md:h-12 w-auto" />
               <h2 className="text-3xl sm:text-4xl font-bold text-black" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
                 Premier Interior Finishing Services in {location.city}, {location.region}
               </h2>
@@ -225,7 +226,7 @@ const LocationPage = () => {
             
             <div className="prose prose-lg max-w-none">
               <p className="text-gray-700 leading-relaxed mb-4" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                Two Fungis Ltd is proud to serve {location.city} and surrounding areas in {location.region}. With over 20 years of combined experience, our founders Scott Marshall and Beau Suprun bring unparalleled expertise in interior finishing, commercial millwork, and precision carpentry to every project.
+                Two Fungis Finishing is proud to serve {location.city} and surrounding areas in {location.region}. With over 20 years of combined experience, our founders Scott Marshall and Beau Suprun bring unparalleled expertise in interior finishing, commercial millwork, and precision carpentry to every project.
               </p>
               
               <h3 className="text-2xl font-bold text-black mb-4 mt-8" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
@@ -236,43 +237,43 @@ const LocationPage = () => {
                 <li className="flex items-start">
                   <CheckCircle2 style={{ color: '#228B22' }} className="mr-3 flex-shrink-0 mt-1" size={20} />
                   <span className="text-gray-700" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                    <strong>Residential Interior Finishing:</strong> Custom millwork, trim installation, and finishing carpentry for homes
+                    <strong>Finish Carpentry:</strong> Trim, casing, baseboards, crown, stairs and built-ins for commercial and multi-family projects in {location.city}
                   </span>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle2 style={{ color: '#228B22' }} className="mr-3 flex-shrink-0 mt-1" size={20} />
                   <span className="text-gray-700" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                    <strong>Commercial Millwork:</strong> Professional-grade solutions for offices, retail spaces, and commercial buildings
+                    <strong>Architectural Millwork:</strong> Custom millwork installation — feature walls, reception desks, custom cabinetry and bespoke joinery
                   </span>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle2 style={{ color: '#228B22' }} className="mr-3 flex-shrink-0 mt-1" size={20} />
                   <span className="text-gray-700" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                    <strong>Multi-Unit Finishing:</strong> Expert management and installation for apartment buildings and condominiums
+                    <strong>Doors &amp; Hardware:</strong> Commercial and fire-rated doors with full hardware scheduling and install
                   </span>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle2 style={{ color: '#228B22' }} className="mr-3 flex-shrink-0 mt-1" size={20} />
                   <span className="text-gray-700" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                    <strong>Cabinet Installation:</strong> Precision cabinet installation for kitchens, bathrooms, and custom spaces
+                    <strong>Multi-Family Construction:</strong> Suite finishing packages and common-area millwork for {location.city} developments
                   </span>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle2 style={{ color: '#228B22' }} className="mr-3 flex-shrink-0 mt-1" size={20} />
                   <span className="text-gray-700" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                    <strong>Flooring Installation:</strong> Expert hardwood, laminate, and engineered flooring services
+                    <strong>Commercial Interiors &amp; Tenant Improvements:</strong> Office, retail, hospitality fit-outs and TIs
                   </span>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle2 style={{ color: '#228B22' }} className="mr-3 flex-shrink-0 mt-1" size={20} />
                   <span className="text-gray-700" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                    <strong>High-Rise Projects:</strong> Specialized finishing for high-rise commercial and residential buildings
+                    <strong>Deficiency Completion:</strong> Punch-lists, warranty repairs and documented closeout for {location.city} projects
                   </span>
                 </li>
               </ul>
 
               <h3 className="text-2xl font-bold text-black mb-4 mt-8" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
-                Why Choose Two Fungis Ltd in {location.city}?
+                Why Choose Two Fungis Finishing in {location.city}?
               </h3>
               
               <p className="text-gray-700 leading-relaxed mb-4" style={{ fontFamily: 'Open Sans, sans-serif' }}>

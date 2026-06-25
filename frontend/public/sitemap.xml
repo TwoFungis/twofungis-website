@@ -1,24 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://twofungis.ca/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
-  <url><loc>https://twofungis.ca/locations/vancouver</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://twofungis.ca/locations/victoria</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://twofungis.ca/locations/kelowna</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://twofungis.ca/locations/nanaimo</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://twofungis.ca/locations/burnaby</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://twofungis.ca/locations/surrey</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://twofungis.ca/locations/richmond</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://twofungis.ca/locations/abbotsford</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://twofungis.ca/locations/langley</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://twofungis.ca/locations/coquitlam</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://twofungis.ca/locations/new-westminster</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://twofungis.ca/locations/chilliwack</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://twofungis.ca/locations/kamloops</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://twofungis.ca/locations/penticton</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://twofungis.ca/locations/penticton</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://twofungis.ca/locations/kelowna</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
   <url><loc>https://twofungis.ca/locations/west-kelowna</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://twofungis.ca/locations/courtenay</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://twofungis.ca/locations/duncan</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://twofungis.ca/locations/campbell-river</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://twofungis.ca/locations/merritt</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://twofungis.ca/locations/osoyoos</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://twofungis.ca/locations/summerland</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://twofungis.ca/locations/peachland</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://twofungis.ca/locations/lake-country</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://twofungis.ca/locations/vernon</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://twofungis.ca/locations/oliver</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://twofungis.ca/locations/osoyoos</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://twofungis.ca/locations/okanagan-falls</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
 </urlset>

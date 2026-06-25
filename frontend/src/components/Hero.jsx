@@ -19,17 +19,32 @@ const Hero = () => {
           <div className="mb-6 flex justify-center">
             <img
               src="https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/afq4qky8_ChatGPT%20Image%20Jun%2017%2C%202026%2C%2012_03_36%20PM.png"
-              alt="Two Fungis Ltd"
+              alt="Two Fungis Finishing"
               className="w-full max-w-5xl h-auto drop-shadow-2xl"
             />
           </div>
           
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-6 animate-fade-in" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
-            Premium Interior <span className="text-red-600">Finishing & Carpentry</span>
+            Okanagan Finish Carpentry <span className="text-red-600">& Architectural Millwork</span>
           </h1>
-          <p className="text-xl sm:text-2xl text-gray-200 mb-8 max-w-2xl mx-auto" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-            Specializing in high end residential & commercial finishing, including high-rise & multi-unit projects across the Okanagan to Vancouver Island regions since 2017
+          <p className="text-xl sm:text-2xl text-gray-200 mb-6 max-w-3xl mx-auto" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+            Two Fungis Finishing is an Okanagan-based finishing contractor specializing in commercial finish carpentry, architectural millwork, doors &amp; hardware, multi-family residential and deficiency completion across Penticton, Kelowna, West Kelowna, Summerland and the entire Okanagan region.
           </p>
+          {/* Service Pillars */}
+          <div className="flex flex-wrap justify-center gap-2 mb-8 max-w-3xl mx-auto" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+            {[
+              'Finish Carpentry',
+              'Architectural Millwork',
+              'Doors & Hardware',
+              'Multi-Family',
+              'Commercial Interiors',
+              'Deficiency Completion',
+            ].map((p) => (
+              <span key={p} className="px-3 py-1 rounded-full text-sm text-white border" style={{ borderColor: 'rgba(34,139,34,0.6)', backgroundColor: 'rgba(34,139,34,0.15)' }}>
+                {p}
+              </span>
+            ))}
+          </div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button
               onClick={() => scrollToSection('contact')}
@@ -61,11 +76,11 @@ const Hero = () => {
               rel="noopener noreferrer dofollow"
               className="bg-white p-3 rounded-lg shadow-2xl hover:scale-105 transition-transform"
               data-testid="procore-badge-top"
-              aria-label="Two Fungis Ltd on the Procore Construction Network"
+              aria-label="Two Fungis Finishing on the Procore Construction Network"
             >
               <img
                 src="https://network.procore.com/assets/static/procore-black-badge.svg"
-                alt="Procore Construction Network — Two Fungis Ltd"
+                alt="Procore Construction Network — Two Fungis Finishing"
                 className="h-16 md:h-20 w-auto"
               />
             </a>

@@ -101,7 +101,7 @@ const Portfolio = () => {
     },
     {
       image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png',
-      title: 'Two Fungis Ltd - Premium Craftsmanship',
+      title: 'Two Fungis Finishing - Premium Craftsmanship',
       category: 'Our Brand'
     }
   ];
@@ -115,7 +115,7 @@ const Portfolio = () => {
           {/* Header */}
           <div className="text-center mb-10">
             <div className="flex flex-col items-center justify-center gap-3 mb-4">
-              <img src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png" alt="Two Fungis Ltd" className="h-20 md:h-24 w-auto" />
+              <img src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png" alt="Two Fungis Finishing" className="h-20 md:h-24 w-auto" />
               <h2 className="text-4xl sm:text-5xl font-bold text-white" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
                 Our <span className="text-red-600">Portfolio</span>
               </h2>
@@ -144,7 +144,7 @@ const Portfolio = () => {
                     <div className="absolute bottom-2 right-2 opacity-60 group-hover:opacity-80 transition-opacity">
                       <img
                         src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png"
-                        alt="Two Fungis Ltd"
+                        alt="Two Fungis Finishing"
                         className="h-8 w-auto"
                       />
                     </div>
