@@ -1,6 +1,8 @@
 import React from 'react';
-import { Hammer, Layers, DoorOpen, Building2, Building, ClipboardCheck, Wrench, Briefcase } from 'lucide-react';
+import { Hammer, Layers, DoorOpen, Building2, Building, ClipboardCheck, Wrench, Briefcase, FileCheck2, ArrowUpRight } from 'lucide-react';
 import { Card } from './ui/card';
+
+const PREQUAL_PDF = 'https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/9g05ohxo_Prequalification-Checklist.pdf';
 
 const Services = () => {
   const services = [
@@ -80,6 +82,36 @@ const Services = () => {
 
           {/* Services Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+            {/* Prequalification Checklist — featured first card (resource for GCs) */}
+            <a
+              href={PREQUAL_PDF}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group relative block p-6 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 border-l-4 overflow-hidden"
+              style={{ backgroundColor: '#0f0f12', borderColor: '#228B22' }}
+              data-testid="prequal-card"
+              aria-label="Open Two Fungis Finishing prequalification checklist PDF"
+            >
+              <div className="absolute top-4 right-4 opacity-60 group-hover:opacity-100 transition-opacity">
+                <ArrowUpRight className="text-white" size={20} />
+              </div>
+              <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4" style={{ backgroundColor: '#228B22' }}>
+                <FileCheck2 className="text-white" size={24} />
+              </div>
+              <p className="text-xs uppercase tracking-[0.2em] mb-2" style={{ color: '#32CD32', fontFamily: 'Open Sans, sans-serif' }}>
+                For General Contractors
+              </p>
+              <h3 className="text-2xl font-bold text-white mb-3" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
+                Prequalification Checklist
+              </h3>
+              <p className="text-gray-300 mb-4 leading-relaxed text-sm" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+                Add Two Fungis Finishing to your bid list. Open the prequalification document to review our company info, insurance, WorkSafeBC coverage and references.
+              </p>
+              <span className="inline-flex items-center gap-2 text-sm font-semibold" style={{ color: '#32CD32', fontFamily: 'Open Sans, sans-serif' }}>
+                View Checklist (PDF) <ArrowUpRight size={14} />
+              </span>
+            </a>
+
             {services.map((service, index) => {
               const IconComponent = service.icon;
               return (
