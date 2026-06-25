@@ -25,19 +25,18 @@ const Hero = () => {
           </div>
           
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-6 animate-fade-in" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
-            Okanagan Finish Carpentry <span className="text-red-600">& Architectural Millwork</span>
+            British Columbia Commercial <span className="text-red-600">Finish Carpentry &amp; Millwork</span>
           </h1>
           <p className="text-xl sm:text-2xl text-gray-200 mb-6 max-w-3xl mx-auto" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-            Two Fungis Finishing is an Okanagan-based finishing contractor specializing in commercial finish carpentry, architectural millwork, doors &amp; hardware, multi-family residential and deficiency completion across Penticton, Kelowna, West Kelowna, Summerland and the entire Okanagan region.
+            Two Fungis Finishing is a British Columbia finishing contractor — supporting commercial and multifamily projects throughout Southern BC. Serving British Columbia from Vancouver to the Okanagan and Vancouver Island.
           </p>
           {/* Service Pillars */}
           <div className="flex flex-wrap justify-center gap-2 mb-8 max-w-3xl mx-auto" style={{ fontFamily: 'Open Sans, sans-serif' }}>
             {[
-              'Finish Carpentry',
+              'Commercial Finish Carpentry',
+              'Multi-Family Construction',
               'Architectural Millwork',
               'Doors & Hardware',
-              'Multi-Family',
-              'Commercial Interiors',
               'Deficiency Completion',
             ].map((p) => (
               <span key={p} className="px-3 py-1 rounded-full text-sm text-white border" style={{ borderColor: 'rgba(34,139,34,0.6)', backgroundColor: 'rgba(34,139,34,0.15)' }}>

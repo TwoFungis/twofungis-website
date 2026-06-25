@@ -38,7 +38,7 @@ const ServiceAreas = () => {
             </div>
             <div className="w-24 h-1 bg-red-600 mx-auto mb-6"></div>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-              Proudly serving the entire Okanagan — Penticton, Kelowna, West Kelowna, Summerland and beyond
+              Serving British Columbia — from Vancouver and the Fraser Valley through the Okanagan to Vancouver Island
             </p>
           </div>
 

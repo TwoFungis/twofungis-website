@@ -62,7 +62,7 @@ const Services = () => {
             </div>
             <div className="w-24 h-1 bg-red-600 mx-auto mb-6"></div>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-              Finish carpentry, architectural millwork, doors &amp; hardware, multi-family, commercial interiors, deficiency completion and tenant improvements — serving the entire Okanagan.
+              Commercial finish carpentry, multi-family construction, architectural millwork, doors &amp; hardware and deficiency completion — supporting projects throughout British Columbia.
             </p>
           </div>
 

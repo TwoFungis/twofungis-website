@@ -48,7 +48,7 @@ const Contact = () => {
                   </div>
                   <p className="text-2xl font-bold text-red-600 mb-1">778-268-4920</p>
                   <p className="font-bold text-black" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>Scott Marshall</p>
-                  <p className="text-gray-500 text-sm">Penticton &amp; South Okanagan</p>
+                  <p className="text-gray-500 text-sm">Okanagan / Thompson / Fraser Valley</p>
                 </a>
 
                 {/* Phone 2 - Beau */}
@@ -62,7 +62,7 @@ const Contact = () => {
                   </div>
                   <p className="text-2xl font-bold text-red-600 mb-1">250-327-8202</p>
                   <p className="font-bold text-black" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>Beau Suprun</p>
-                  <p className="text-gray-500 text-sm">Kelowna &amp; Central Okanagan</p>
+                  <p className="text-gray-500 text-sm">Vancouver Island / Lower Mainland</p>
                 </a>
               </div>
 

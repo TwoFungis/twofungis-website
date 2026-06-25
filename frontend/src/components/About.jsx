@@ -15,7 +15,7 @@ const About = () => {
             </div>
             <div className="w-24 h-1 bg-red-600 mx-auto mb-6"></div>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-              We are an Okanagan-based finishing contractor serving Penticton, Kelowna, West Kelowna, Summerland and the entire Okanagan region — specializing in commercial finish carpentry, architectural millwork, doors & hardware, multi-family residential, commercial interiors, deficiency completion and tenant improvements.
+              We are a British Columbia finishing contractor — supporting commercial and multifamily projects throughout Southern BC. Two Fungis Finishing serves clients from Vancouver and the Fraser Valley through the Okanagan to Vancouver Island, specializing in commercial finish carpentry, architectural millwork, doors &amp; hardware, multi-family construction and deficiency completion.
             </p>
           </div>
 
@@ -34,7 +34,7 @@ const About = () => {
                 Beau Suprun, master craftsman, exceptional carpenter, and machinist, brings an unparalleled eye for detail and perfection that is second to none in the finishing world. With extensive experience in multi-unit finishing management and installation, his meticulous approach guarantees flawless execution on every project.
               </p>
               <p className="text-gray-700 mb-4 leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                With our $5 million liability insurance and proven track record, we continue to secure commercial finish carpentry, multi-family and architectural millwork contracts throughout the Okanagan. Our commitment to excellence and professional service has made us a trusted partner for developers, GCs, and homeowners alike.
+                With our $5 million liability insurance and proven track record, we continue to secure commercial finish carpentry, multi-family and architectural millwork contracts throughout British Columbia. Our commitment to excellence and professional service has made us a trusted partner for developers, GCs, and homeowners alike.
               </p>
               <p className="text-gray-700 leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                 Together, Scott and Beau lead a team dedicated to precision craftsmanship and reliable schedule performance. From multi-family developments and commercial tenant improvements to bespoke architectural millwork, our combined Okanagan expertise ensures every detail is executed to perfection.

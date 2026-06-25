@@ -20,7 +20,7 @@ const Footer = () => {
                 />
               </Link>
               <p className="text-gray-400 mb-4" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                Two Fungis Finishing is an Okanagan-based finishing contractor specializing in finish carpentry, architectural millwork, doors &amp; hardware, multi-family residential and commercial interiors.
+                Two Fungis Finishing is a British Columbia finishing contractor — supporting commercial and multifamily projects from Vancouver and the Fraser Valley through the Okanagan to Vancouver Island.
               </p>
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full" style={{ backgroundColor: 'rgba(34, 139, 34, 0.2)', border: '1px solid rgba(34, 139, 34, 0.5)' }}>
                 <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#228B22' }}></div>
@@ -56,20 +56,20 @@ const Footer = () => {
               <ul className="space-y-3" style={{ fontFamily: 'Open Sans, sans-serif' }}>
                 <li className="flex items-start">
                   <MapPin style={{ color: '#228B22' }} className="mr-2 flex-shrink-0 mt-1" size={18} />
-                  <span className="text-gray-400">Serving the Okanagan — Penticton, Kelowna, West Kelowna, Summerland &amp; surrounding</span>
+                  <span className="text-gray-400">Serving British Columbia — Vancouver, Fraser Valley, Okanagan &amp; Vancouver Island</span>
                 </li>
                 <li className="flex items-start">
                   <Phone className="text-red-600 mr-2 flex-shrink-0 mt-1" size={18} />
                   <div>
                     <a href="tel:778-268-4920" className="text-gray-400 transition-colors block" onMouseEnter={(e) => e.target.style.color='#228B22'} onMouseLeave={(e) => e.target.style.color='#9ca3af'}>778-268-4920</a>
-                    <span className="text-gray-500 text-xs">Scott Marshall — Penticton &amp; South Okanagan</span>
+                    <span className="text-gray-500 text-xs">Scott Marshall — Okanagan, Thompson &amp; Fraser Valley</span>
                   </div>
                 </li>
                 <li className="flex items-start">
                   <Phone className="text-red-600 mr-2 flex-shrink-0 mt-1" size={18} />
                   <div>
                     <a href="tel:250-327-8202" className="text-gray-400 transition-colors block" onMouseEnter={(e) => e.target.style.color='#228B22'} onMouseLeave={(e) => e.target.style.color='#9ca3af'}>250-327-8202</a>
-                    <span className="text-gray-500 text-xs">Beau Suprun — Kelowna &amp; Central Okanagan</span>
+                    <span className="text-gray-500 text-xs">Beau Suprun — Vancouver Island &amp; Lower Mainland</span>
                   </div>
                 </li>
                 <li className="flex items-start">
@@ -104,7 +104,7 @@ const Footer = () => {
           {/* Bottom Bar - LEGAL ENTITY */}
           <div className="border-t border-gray-800 pt-8 text-center">
             <p className="text-gray-400" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-              © {currentYear} Two Fungis Ltd. — Operating as Two Fungis Finishing. All rights reserved. | Serving the Okanagan since 2017
+              © {currentYear} Two Fungis Ltd. — Operating as Two Fungis Finishing. All rights reserved. | Serving British Columbia since 2017
             </p>
           </div>
         </div>

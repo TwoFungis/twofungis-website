@@ -10,24 +10,28 @@ import TradeOSBanner from '../components/TradeOSBanner';
 import { Button } from '../components/ui/button';
 import { MapPin, Phone, Mail, CheckCircle2 } from 'lucide-react';
 
-// Determine which founder primarily covers a given region within the Okanagan
+// Determine which founder primarily covers a given region across British Columbia
 const getPrimaryContact = (region) => {
   const r = (region || '').toLowerCase();
-  // Scott Marshall — South Okanagan (Penticton, Summerland, Oliver, Osoyoos, Okanagan Falls)
-  if (r.includes('south')) {
+  // Scott Marshall — Okanagan, Thompson & Fraser Valley
+  if (
+    r.includes('okanagan') ||
+    r.includes('thompson') ||
+    r.includes('fraser')
+  ) {
     return {
       name: 'Scott Marshall',
       phone: '778-268-4920',
       phoneHref: 'tel:778-268-4920',
-      area: 'Penticton & South Okanagan',
+      area: 'Okanagan, Thompson & Fraser Valley',
     };
   }
-  // Beau Suprun — Central / North Okanagan (Kelowna, West Kelowna, Lake Country, Peachland, Vernon)
+  // Beau Suprun — Vancouver Island & Lower Mainland (Coastal BC)
   return {
     name: 'Beau Suprun',
     phone: '250-327-8202',
     phoneHref: 'tel:250-327-8202',
-    area: 'Kelowna & Central / North Okanagan',
+    area: 'Vancouver Island & Lower Mainland',
   };
 };
 
@@ -50,8 +54,8 @@ const LocationPage = () => {
 
   useEffect(() => {
     if (location) {
-      const title = `${location.city} Finish Carpentry & Architectural Millwork | Two Fungis Finishing | Okanagan BC`;
-      const desc = `Two Fungis Finishing — ${location.city}'s commercial finish carpentry, architectural millwork, doors & hardware, multi-family and deficiency completion specialists. ${location.description} Free quotes. Call ${primary.name} at ${primary.phone}.`;
+      const title = `${location.city} Commercial Finish Carpentry & Architectural Millwork | Two Fungis Finishing | British Columbia`;
+      const desc = `Two Fungis Finishing in ${location.city} — commercial finish carpentry, architectural millwork, doors & hardware, multi-family construction and deficiency completion. ${location.description} Call ${primary.name} at ${primary.phone}.`;
       const url = `https://twofungis.ca/locations/${location.slug}`;
       const keywords = `finish carpentry ${location.city}, architectural millwork ${location.city}, doors and hardware ${location.city}, multi-family construction ${location.city}, commercial interiors ${location.city}, deficiency completion ${location.city}, tenant improvements ${location.city}, finishing contractor ${location.region}, Two Fungis Finishing ${location.city}, Two Fungis ${location.city}, finish carpenter Okanagan`;
 
