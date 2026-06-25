@@ -1,112 +1,39 @@
-import React, { useState } from 'react';
-import { ZoomIn } from 'lucide-react';
-import { Dialog, DialogContent, DialogTrigger } from './ui/dialog';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Plus, X, ChevronLeft, ChevronRight } from 'lucide-react';
+
+// Portfolio images — alt text is for accessibility & SEO only (not shown on the card)
+const photos = [
+  { src: 'https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/uj0cmrlu_scott16.jpg',  alt: 'Basement framing & stair build — Two Fungis Finishing' },
+  { src: 'https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/3uhpnl5a_scott15.jpg',  alt: 'Custom kitchen with granite island & shaker cabinetry — Two Fungis Finishing' },
+  { src: 'https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/010ubehg_scott12.jpeg', alt: 'Custom coffered ceiling detail — Two Fungis Finishing' },
+  { src: 'https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/bkyow0po_scott2.jpg',   alt: 'Modern kitchen with quartz waterfall island — Two Fungis Finishing' },
+  { src: 'https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/ih07eflu_20211006_132459.jpg', alt: 'Custom interior stairs & railing — Two Fungis Finishing' },
+];
+
+const THUMB_LOGO = 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png';
 
 const Portfolio = () => {
-  const projects = [
-    {
-      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/xy0jgjk8_IMG_20191217_163428.jpg',
-      title: 'Residential Staircase & Railing',
-      category: 'Residential'
-    },
-    {
-      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/oce3ehrv_20211103_163344.jpg',
-      title: 'Custom Millwork & Cabinetry',
-      category: 'Residential'
-    },
-    {
-      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/v2glu48u_IMG_20200403_134102.jpg',
-      title: 'Floating Staircase Construction',
-      category: 'Multi-Unit'
-    },
-    {
-      image: 'https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/q64sa5sh_20221115_145141.jpg',
-      title: 'Custom Bathroom Vanity & Tile Finishing',
-      category: 'Residential'
-    },
-    {
-      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/bzus3wmb_Messenger_creation_36C70082-8A8C-4DDB-AD6E-ECD1C9EA46D2.jpeg',
-      title: 'Custom Wall Paneling & Trim Work',
-      category: 'Residential'
-    },
-    {
-      image: 'https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/8b6defpa_20221115_113241.jpg',
-      title: 'Stone Fireplace & Custom Mantel',
-      category: 'Residential'
-    },
-    {
-      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/j7f9wan6_IMG_20191217_163614.jpg',
-      title: 'Custom Wood Staircase',
-      category: 'Residential'
-    },
-    {
-      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/38llggo5_Messenger_creation_93E07220-5F16-45F6-A018-C089F70AADD0.jpeg',
-      title: 'Coffered Ceiling with Crown Molding',
-      category: 'Residential'
-    },
-    {
-      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/fu9jwkgc_20211011_153642.jpg',
-      title: 'White Kitchen Cabinet Installation',
-      category: 'Residential'
-    },
-    {
-      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/w08mfqcc_IMG_20191219_205008.jpg',
-      title: 'Modern Stair Installation',
-      category: 'Commercial'
-    },
-    {
-      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/04skro1o_Messenger_creation_A9C50B15-98C6-4DCE-BE37-88B3200992E0.jpeg',
-      title: 'Wooden Staircase Railing Detail',
-      category: 'Residential'
-    },
-    {
-      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/n3k3qxu3_20220128_182344.jpg',
-      title: 'Modern Bathroom Vanity & Vessel Sinks',
-      category: 'Residential'
-    },
-    {
-      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/5od2mhbp_IMG_20200403_115211.jpg',
-      title: 'Custom Feature Wall',
-      category: 'Commercial'
-    },
-    {
-      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/m2uclkhb_Messenger_creation_373AE9DE-1CB6-47BB-9D91-B5F2182586E7.jpeg',
-      title: 'Coffered Ceiling Craftsmanship',
-      category: 'Residential'
-    },
-    {
-      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/w5ytwuxa_IMG_20191217_163454.jpg',
-      title: 'Staircase Detail & Craftsmanship',
-      category: 'Residential'
-    },
-    {
-      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/im4qkioh_Messenger_creation_564A7F58-5188-444E-9369-A57636159BF8.jpeg',
-      title: 'Two-Tone Wood Staircase',
-      category: 'Multi-Unit'
-    },
-    {
-      image: 'https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/7ezj60zh_20221115_145127.jpg',
-      title: 'Custom Kitchen Design & Installation',
-      category: 'Residential'
-    },
-    {
-      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/qd4ch2yy_IMG_20190920_102445.jpg',
-      title: 'Interior Railing Work',
-      category: 'Multi-Unit'
-    },
-    {
-      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/f44juoiy_IMG_20200312_154654.jpg',
-      title: 'Interior Door Installation',
-      category: 'Residential'
-    },
-    {
-      image: 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png',
-      title: 'Two Fungis Finishing - Premium Craftsmanship',
-      category: 'Our Brand'
-    }
-  ];
+  const [activeIndex, setActiveIndex] = useState(null);
+  const isOpen = activeIndex !== null;
 
-  const [selectedImage, setSelectedImage] = useState(null);
+  const close = useCallback(() => setActiveIndex(null), []);
+  const next  = useCallback(() => setActiveIndex((i) => (i + 1) % photos.length), []);
+  const prev  = useCallback(() => setActiveIndex((i) => (i - 1 + photos.length) % photos.length), []);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e) => {
+      if (e.key === 'Escape') close();
+      if (e.key === 'ArrowRight') next();
+      if (e.key === 'ArrowLeft') prev();
+    };
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', onKey);
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', onKey);
+    };
+  }, [isOpen, close, next, prev]);
 
   return (
     <section id="portfolio" className="py-12 bg-black scroll-mt-32">
@@ -115,74 +42,91 @@ const Portfolio = () => {
           {/* Header */}
           <div className="text-center mb-10">
             <div className="flex flex-col items-center justify-center gap-3 mb-4">
-              <img src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png" alt="Two Fungis Finishing" className="h-20 md:h-24 w-auto" />
+              <img src={THUMB_LOGO} alt="Two Fungis Finishing" className="h-20 md:h-24 w-auto" />
               <h2 className="text-4xl sm:text-5xl font-bold text-white" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
-                Our <span className="text-red-600">Portfolio</span>
+                Our <span className="text-red-600">Projects</span>
               </h2>
             </div>
             <div className="w-24 h-1 bg-red-600 mx-auto mb-6"></div>
-            <p className="text-lg text-gray-300 max-w-2xl mx-auto" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-              Showcasing our commitment to quality craftsmanship and attention to detail
-            </p>
           </div>
 
-          {/* Gallery Grid */}
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {projects.map((project, index) => (
-              <Dialog key={index}>
-                <DialogTrigger asChild>
-                  <div
-                    className="relative group cursor-pointer overflow-hidden rounded-lg"
-                    onClick={() => setSelectedImage(project.image)}
-                  >
-                    <img
-                      src={project.image}
-                      alt={project.title}
-                      className="w-full h-80 object-cover transition-transform duration-500 group-hover:scale-110"
-                    />
-                    {/* Watermark - MORE VISIBLE */}
-                    <div className="absolute bottom-2 right-2 opacity-60 group-hover:opacity-80 transition-opacity">
-                      <img
-                        src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png"
-                        alt="Two Fungis Finishing"
-                        className="h-8 w-auto"
-                      />
-                    </div>
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <div className="absolute bottom-0 left-0 right-0 p-6">
-                        <span className="inline-block px-3 py-1 bg-red-600 text-white text-sm font-semibold rounded-full mb-3">
-                          {project.category}
-                        </span>
-                        <h3 className="text-xl font-bold text-white" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
-                          {project.title}
-                        </h3>
-                      </div>
-                      <div className="absolute top-4 right-4 bg-white/20 backdrop-blur-sm p-3 rounded-full">
-                        <ZoomIn className="text-white" size={20} />
-                      </div>
-                    </div>
+          {/* Grid */}
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {photos.map((p, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => setActiveIndex(i)}
+                className="group relative block w-full aspect-square overflow-hidden rounded-lg bg-neutral-900 focus:outline-none focus:ring-2 focus:ring-red-600"
+                data-testid={`project-${i}`}
+                aria-label={`Open project image ${i + 1}`}
+              >
+                <img
+                  src={p.src}
+                  alt={p.alt}
+                  loading="lazy"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                {/* Hover overlay: logo + plus */}
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/55 transition-colors duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                  <div className="flex items-center gap-3 bg-white/95 px-4 py-2 rounded-full shadow-lg">
+                    <img src={THUMB_LOGO} alt="" className="h-8 w-auto" />
+                    <Plus size={20} className="text-black" strokeWidth={2.5} />
                   </div>
-                </DialogTrigger>
-                <DialogContent className="max-w-4xl w-full bg-black border-red-600">
-                  <img
-                    src={project.image}
-                    alt={project.title}
-                    className="w-full h-auto rounded-lg"
-                  />
-                  <div className="mt-4">
-                    <span className="inline-block px-3 py-1 bg-red-600 text-white text-sm font-semibold rounded-full mb-2">
-                      {project.category}
-                    </span>
-                    <h3 className="text-2xl font-bold text-white" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
-                      {project.title}
-                    </h3>
-                  </div>
-                </DialogContent>
-              </Dialog>
+                </div>
+              </button>
             ))}
           </div>
         </div>
       </div>
+
+      {/* Lightbox */}
+      {isOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-[80] bg-black/95 flex items-center justify-center p-4 sm:p-8"
+          onClick={close}
+          data-testid="lightbox"
+        >
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); close(); }}
+            className="absolute top-4 right-4 text-white p-2 rounded-full hover:bg-white/10"
+            aria-label="Close"
+            data-testid="lightbox-close"
+          >
+            <X size={28} />
+          </button>
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); prev(); }}
+            className="absolute left-2 sm:left-6 text-white p-2 rounded-full hover:bg-white/10"
+            aria-label="Previous image"
+            data-testid="lightbox-prev"
+          >
+            <ChevronLeft size={36} />
+          </button>
+          <img
+            src={photos[activeIndex].src}
+            alt={photos[activeIndex].alt}
+            className="max-h-[88vh] max-w-[92vw] object-contain rounded-lg shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          />
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); next(); }}
+            className="absolute right-2 sm:right-6 text-white p-2 rounded-full hover:bg-white/10"
+            aria-label="Next image"
+            data-testid="lightbox-next"
+          >
+            <ChevronRight size={36} />
+          </button>
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/70 text-sm" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+            {activeIndex + 1} / {photos.length}
+          </div>
+        </div>
+      )}
     </section>
   );
 };
