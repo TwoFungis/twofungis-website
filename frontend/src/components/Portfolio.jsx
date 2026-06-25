@@ -13,6 +13,11 @@ const photos = [
   { src: 'https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/5jjo8hpb_20220909_152047.jpg',  alt: 'Stair build with custom posts &amp; handrails — Two Fungis Finishing' },
   { src: 'https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/oglnnseg_20220114_223756.jpg',  alt: 'White stair railing with iron spindles — Two Fungis Finishing' },
   { src: 'https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/wl2hjvkn_beau10.jpg',           alt: 'Custom butler pantry &amp; wine cabinetry — Two Fungis Finishing' },
+  { src: 'https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/0wl50jyb_scott13.jpg',          alt: 'Custom kitchen island with open shelving &amp; shaker drawers — Two Fungis Finishing' },
+  { src: 'https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/0z4it3bk_scott9.jpeg',          alt: 'White shaker kitchen with crown molding &amp; subway tile — Two Fungis Finishing' },
+  { src: 'https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/rxzrpbvt_scott8.jpg',           alt: 'White railing with iron spindles in progress — Two Fungis Finishing' },
+  { src: 'https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/r4eu9zpx_scott7.jpg',           alt: 'Custom wood-spindle railing detail — Two Fungis Finishing' },
+  { src: 'https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/nulwwi8b_beau20.jpg',           alt: 'Stained stairs with custom decorative wood panel — Two Fungis Finishing' },
 ];
 
 const THUMB_LOGO = 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png';
