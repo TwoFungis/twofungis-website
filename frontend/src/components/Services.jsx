@@ -2,7 +2,7 @@ import React from 'react';
 import { Hammer, Layers, DoorOpen, Building2, Building, ClipboardCheck, Wrench, Briefcase, FileCheck2, ArrowUpRight } from 'lucide-react';
 import { Card } from './ui/card';
 
-const PREQUAL_PDF = 'https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/9g05ohxo_Prequalification-Checklist.pdf';
+const PREQUAL_PDF = 'https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/3lzhlylr_Two%20Fungis%20Prequalificaton.pdf';
 
 const Services = () => {
   const services = [
