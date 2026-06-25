@@ -44,7 +44,7 @@ const Hero = () => {
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor='#228B22'}
               data-testid="hero-tender-btn"
             >
-              Request a Tender Invitation
+              Invite Us to Tender
               <ChevronRight size={18} className="ml-1" />
             </Button>
             <Button
