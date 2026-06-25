@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { locations } from '../data/locations';
 import Header from '../components/Header';
@@ -7,33 +7,9 @@ import Portfolio from '../components/Portfolio';
 import Contact from '../components/Contact';
 import Footer from '../components/Footer';
 import TradeOSBanner from '../components/TradeOSBanner';
+import PrequalificationModal from '../components/PrequalificationModal';
 import { Button } from '../components/ui/button';
-import { MapPin, Phone, Mail, CheckCircle2 } from 'lucide-react';
-
-// Determine which founder primarily covers a given region across British Columbia
-const getPrimaryContact = (region) => {
-  const r = (region || '').toLowerCase();
-  // Scott Marshall — Okanagan, Thompson & Fraser Valley
-  if (
-    r.includes('okanagan') ||
-    r.includes('thompson') ||
-    r.includes('fraser')
-  ) {
-    return {
-      name: 'Scott Marshall',
-      phone: '778-268-4920',
-      phoneHref: 'tel:778-268-4920',
-      area: 'Okanagan, Thompson & Fraser Valley',
-    };
-  }
-  // Beau Suprun — Vancouver Island & Lower Mainland (Coastal BC)
-  return {
-    name: 'Beau Suprun',
-    phone: '250-327-8202',
-    phoneHref: 'tel:250-327-8202',
-    area: 'Vancouver Island & Lower Mainland',
-  };
-};
+import { MapPin, Phone, Mail, CheckCircle2, ChevronRight } from 'lucide-react';
 
 const upsertMeta = (selector, attr, value) => {
   let el = document.querySelector(selector);
@@ -50,14 +26,14 @@ const LocationPage = () => {
   const { city } = useParams();
   const navigate = useNavigate();
   const location = locations.find(loc => loc.slug === city);
-  const primary = location ? getPrimaryContact(location.region) : null;
+  const [prequalOpen, setPrequalOpen] = useState(false);
 
   useEffect(() => {
     if (location) {
       const title = `${location.city} Commercial Finish Carpentry & Architectural Millwork | Two Fungis Finishing | British Columbia`;
-      const desc = `Two Fungis Finishing in ${location.city} — commercial and multifamily finishing contractor. ${location.description} Tender invitations and consultations welcome. Call ${primary.name} at ${primary.phone}.`;
+      const desc = `Two Fungis Finishing in ${location.city} — commercial and multifamily finishing contractor specializing in finish carpentry, architectural millwork, doors & hardware, multi-family construction and deficiency completion. ${location.description} Tender invitations and prequalification requests welcome.`;
       const url = `https://twofungis.ca/locations/${location.slug}`;
-      const keywords = `finish carpentry ${location.city}, architectural millwork ${location.city}, doors and hardware ${location.city}, multi-family construction ${location.city}, commercial interiors ${location.city}, deficiency completion ${location.city}, tenant improvements ${location.city}, finishing contractor ${location.region}, Two Fungis Finishing ${location.city}, Two Fungis ${location.city}, finish carpenter Okanagan`;
+      const keywords = `commercial finish carpentry ${location.city}, finish carpentry ${location.city}, architectural millwork ${location.city}, doors and hardware ${location.city}, multi-family construction ${location.city}, commercial interiors ${location.city}, deficiency completion ${location.city}, tenant improvements ${location.city}, finishing contractor ${location.region}, Two Fungis Finishing ${location.city}, Two Fungis ${location.city}`;
 
       document.title = title;
       upsertMeta('meta[name="description"]', 'content', desc);
@@ -78,7 +54,7 @@ const LocationPage = () => {
       }
       canonical.setAttribute('href', url);
 
-      // Per-location JSON-LD (LocalBusiness)
+      // Per-location JSON-LD
       const ldId = 'ld-location';
       let ld = document.getElementById(ldId);
       if (!ld) {
@@ -91,9 +67,9 @@ const LocationPage = () => {
         '@context': 'https://schema.org',
         '@type': 'GeneralContractor',
         name: `Two Fungis Finishing — ${location.city}`,
+        legalName: 'Two Fungis Ltd.',
         description: desc,
         url,
-        telephone: `+1-${primary.phone}`,
         email: 'inbox@twofungis.ca',
         priceRange: '$$',
         address: {
@@ -103,6 +79,10 @@ const LocationPage = () => {
           addressCountry: 'CA',
         },
         areaServed: { '@type': 'City', name: location.city },
+        contactPoint: [
+          { '@type': 'ContactPoint', telephone: '+1-778-268-4920', contactType: 'sales', name: 'Scott Marshall' },
+          { '@type': 'ContactPoint', telephone: '+1-250-327-8202', contactType: 'sales', name: 'Beau Suprun' },
+        ],
         founder: [
           { '@type': 'Person', name: 'Scott Marshall' },
           { '@type': 'Person', name: 'Beau Suprun' },
@@ -115,7 +95,7 @@ const LocationPage = () => {
       const ld = document.getElementById('ld-location');
       if (ld) ld.remove();
     };
-  }, [location, primary]);
+  }, [location]);
 
   if (!location) {
     navigate('/');
@@ -152,67 +132,54 @@ const LocationPage = () => {
               <div className="flex items-center justify-center gap-3 flex-wrap">
                 <MapPin className="text-red-600" size={28} />
                 <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
-                  Interior Finishing in <span className="text-red-600">{location.city}</span>
+                  Commercial &amp; Multifamily Finishing in <span className="text-red-600">{location.city}</span>
                 </h1>
               </div>
             </div>
-            
-            <p className="text-xl sm:text-2xl text-gray-300 mb-6" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+
+            <p className="text-lg sm:text-xl text-gray-300 mb-6 max-w-3xl mx-auto" style={{ fontFamily: 'Open Sans, sans-serif' }}>
               {location.description}
             </p>
 
             <div className="flex flex-wrap gap-3 justify-center mb-8 text-gray-400">
               <span className="flex items-center gap-2">
                 <CheckCircle2 size={20} style={{ color: '#228B22' }} />
-                20+ Years Combined Experience
-              </span>
-              <span className="flex items-center gap-2">
-                <CheckCircle2 size={20} style={{ color: '#228B22' }} />
                 $5M Insured
               </span>
               <span className="flex items-center gap-2">
                 <CheckCircle2 size={20} style={{ color: '#228B22' }} />
-                Local Experts
+                WorkSafeBC Compliant
+              </span>
+              <span className="flex items-center gap-2">
+                <CheckCircle2 size={20} style={{ color: '#228B22' }} />
+                BC-Wide Coverage
               </span>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href={primary.phoneHref}
-                className="inline-flex items-center justify-center gap-2 text-white px-8 py-4 text-lg font-semibold rounded-md transition-colors"
+              <Button
+                onClick={() => scrollToSection('contact')}
+                className="text-white px-8 py-6 text-base font-semibold inline-flex items-center"
                 style={{ backgroundColor: '#228B22' }}
                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor='#1e7b1e'}
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor='#228B22'}
-                data-testid="primary-call-btn"
+                data-testid="location-tender-btn"
               >
-                <Phone size={20} />
-                Call {primary.name}: {primary.phone}
-              </a>
-              <Button
-                onClick={() => scrollToSection('contact')}
-                className="text-white px-8 py-6 text-lg font-semibold"
-                style={{ backgroundColor: '#dc2626' }}
-                onMouseEnter={(e) => e.target.style.backgroundColor='#b91c1c'}
-                onMouseLeave={(e) => e.target.style.backgroundColor='#dc2626'}
-              >
-                Get a Free Quote in {location.city}
+                Invite Us to Tender
+                <ChevronRight size={18} className="ml-1" />
               </Button>
               <Button
-                onClick={() => scrollToSection('portfolio')}
+                onClick={() => setPrequalOpen(true)}
                 variant="outline"
-                className="text-white px-8 py-6 text-lg font-semibold"
-                style={{ borderColor: '#228B22', borderWidth: '2px' }}
-                onMouseEnter={(e) => { e.target.style.backgroundColor = '#228B22'; e.target.style.color = 'black'; }}
-                onMouseLeave={(e) => { e.target.style.backgroundColor = 'transparent'; e.target.style.color = 'white'; }}
+                className="text-white px-8 py-6 text-base font-semibold inline-flex items-center"
+                style={{ borderColor: '#ffffff', borderWidth: '1px', backgroundColor: 'transparent' }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#000000'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#ffffff'; }}
+                data-testid="location-prequal-btn"
               >
-                View Our Work
+                Request Prequalification Package
               </Button>
             </div>
-
-            {/* Local Primary Contact Caption */}
-            <p className="mt-4 text-sm text-gray-400" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-              Your local contact for {location.city}: <span className="font-semibold text-white">{primary.name}</span> — {primary.area}
-            </p>
           </div>
         </div>
       </section>
@@ -224,7 +191,7 @@ const LocationPage = () => {
             <div className="flex flex-col items-start gap-3 mb-6">
               <img src="https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png" alt="Two Fungis Finishing" className="h-10 md:h-12 w-auto" />
               <h2 className="text-3xl sm:text-4xl font-bold text-black" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
-                Premier Interior Finishing Services in {location.city}, {location.region}
+                Commercial &amp; Multifamily Finishing Services in {location.city}, {location.region}
               </h2>
             </div>
             
@@ -284,13 +251,13 @@ const LocationPage = () => {
                 We're not just contractors – we're craftsmen who take pride in every detail. Our team brings together Scott Marshall's 20 years of hands-on experience in millwork and finishing carpentry, and Beau Suprun's exceptional eye for detail as a master craftsman and machinist. This combination of experience and precision ensures your project in {location.city} exceeds expectations.
               </p>
 
-              {location.keyProjects && location.keyProjects.length > 0 && (
+              {location.projectTypes && location.projectTypes.length > 0 && (
                 <>
                   <h3 className="text-2xl font-bold text-black mb-4 mt-8" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
                     Project Types We Serve in {location.city}
                   </h3>
                   <ul className="space-y-2 mb-8">
-                    {location.keyProjects.map((project, index) => (
+                    {location.projectTypes.map((project, index) => (
                       <li key={index} className="flex items-center text-gray-700">
                         <div className="w-2 h-2 bg-red-600 rounded-full mr-3"></div>
                         <span style={{ fontFamily: 'Open Sans, sans-serif' }}>{project}</span>
@@ -302,20 +269,44 @@ const LocationPage = () => {
 
               <div className="bg-gray-50 p-6 rounded-lg mt-8">
                 <h3 className="text-xl font-bold text-black mb-3" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
-                  Ready to Start Your Project in {location.city}?
+                  Working in {location.city}?
                 </h3>
                 <p className="text-gray-700 mb-4" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                  Contact us today for a free consultation and quote. We're fully insured with $5 million liability coverage and ready to bring your vision to life.
+                  Invite Two Fungis Finishing to tender your next commercial or multifamily project. $5 million liability coverage, WorkSafeBC compliant, and ready to support GCs and developers across British Columbia.
                 </p>
-                <div className="flex flex-wrap gap-4">
-                  <a href={primary.phoneHref} className="flex items-center font-semibold" style={{ color: '#228B22' }}>
-                    <Phone size={20} className="mr-2" />
-                    {primary.phone} — {primary.name}
+                <div className="grid sm:grid-cols-2 gap-3 mb-4">
+                  <a href="tel:778-268-4920" className="flex items-center font-semibold text-sm" style={{ color: '#228B22' }} data-testid="loc-call-scott">
+                    <Phone size={18} className="mr-2" />
+                    778-268-4920 — Scott Marshall
                   </a>
-                  <a href="mailto:inbox@twofungis.ca" className="flex items-center font-semibold" style={{ color: '#228B22' }}>
-                    <Mail size={20} className="mr-2" />
-                    inbox@twofungis.ca
+                  <a href="tel:250-327-8202" className="flex items-center font-semibold text-sm" style={{ color: '#228B22' }} data-testid="loc-call-beau">
+                    <Phone size={18} className="mr-2" />
+                    250-327-8202 — Beau Suprun
                   </a>
+                </div>
+                <a href="mailto:inbox@twofungis.ca" className="flex items-center font-semibold text-sm" style={{ color: '#228B22' }}>
+                  <Mail size={18} className="mr-2" />
+                  inbox@twofungis.ca
+                </a>
+                <div className="mt-5 flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    onClick={() => scrollToSection('contact')}
+                    className="inline-flex items-center gap-2 text-white px-5 py-2.5 rounded-md text-sm font-semibold"
+                    style={{ backgroundColor: '#228B22' }}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor='#1e7b1e'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor='#228B22'}
+                  >
+                    Invite Us to Tender <ChevronRight size={14} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPrequalOpen(true)}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-md text-sm font-semibold border-2"
+                    style={{ borderColor: '#228B22', color: '#228B22', backgroundColor: 'transparent' }}
+                  >
+                    Request Prequalification Package
+                  </button>
                 </div>
               </div>
             </div>
@@ -327,6 +318,8 @@ const LocationPage = () => {
       <Portfolio />
       <Contact />
       <Footer />
+
+      <PrequalificationModal open={prequalOpen} onClose={() => setPrequalOpen(false)} />
     </div>
   );
 };
