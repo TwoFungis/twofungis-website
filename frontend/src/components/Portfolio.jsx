@@ -23,6 +23,12 @@ const photos = [
   { src: 'https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/1shkxhie_beau14.jpg',           alt: 'Light oak kitchen cabinetry installation in progress — Two Fungis Finishing' },
   { src: 'https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/cyt30l84_beau12.jpg',           alt: 'Matte light-grey contemporary kitchen — Two Fungis Finishing' },
   { src: 'https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/ossl74uy_beau8.jpg',            alt: 'Cedar tongue-and-groove vaulted ceiling with steel ties — Two Fungis Finishing' },
+  {
+    src: 'https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/9g05ohxo_Prequalification-Checklist.pdf',
+    alt: 'Two Fungis Finishing Prequalification Checklist (PDF) — for general contractors',
+    type: 'pdf',
+    label: 'Prequalification Checklist'
+  },
 ];
 
 const THUMB_LOGO = 'https://customer-assets.emergentagent.com/job_okanagan-interiors/artifacts/x3dcmfph_image%20%281%29.png';
@@ -76,12 +82,22 @@ const Portfolio = () => {
                 data-testid={`project-${i}`}
                 aria-label={`Open project image ${i + 1}`}
               >
-                <img
-                  src={p.src}
-                  alt={p.alt}
-                  loading="lazy"
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
+                {p.type === 'pdf' ? (
+                  <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-neutral-900 to-black p-6 transition-transform duration-500 group-hover:scale-105">
+                    <img src={THUMB_LOGO} alt="" className="h-16 md:h-20 w-auto mb-4" />
+                    <div className="text-center">
+                      <p className="text-xs uppercase tracking-[0.25em] text-red-500 mb-2" style={{ fontFamily: 'Open Sans, sans-serif' }}>PDF Document</p>
+                      <p className="text-white text-xl md:text-2xl font-bold leading-tight" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>{p.label}</p>
+                    </div>
+                  </div>
+                ) : (
+                  <img
+                    src={p.src}
+                    alt={p.alt}
+                    loading="lazy"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                )}
                 {/* Subtle hover wash */}
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
 
@@ -132,12 +148,21 @@ const Portfolio = () => {
           >
             <ChevronLeft size={36} />
           </button>
-          <img
-            src={photos[activeIndex].src}
-            alt={photos[activeIndex].alt}
-            className="max-h-[88vh] max-w-[92vw] object-contain rounded-lg shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          />
+          {photos[activeIndex].type === 'pdf' ? (
+            <iframe
+              src={photos[activeIndex].src}
+              title={photos[activeIndex].alt}
+              className="w-[92vw] h-[88vh] rounded-lg shadow-2xl bg-white"
+              onClick={(e) => e.stopPropagation()}
+            />
+          ) : (
+            <img
+              src={photos[activeIndex].src}
+              alt={photos[activeIndex].alt}
+              className="max-h-[88vh] max-w-[92vw] object-contain rounded-lg shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            />
+          )}
           <button
             type="button"
             onClick={(e) => { e.stopPropagation(); next(); }}
