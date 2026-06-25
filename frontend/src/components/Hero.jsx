@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from './ui/button';
-import { ChevronRight, Phone } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
+import PrequalificationModal from './PrequalificationModal';
 
 const Hero = () => {
+  const [prequalOpen, setPrequalOpen] = useState(false);
+
   const scrollToSection = (id) => {
     const element = document.getElementById(id);
     if (element) {
@@ -45,15 +48,15 @@ const Hero = () => {
               <ChevronRight size={18} className="ml-1" />
             </Button>
             <Button
-              onClick={() => scrollToSection('contact')}
+              onClick={() => setPrequalOpen(true)}
               variant="outline"
               className="text-white px-8 py-6 text-base font-semibold inline-flex items-center"
               style={{ borderColor: '#ffffff', borderWidth: '1px', backgroundColor: 'transparent' }}
               onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.color = '#000000'; }}
               onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#ffffff'; }}
-              data-testid="hero-consult-btn"
+              data-testid="hero-prequal-btn"
             >
-              Request a Consultation
+              Request Prequalification Package
             </Button>
           </div>
 
@@ -81,6 +84,8 @@ const Hero = () => {
           </div>
         </div>
       </div>
+
+      <PrequalificationModal open={prequalOpen} onClose={() => setPrequalOpen(false)} />
     </section>
   );
 };

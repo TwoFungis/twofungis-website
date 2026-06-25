@@ -1,10 +1,10 @@
-import React from 'react';
-import { Hammer, Layers, DoorOpen, Building2, Building, ClipboardCheck, Wrench, Briefcase, FileCheck2, ArrowUpRight } from 'lucide-react';
+import React, { useState } from 'react';
+import { Hammer, Layers, DoorOpen, Building2, Building, ClipboardCheck, Wrench, Briefcase, FileCheck2, ArrowRight } from 'lucide-react';
 import { Card } from './ui/card';
-
-const PREQUAL_PDF = 'https://customer-assets.emergentagent.com/job_find-twofungis/artifacts/3lzhlylr_Two%20Fungis%20Prequalificaton.pdf';
+import PrequalificationModal from './PrequalificationModal';
 
 const Services = () => {
+  const [prequalOpen, setPrequalOpen] = useState(false);
   const services = [
     {
       icon: Hammer,
@@ -82,36 +82,6 @@ const Services = () => {
 
           {/* Services Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-            {/* Prequalification Checklist — featured first card (resource for GCs) */}
-            <a
-              href={PREQUAL_PDF}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group relative block p-6 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 border-l-4 overflow-hidden"
-              style={{ backgroundColor: '#0f0f12', borderColor: '#228B22' }}
-              data-testid="prequal-card"
-              aria-label="Open Two Fungis Finishing prequalification checklist PDF"
-            >
-              <div className="absolute top-4 right-4 opacity-60 group-hover:opacity-100 transition-opacity">
-                <ArrowUpRight className="text-white" size={20} />
-              </div>
-              <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4" style={{ backgroundColor: '#228B22' }}>
-                <FileCheck2 className="text-white" size={24} />
-              </div>
-              <p className="text-xs uppercase tracking-[0.2em] mb-2" style={{ color: '#32CD32', fontFamily: 'Open Sans, sans-serif' }}>
-                For General Contractors
-              </p>
-              <h3 className="text-2xl font-bold text-white mb-3" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
-                Prequalification Checklist
-              </h3>
-              <p className="text-gray-300 mb-4 leading-relaxed text-sm" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                Add Two Fungis Finishing to your bid list. Open the prequalification document to review our company info, insurance, WorkSafeBC coverage and references.
-              </p>
-              <span className="inline-flex items-center gap-2 text-sm font-semibold" style={{ color: '#32CD32', fontFamily: 'Open Sans, sans-serif' }}>
-                View Checklist (PDF) <ArrowUpRight size={14} />
-              </span>
-            </a>
-
             {services.map((service, index) => {
               const IconComponent = service.icon;
               return (
@@ -143,7 +113,7 @@ const Services = () => {
           </div>
 
           {/* Industries Strip */}
-          <div className="border-t border-gray-200 pt-10">
+          <div className="border-t border-gray-200 pt-10 mb-16">
             <h3 className="text-xs uppercase tracking-[0.2em] text-gray-500 text-center mb-4" style={{ fontFamily: 'Open Sans, sans-serif' }}>
               Industries We Serve
             </h3>
@@ -155,8 +125,84 @@ const Services = () => {
               ))}
             </div>
           </div>
+
+          {/* Subcontractor Prequalification — procurement-ready resource section */}
+          <section
+            id="prequalification"
+            className="rounded-xl p-8 sm:p-12 shadow-2xl scroll-mt-32"
+            style={{ backgroundColor: '#0f0f12' }}
+            data-testid="prequal-section"
+          >
+            <div className="grid lg:grid-cols-3 gap-8 items-start">
+              <div className="lg:col-span-1">
+                <div className="w-14 h-14 rounded-lg flex items-center justify-center mb-4" style={{ backgroundColor: '#228B22' }}>
+                  <FileCheck2 className="text-white" size={28} />
+                </div>
+                <p className="text-xs uppercase tracking-[0.2em] mb-2" style={{ color: '#32CD32', fontFamily: 'Open Sans, sans-serif' }}>
+                  For Procurement &amp; GCs
+                </p>
+                <h3 className="text-3xl sm:text-4xl font-bold text-white mb-4" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
+                  Subcontractor Prequalification
+                </h3>
+                <p className="text-gray-300 text-sm leading-relaxed mb-6" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+                  Two Fungis Finishing maintains a current Subcontractor Prequalification Package for General Contractors, Developers, Construction Managers, Procurement Teams, and Property Managers.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setPrequalOpen(true)}
+                  className="inline-flex items-center gap-2 text-white px-6 py-3 rounded-md text-sm font-semibold transition-colors"
+                  style={{ backgroundColor: '#228B22' }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor='#1e7b1e'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor='#228B22'}
+                  data-testid="services-prequal-btn"
+                >
+                  Request Prequalification Package <ArrowRight size={16} />
+                </button>
+              </div>
+
+              <div className="lg:col-span-2">
+                <p className="text-xs uppercase tracking-[0.2em] text-gray-400 mb-3" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+                  Package Includes
+                </p>
+                <ul className="grid sm:grid-cols-2 gap-x-6 gap-y-2 mb-6" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+                  {[
+                    'Corporate Information',
+                    'WorkSafeBC Status',
+                    'Commercial General Liability',
+                    'Financial Qualifications',
+                    'Quality Management',
+                    'Staffing &amp; Equipment',
+                    'Project Experience',
+                    'Construction Systems',
+                    'References (Available Upon Request)',
+                  ].map((item) => (
+                    <li key={item} className="flex items-start text-gray-200 text-sm">
+                      <span className="inline-block w-1.5 h-1.5 rounded-full mt-2 mr-3 flex-shrink-0" style={{ backgroundColor: '#228B22' }}></span>
+                      <span dangerouslySetInnerHTML={{ __html: item }} />
+                    </li>
+                  ))}
+                </ul>
+                <p className="text-gray-400 text-xs italic leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+                  To ensure our information remains accurate and current, our latest prequalification package is provided directly upon request rather than publicly downloaded.
+                </p>
+
+                {/* Future expansion slot — additional downloadable resources can be added here */}
+                {/*
+                <div className="mt-8 pt-6 border-t border-white/10">
+                  <p className="text-xs uppercase tracking-[0.2em] text-gray-400 mb-3">Additional Resources</p>
+                  <div className="grid sm:grid-cols-2 gap-2 text-sm">
+                    Add: Capability Statement, Insurance Certificate, Bonding Letter,
+                    WorkSafeBC Clearance, Safety Documentation, Project Portfolio
+                  </div>
+                </div>
+                */}
+              </div>
+            </div>
+          </section>
         </div>
       </div>
+
+      <PrequalificationModal open={prequalOpen} onClose={() => setPrequalOpen(false)} />
     </section>
   );
 };
