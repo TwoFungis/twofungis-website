@@ -105,7 +105,9 @@ frontend/node_modules/.cache/default-development/6.pack_
 frontend/node_modules/.cache/default-development/18.pack
 .env
 .env.*
+!.env.example
 *.env
+!*.env.example
 credentials.json
 *.key
 .credentials
