@@ -326,7 +326,20 @@ export const useAuthStore = create((set, get) => ({
 
   signInWithMagicLink: async (email) => {
     set({ loading: true });
-    const redirectUrl = window.location.origin;
+    
+    // Use environment variable for redirect URL, fallback to window.location.origin
+    // In production, this should be the deployed app URL
+    const baseUrl = process.env.REACT_APP_BACKEND_URL 
+      ? process.env.REACT_APP_BACKEND_URL.replace('/api', '').replace(':8001', '')
+      : window.location.origin;
+    
+    // Ensure we use the current origin for preview environments
+    const redirectUrl = window.location.hostname.includes('preview.emergentagent.com')
+      ? window.location.origin
+      : (baseUrl || window.location.origin);
+    
+    console.log('Magic link redirect URL:', `${redirectUrl}/app/dashboard`);
+    
     try {
       const { error } = await supabase.auth.signInWithOtp({ 
         email,
