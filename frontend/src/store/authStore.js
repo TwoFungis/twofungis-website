@@ -333,8 +333,10 @@ export const useAuthStore = create((set, get) => ({
       ? process.env.REACT_APP_BACKEND_URL.replace('/api', '').replace(':8001', '')
       : window.location.origin;
     
-    // Ensure we use the current origin for preview environments
-    const redirectUrl = window.location.hostname.includes('preview.emergentagent.com')
+    // Use current origin for preview/development environments
+    const isPreviewEnv = window.location.hostname.includes('preview.') || 
+                         window.location.hostname === 'localhost';
+    const redirectUrl = isPreviewEnv
       ? window.location.origin
       : (baseUrl || window.location.origin);
     
