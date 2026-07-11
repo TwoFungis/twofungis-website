@@ -50,6 +50,31 @@ The permanent architecture for Company Brain - the operational intelligence of t
 - Every AI interaction routes through ONE Company Brain
 - Company Brain calls modules; modules NEVER call Company Brain
 
+### MODULE ISOLATION RULE (Architectural Constraint)
+**No module communicates directly with another module.**
+
+```
+❌ FORBIDDEN:
+   Projects → Financial (direct call)
+   Financial → CRM (direct call)
+   Production Library → Projects (direct call)
+
+✅ REQUIRED:
+   Projects → Service Interface → Financial
+   Module A → Company Brain → Module B
+```
+
+**Principles:**
+1. Each module owns its own data exclusively
+2. Cross-module requests occur through service interfaces
+3. Company Brain is the orchestrator for cross-module operations
+4. This preserves modularity and prevents tight coupling
+
+**Examples:**
+- Creating an invoice from a project milestone → Company Brain orchestrates
+- Linking a client to a project → Service interface, not direct DB call
+- Updating production rates that affect estimates → Event-driven through services
+
 ### UI Refinement (July 11, 2026)
 Following "One Action = One Way" principle, removed duplicate controls for TFCS users:
 - ❌ Blue Quick Add button → Use Company Brain

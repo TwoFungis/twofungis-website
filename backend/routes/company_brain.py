@@ -13,6 +13,26 @@ ONE BRAIN RULE:
 - Every AI interaction routes through ONE Company Brain
 - Company Brain calls modules; modules NEVER call Company Brain
 
+MODULE ISOLATION RULE (Architectural Constraint):
+=================================================
+No module communicates directly with another module.
+All cross-module communication must happen through defined services.
+
+❌ FORBIDDEN:
+   - Projects directly modifying Financial
+   - Financial directly modifying CRM
+   - Production Library directly modifying Projects
+   - Any module importing and calling another module's internal functions
+
+✅ REQUIRED:
+   - Each module owns its own data exclusively
+   - Cross-module requests occur through service interfaces
+   - Company Brain orchestrates multi-module operations
+   - Use events/callbacks for loose coupling when needed
+
+This preserves modularity and keeps the Company Brain as the 
+orchestrator rather than tightly coupling the application.
+
 ACTION PIPELINE:
 Intent → Plan → Permission Check → Execute → Activity Log → Result → Undo Window
 """
