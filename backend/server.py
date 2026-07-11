@@ -56,6 +56,9 @@ from routes.projects import router as projects_router
 # Import Quotes routes
 from routes.quotes import router as quotes_router
 
+# Import TFCS Mainframe routes
+from routes.tfcs import router as tfcs_router
+
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env', override=False)
 
@@ -203,6 +206,9 @@ app.include_router(projects_router)
 
 # Include Quotes routes
 app.include_router(quotes_router)
+
+# Include TFCS Mainframe routes
+app.include_router(tfcs_router)
 
 app.add_middleware(
     CORSMiddleware,
