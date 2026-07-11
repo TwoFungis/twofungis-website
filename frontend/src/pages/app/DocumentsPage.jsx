@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   FolderOpen, Plus, Search, Upload, File, FileText, Image, 
   Download, Trash2, Eye, MoreVertical, FolderPlus, Grid, List
@@ -35,11 +35,7 @@ const DocumentsPage = () => {
   const [viewMode, setViewMode] = useState('grid');
   const [showUploadModal, setShowUploadModal] = useState(false);
 
-  useEffect(() => {
-    fetchDocuments();
-  }, [currentFolder]);
-
-  const fetchDocuments = async () => {
+  const fetchDocuments = useCallback(async () => {
     setIsLoading(true);
     try {
       const response = await fetch(`${API_URL}/api/documents?folder=${currentFolder || ''}`, {
@@ -68,7 +64,11 @@ const DocumentsPage = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [currentFolder, user?.access_token]);
+
+  useEffect(() => {
+    fetchDocuments();
+  }, [fetchDocuments]);
 
   const filteredDocuments = documents.filter(doc =>
     doc.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||

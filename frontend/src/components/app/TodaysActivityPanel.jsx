@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Receipt, Send, Bell, FolderKanban, 
   Clock, TrendingUp, ChevronRight 
@@ -21,13 +21,7 @@ const TodaysActivityPanel = () => {
   });
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (user) {
-      fetchTodaysActivity();
-    }
-  }, [user]);
-
-  const fetchTodaysActivity = async () => {
+  const fetchTodaysActivity = useCallback(async () => {
     if (!user) return;
     
     try {
@@ -88,7 +82,13 @@ const TodaysActivityPanel = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    if (user) {
+      fetchTodaysActivity();
+    }
+  }, [user, fetchTodaysActivity]);
 
   const formatCurrency = (value) => {
     return new Intl.NumberFormat('en-CA', { 

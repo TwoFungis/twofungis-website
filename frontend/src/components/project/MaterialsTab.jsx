@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Plus, Package, Truck, Wrench, Settings2, Clock, Trash2, 
   Edit2, DollarSign, Receipt, Check, X, ChevronDown
@@ -70,21 +70,15 @@ const MaterialsTab = ({ projectId }) => {
     notes: ''
   });
 
-  useEffect(() => {
-    if (projectId) {
-      fetchMaterials();
-    }
-  }, [projectId]);
-
-  const getAuthHeaders = async () => {
+  const getAuthHeaders = useCallback(async () => {
     const { data: { session } } = await supabase.auth.getSession();
     return {
       'Authorization': `Bearer ${session?.access_token}`,
       'Content-Type': 'application/json'
     };
-  };
+  }, []);
 
-  const fetchMaterials = async () => {
+  const fetchMaterials = useCallback(async () => {
     setLoading(true);
     try {
       const headers = await getAuthHeaders();
@@ -102,7 +96,13 @@ const MaterialsTab = ({ projectId }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [projectId, getAuthHeaders]);
+
+  useEffect(() => {
+    if (projectId) {
+      fetchMaterials();
+    }
+  }, [projectId, fetchMaterials]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

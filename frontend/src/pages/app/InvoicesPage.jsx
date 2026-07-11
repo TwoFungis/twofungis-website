@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Receipt, Plus, Search, Send, CheckCircle, Clock, AlertCircle,
   Eye, Download, MoreVertical, DollarSign, Building2, X, Trash2, Calendar
@@ -42,19 +42,15 @@ const InvoicesPage = () => {
     drafts: 0
   });
 
-  useEffect(() => {
-    fetchInvoices();
-  }, []);
-
-  const getAuthHeaders = async () => {
+  const getAuthHeaders = useCallback(async () => {
     const { data: { session } } = await supabase.auth.getSession();
     return {
       'Authorization': `Bearer ${session?.access_token}`,
       'Content-Type': 'application/json'
     };
-  };
+  }, []);
 
-  const fetchInvoices = async () => {
+  const fetchInvoices = useCallback(async () => {
     setIsLoading(true);
     try {
       const headers = await getAuthHeaders();
@@ -78,7 +74,11 @@ const InvoicesPage = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [getAuthHeaders]);
+
+  useEffect(() => {
+    fetchInvoices();
+  }, [fetchInvoices]);
 
   const handleSendInvoice = async (invoiceId) => {
     try {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   TrendingUp, FolderKanban, FileText, AlertTriangle, DollarSign,
@@ -14,6 +14,13 @@ import TrialLockedBanner from '../../components/app/TrialLockedBanner';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
+// Founder emails - defined outside component
+const FOUNDER_EMAILS = [
+  "info@twofungis.ca",
+  "swdmarshall@gmail.com", 
+  "carpenterbeau@hotmail.com"
+];
+
 const DashboardPage = () => {
   const { profile, user, accessState } = useAuthStore();
   const [projects, setProjects] = useState([]);
@@ -24,13 +31,6 @@ const DashboardPage = () => {
   const [loading, setLoading] = useState(true);
   const [cashFlowForecast, setCashFlowForecast] = useState(null);
   const [outstandingInvoicesData, setOutstandingInvoicesData] = useState(null);
-  
-  // Founder emails list
-  const FOUNDER_EMAILS = [
-    "info@twofungis.ca",
-    "swdmarshall@gmail.com", 
-    "carpenterbeau@hotmail.com"
-  ];
   
   // Check if user is a founder by email
   const userEmail = user?.email?.toLowerCase() || '';
@@ -44,21 +44,15 @@ const DashboardPage = () => {
     parseInt(localStorage.getItem('tradeos_tax_rate') || '25')
   );
 
-  const getAuthHeaders = async () => {
+  const getAuthHeaders = useCallback(async () => {
     const { data: { session } } = await supabase.auth.getSession();
     return {
       'Authorization': `Bearer ${session?.access_token}`,
       'Content-Type': 'application/json'
     };
-  };
+  }, []);
 
-  useEffect(() => {
-    fetchDashboardData();
-    fetchCashFlowForecast();
-    fetchOutstandingInvoices();
-  }, [user]);
-
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = useCallback(async () => {
     if (!user) return;
     setLoading(true);
 
@@ -81,9 +75,9 @@ const DashboardPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
-  const fetchCashFlowForecast = async () => {
+  const fetchCashFlowForecast = useCallback(async () => {
     if (!user) return;
     try {
       const headers = await getAuthHeaders();
@@ -95,9 +89,9 @@ const DashboardPage = () => {
     } catch (err) {
       console.error('Error fetching cash flow forecast:', err);
     }
-  };
+  }, [user, getAuthHeaders]);
 
-  const fetchOutstandingInvoices = async () => {
+  const fetchOutstandingInvoices = useCallback(async () => {
     if (!user) return;
     try {
       const headers = await getAuthHeaders();
@@ -109,7 +103,13 @@ const DashboardPage = () => {
     } catch (err) {
       console.error('Error fetching outstanding invoices:', err);
     }
-  };
+  }, [user, getAuthHeaders]);
+
+  useEffect(() => {
+    fetchDashboardData();
+    fetchCashFlowForecast();
+    fetchOutstandingInvoices();
+  }, [fetchDashboardData, fetchCashFlowForecast, fetchOutstandingInvoices]);
 
   // Save preferences
   const handleMarginChange = (val) => {

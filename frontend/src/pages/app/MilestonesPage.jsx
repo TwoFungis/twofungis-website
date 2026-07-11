@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Flag, Plus, Search, CheckCircle, Clock, Send, Receipt, 
   ChevronRight, MoreVertical, Edit2, Trash2, Lock, X, AlertCircle
@@ -43,19 +43,15 @@ const MilestonesPage = () => {
     total_value: 0
   });
 
-  const getAuthHeaders = async () => {
+  const getAuthHeaders = useCallback(async () => {
     const { data: { session } } = await supabase.auth.getSession();
     return {
       'Authorization': `Bearer ${session?.access_token}`,
       'Content-Type': 'application/json'
     };
-  };
-
-  useEffect(() => {
-    fetchMilestones();
   }, []);
 
-  const fetchMilestones = async () => {
+  const fetchMilestones = useCallback(async () => {
     setIsLoading(true);
     try {
       const headers = await getAuthHeaders();
@@ -78,7 +74,11 @@ const MilestonesPage = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [getAuthHeaders]);
+
+  useEffect(() => {
+    fetchMilestones();
+  }, [fetchMilestones]);
 
   const handleStatusChange = async (milestoneId, newStatus) => {
     try {

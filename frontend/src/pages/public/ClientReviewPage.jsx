@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { 
   CheckCircle2, 
@@ -33,7 +33,7 @@ const ClientReviewPage = () => {
   const [clientName, setClientName] = useState('');
   const [successMessage, setSuccessMessage] = useState(null);
 
-  const fetchMilestones = async () => {
+  const fetchMilestones = useCallback(async () => {
     if (!token) {
       setError('Invalid link');
       setLoading(false);
@@ -67,11 +67,11 @@ const ClientReviewPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
 
   useEffect(() => {
     fetchMilestones();
-  }, [token]);
+  }, [fetchMilestones]);
 
   const handleApprove = async () => {
     if (!commentModal) return;

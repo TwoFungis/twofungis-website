@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Calculator, TrendingUp, TrendingDown, DollarSign, Calendar, 
   Filter, Download, FileText, Info, ChevronDown, PieChart,
@@ -41,21 +41,15 @@ const TaxSummaryPage = () => {
     return saved ? parseInt(saved) : 25;
   });
 
-  useEffect(() => {
-    if (user) {
-      fetchData();
-    }
-  }, [user, viewMode, selectedYear, selectedMonth, selectedQuarter]);
-
-  const getAuthHeaders = async () => {
+  const getAuthHeaders = useCallback(async () => {
     const { data: { session } } = await supabase.auth.getSession();
     return {
       'Authorization': `Bearer ${session?.access_token}`,
       'Content-Type': 'application/json'
     };
-  };
+  }, []);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     try {
       const headers = await getAuthHeaders();
@@ -103,7 +97,13 @@ const TaxSummaryPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [viewMode, selectedYear, selectedMonth, selectedQuarter, getAuthHeaders]);
+
+  useEffect(() => {
+    if (user) {
+      fetchData();
+    }
+  }, [user, fetchData]);
 
   const handleTaxRateChange = (rate) => {
     setTaxRate(rate);

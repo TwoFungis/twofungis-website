@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Download, X, Smartphone, Check, ChevronRight } from 'lucide-react';
 import PWAInstallService from '../../services/PWAInstallService';
 
@@ -6,13 +6,7 @@ const PWAInstallModal = ({ isOpen, onClose }) => {
   const [installStatus, setInstallStatus] = useState('idle'); // idle, prompting, success, manual
   const [instructions, setInstructions] = useState(null);
 
-  useEffect(() => {
-    if (isOpen) {
-      handleInstall();
-    }
-  }, [isOpen]);
-
-  const handleInstall = async () => {
+  const handleInstall = useCallback(async () => {
     // Check if already installed
     if (PWAInstallService.isInstalled()) {
       setInstallStatus('success');
@@ -32,7 +26,13 @@ const PWAInstallModal = ({ isOpen, onClose }) => {
       // User dismissed prompt
       onClose();
     }
-  };
+  }, [onClose]);
+
+  useEffect(() => {
+    if (isOpen) {
+      handleInstall();
+    }
+  }, [isOpen, handleInstall]);
 
   if (!isOpen) return null;
 

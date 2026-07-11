@@ -41,6 +41,9 @@ import { useBrainContext, getContextFromPath } from '../../hooks/useBrainContext
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
+// Founder emails - defined outside component to avoid re-creation on each render
+const FOUNDER_EMAILS = ["info@twofungis.ca", "swdmarshall@gmail.com", "carpenterbeau@hotmail.com", "inbox@twofungis.ca"];
+
 const AppLayout = () => {
   const { profile, signOut, user } = useAuthStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -61,7 +64,6 @@ const AppLayout = () => {
   }, [location.pathname, setContext]);
   
   // Founder email check - use user.email from auth
-  const FOUNDER_EMAILS = ["info@twofungis.ca", "swdmarshall@gmail.com", "carpenterbeau@hotmail.com", "inbox@twofungis.ca"];
   const userEmail = (user?.email || '').toLowerCase();
   const isFounder = FOUNDER_EMAILS.map(e => e.toLowerCase()).includes(userEmail);
   const tier = (profile?.subscription_tier || '').toLowerCase();

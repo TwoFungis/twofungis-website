@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Wallet, Plus, Search, Filter, Upload, Receipt, Tag, Calendar,
   TrendingUp, TrendingDown, Calculator, FileText, Camera, MoreVertical,
@@ -40,19 +40,15 @@ const ExpensesPage = () => {
   const [activeActionMenu, setActiveActionMenu] = useState(null);
   const [editingExpense, setEditingExpense] = useState(null);
 
-  useEffect(() => {
-    fetchExpenses();
-  }, []);
-
-  const getAuthHeaders = async () => {
+  const getAuthHeaders = useCallback(async () => {
     const { data: { session } } = await supabase.auth.getSession();
     return {
       'Authorization': `Bearer ${session?.access_token}`,
       'Content-Type': 'application/json'
     };
-  };
+  }, []);
 
-  const fetchExpenses = async () => {
+  const fetchExpenses = useCallback(async () => {
     setIsLoading(true);
     try {
       const headers = await getAuthHeaders();
@@ -66,7 +62,11 @@ const ExpensesPage = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [getAuthHeaders]);
+
+  useEffect(() => {
+    fetchExpenses();
+  }, [fetchExpenses]);
 
   const handleDeleteExpense = async (expenseId) => {
     if (!window.confirm('Are you sure you want to delete this expense?')) return;

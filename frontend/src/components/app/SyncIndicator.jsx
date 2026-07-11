@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Cloud, CloudOff, RefreshCw, Check, AlertCircle } from 'lucide-react';
 import OfflineQueueService from '../../services/OfflineQueueService';
 import { supabase } from '../../lib/supabase';
@@ -13,13 +13,39 @@ const SyncIndicator = () => {
   const [isSyncing, setIsSyncing] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
 
-  const getAuthHeaders = async () => {
+  const getAuthHeaders = useCallback(async () => {
     const { data: { session } } = await supabase.auth.getSession();
     return {
       'Authorization': `Bearer ${session?.access_token}`,
       'Content-Type': 'application/json'
     };
-  };
+  }, []);
+
+  const triggerSync = useCallback(async () => {
+    if (isSyncing) return;
+    
+    const pending = OfflineQueueService.getPendingCount();
+    if (pending === 0) return;
+
+    setIsSyncing(true);
+    try {
+      const result = await OfflineQueueService.syncAll(getAuthHeaders, API_URL);
+      
+      if (result.success) {
+        if (result.synced > 0) {
+          toast.success(`Synced ${result.synced} item${result.synced > 1 ? 's' : ''}`);
+        }
+      } else if (result.reason !== 'offline') {
+        toast.error(`Sync failed for ${result.failed} item${result.failed > 1 ? 's' : ''}`);
+      }
+    } catch (err) {
+      console.error('Sync error:', err);
+    } finally {
+      setIsSyncing(false);
+      setPendingCount(OfflineQueueService.getPendingCount());
+      setSyncStatus(OfflineQueueService.getSyncStatus());
+    }
+  }, [isSyncing, getAuthHeaders]);
 
   useEffect(() => {
     // Listen for online/offline
@@ -58,33 +84,7 @@ const SyncIndicator = () => {
       window.removeEventListener('tradeos-connection-restored', handleConnectionRestored);
       clearInterval(interval);
     };
-  }, []);
-
-  const triggerSync = async () => {
-    if (isSyncing) return;
-    
-    const pending = OfflineQueueService.getPendingCount();
-    if (pending === 0) return;
-
-    setIsSyncing(true);
-    try {
-      const result = await OfflineQueueService.syncAll(getAuthHeaders, API_URL);
-      
-      if (result.success) {
-        if (result.synced > 0) {
-          toast.success(`Synced ${result.synced} item${result.synced > 1 ? 's' : ''}`);
-        }
-      } else if (result.reason !== 'offline') {
-        toast.error(`Sync failed for ${result.failed} item${result.failed > 1 ? 's' : ''}`);
-      }
-    } catch (err) {
-      console.error('Sync error:', err);
-    } finally {
-      setIsSyncing(false);
-      setPendingCount(OfflineQueueService.getPendingCount());
-      setSyncStatus(OfflineQueueService.getSyncStatus());
-    }
-  };
+  }, [triggerSync]);
 
   // Don't show if everything is synced and online
   const showIndicator = !isOnline || pendingCount > 0 || syncStatus.status === 'synced';

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Receipt, Send, Clock, AlertCircle, CheckCircle, DollarSign,
   ChevronRight, Mail, Calendar, Building2, Search, Filter, X
@@ -20,19 +20,15 @@ const ReceivablesPage = () => {
   const [sendingReminder, setSendingReminder] = useState(false);
   const [selectedTone, setSelectedTone] = useState('standard');
 
-  const getAuthHeaders = async () => {
+  const getAuthHeaders = useCallback(async () => {
     const { data: { session } } = await supabase.auth.getSession();
     return {
       'Authorization': `Bearer ${session?.access_token}`,
       'Content-Type': 'application/json'
     };
-  };
+  }, []);
 
-  useEffect(() => {
-    fetchOutstandingInvoices();
-  }, [user]);
-
-  const fetchOutstandingInvoices = async () => {
+  const fetchOutstandingInvoices = useCallback(async () => {
     if (!user) return;
     setLoading(true);
     try {
@@ -49,7 +45,11 @@ const ReceivablesPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, getAuthHeaders]);
+
+  useEffect(() => {
+    fetchOutstandingInvoices();
+  }, [fetchOutstandingInvoices]);
 
   const handleSendReminder = async () => {
     if (!selectedInvoice) return;

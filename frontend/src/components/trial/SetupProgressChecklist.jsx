@@ -68,7 +68,7 @@ const SetupProgressChecklist = () => {
     if (user) {
       refreshSetupProgress().finally(() => setInitialLoading(false));
     }
-  }, [user]);
+  }, [user, refreshSetupProgress]);
 
   // Check if already dismissed in localStorage
   useEffect(() => {
