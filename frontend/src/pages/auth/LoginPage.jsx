@@ -34,7 +34,8 @@ const LoginPage = () => {
         if (result?.error) {
           setError(result.error.message || 'Invalid email or password');
         } else {
-          navigate('/app/dashboard');
+          // Navigate to /app - DashboardRedirect will determine the correct landing page
+          navigate('/app');
         }
       }
     } catch (err) {

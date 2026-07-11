@@ -24,3 +24,4 @@
 - Both TFCS Owners have full access to Company Brain, User Management, Financial, System Settings
 - Password changes are private (no activity logging, no notifications)
 - Use Settings > Change Password to update passwords
+- **Post-Login Routing:** TFCS users auto-redirect to `/app/mainframe`, standard users to `/app/dashboard`

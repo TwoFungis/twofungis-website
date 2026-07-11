@@ -18,6 +18,7 @@ import ActivateBusinessFlow from './pages/auth/ActivateBusinessFlow';
 
 // App Pages
 import DashboardPage from './pages/app/DashboardPage';
+import DashboardRedirect from './components/routing/DashboardRedirect';
 import ProjectsPage from './pages/app/ProjectsPage';
 import ProjectDetailPage from './pages/app/ProjectDetailPage';
 import EstimatingPage from './pages/app/EstimatingPage';
@@ -116,7 +117,7 @@ function App() {
             <AppLayout />
           </ProtectedRoute>
         }>
-          <Route index element={<Navigate to="/app/dashboard" replace />} />
+          <Route index element={<DashboardRedirect />} />
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="projects" element={<ProjectsPage />} />
           <Route path="projects/:id" element={<ProjectDetailPage />} />

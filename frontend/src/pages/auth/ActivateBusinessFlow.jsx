@@ -353,7 +353,8 @@ const ActivateBusinessFlow = () => {
       }
     }
     
-    navigate('/app/dashboard');
+    // Navigate to /app - DashboardRedirect will determine the correct landing page
+    navigate('/app');
   };
 
   // Format currency
@@ -415,7 +416,7 @@ const ActivateBusinessFlow = () => {
           </div>
 
           <button
-            onClick={() => navigate('/app/dashboard')}
+            onClick={() => navigate('/app')}
             className="w-full bg-steel-500 hover:bg-steel-600 text-white py-4 rounded-xl font-semibold text-lg transition-colors flex items-center justify-center gap-2"
             data-testid="go-to-dashboard-btn"
           >

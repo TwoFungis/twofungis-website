@@ -45,6 +45,32 @@ Build "TradeOS," a financial tracking tool for contractors. The application incl
 ### Owner Completion & Account Management
 Both company owners are now fully operational in TFCS Mainframe.
 
+### Centralized Post-Login Routing Architecture ✅ (July 11, 2026)
+Implemented clean, architectural routing that determines the correct landing page after authentication.
+
+**Architecture:**
+```
+User logs in → navigate('/app') → DashboardRedirect component
+                                         ↓
+                               Check /api/tfcs/role/me
+                                         ↓
+                    ┌────────────────────┴────────────────────┐
+                    ↓                                         ↓
+            has_role: true                            has_role: false
+                    ↓                                         ↓
+         Navigate to /app/mainframe              Navigate to /app/dashboard
+```
+
+**Key Decisions:**
+- Login flow ONLY authenticates, no routing decisions
+- Single centralized routing component: `DashboardRedirect.jsx`
+- Uses existing TFCS role API (`/api/tfcs/role/me`) - no hardcoded emails
+- No duplicate routing logic anywhere in codebase
+
+**Key Files:**
+- `/app/frontend/src/components/routing/DashboardRedirect.jsx` - Centralized routing
+- `/app/frontend/src/App.js` - Route index uses DashboardRedirect
+
 ### Company Owners ✅
 | Name | Email | Role | Status |
 |------|-------|------|--------|
@@ -261,6 +287,7 @@ The Company's first structured knowledge base. AI integration is intentionally p
 ### TFCS Mainframe (Spec 1.0-1.1)
 - `/app/frontend/src/pages/app/MainframePage.jsx`
 - `/app/frontend/src/components/layout/AppLayout.jsx`
+- `/app/frontend/src/components/routing/DashboardRedirect.jsx` - Centralized post-login routing
 - `/app/backend/routes/tfcs.py`
 - `/app/backend/routes/tfcs_activity.py`
 - `/app/migrations/011_tfcs_mainframe_foundation.sql`

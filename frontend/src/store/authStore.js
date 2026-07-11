@@ -340,13 +340,14 @@ export const useAuthStore = create((set, get) => ({
       ? window.location.origin
       : (baseUrl || window.location.origin);
     
-    console.log('Magic link redirect URL:', `${redirectUrl}/app/dashboard`);
+    console.log('Magic link redirect URL:', `${redirectUrl}/app`);
     
     try {
       const { error } = await supabase.auth.signInWithOtp({ 
         email,
         options: {
-          emailRedirectTo: `${redirectUrl}/app/dashboard`
+          // Redirect to /app - DashboardRedirect will determine the correct landing page
+          emailRedirectTo: `${redirectUrl}/app`
         }
       });
       set({ loading: false });

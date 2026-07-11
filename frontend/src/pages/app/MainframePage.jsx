@@ -614,7 +614,7 @@ const MainframePage = () => {
             You do not have access to TFCS Mainframe. Contact your administrator.
           </p>
           <button
-            onClick={() => navigate('/app/dashboard')}
+            onClick={() => navigate('/app')}
             className="px-4 py-2 bg-tfcs-surface border border-tfcs-border rounded text-white hover:bg-tfcs-surface-hover transition-colors"
           >
             Return to Dashboard

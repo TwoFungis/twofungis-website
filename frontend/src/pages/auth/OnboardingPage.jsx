@@ -96,7 +96,8 @@ const OnboardingPage = () => {
           setError(errorMsg || 'Failed to save profile');
         }
       } else {
-        navigate('/app/dashboard');
+        // Navigate to /app - DashboardRedirect will determine the correct landing page
+        navigate('/app');
       }
     } catch (err) {
       console.error('Onboarding error:', err);
