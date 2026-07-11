@@ -10,6 +10,11 @@ Build "TradeOS," a financial tracking tool for contractors. The application incl
 - **Trial + Locked access monetization model** ✅ IMPLEMENTED
 - **TFCS Mainframe** - Internal operational system for Two Fungis Finishing ✅ SPEC 1.2 COMPLETE
 
+## Brand Identity (Updated July 11, 2026)
+- **Tagline:** "Built for Builders. Intelligence for Trades."
+- **Color Palette:** Black (#0a0a0a), Deep Charcoal (#111111), Emerald Green accents, Red accents
+- **Target Market:** Canadian contractors and small trade businesses
+
 ## User Personas
 - **Primary:** Independent contractors and small trade businesses
 - **Secondary:** Founding/Elite lifetime members with premium access
@@ -37,6 +42,25 @@ Build "TradeOS," a financial tracking tool for contractors. The application incl
 12. ✅ **TFCS Mainframe Specification 1.1** (Command Center Dashboard)
 13. ✅ **TFCS Mainframe Specification 1.2** (Company Brain Foundation)
 14. ✅ **TFCS Mainframe Specification 1.2.1** (Owner Completion & Account Management)
+15. ✅ **Login Page Refresh** (Two Fungis Branding - July 11, 2026)
+16. ✅ **PWA Manifest Fix** (Corrected start_url routing - July 11, 2026)
+
+---
+
+## Login Page Refresh (July 11, 2026)
+
+### Changes Made
+- Updated tagline to "Built for Builders. Intelligence for Trades."
+- Applied Two Fungis brand colors (Black, Deep Charcoal, Emerald Green)
+- Modernized button styling with gradient and shadow effects
+- Improved input field focus states with emerald accents
+- Added subtle background gradient accents
+- Added "Secured by TradeOS" footer badge
+- Preserved all existing functionality (email/password login, magic link, PWA modal)
+
+### PWA Manifest Fix
+- Fixed `manifest.json` start_url from `/app/dashboard` to `/app`
+- This allows DashboardRedirect to properly route TFCS users to Mainframe
 
 ---
 

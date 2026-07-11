@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, ArrowRight, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, ArrowRight, Eye, EyeOff, Shield } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
-import { LogoLink } from '../../components/ui/Logo';
 import PWARedirectModal from '../../components/app/PWARedirectModal';
 
 const LoginPage = () => {
@@ -48,10 +47,13 @@ const LoginPage = () => {
 
   if (magicLinkSent) {
     return (
-      <div className="min-h-screen bg-charcoal-900 flex items-center justify-center px-4">
-        <div className="max-w-md w-full bg-charcoal-800 rounded-2xl p-8 border border-charcoal-700 text-center">
-          <div className="w-16 h-16 bg-steel-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Mail className="w-8 h-8 text-steel-400" />
+      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center px-4">
+        {/* Subtle gradient accent */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-gradient-to-b from-emerald-600/10 via-transparent to-transparent blur-3xl pointer-events-none" />
+        
+        <div className="max-w-md w-full bg-[#111111] rounded-2xl p-8 border border-[#1f1f1f] text-center relative">
+          <div className="w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto mb-6 ring-1 ring-emerald-500/20">
+            <Mail className="w-8 h-8 text-emerald-400" />
           </div>
           <h2 className="text-2xl font-bold text-white mb-4">Check Your Email</h2>
           <p className="text-gray-400 mb-6">
@@ -59,7 +61,7 @@ const LoginPage = () => {
           </p>
           <button 
             onClick={() => setMagicLinkSent(false)}
-            className="text-steel-400 hover:text-steel-300 transition-colors"
+            className="text-emerald-400 hover:text-emerald-300 transition-colors font-medium"
           >
             Use a different email
           </button>
@@ -69,42 +71,79 @@ const LoginPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-charcoal-900 flex items-center justify-center px-4 relative">
-      {/* Background Shield Watermark */}
+    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center px-4 relative overflow-hidden">
+      {/* Premium gradient accents */}
+      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-gradient-to-br from-red-600/8 via-transparent to-transparent blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-gradient-to-tl from-emerald-600/8 via-transparent to-transparent blur-3xl pointer-events-none" />
+      
+      {/* Subtle grid pattern */}
       <div 
-        className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-[0.03]"
-      >
-        <img src="/shield-icon.png" alt="" className="w-96 h-96 object-contain" />
-      </div>
+        className="absolute inset-0 pointer-events-none opacity-[0.015]"
+        style={{
+          backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
+          backgroundSize: '64px 64px'
+        }}
+      />
 
       <div className="max-w-md w-full relative z-10">
-        <div className="flex justify-center mb-8">
-          <Link to="/">
-            <img src="/shield-icon.png" alt="TradeOS" className="h-20 w-auto" />
+        {/* Logo and Branding */}
+        <div className="flex flex-col items-center mb-10">
+          <Link to="/" className="group">
+            <div className="relative">
+              <img 
+                src="/shield-icon.png" 
+                alt="TradeOS" 
+                className="h-20 w-auto transition-transform duration-300 group-hover:scale-105" 
+              />
+              {/* Subtle glow effect */}
+              <div className="absolute inset-0 bg-emerald-500/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            </div>
           </Link>
+          
+          {/* New Tagline */}
+          <div className="mt-6 text-center">
+            <h1 className="text-xl font-bold text-white tracking-tight">
+              Built for Builders.
+            </h1>
+            <p className="text-lg text-emerald-400 font-medium mt-1">
+              Intelligence for Trades.
+            </p>
+          </div>
         </div>
 
-        <div className="bg-charcoal-800 rounded-2xl p-8 border border-charcoal-700" data-testid="login-form">
-          <h2 className="text-2xl font-bold text-white mb-1 text-center italic">Welcome Back</h2>
-          <p className="text-gray-400 text-center text-sm mb-1">Sign in to your account</p>
-          <p className="text-steel-400 text-center text-xs font-medium mb-6">Built for Builders. Financial intelligence for small trades.</p>
+        {/* Login Card */}
+        <div 
+          className="bg-[#111111] rounded-2xl p-8 border border-[#1f1f1f] shadow-2xl shadow-black/50" 
+          data-testid="login-form"
+        >
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold text-white mb-2">Welcome Back</h2>
+            <p className="text-gray-500 text-sm">Sign in to your account</p>
+          </div>
 
+          {/* Error Message */}
           {error && (
-            <div className="bg-risk/20 border border-risk/50 text-risk px-4 py-3 rounded-lg mb-6 text-sm" data-testid="login-error">
+            <div 
+              className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl mb-6 text-sm flex items-center gap-3" 
+              data-testid="login-error"
+            >
+              <div className="w-2 h-2 bg-red-500 rounded-full flex-shrink-0" />
               {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Email Field */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">Email</label>
-              <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+              <div className="relative group">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-600 group-focus-within:text-emerald-400 transition-colors" />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg pl-12 pr-4 py-3 text-white placeholder-gray-500 focus:border-steel-500 focus:ring-1 focus:ring-steel-500 transition-colors"
+                  className="w-full bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl pl-12 pr-4 py-3.5 text-white placeholder-gray-600 focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20 focus:bg-[#0f0f0f] transition-all duration-200 outline-none"
                   placeholder="you@company.com"
                   required
                   data-testid="login-email-input"
@@ -112,24 +151,25 @@ const LoginPage = () => {
               </div>
             </div>
 
+            {/* Password Field */}
             {!useMagicLink && (
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">Password</label>
-                <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                <div className="relative group">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-600 group-focus-within:text-emerald-400 transition-colors" />
                   <input
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full bg-charcoal-700 border border-charcoal-600 rounded-lg pl-12 pr-12 py-3 text-white placeholder-gray-500 focus:border-steel-500 focus:ring-1 focus:ring-steel-500 transition-colors"
-                    placeholder="••••••••"
+                    className="w-full bg-[#0a0a0a] border border-[#2a2a2a] rounded-xl pl-12 pr-12 py-3.5 text-white placeholder-gray-600 focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20 focus:bg-[#0f0f0f] transition-all duration-200 outline-none"
+                    placeholder="Enter your password"
                     required={!useMagicLink}
                     data-testid="login-password-input"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-400 transition-colors"
                     data-testid="password-toggle"
                     aria-label={showPassword ? "Hide password" : "Show password"}
                   >
@@ -143,10 +183,11 @@ const LoginPage = () => {
               </div>
             )}
 
+            {/* Submit Button */}
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-steel-500 hover:bg-steel-600 disabled:opacity-50 disabled:cursor-not-allowed text-white py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
+              className="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed text-white py-3.5 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 hover:scale-[1.02] active:scale-[0.98]"
               data-testid="login-submit-btn"
             >
               {isSubmitting ? (
@@ -160,22 +201,35 @@ const LoginPage = () => {
             </button>
           </form>
 
+          {/* Magic Link Toggle */}
           <div className="mt-6 text-center">
             <button
               onClick={() => setUseMagicLink(!useMagicLink)}
-              className="text-steel-400 hover:text-steel-300 transition-colors text-sm"
+              className="text-gray-500 hover:text-emerald-400 transition-colors text-sm font-medium"
             >
               {useMagicLink ? 'Use password instead' : 'Sign in with magic link'}
             </button>
           </div>
 
-          <div className="mt-8 pt-6 border-t border-charcoal-600 text-center">
-            <p className="text-gray-400">
+          {/* Sign Up Link */}
+          <div className="mt-8 pt-6 border-t border-[#1f1f1f] text-center">
+            <p className="text-gray-500 text-sm">
               Don&apos;t have an account?{' '}
-              <Link to="/signup" className="text-steel-400 hover:text-steel-300 font-medium transition-colors">
-                Download free app
+              <Link 
+                to="/signup" 
+                className="text-emerald-400 hover:text-emerald-300 font-semibold transition-colors"
+              >
+                Get Started Free
               </Link>
             </p>
+          </div>
+        </div>
+
+        {/* Footer Badge */}
+        <div className="mt-8 flex justify-center">
+          <div className="flex items-center gap-2 text-gray-600 text-xs">
+            <Shield className="w-4 h-4" />
+            <span>Secured by TradeOS</span>
           </div>
         </div>
       </div>

@@ -2,9 +2,9 @@
   "name": "TradeOS - Built for Builders",
   "short_name": "TradeOS",
   "description": "Know your margin. Control your projects. Get paid faster.",
-  "start_url": "/app/dashboard",
+  "start_url": "/app",
   "scope": "/",
-  "id": "/app/dashboard",
+  "id": "/app",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui"],
   "orientation": "any",
@@ -42,8 +42,8 @@
   "shortcuts": [
     {
       "name": "Dashboard",
-      "url": "/app/dashboard",
-      "description": "View your financial dashboard"
+      "url": "/app",
+      "description": "View your dashboard"
     },
     {
       "name": "New Project",
