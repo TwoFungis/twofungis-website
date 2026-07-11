@@ -387,6 +387,20 @@ const MainframePage = () => {
   const [activities, setActivities] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
+  // Helper function for relative time formatting
+  const formatTimeAgo = useCallback((dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const now = new Date();
+    const diff = Math.floor((now - date) / 1000);
+    
+    if (diff < 60) return 'Just now';
+    if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
+    if (diff < 172800) return 'Yesterday';
+    return date.toLocaleDateString();
+  }, []);
+
   const fetchData = useCallback(async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -469,24 +483,11 @@ const MainframePage = () => {
     } finally {
       setLoading(false);
     }
-  }, [navigate]);
+  }, [navigate, formatTimeAgo]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
-
-  const formatTimeAgo = (dateString) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    const now = new Date();
-    const diff = Math.floor((now - date) / 1000);
-    
-    if (diff < 60) return 'Just now';
-    if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
-    if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
-    if (diff < 172800) return 'Yesterday';
-    return date.toLocaleDateString();
-  };
 
   const handleRowClick = (section, filter) => {
     navigate(`/app/${section}?status=${filter}`);
@@ -628,7 +629,7 @@ const MainframePage = () => {
       />
 
       {/* Main Content */}
-      <main className="px-4 lg:px-6 py-6 space-y-6">
+      <main className="px-4 lg:px-6 py-6 pb-32 lg:pb-24 space-y-6">
         {/* Today's Focus */}
         <TodaysFocus items={todaysFocus} />
         

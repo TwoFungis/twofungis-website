@@ -8,7 +8,7 @@ Build "TradeOS," a financial tracking tool for contractors. The application incl
 - "Quick Add" functionality for expenses
 - PWA installation support
 - **Trial + Locked access monetization model** ✅ IMPLEMENTED
-- **TFCS Mainframe** - Internal operational system for Two Fungis Finishing ✅ SPEC 1.0 COMPLETE
+- **TFCS Mainframe** - Internal operational system for Two Fungis Finishing ✅ SPEC 1.1 COMPLETE
 
 ## User Personas
 - **Primary:** Independent contractors and small trade businesses
@@ -33,14 +33,45 @@ Build "TradeOS," a financial tracking tool for contractors. The application incl
 8. ✅ PWA support with service worker
 9. ✅ Subscription tiers (free, pro, elite, lifetime)
 10. ✅ **Trial + Locked Access Model**
-11. ✅ **TFCS Mainframe Specification 1.0** (Foundation verified)
+11. ✅ **TFCS Mainframe Specification 1.0** (Backend Foundation)
+12. ✅ **TFCS Mainframe Specification 1.1** (Command Center Dashboard)
 
 ---
 
-## TFCS Mainframe - Specification 1.0 COMPLETE (July 11, 2026)
+## TFCS Mainframe - Specification 1.1 COMPLETE (July 11, 2026)
+
+### Command Center Dashboard
+Premium "Mission Control" interface for Two Fungis Finishing operations.
+
+### UI Components ✅
+| Component | Status | Data Source |
+|-----------|--------|-------------|
+| **Header** | ✅ | Title, Notifications, Catch Me Up, Owner Access, Quick Add |
+| **Today's Focus** | ✅ Architecture | Empty state until priority logic implemented |
+| **Projects Card** | ✅ LIVE | Real data from `/api/projects` |
+| **Opportunities Card** | ✅ Architecture | Shows zeros until `/api/opportunities` endpoint exists |
+| **Company Brain** | ✅ Placeholder | "Company Brain will summarize activity here in a future specification." |
+| **Recent Activity** | ✅ LIVE | Real data from `/api/tfcs/activity` |
+| **Notifications Panel** | ✅ LIVE | Real data from `/api/tfcs/notifications` |
+| **Owner Access Panel** | ✅ LIVE | Real data from `/api/tfcs/role/me` |
+
+### Design Philosophy
+- Mission Control aesthetic, NOT accounting software
+- Dark theme with premium gold accents
+- High-density, industrial premium feel
+- Fully responsive (Desktop, Tablet, Mobile)
+
+### Key Files
+- `/app/frontend/src/pages/app/MainframePage.jsx` - Command Center UI
+- `/app/frontend/src/components/layout/AppLayout.jsx` - TFCS Sidebar hierarchy
+- `/app/design_guidelines.json` - Design specifications
+
+---
+
+## TFCS Mainframe - Specification 1.0 (Backend Foundation)
 
 ### Overview
-TFCS Mainframe is an internal operational system for Two Fungis Finishing that runs within TradeOS but is strictly separated from the customer-facing side. It tracks ALL meaningful business actions across TradeOS and TFCS itself.
+TFCS Mainframe is an internal operational system for Two Fungis Finishing that runs within TradeOS but is strictly separated from the customer-facing side.
 
 ### Architecture
 - **Separate workspace** from commercial TradeOS
@@ -55,23 +86,6 @@ TFCS Mainframe is an internal operational system for Two Fungis Finishing that r
 | **Manager** | Operational access, manages projects/employees, limited visibility |
 | **Employee** | Restricted to own data and assigned work |
 
-### Activity Events
-Captures meaningful business actions across ALL of TradeOS:
-- Opportunities, Estimates, Quotes
-- Projects, Milestones
-- Production Library edits
-- Documents, Expenses, Invoices, Payments
-- Material/Tool Requests
-- Daily Reports
-- User management, Status changes
-
-**NOT logged:** System-generated events (logins, page navigation, insignificant UI actions)
-
-### Backend Implementation ✅
-- `/app/backend/routes/tfcs.py` - Main TFCS routes (RBAC, Activity Events, Notifications)
-- `/app/backend/routes/tfcs_activity.py` - Helper module for logging from other routes
-- `/app/migrations/011_tfcs_mainframe_foundation.sql` - Complete database migration
-
 ### API Endpoints
 | Endpoint | Method | Description | Auth |
 |----------|--------|-------------|------|
@@ -85,10 +99,10 @@ Captures meaningful business actions across ALL of TradeOS:
 | `/api/tfcs/notifications` | GET | User's notifications | JWT |
 | `/api/tfcs/notifications/{id}/read` | PATCH | Mark as read | JWT |
 | `/api/tfcs/notifications/read-all` | PATCH | Mark all as read | JWT |
-| `/api/tfcs/init-owner` | POST | Initialize owner (inbox@twofungis.ca only) | JWT |
+| `/api/tfcs/init-owner` | POST | Initialize owner | JWT |
 | `/api/tfcs/diagnostics` | GET | System diagnostics | Owner |
 
-### Database Tables (Migration Required)
+### Database Tables
 ```
 tfcs_user_roles           - Role assignments
 tfcs_activity_events      - Permanent activity history
@@ -97,13 +111,10 @@ tfcs_settings             - System configuration
 tfcs_notification_preferences - Per-user preferences
 ```
 
-### Initial Owner
-Email: `inbox@twofungis.ca` is designated as the initial Owner.
-
-### Migration Instructions
-1. Run `/app/migrations/011_tfcs_mainframe_foundation.sql` in Supabase SQL Editor
-2. After migration, call `POST /api/tfcs/init-owner` while logged in as `inbox@twofungis.ca`
-3. Optionally run: `SELECT tfcs_assign_owner_by_email('inbox@twofungis.ca');` directly in SQL
+### Backend Files
+- `/app/backend/routes/tfcs.py` - TFCS routes with RBAC
+- `/app/backend/routes/tfcs_activity.py` - Activity logging helper
+- `/app/migrations/011_tfcs_mainframe_foundation.sql` - Database migration
 
 ---
 
@@ -120,28 +131,25 @@ Email: `inbox@twofungis.ca` is designated as the initial Owner.
 - AI Copilot: 3 messages/day, General Mode only (no project context)
 - Can view all existing data
 
-### Migration File
-`/app/migrations/010_trial_locked_model.sql`
-
 ---
 
 ## Upcoming Tasks (Priority Order)
 
-### P0 - TFCS Mainframe Dashboard
-- Build Dashboard UI (AFTER foundation approved)
-- Must wait for user approval before proceeding
-
-### P1 - TFCS AI Features
-- "Catch Me Up" summaries based on Activity Events
+### P1 - TFCS AI Features (Company Brain)
+- "Catch Me Up" actual AI summaries based on Activity Events
 - Daily/project summaries using GPT-5.2
+- Replace placeholder text in Command Center
 
 ### P2 - Additional Features
+- Production Library (Single source of truth for estimating)
 - Add second Owner role for 'Beau'
 - Estimate Templates + Production Rates
 - QuickBooks Sync (Sandbox-Ready)
 
-## Future/Backlog
+### P3 - Future/Backlog
 - Trust Pack Settings Tab
+- `/api/opportunities` endpoint for Opportunities card
+- Priority logic for Today's Focus
 - Complete AI Copilot enhancements
 - Delete Account functionality
 - Performance optimization
@@ -159,9 +167,13 @@ Email: `inbox@twofungis.ca` is designated as the initial Owner.
 ## Key Files Reference
 
 ### TFCS Mainframe
+- `/app/frontend/src/pages/app/MainframePage.jsx` - Command Center Dashboard
+- `/app/frontend/src/components/layout/AppLayout.jsx` - TFCS Sidebar
 - `/app/backend/routes/tfcs.py` - TFCS routes with RBAC
 - `/app/backend/routes/tfcs_activity.py` - Activity logging helper
 - `/app/migrations/011_tfcs_mainframe_foundation.sql` - Database migration
+- `/app/design_guidelines.json` - Design specifications
+- `/app/backend/tests/test_tfcs_mainframe.py` - Backend test suite
 
 ### Access Control
 - `/app/backend/routes/access_control.py` - Core access state logic
