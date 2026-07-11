@@ -32,6 +32,7 @@ import DocumentsPage from './pages/app/DocumentsPage';
 import TaxSummaryPage from './pages/app/TaxSummaryPage';
 import IntegrationsPage from './pages/app/IntegrationsPage';
 import ReceivablesPage from './pages/app/ReceivablesPage';
+import MainframePage from './pages/app/MainframePage';
 
 // Layout
 import AppLayout from './components/layout/AppLayout';
@@ -132,6 +133,7 @@ function App() {
           <Route path="integrations" element={<IntegrationsPage />} />
           <Route path="settings" element={<SettingsPage />} />
           <Route path="profile" element={<ProfilePage />} />
+          <Route path="mainframe" element={<MainframePage />} />
         </Route>
 
         {/* Catch all - redirect to home */}

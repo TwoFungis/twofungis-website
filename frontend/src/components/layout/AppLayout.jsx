@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, NavLink, useNavigate, Link } from 'react-router-dom';
 import { 
   LayoutDashboard, 
@@ -21,7 +21,8 @@ import {
   PieChart,
   Briefcase,
   Link2,
-  DollarSign
+  DollarSign,
+  Shield
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { Logo, LogoIcon } from '../ui/Logo';
@@ -34,15 +35,18 @@ import SyncIndicator from '../app/SyncIndicator';
 import UpdateBanner from '../app/UpdateBanner';
 import PWARedirectModal from '../app/PWARedirectModal';
 
+const API_URL = process.env.REACT_APP_BACKEND_URL;
+
 const AppLayout = () => {
   const { profile, signOut, user } = useAuthStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [quickActionOpen, setQuickActionOpen] = useState(false);
   const [showQuickExpenseModal, setShowQuickExpenseModal] = useState(false);
+  const [tfcsRole, setTfcsRole] = useState(null);
   const navigate = useNavigate();
   
   // Founder email check - use user.email from auth
-  const FOUNDER_EMAILS = ["info@twofungis.ca", "swdmarshall@gmail.com", "carpenterbeau@hotmail.com"];
+  const FOUNDER_EMAILS = ["info@twofungis.ca", "swdmarshall@gmail.com", "carpenterbeau@hotmail.com", "inbox@twofungis.ca"];
   const userEmail = (user?.email || '').toLowerCase();
   const isFounder = FOUNDER_EMAILS.map(e => e.toLowerCase()).includes(userEmail);
   const tier = (profile?.subscription_tier || '').toLowerCase();
@@ -52,6 +56,39 @@ const AppLayout = () => {
     : tier === 'elite' 
       ? 'Elite' 
       : 'Pro';
+
+  // Check TFCS Mainframe access for designated users
+  useEffect(() => {
+    const checkTfcsAccess = async () => {
+      // Only check for potential TFCS users
+      if (!userEmail || !FOUNDER_EMAILS.map(e => e.toLowerCase()).includes(userEmail)) {
+        return;
+      }
+
+      try {
+        const token = localStorage.getItem('supabase_token') || 
+          JSON.parse(localStorage.getItem('sb-oiocmchdtllqpszciuxh-auth-token') || '{}')?.access_token;
+
+        if (!token) return;
+
+        const response = await fetch(`${API_URL}/api/tfcs/role/me`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setTfcsRole(data);
+        }
+      } catch (e) {
+        console.log('TFCS check failed:', e);
+      }
+    };
+
+    checkTfcsAccess();
+  }, [userEmail]);
 
   // Focused navigation - Core business functions only
   const navItems = [
@@ -117,6 +154,27 @@ const AppLayout = () => {
           
           {/* Separator */}
           <div className="border-t border-charcoal-700 my-2"></div>
+          
+          {/* TFCS Mainframe - Only visible to users with TFCS access */}
+          {(tfcsRole?.has_role || FOUNDER_EMAILS.map(e => e.toLowerCase()).includes(userEmail)) && (
+            <NavLink
+              to="/app/mainframe"
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                  isActive
+                    ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                    : 'text-amber-400/70 hover:text-amber-400 hover:bg-amber-500/10'
+                }`
+              }
+              data-testid="nav-mainframe"
+            >
+              <Shield className="w-5 h-5" />
+              <span className="font-medium">TFCS Mainframe</span>
+              {tfcsRole?.role === 'owner' && (
+                <Crown className="w-4 h-4 ml-auto" />
+              )}
+            </NavLink>
+          )}
           
           {/* Bottom nav items */}
           {bottomNavItems.map((item) => (

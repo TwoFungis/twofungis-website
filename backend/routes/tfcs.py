@@ -473,24 +473,102 @@ async def notify_role(
 
 @router.get("/role/me")
 async def get_my_role(authorization: str = Header(...)):
-    """Get the current user's TFCS Mainframe role"""
+    """
+    Get the current user's TFCS Mainframe role.
+    Auto-assigns Owner role to inbox@twofungis.ca if tables exist and no owner assigned.
+    """
     user_id = await verify_jwt_token(authorization)
+    
+    # First, check if this user already has a role
     role_info = await get_user_role(user_id)
     
-    if not role_info:
+    if role_info:
         return {
-            "has_role": False,
-            "role": None,
-            "message": "No TFCS Mainframe role assigned"
+            "has_role": True,
+            "role": role_info.role.value,
+            "user_id": role_info.user_id,
+            "user_email": role_info.user_email,
+            "user_name": role_info.user_name,
+            "is_active": role_info.is_active
         }
     
+    # No role - check if this is the designated owner email
+    try:
+        async with httpx.AsyncClient() as client:
+            # Get user's email from Supabase auth
+            user_response = await client.get(
+                f"{SUPABASE_URL}/auth/v1/admin/users",
+                headers={
+                    "apikey": SUPABASE_SERVICE_KEY,
+                    "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}"
+                }
+            )
+            
+            if user_response.status_code == 200:
+                users = user_response.json().get('users', [])
+                current_user = next((u for u in users if u.get('id') == user_id), None)
+                
+                if current_user and current_user.get('email') == "inbox@twofungis.ca":
+                    # This is the designated owner - auto-assign if tables exist
+                    # Check if tables exist first
+                    table_check = await client.get(
+                        f"{SUPABASE_URL}/rest/v1/tfcs_user_roles?limit=1",
+                        headers=await get_service_headers()
+                    )
+                    
+                    if table_check.status_code == 200:
+                        # Tables exist - check if any owner already exists
+                        owners_check = await client.get(
+                            f"{SUPABASE_URL}/rest/v1/tfcs_user_roles?role=eq.owner&is_active=eq.true&select=id",
+                            headers=await get_service_headers()
+                        )
+                        
+                        existing_owners = owners_check.json() if owners_check.status_code == 200 else []
+                        
+                        if not existing_owners:
+                            # No owner exists - auto-assign this user as owner
+                            logger.info(f"Auto-assigning Owner role to inbox@twofungis.ca")
+                            role_payload = {
+                                "user_id": user_id,
+                                "role": "owner",
+                                "user_email": "inbox@twofungis.ca",
+                                "user_name": current_user.get('user_metadata', {}).get('full_name'),
+                                "assigned_at": datetime.now(timezone.utc).isoformat(),
+                                "is_active": True,
+                                "notes": "Auto-assigned initial owner"
+                            }
+                            
+                            assign_response = await client.post(
+                                f"{SUPABASE_URL}/rest/v1/tfcs_user_roles",
+                                headers=await get_service_headers(),
+                                json=role_payload
+                            )
+                            
+                            if assign_response.status_code in [200, 201]:
+                                return {
+                                    "has_role": True,
+                                    "role": "owner",
+                                    "user_id": user_id,
+                                    "user_email": "inbox@twofungis.ca",
+                                    "user_name": role_payload.get("user_name"),
+                                    "is_active": True,
+                                    "auto_assigned": True
+                                }
+                    elif 'does not exist' in table_check.text or 'PGRST205' in table_check.text:
+                        # Tables don't exist yet
+                        return {
+                            "has_role": False,
+                            "role": None,
+                            "message": "TFCS tables not initialized. Run migration 011_tfcs_mainframe_foundation.sql first.",
+                            "tables_initialized": False
+                        }
+    except Exception as e:
+        logger.error(f"Error checking auto-assign: {e}")
+    
     return {
-        "has_role": True,
-        "role": role_info.role.value,
-        "user_id": role_info.user_id,
-        "user_email": role_info.user_email,
-        "user_name": role_info.user_name,
-        "is_active": role_info.is_active
+        "has_role": False,
+        "role": None,
+        "message": "No TFCS Mainframe role assigned"
     }
 
 @router.get("/roles")
