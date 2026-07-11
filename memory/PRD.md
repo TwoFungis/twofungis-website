@@ -44,6 +44,7 @@ Build "TradeOS," a financial tracking tool for contractors. The application incl
 14. ✅ **TFCS Mainframe Specification 1.2.1** (Owner Completion & Account Management)
 15. ✅ **Login Page Refresh** (Two Fungis Branding - July 11, 2026)
 16. ✅ **PWA Manifest Fix** (Corrected start_url routing - July 11, 2026)
+17. ✅ **Landing Page Refresh** (New tagline & emerald branding - July 11, 2026)
 
 ---
 
@@ -61,6 +62,20 @@ Build "TradeOS," a financial tracking tool for contractors. The application incl
 ### PWA Manifest Fix
 - Fixed `manifest.json` start_url from `/app/dashboard` to `/app`
 - This allows DashboardRedirect to properly route TFCS users to Mainframe
+
+---
+
+## Landing Page Refresh (July 11, 2026)
+
+### Changes Made
+- Updated hero tagline to "Built for Builders. Intelligence for Trades."
+- Applied Two Fungis brand colors (Black #0a0a0a, Charcoal #111111, Emerald Green)
+- Changed all CTAs to "Get Started Free" with emerald gradient buttons
+- Updated feature card icons to emerald accents
+- Updated trust indicators with emerald icons
+- Modernized testimonials section header: "Trusted by Canadian Trades"
+- Added subtle gradient accents in hero and CTA sections
+- Preserved all existing functionality (PWA install, navigation, responsiveness)
 
 ---
 

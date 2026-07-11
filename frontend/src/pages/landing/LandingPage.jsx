@@ -99,32 +99,32 @@ const LandingPage = () => {
     },
     {
       name: 'Elite',
-      price: '$59',
+      price: '$49',
       period: '/month',
+      description: 'For established trades scaling up.',
       popular: true,
-      description: 'Built for contractors running serious operations.',
       features: [
         'Everything in Pro',
-        'Financial health dashboard',
-        'Advanced margin analytics',
-        'Tax summary & projections',
+        'AI Copilot assistant',
+        'Advanced analytics',
         'Document vault (25GB)',
-        'PDF report exports',
-        'Priority support'
+        'Priority support',
+        'Custom branding',
+        'API access'
       ]
     }
   ];
 
   const testimonials = [
     {
-      quote: "Finally, I know my margin before the job is done. TradeOS saved me from a $15K loss I didn't see coming.",
-      author: "Mike T.",
-      title: "Framing Contractor, BC"
+      quote: "Finally, a tool that gets how contractors work. I know my margin before the job even starts now.",
+      author: "Mike D.",
+      title: "General Contractor, ON"
     },
     {
-      quote: "Change orders used to kill my profit. Now every scope change is tracked and billed. Game changer.",
-      author: "Sarah K.",
-      title: "Renovation Specialist, ON"
+      quote: "TradeOS saved my bacon on change orders. I was leaking profit and didn't even know it.",
+      author: "Sarah M.",
+      title: "Renovation Specialist, BC"
     },
     {
       quote: "The milestone workflow keeps my invoicing on track. I get paid faster and nothing slips through.",
@@ -134,15 +134,15 @@ const LandingPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-charcoal-900">
+    <div className="min-h-screen bg-[#0a0a0a]">
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-charcoal-900/90 backdrop-blur-md border-b border-charcoal-700/50">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-[#0a0a0a]/95 backdrop-blur-md border-b border-[#1a1a1a]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             <Link to="/" className="flex items-center gap-3">
               <img src="/shield-icon.png" alt="TradeOS" className="h-12 w-auto" />
               <span className="text-xl font-bold text-white tracking-tight hidden sm:block">
-                TRADEOS<span className="text-steel-400 align-super text-xs">™</span>
+                TRADEOS<span className="text-emerald-400 align-super text-xs">™</span>
               </span>
             </Link>
             <nav className="hidden md:flex items-center gap-8">
@@ -153,11 +153,11 @@ const LandingPage = () => {
               <Link 
                 to="/signup" 
                 onClick={handleCTAClick}
-                className="bg-steel-500 hover:bg-steel-600 text-white px-5 py-2.5 rounded-lg font-medium transition-all hover:shadow-lg hover:shadow-steel-500/25 flex items-center gap-2"
+                className="bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white px-5 py-2.5 rounded-lg font-medium transition-all hover:shadow-lg hover:shadow-emerald-500/25 flex items-center gap-2"
                 data-testid="download-app-btn"
               >
                 <Download className="w-4 h-4" />
-                Download Free App
+                Get Started Free
               </Link>
             </nav>
             <div className="md:hidden flex items-center gap-2">
@@ -165,10 +165,10 @@ const LandingPage = () => {
               <Link 
                 to="/signup" 
                 onClick={handleCTAClick}
-                className="bg-steel-500 hover:bg-steel-600 text-white px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-1.5"
+                className="bg-gradient-to-r from-emerald-600 to-emerald-500 text-white px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-1.5"
               >
                 <Download className="w-4 h-4" />
-                Download App
+                Get Started
               </Link>
             </div>
           </div>
@@ -176,32 +176,48 @@ const LandingPage = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="relative pt-24 pb-20 px-4 min-h-[90vh] flex items-center">
+      <section className="relative pt-24 pb-20 px-4 min-h-[90vh] flex items-center overflow-hidden">
+        {/* Background with gradient overlay */}
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: `url(${IMAGES.hero})` }}
         >
-          <div className="absolute inset-0 bg-gradient-to-b from-charcoal-900/80 via-charcoal-900/85 to-charcoal-900"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a]/90 via-[#0a0a0a]/85 to-[#0a0a0a]"></div>
         </div>
         
+        {/* Accent gradients */}
+        <div className="absolute top-1/4 left-0 w-[600px] h-[600px] bg-gradient-to-br from-emerald-600/10 via-transparent to-transparent blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-gradient-to-tl from-red-600/8 via-transparent to-transparent blur-3xl pointer-events-none" />
+        
         <div className="relative max-w-4xl mx-auto text-center">
-          <div className="flex justify-center mb-6">
-            <img 
-              src="/logo.png" 
-              alt="TradeOS - Built for Builders" 
-              className="h-44 sm:h-56 lg:h-64 w-auto drop-shadow-2xl"
-            />
+          {/* Logo */}
+          <div className="flex justify-center mb-8">
+            <div className="relative">
+              <img 
+                src="/logo.png" 
+                alt="TradeOS - Built for Builders" 
+                className="h-44 sm:h-56 lg:h-64 w-auto drop-shadow-2xl"
+              />
+              {/* Subtle glow */}
+              <div className="absolute inset-0 bg-emerald-500/10 blur-3xl rounded-full" />
+            </div>
           </div>
           
-          <p className="text-steel-400 font-semibold text-lg mb-4 tracking-wide">
-            Built for Builders. Financial intelligence for small trades.
+          {/* New Tagline */}
+          <div className="mb-6">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-2 tracking-tight">
+              Built for Builders.
+            </h1>
+            <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-emerald-400">
+              Intelligence for Trades.
+            </p>
+          </div>
+          
+          <p className="text-lg sm:text-xl text-gray-300 mb-4 max-w-2xl mx-auto">
+            Know your margin. Control your projects. Get paid faster.
           </p>
           
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-6">
-            Know your margin. Control your projects. Get paid faster.
-          </h1>
-          
-          <p className="text-lg text-gray-300 mb-10 max-w-2xl mx-auto">
+          <p className="text-base text-gray-400 mb-10 max-w-2xl mx-auto">
             The contractor operating system that gives you clarity on every project, control over every dollar, and execution that protects your profit.
           </p>
           
@@ -209,11 +225,11 @@ const LandingPage = () => {
             <Link 
               to="/signup" 
               onClick={handleCTAClick}
-              className="group bg-steel-500 hover:bg-steel-400 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all hover:shadow-xl hover:shadow-steel-500/30 flex items-center justify-center gap-2"
+              className="group bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all hover:shadow-xl hover:shadow-emerald-500/30 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98]"
               data-testid="hero-cta-btn"
             >
               <Download className="w-5 h-5" />
-              Download Free App
+              Get Started Free
               <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
             <a 
@@ -231,15 +247,15 @@ const LandingPage = () => {
           {/* Trust indicators */}
           <div className="flex flex-wrap items-center justify-center gap-8 mt-12 text-sm text-gray-400">
             <div className="flex items-center gap-2">
-              <Shield className="w-4 h-4 text-steel-400" />
+              <Shield className="w-4 h-4 text-emerald-400" />
               <span>Bank-level security</span>
             </div>
             <div className="flex items-center gap-2">
-              <Star className="w-4 h-4 text-warning fill-warning" />
+              <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
               <span>4.9/5 rating</span>
             </div>
             <div className="flex items-center gap-2">
-              <DollarSign className="w-4 h-4 text-success" />
+              <DollarSign className="w-4 h-4 text-emerald-400" />
               <span>$2M+ tracked</span>
             </div>
           </div>
@@ -247,22 +263,22 @@ const LandingPage = () => {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-20 px-4 relative">
+      <section id="features" className="py-20 px-4 relative bg-[#0f0f0f]">
         <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-10"
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-5"
           style={{ backgroundImage: `url(${IMAGES.features})` }}
         />
         {/* Shield decoration */}
-        <div className="absolute top-10 left-10 opacity-5 pointer-events-none hidden lg:block">
+        <div className="absolute top-10 left-10 opacity-[0.03] pointer-events-none hidden lg:block">
           <img src="/shield-icon.png" alt="" className="w-32 h-32" />
         </div>
-        <div className="absolute bottom-10 right-10 opacity-5 pointer-events-none hidden lg:block">
+        <div className="absolute bottom-10 right-10 opacity-[0.03] pointer-events-none hidden lg:block">
           <img src="/shield-icon.png" alt="" className="w-32 h-32" />
         </div>
         <div className="relative max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <div className="flex items-center justify-center gap-3 mb-4">
-              <img src="/shield-icon.png" alt="" className="w-10 h-10 opacity-50" />
+              <img src="/shield-icon.png" alt="" className="w-10 h-10 opacity-30" />
               <h2 className="text-3xl sm:text-4xl font-bold text-white">
                 Control. Clarity. Execution.
               </h2>
@@ -276,10 +292,10 @@ const LandingPage = () => {
             {features.map((feature, index) => (
               <div 
                 key={index}
-                className="bg-charcoal-800/80 backdrop-blur-sm rounded-xl border border-charcoal-700 p-6 hover:border-steel-500/50 transition-all"
+                className="bg-[#111111] backdrop-blur-sm rounded-xl border border-[#1f1f1f] p-6 hover:border-emerald-500/30 transition-all group"
               >
-                <div className="w-12 h-12 bg-steel-500/20 rounded-lg flex items-center justify-center mb-4">
-                  <feature.icon className="w-6 h-6 text-steel-400" />
+                <div className="w-12 h-12 bg-emerald-500/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-emerald-500/20 transition-colors">
+                  <feature.icon className="w-6 h-6 text-emerald-400" />
                 </div>
                 <h3 className="text-xl font-semibold text-white mb-2">{feature.title}</h3>
                 <p className="text-gray-400">{feature.description}</p>
@@ -290,7 +306,7 @@ const LandingPage = () => {
       </section>
 
       {/* Pricing Section */}
-      <section id="pricing" className="py-20 px-4 bg-charcoal-800/50">
+      <section id="pricing" className="py-20 px-4 bg-[#0a0a0a]">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
@@ -305,14 +321,14 @@ const LandingPage = () => {
             {plans.map((plan, index) => (
               <div 
                 key={index}
-                className={`bg-charcoal-800 rounded-xl border p-8 ${
+                className={`bg-[#111111] rounded-xl border p-8 ${
                   plan.popular 
-                    ? 'border-steel-500 ring-2 ring-steel-500/20' 
-                    : 'border-charcoal-700'
+                    ? 'border-emerald-500/50 ring-2 ring-emerald-500/20' 
+                    : 'border-[#1f1f1f]'
                 }`}
               >
                 {plan.popular && (
-                  <span className="bg-steel-500 text-white text-xs font-bold px-3 py-1 rounded-full mb-4 inline-block">
+                  <span className="bg-gradient-to-r from-emerald-600 to-emerald-500 text-white text-xs font-bold px-3 py-1 rounded-full mb-4 inline-block">
                     Most Popular
                   </span>
                 )}
@@ -325,7 +341,7 @@ const LandingPage = () => {
                 <ul className="space-y-3 mb-8">
                   {plan.features.map((feature, idx) => (
                     <li key={idx} className="flex items-start gap-3 text-gray-300">
-                      <Check className="w-5 h-5 text-success flex-shrink-0 mt-0.5" />
+                      <Check className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
                       <span>{feature}</span>
                     </li>
                   ))}
@@ -333,14 +349,14 @@ const LandingPage = () => {
                 <Link
                   to="/signup"
                   onClick={handleCTAClick}
-                  className={`block w-full py-3 rounded-lg font-semibold text-center transition-colors flex items-center justify-center gap-2 ${
+                  className={`block w-full py-3 rounded-lg font-semibold text-center transition-all flex items-center justify-center gap-2 ${
                     plan.popular
-                      ? 'bg-steel-500 hover:bg-steel-600 text-white'
-                      : 'bg-charcoal-700 hover:bg-charcoal-600 text-white'
+                      ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white shadow-lg shadow-emerald-500/20'
+                      : 'bg-[#1a1a1a] hover:bg-[#222222] text-white border border-[#2a2a2a]'
                   }`}
                 >
                   <Download className="w-4 h-4" />
-                  Download Free App
+                  Get Started Free
                 </Link>
               </div>
             ))}
@@ -349,14 +365,14 @@ const LandingPage = () => {
       </section>
 
       {/* Testimonials Section */}
-      <section id="testimonials" className="py-20 px-4">
+      <section id="testimonials" className="py-20 px-4 bg-[#0f0f0f]">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-              Built by Builders, for Builders
+              Trusted by Canadian Trades
             </h2>
             <p className="text-gray-400">
-              Hear from contractors who've taken control of their business.
+              Hear from contractors who&apos;ve taken control of their business.
             </p>
           </div>
           
@@ -364,14 +380,14 @@ const LandingPage = () => {
             {testimonials.map((testimonial, index) => (
               <div 
                 key={index}
-                className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6"
+                className="bg-[#111111] rounded-xl border border-[#1f1f1f] p-6"
               >
                 <div className="flex gap-1 mb-4">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 text-warning fill-warning" />
+                    <Star key={i} className="w-4 h-4 text-amber-400 fill-amber-400" />
                   ))}
                 </div>
-                <p className="text-gray-300 mb-4 italic">"{testimonial.quote}"</p>
+                <p className="text-gray-300 mb-4 italic">&ldquo;{testimonial.quote}&rdquo;</p>
                 <div>
                   <p className="text-white font-medium">{testimonial.author}</p>
                   <p className="text-gray-500 text-sm">{testimonial.title}</p>
@@ -383,15 +399,19 @@ const LandingPage = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-4 relative">
+      <section className="py-20 px-4 relative overflow-hidden">
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: `url(${IMAGES.cta})` }}
         >
-          <div className="absolute inset-0 bg-charcoal-900/90"></div>
+          <div className="absolute inset-0 bg-[#0a0a0a]/95"></div>
         </div>
+        
+        {/* Accent gradient */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-to-b from-emerald-600/10 via-transparent to-transparent blur-3xl pointer-events-none" />
+        
         <div className="relative max-w-3xl mx-auto text-center">
-          <img src="/shield-icon.png" alt="" className="w-16 h-16 mx-auto mb-6 opacity-30" />
+          <img src="/shield-icon.png" alt="" className="w-16 h-16 mx-auto mb-6 opacity-20" />
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
             Take Control of Your Projects
           </h2>
@@ -401,10 +421,10 @@ const LandingPage = () => {
           <Link
             to="/signup"
             onClick={handleCTAClick}
-            className="inline-flex items-center gap-2 bg-steel-500 hover:bg-steel-400 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all hover:shadow-xl hover:shadow-steel-500/30"
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all hover:shadow-xl hover:shadow-emerald-500/30 hover:scale-[1.02] active:scale-[0.98]"
           >
             <Download className="w-5 h-5" />
-            Download Free App
+            Get Started Free
             <ChevronRight className="w-5 h-5" />
           </Link>
           <p className="text-gray-500 text-sm mt-4">
@@ -414,13 +434,13 @@ const LandingPage = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-charcoal-800 border-t border-charcoal-700 py-12 px-4">
+      <footer className="bg-[#0a0a0a] border-t border-[#1a1a1a] py-12 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between gap-8">
             <div className="flex items-center gap-3">
               <img src="/shield-icon.png" alt="TradeOS" className="h-10 w-auto" />
               <div>
-                <span className="text-lg font-bold text-white">TRADEOS<span className="text-steel-400 align-super text-xs">™</span></span>
+                <span className="text-lg font-bold text-white">TRADEOS<span className="text-emerald-400 align-super text-xs">™</span></span>
                 <p className="text-gray-500 text-sm">Built for Builders.</p>
               </div>
             </div>
@@ -430,7 +450,7 @@ const LandingPage = () => {
               <a href="mailto:support@tradeos.ca" className="text-gray-400 hover:text-white transition-colors">Contact</a>
             </div>
           </div>
-          <div className="border-t border-charcoal-700 mt-8 pt-8 text-center text-gray-500 text-sm">
+          <div className="border-t border-[#1a1a1a] mt-8 pt-8 text-center text-gray-500 text-sm">
             <p>© {new Date().getFullYear()} TradeOS™. All rights reserved.</p>
           </div>
         </div>
