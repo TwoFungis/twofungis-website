@@ -8,7 +8,7 @@ Build "TradeOS," a financial tracking tool for contractors. The application incl
 - "Quick Add" functionality for expenses
 - PWA installation support
 - **Trial + Locked access monetization model** ✅ IMPLEMENTED
-- **TFCS Mainframe** - Internal operational system for Two Fungis Finishing ✅ FOUNDATION COMPLETE
+- **TFCS Mainframe** - Internal operational system for Two Fungis Finishing ✅ SPEC 1.0 COMPLETE
 
 ## User Personas
 - **Primary:** Independent contractors and small trade businesses
@@ -23,7 +23,7 @@ Build "TradeOS," a financial tracking tool for contractors. The application incl
 - **Integrations:** Stripe (payments), Resend (email), OpenAI GPT-5.2 (AI Copilot via emergentintegrations)
 
 ## Core Features Implemented
-1. ✅ User authentication (Supabase)
+1. ✅ User authentication (Supabase) + Password visibility toggle
 2. ✅ Profit Snapshot dashboard
 3. ✅ Project management with quotes/invoices
 4. ✅ Expense tracking with Quick Add
@@ -33,11 +33,11 @@ Build "TradeOS," a financial tracking tool for contractors. The application incl
 8. ✅ PWA support with service worker
 9. ✅ Subscription tiers (free, pro, elite, lifetime)
 10. ✅ **Trial + Locked Access Model**
-11. ✅ **TFCS Mainframe Foundation** (Backend architecture only)
+11. ✅ **TFCS Mainframe Specification 1.0** (Foundation verified)
 
 ---
 
-## TFCS Mainframe (July 11, 2026)
+## TFCS Mainframe - Specification 1.0 COMPLETE (July 11, 2026)
 
 ### Overview
 TFCS Mainframe is an internal operational system for Two Fungis Finishing that runs within TradeOS but is strictly separated from the customer-facing side. It tracks ALL meaningful business actions across TradeOS and TFCS itself.

@@ -15,6 +15,7 @@ import {
   UserCheck
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
+import { supabase } from '../../lib/supabase';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -35,8 +36,9 @@ const MainframePage = () => {
     setError(null);
 
     try {
-      const token = localStorage.getItem('supabase_token') || 
-        JSON.parse(localStorage.getItem('sb-oiocmchdtllqpszciuxh-auth-token') || '{}')?.access_token;
+      // Get token from Supabase session (unified approach)
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
 
       if (!token) {
         setError('Not authenticated');
