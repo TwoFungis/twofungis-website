@@ -1,0 +1,64 @@
+{
+  "summary": "Spec 1.2.1 Owner Completion & Account Management fully verified. Backend: 13/13 pytest tests passed against /api/tfcs/owners, /api/tfcs/team, /api/tfcs/owners/create - both Scott (inbox@twofungis.ca) and Beau (carpenterbeau@hotmail.com) successfully login with TradeOS2024!, both have Owner role, /api/tfcs/owners returns count>=2 with both emails/status=active/last_login, /api/tfcs/team sorts by role hierarchy (owner<manager<employee) with no sort_order leaking, POST /owners/create is properly idempotent (already_existed=true for Beau on re-run), and requires owner auth. Frontend: OwnerAccessPanel opens via owner-access-btn for BOTH Scott and Beau. Panel shows Company Owners section with 2 owner cards (owner-0, owner-1) each displaying name, email, Owner badge, Active status (green dot), and 'Last login: Just now'. Your Account section shows current user's Name/Email/Role. Permissions section shows all 5 permissions (Full Access, Financial, User Management, Company Brain, System Settings). Close (X) via close-owner testid works. Mobile viewport (390x844) renders panel full-width. Password change flow (SettingsPage.jsx handleChangePassword) calls supabase.auth.updateUser directly - bypasses backend entirely so cannot create activity_events or notifications (verified via code inspection).",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "OwnerAccessPanel - Company Owners card for Scott",
+        "issues": [
+          "Scott's owner card shows 'inbox' as the name because tfcs_user_roles.user_name is NULL for Scott. Owner card fallback uses email.split('@')[0]. Beau's card correctly shows 'Beau' because the /owners/create endpoint stored user_name='Beau Carpenter'. Consider backfilling Scott's user_name to 'Scott Marshall' in tfcs_user_roles for consistency."
+        ]
+      },
+      {
+        "screen": "OwnerAccessPanel - Your Account section (Scott logged in)",
+        "issues": [
+          "When Scott is logged in, Your Account > Name shows 'Owner' (fallback string from `roleData?.user_name || 'Owner'`). This is because /api/tfcs/role/me returns user_name=null. Same root cause as above - backfill tfcs_user_roles.user_name for Scott."
+        ]
+      },
+      {
+        "screen": "MainframePage state",
+        "issues": [
+          "setLoadingOwners is declared but never called with true/false anywhere in fetchData(). The spinner branch (loadingOwners ? <Loader2/> : ...) is effectively dead code. Should wrap the owners fetch in setLoadingOwners(true)/setLoadingOwners(false) for a proper loading indicator; currently panel opens with empty owners list until fetch completes."
+        ]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_owner_management.py",
+    "/app/test_reports/pytest/owner_management_results.xml"
+  ],
+  "action_items": [
+    "Optional: Backfill tfcs_user_roles.user_name = 'Scott Marshall' for inbox@twofungis.ca so his card doesn't show 'inbox' and Your Account doesn't say 'Owner'.",
+    "Optional: Wire setLoadingOwners(true/false) around the /api/tfcs/owners fetch in MainframePage.fetchData - currently the loading spinner branch never triggers.",
+    "Note: 'Created Owner account for Beau' is present in Recent Activity feed on the Mainframe dashboard - this is EXPECTED per spec (role assignment/creation is a significant, non-private event). Password changes remain private."
+  ],
+  "critical_code_review_comments": [
+    "routes/tfcs.py list_owners/list_team: fetches ALL supabase auth users via /auth/v1/admin/users on every call to enrich last_sign_in_at. This is O(N_users) per request and will degrade at scale. Consider caching or filtering the admin users query by ID (list of role.user_id).",
+    "routes/tfcs.py create_owner_account: idempotency branch returns early only when existing_role.role == OWNER. If the target email already exists as auth user but has a MANAGER/EMPLOYEE role, code falls through to 'target_user_id' block (skipping the auth create) but role_payload upserts owner - good. However if the email exists but has NO role, target_user_id is set from existing_user but then role_payload assigns owner correctly. Flow works but branches are subtle - add explicit comments.",
+    "routes/tfcs.py create_owner_account: uses Prefer=resolution=merge-duplicates for upsert but tfcs_user_roles table may not have a unique constraint on user_id. Fallback code uses on_conflict=user_id which requires a unique index. Verify schema has UNIQUE (user_id) on tfcs_user_roles.",
+    "routes/tfcs.py list_owners: uses order=assigned_at.asc but Scott's row was pre-existing (auto-assigned) while Beau was assigned recently, so order is stable. Fine.",
+    "MainframePage.jsx OwnerAccessPanel: currently receives roleData, owners, loadingOwners as props but Panel could just consume via context - passing 3 large props through a top-level component is fine for now but consider useReducer for tfcs command center state if it grows.",
+    "SettingsPage.jsx handleChangePassword: correctly uses supabase.auth.updateUser directly - no backend call - so no activity log / notification is generated. This is the CORRECT privacy-preserving pattern per spec 1.2.1. However there is NO current password re-verification - Supabase allows a logged-in session to change password without knowing the old one. If user's session is hijacked (stolen JWT), attacker can change password. Consider re-authenticating with currentPassword field (currently collected in the form but ignored).",
+    "SettingsPage.jsx: passwordForm state includes currentPassword but handleChangePassword never validates it. If UX collects it, code should either verify with signInWithPassword({email, currentPassword}) first, or remove the field to avoid misleading users.",
+    "OwnerAccessPanel: 'Last login: Just now' comes from Supabase auth.users.last_sign_in_at which is updated ON every token refresh, not only sign-in. So 'Just now' may not reflect true login time. Not a bug per se, but worth documenting.",
+    "MainframePage.jsx: setLoadingOwners is destructured but never invoked (state remains false forever). Effectively dead-code branch in OwnerAccessPanel. Fix or remove."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_owner_management.py (new file - 13 pytest cases)"
+  ],
+  "success_rate": {
+    "backend": "100% (13/13)",
+    "frontend": "100% (15/15 checks - both users login, both see panel via owner-access-btn, both see 2 owner cards owner-0/owner-1 with name/email/badge/status/last-login, Your Account section correct, all 5 Permissions rendered, close-owner works, mobile 390x844 renders panel)"
+  },
+  "test_credentials": "Scott: inbox@twofungis.ca / TradeOS2024! (owner). Beau: carpenterbeau@hotmail.com / TradeOS2024! (owner). Both verified via Supabase password grant + role check.",
+  "seed_data_creation": "None - Beau's account was pre-created by main agent via /api/tfcs/owners/create; verified idempotency (already_existed=true) on re-invocation.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Backend test suite: /app/backend/tests/test_owner_management.py - run with `python -m pytest backend/tests/test_owner_management.py -v`. All /api/tfcs/owners /api/tfcs/team /api/tfcs/owners/create endpoints validated. Frontend testids verified: owner-access-btn, close-owner, owner-0, owner-1. If future iterations add a 3rd owner, owner-2 testid will follow the same pattern. Note that /api/tfcs/team endpoint is not yet consumed by the UI (only /api/tfcs/owners is used). Password change via SettingsPage bypasses backend entirely (uses supabase.auth.updateUser) - no activity log or notification is created, which is the correct spec behavior.",
+  "rca_of_the_issue": "N/A - no failures. All 15 acceptance criteria from Spec 1.2.1 review_request verified functional."
+}

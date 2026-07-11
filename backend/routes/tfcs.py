@@ -768,6 +768,300 @@ async def remove_role(
         logger.error(f"Error removing role: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
+# =====================================================
+# API ENDPOINTS - OWNER MANAGEMENT
+# =====================================================
+
+class CreateOwnerRequest(BaseModel):
+    """Request to create a new owner account"""
+    email: str
+    password: str
+    full_name: str
+
+
+@router.post("/owners/create")
+async def create_owner_account(
+    request_data: CreateOwnerRequest,
+    request: Request,
+    auth_data: tuple = Depends(require_owner)
+):
+    """
+    Create a new Owner account (owner only).
+    This creates the Supabase auth user and assigns Owner role.
+    Used for setting up additional company owners like Beau.
+    """
+    owner_id, owner_info = auth_data
+    
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            # Check if user already exists
+            user_response = await client.get(
+                f"{SUPABASE_URL}/auth/v1/admin/users",
+                headers={
+                    "apikey": SUPABASE_SERVICE_KEY,
+                    "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}"
+                }
+            )
+            
+            if user_response.status_code != 200:
+                raise HTTPException(status_code=500, detail="Failed to check existing users")
+            
+            users = user_response.json().get('users', [])
+            existing_user = next((u for u in users if u.get('email') == request_data.email), None)
+            
+            if existing_user:
+                # User exists - just assign role if not already assigned
+                target_user_id = existing_user['id']
+                existing_role = await get_user_role(target_user_id)
+                
+                if existing_role and existing_role.role == TFCSRole.OWNER:
+                    return {
+                        "success": True,
+                        "message": f"Owner {request_data.email} already exists",
+                        "user_id": target_user_id,
+                        "already_existed": True
+                    }
+            else:
+                # Create new user via Supabase Admin API
+                create_response = await client.post(
+                    f"{SUPABASE_URL}/auth/v1/admin/users",
+                    headers={
+                        "apikey": SUPABASE_SERVICE_KEY,
+                        "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+                        "Content-Type": "application/json"
+                    },
+                    json={
+                        "email": request_data.email,
+                        "password": request_data.password,
+                        "email_confirm": True,
+                        "user_metadata": {
+                            "full_name": request_data.full_name
+                        }
+                    }
+                )
+                
+                if create_response.status_code not in [200, 201]:
+                    error_detail = create_response.text
+                    logger.error(f"Failed to create user: {error_detail}")
+                    raise HTTPException(status_code=500, detail=f"Failed to create user account: {error_detail}")
+                
+                new_user = create_response.json()
+                target_user_id = new_user.get('id')
+                
+                if not target_user_id:
+                    raise HTTPException(status_code=500, detail="User created but no ID returned")
+            
+            # Assign Owner role
+            role_payload = {
+                "user_id": target_user_id,
+                "role": TFCSRole.OWNER.value,
+                "user_email": request_data.email,
+                "user_name": request_data.full_name,
+                "assigned_by": owner_id,
+                "assigned_at": datetime.now(timezone.utc).isoformat(),
+                "is_active": True,
+                "notes": f"Owner account created by {owner_info.user_email}"
+            }
+            
+            # Upsert role
+            role_response = await client.post(
+                f"{SUPABASE_URL}/rest/v1/tfcs_user_roles",
+                headers={
+                    **await get_service_headers(),
+                    "Prefer": "resolution=merge-duplicates"
+                },
+                json=role_payload
+            )
+            
+            if role_response.status_code not in [200, 201]:
+                logger.error(f"Failed to assign role: {role_response.text}")
+                # Try upsert via on_conflict
+                role_response = await client.post(
+                    f"{SUPABASE_URL}/rest/v1/tfcs_user_roles?on_conflict=user_id",
+                    headers=await get_service_headers(),
+                    json=role_payload
+                )
+            
+            # Log activity (owner creation is significant)
+            await log_activity(
+                user_id=owner_id,
+                user_role=owner_info.role.value,
+                user_email=owner_info.user_email,
+                event_data=ActivityEventCreate(
+                    action=f"Created Owner account for {request_data.full_name}",
+                    action_type=ActionType.CREATE,
+                    object_type=ObjectType.USER,
+                    category=Category.TEAM,
+                    object_name=request_data.full_name,
+                    new_value="owner",
+                    related_user_id=target_user_id,
+                    source="mainframe"
+                ),
+                request=request
+            )
+            
+            return {
+                "success": True,
+                "message": f"Owner account created for {request_data.full_name}",
+                "user_id": target_user_id,
+                "email": request_data.email,
+                "role": "owner"
+            }
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error creating owner: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/owners")
+async def list_owners(
+    auth_data: tuple = Depends(require_employee)
+):
+    """
+    List all company owners with their details.
+    Returns owners sorted by creation date.
+    """
+    user_id, role_info = auth_data
+    
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            # Get all active owners from tfcs_user_roles
+            roles_response = await client.get(
+                f"{SUPABASE_URL}/rest/v1/tfcs_user_roles?role=eq.owner&is_active=eq.true&select=*&order=assigned_at.asc",
+                headers=await get_service_headers()
+            )
+            
+            if roles_response.status_code != 200:
+                raise HTTPException(status_code=500, detail="Failed to fetch owners")
+            
+            owner_roles = roles_response.json()
+            
+            # Get user details from Supabase auth for last_sign_in_at
+            users_response = await client.get(
+                f"{SUPABASE_URL}/auth/v1/admin/users",
+                headers={
+                    "apikey": SUPABASE_SERVICE_KEY,
+                    "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}"
+                }
+            )
+            
+            auth_users = {}
+            if users_response.status_code == 200:
+                for u in users_response.json().get('users', []):
+                    auth_users[u.get('id')] = {
+                        "last_sign_in_at": u.get('last_sign_in_at'),
+                        "created_at": u.get('created_at'),
+                        "email_confirmed_at": u.get('email_confirmed_at')
+                    }
+            
+            # Combine data
+            owners = []
+            for role in owner_roles:
+                user_auth = auth_users.get(role.get('user_id'), {})
+                owners.append({
+                    "user_id": role.get('user_id'),
+                    "email": role.get('user_email'),
+                    "name": role.get('user_name'),
+                    "role": role.get('role'),
+                    "status": "active" if role.get('is_active') else "inactive",
+                    "assigned_at": role.get('assigned_at'),
+                    "last_login": user_auth.get('last_sign_in_at'),
+                    "created_at": user_auth.get('created_at')
+                })
+            
+            return {
+                "success": True,
+                "owners": owners,
+                "count": len(owners)
+            }
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error listing owners: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/team")
+async def list_team_members(
+    auth_data: tuple = Depends(require_employee)
+):
+    """
+    List all TFCS team members (Owners, Managers, Employees).
+    Owners are listed first, then by role hierarchy.
+    """
+    user_id, role_info = auth_data
+    
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            # Get all active roles
+            roles_response = await client.get(
+                f"{SUPABASE_URL}/rest/v1/tfcs_user_roles?is_active=eq.true&select=*",
+                headers=await get_service_headers()
+            )
+            
+            if roles_response.status_code != 200:
+                raise HTTPException(status_code=500, detail="Failed to fetch team")
+            
+            all_roles = roles_response.json()
+            
+            # Get user details from Supabase auth
+            users_response = await client.get(
+                f"{SUPABASE_URL}/auth/v1/admin/users",
+                headers={
+                    "apikey": SUPABASE_SERVICE_KEY,
+                    "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}"
+                }
+            )
+            
+            auth_users = {}
+            if users_response.status_code == 200:
+                for u in users_response.json().get('users', []):
+                    auth_users[u.get('id')] = {
+                        "last_sign_in_at": u.get('last_sign_in_at'),
+                        "created_at": u.get('created_at')
+                    }
+            
+            # Combine and sort (owners first, then managers, then employees)
+            role_order = {"owner": 0, "manager": 1, "employee": 2}
+            
+            team = []
+            for role in all_roles:
+                user_auth = auth_users.get(role.get('user_id'), {})
+                team.append({
+                    "user_id": role.get('user_id'),
+                    "email": role.get('user_email'),
+                    "name": role.get('user_name'),
+                    "role": role.get('role'),
+                    "status": "active" if role.get('is_active') else "inactive",
+                    "assigned_at": role.get('assigned_at'),
+                    "last_login": user_auth.get('last_sign_in_at'),
+                    "sort_order": role_order.get(role.get('role'), 99)
+                })
+            
+            # Sort by role hierarchy, then by name
+            team.sort(key=lambda x: (x['sort_order'], x.get('name') or ''))
+            
+            # Remove sort_order from response
+            for member in team:
+                del member['sort_order']
+            
+            return {
+                "success": True,
+                "team": team,
+                "count": len(team)
+            }
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error listing team: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # =====================================================
 # API ENDPOINTS - ACTIVITY EVENTS
 # =====================================================

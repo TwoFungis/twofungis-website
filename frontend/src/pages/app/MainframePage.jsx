@@ -93,7 +93,7 @@ const CatchMeUpPanel = ({ isOpen, onClose }) => {
   );
 };
 
-const OwnerAccessPanel = ({ isOpen, onClose, roleData }) => {
+const OwnerAccessPanel = ({ isOpen, onClose, roleData, owners, loadingOwners }) => {
   if (!isOpen) return null;
   
   const permissions = [
@@ -104,10 +104,23 @@ const OwnerAccessPanel = ({ isOpen, onClose, roleData }) => {
     { label: 'System Settings', enabled: true },
   ];
   
+  const formatLastLogin = (dateString) => {
+    if (!dateString) return 'Never';
+    const date = new Date(dateString);
+    const now = new Date();
+    const diff = Math.floor((now - date) / 1000);
+    
+    if (diff < 60) return 'Just now';
+    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+    if (diff < 172800) return 'Yesterday';
+    return date.toLocaleDateString();
+  };
+  
   return (
     <div className="fixed inset-0 z-50 lg:relative lg:inset-auto">
       <div className="fixed inset-0 bg-black/50 lg:hidden" onClick={onClose} />
-      <div className="fixed right-0 top-0 h-full w-full max-w-sm bg-tfcs-surface border-l border-tfcs-gold/30 lg:absolute lg:top-full lg:right-0 lg:h-auto lg:mt-2 lg:rounded lg:border overflow-hidden">
+      <div className="fixed right-0 top-0 h-full w-full max-w-sm bg-tfcs-surface border-l border-tfcs-gold/30 lg:absolute lg:top-full lg:right-0 lg:h-auto lg:max-h-[80vh] lg:mt-2 lg:rounded lg:border overflow-hidden flex flex-col">
         <div className="flex items-center justify-between p-4 border-b border-tfcs-gold/30 bg-tfcs-gold-muted">
           <div className="flex items-center gap-2">
             <Crown className="w-5 h-5 text-tfcs-gold" />
@@ -117,16 +130,62 @@ const OwnerAccessPanel = ({ isOpen, onClose, roleData }) => {
             <X className="w-5 h-5" />
           </button>
         </div>
-        <div className="p-4 space-y-4">
-          <div>
-            <p className="text-xs text-zinc-500 uppercase tracking-wider font-mono">Owner</p>
-            <p className="text-white font-medium">{roleData?.user_name || 'Scott Marshall'}</p>
+        
+        <div className="flex-1 overflow-y-auto">
+          {/* Owner Management Section */}
+          <div className="p-4 border-b border-tfcs-border">
+            <p className="text-xs text-zinc-500 uppercase tracking-wider font-mono mb-3">Company Owners</p>
+            {loadingOwners ? (
+              <div className="flex items-center justify-center py-4">
+                <Loader2 className="w-5 h-5 text-tfcs-gold animate-spin" />
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {owners.map((owner, i) => (
+                  <div key={owner.user_id || i} className="bg-black/30 rounded p-3" data-testid={`owner-${i}`}>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-white font-medium">{owner.name || owner.email?.split('@')[0]}</p>
+                        <p className="text-xs text-zinc-500">{owner.email}</p>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Crown className="w-3 h-3 text-tfcs-gold" />
+                        <span className="text-xs text-tfcs-gold font-medium">Owner</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between mt-2 text-xs text-zinc-500">
+                      <span className={owner.status === 'active' ? 'text-tfcs-green' : 'text-zinc-500'}>
+                        {owner.status === 'active' ? '● Active' : '○ Inactive'}
+                      </span>
+                      <span>Last login: {formatLastLogin(owner.last_login)}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-          <div>
-            <p className="text-xs text-zinc-500 uppercase tracking-wider font-mono">Role</p>
-            <p className="text-tfcs-gold font-medium capitalize">{roleData?.role || 'Owner'}</p>
+          
+          {/* Current User Info */}
+          <div className="p-4 border-b border-tfcs-border">
+            <p className="text-xs text-zinc-500 uppercase tracking-wider font-mono mb-2">Your Account</p>
+            <div className="space-y-2">
+              <div>
+                <p className="text-xs text-zinc-600">Name</p>
+                <p className="text-white">{roleData?.user_name || 'Owner'}</p>
+              </div>
+              <div>
+                <p className="text-xs text-zinc-600">Email</p>
+                <p className="text-white">{roleData?.user_email}</p>
+              </div>
+              <div>
+                <p className="text-xs text-zinc-600">Role</p>
+                <p className="text-tfcs-gold capitalize">{roleData?.role || 'Owner'}</p>
+              </div>
+            </div>
           </div>
-          <div>
+          
+          {/* Permissions */}
+          <div className="p-4">
             <p className="text-xs text-zinc-500 uppercase tracking-wider font-mono mb-2">Permissions</p>
             <div className="space-y-1">
               {permissions.map((perm, i) => (
@@ -386,6 +445,8 @@ const MainframePage = () => {
   const [opportunitiesData, setOpportunitiesData] = useState({}); // Empty until opportunities API implemented
   const [activities, setActivities] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [owners, setOwners] = useState([]);
+  const [loadingOwners, setLoadingOwners] = useState(false);
 
   // Helper function for relative time formatting
   const formatTimeAgo = useCallback((dateString) => {
@@ -477,6 +538,17 @@ const MainframePage = () => {
       // Today's Focus: Architecture ready, awaiting priority logic
       // Will show empty state until priority calculation is implemented
       setTodaysFocus([]);
+      
+      // Fetch owners for Owner Management panel
+      try {
+        const ownersRes = await fetch(`${API_URL}/api/tfcs/owners`, { headers });
+        if (ownersRes.ok) {
+          const data = await ownersRes.json();
+          setOwners(data.owners || []);
+        }
+      } catch (e) {
+        console.log('Owners fetch error:', e);
+      }
       
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -621,6 +693,8 @@ const MainframePage = () => {
         isOpen={ownerAccessOpen} 
         onClose={() => setOwnerAccessOpen(false)}
         roleData={roleData}
+        owners={owners}
+        loadingOwners={loadingOwners}
       />
       <QuickAddPanel 
         isOpen={quickAddOpen} 
