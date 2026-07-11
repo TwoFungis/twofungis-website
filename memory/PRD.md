@@ -50,6 +50,14 @@ The permanent architecture for Company Brain - the operational intelligence of t
 - Every AI interaction routes through ONE Company Brain
 - Company Brain calls modules; modules NEVER call Company Brain
 
+### UI Refinement (July 11, 2026)
+Following "One Action = One Way" principle, removed duplicate controls for TFCS users:
+- ❌ Blue Quick Add button → Use Company Brain
+- ❌ Quick Expense floating button → Use Company Brain
+- ❌ Floating AI Assistant → Use Company Brain
+- ❌ Quick Add FAB → Use Company Brain
+- ✅ Company Brain is now the SINGLE entry point for all operations
+
 ### UI Components ✅
 | Component | Status | Description |
 |-----------|--------|-------------|

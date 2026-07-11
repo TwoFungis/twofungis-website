@@ -44,9 +44,11 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 const AppLayout = () => {
   const { profile, signOut, user } = useAuthStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  // Quick Add controls - only for non-TFCS users
   const [quickActionOpen, setQuickActionOpen] = useState(false);
   const [showQuickExpenseModal, setShowQuickExpenseModal] = useState(false);
   const [tfcsRole, setTfcsRole] = useState(null);
+  // Company Brain - TFCS users only
   const [brainOpen, setBrainOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -291,70 +293,71 @@ const AppLayout = () => {
             {/* Sync Indicator */}
             <SyncIndicator />
             
-            {/* Trial Countdown Badge */}
-            <TrialCountdown />
+            {/* Trial Countdown Badge - Non-TFCS users only */}
+            {!hasTfcsAccess && <TrialCountdown />}
             
-            {/* Company Brain Button - Global Access */}
-            {hasTfcsAccess && (
+            {/* TFCS Users: Company Brain is the single operational interface */}
+            {hasTfcsAccess ? (
               <button
                 onClick={() => setBrainOpen(true)}
-                className="p-2 text-tfcs-gold hover:text-tfcs-gold/80 transition-colors relative"
+                className="bg-tfcs-gold/20 hover:bg-tfcs-gold/30 text-tfcs-gold px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 border border-tfcs-gold/30"
                 data-testid="company-brain-btn"
-                title="Company Brain"
+                title="Company Brain - Your Operations Partner"
               >
                 <Brain className="w-5 h-5" />
+                <span className="hidden sm:inline">Brain</span>
               </button>
-            )}
-            
-            {/* Quick Add Dropdown - includes Quick Expense */}
-            <div className="relative">
-              <button
-                onClick={() => setQuickActionOpen(!quickActionOpen)}
-                className="bg-steel-500 hover:bg-steel-600 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
-                data-testid="quick-add-btn"
-              >
-                <Plus className="w-5 h-5" />
-                <span className="hidden sm:inline">Quick Add</span>
-              </button>
+            ) : (
+              /* Non-TFCS Users: Traditional Quick Add */
+              <div className="relative">
+                <button
+                  onClick={() => setQuickActionOpen(!quickActionOpen)}
+                  className="bg-steel-500 hover:bg-steel-600 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+                  data-testid="quick-add-btn"
+                >
+                  <Plus className="w-5 h-5" />
+                  <span className="hidden sm:inline">Quick Add</span>
+                </button>
 
-              {quickActionOpen && (
-                <>
-                  <div className="fixed inset-0 z-40" onClick={() => setQuickActionOpen(false)} />
-                  <div className="absolute right-0 mt-2 w-52 bg-charcoal-800 rounded-lg shadow-xl border border-charcoal-700 py-2 z-50">
-                    {/* New Expense */}
-                    <button
-                      onClick={() => {
-                        setShowQuickExpenseModal(true);
-                        setQuickActionOpen(false);
-                      }}
-                      className="flex items-center gap-3 w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-charcoal-700 transition-colors"
-                      data-testid="quick-action-new-expense"
-                    >
-                      <Wallet className="w-4 h-4" />
-                      New Expense
-                    </button>
-                    {quickActions.filter(a => a.label !== 'Quick Expense').map((action) => (
+                {quickActionOpen && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setQuickActionOpen(false)} />
+                    <div className="absolute right-0 mt-2 w-52 bg-charcoal-800 rounded-lg shadow-xl border border-charcoal-700 py-2 z-50">
+                      {/* New Expense */}
                       <button
-                        key={action.label}
                         onClick={() => {
-                          if (action.action) {
-                            action.action();
-                          } else if (action.path) {
-                            navigate(action.path);
-                          }
+                          setShowQuickExpenseModal(true);
                           setQuickActionOpen(false);
                         }}
                         className="flex items-center gap-3 w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-charcoal-700 transition-colors"
-                        data-testid={`quick-action-${action.label.toLowerCase().replace(/\s+/g, '-')}`}
+                        data-testid="quick-action-new-expense"
                       >
-                        <action.icon className="w-4 h-4" />
-                        {action.label}
+                        <Wallet className="w-4 h-4" />
+                        New Expense
                       </button>
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
+                      {quickActions.filter(a => a.label !== 'Quick Expense').map((action) => (
+                        <button
+                          key={action.label}
+                          onClick={() => {
+                            if (action.action) {
+                              action.action();
+                            } else if (action.path) {
+                              navigate(action.path);
+                            }
+                            setQuickActionOpen(false);
+                          }}
+                          className="flex items-center gap-3 w-full px-4 py-2 text-gray-300 hover:text-white hover:bg-charcoal-700 transition-colors"
+                          data-testid={`quick-action-${action.label.toLowerCase().replace(/\s+/g, '-')}`}
+                        >
+                          <action.icon className="w-4 h-4" />
+                          {action.label}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
           </div>
         </header>
 
@@ -447,22 +450,22 @@ const AppLayout = () => {
         </>
       )}
 
-      {/* Trial Expired Modal */}
-      <TrialExpiredModal />
+      {/* Trial Expired Modal - Non-TFCS users only */}
+      {!hasTfcsAccess && <TrialExpiredModal />}
 
-      {/* Quick Add Expense Modal */}
-      {showQuickExpenseModal && (
+      {/* Quick Add Expense Modal - Non-TFCS users only */}
+      {!hasTfcsAccess && showQuickExpenseModal && (
         <QuickAddExpenseModal 
           onClose={() => setShowQuickExpenseModal(false)}
           onSuccess={() => setShowQuickExpenseModal(false)}
         />
       )}
       
-      {/* AI Copilot */}
-      <AICopilot />
+      {/* AI Copilot - Non-TFCS users only (TFCS uses Company Brain) */}
+      {!hasTfcsAccess && <AICopilot />}
       
-      {/* Quick Add FAB (Floating Action Button) */}
-      <QuickAddFab />
+      {/* Quick Add FAB (Floating Action Button) - Non-TFCS users only */}
+      {!hasTfcsAccess && <QuickAddFab />}
       
       {/* Update Banner - Shows when service worker update is available */}
       <UpdateBanner />
@@ -470,7 +473,7 @@ const AppLayout = () => {
       {/* PWA Redirect Modal - Shows when user opens in browser but has app installed */}
       <PWARedirectModal />
       
-      {/* Company Brain Panel - Global Collapsible Side Panel */}
+      {/* Company Brain Panel - TFCS users only - Single operational interface */}
       {hasTfcsAccess && (
         <CompanyBrainPanel
           isOpen={brainOpen}
