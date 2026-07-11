@@ -862,6 +862,17 @@ async def get_my_notifications(
                 headers=await get_service_headers()
             )
             
+            # Handle table not existing (pre-migration state)
+            if response.status_code == 404 or (response.status_code != 200 and 'does not exist' in response.text):
+                # Graceful degradation: return empty notifications
+                return {
+                    "success": True,
+                    "notifications": [],
+                    "count": 0,
+                    "unread_count": 0,
+                    "note": "TFCS tables not yet initialized"
+                }
+            
             if response.status_code != 200:
                 raise HTTPException(status_code=500, detail="Failed to fetch notifications")
             
@@ -1031,7 +1042,7 @@ async def initialize_owner(authorization: str = Header(...)):
     
     try:
         async with httpx.AsyncClient() as client:
-            # Get user email
+            # Get user email FIRST - this is the email guard
             user_response = await client.get(
                 f"{SUPABASE_URL}/auth/v1/admin/users",
                 headers={
@@ -1051,23 +1062,28 @@ async def initialize_owner(authorization: str = Header(...)):
             
             user_email = current_user.get('email')
             
-            # Check if this is the designated owner email
+            # EMAIL GUARD - Check if this is the designated owner email BEFORE any DB operations
+            # This must be the FIRST check after verifying the user exists
             if user_email != "inbox@twofungis.ca":
                 raise HTTPException(
                     status_code=403, 
                     detail="Only inbox@twofungis.ca can be the initial owner"
                 )
             
-            # Check if any owners already exist
+            # Check if any owners already exist (handle pre-migration state gracefully)
             owners_response = await client.get(
                 f"{SUPABASE_URL}/rest/v1/tfcs_user_roles?role=eq.owner&is_active=eq.true&select=id",
                 headers=await get_service_headers()
             )
             
+            # If table doesn't exist, that's okay - we'll create it
             if owners_response.status_code == 200:
                 existing_owners = owners_response.json()
                 if existing_owners:
                     raise HTTPException(status_code=400, detail="An owner already exists")
+            elif 'does not exist' not in owners_response.text:
+                # Some other error - not just missing table
+                logger.warning(f"Unexpected response checking owners: {owners_response.text}")
             
             # Assign owner role
             role_payload = {
@@ -1087,6 +1103,12 @@ async def initialize_owner(authorization: str = Header(...)):
             )
             
             if response.status_code not in [200, 201]:
+                # Check if table doesn't exist (PostgREST returns PGRST205 with "Could not find the table")
+                if 'does not exist' in response.text or 'Could not find the table' in response.text or 'PGRST205' in response.text:
+                    raise HTTPException(
+                        status_code=503, 
+                        detail="TFCS tables not initialized. Please run migration 011_tfcs_mainframe_foundation.sql in Supabase first."
+                    )
                 # Try upsert if insert fails
                 response = await client.patch(
                     f"{SUPABASE_URL}/rest/v1/tfcs_user_roles?user_id=eq.{user_id}",
