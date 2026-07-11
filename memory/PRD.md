@@ -36,6 +36,37 @@ Build "TradeOS," a financial tracking tool for contractors. The application incl
 11. ✅ **TFCS Mainframe Specification 1.0** (Backend Foundation)
 12. ✅ **TFCS Mainframe Specification 1.1** (Command Center Dashboard)
 13. ✅ **TFCS Mainframe Specification 1.2** (Company Brain Foundation)
+14. ✅ **TFCS Mainframe Specification 1.2.1** (Owner Completion & Account Management)
+
+---
+
+## TFCS Mainframe - Specification 1.2.1 COMPLETE (July 11, 2026)
+
+### Owner Completion & Account Management
+Both company owners are now fully operational in TFCS Mainframe.
+
+### Company Owners ✅
+| Name | Email | Role | Status |
+|------|-------|------|--------|
+| **Scott Marshall** | inbox@twofungis.ca | Owner | Active |
+| **Beau** | carpenterbeau@hotmail.com | Owner | Active |
+
+### Owner Access Panel ✅
+- **Company Owners section**: Shows both owners with name, email, role badge, status, last login
+- **Your Account section**: Current user's name, email, role
+- **Permissions section**: Full Access, Financial, User Management, Company Brain, System Settings
+
+### Password Management ✅
+- Users can change password via Settings
+- Password changes are PRIVATE (no activity history, no notifications)
+- Uses Supabase Auth directly (bypasses backend logging)
+
+### API Endpoints
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/tfcs/owners/create` | POST | Create new owner (owner only) |
+| `/api/tfcs/owners` | GET | List all company owners |
+| `/api/tfcs/team` | GET | List all team members by role |
 
 ---
 
@@ -198,7 +229,6 @@ The Company's first structured knowledge base. AI integration is intentionally p
 - **Prerequisite:** Production Library must be populated first
 
 ### P2 - Additional Features
-- Add second Owner role for 'Beau'
 - Estimate Templates + Production Rates
 - QuickBooks Sync (Sandbox-Ready)
 

@@ -540,6 +540,7 @@ const MainframePage = () => {
       setTodaysFocus([]);
       
       // Fetch owners for Owner Management panel
+      setLoadingOwners(true);
       try {
         const ownersRes = await fetch(`${API_URL}/api/tfcs/owners`, { headers });
         if (ownersRes.ok) {
@@ -548,6 +549,8 @@ const MainframePage = () => {
         }
       } catch (e) {
         console.log('Owners fetch error:', e);
+      } finally {
+        setLoadingOwners(false);
       }
       
     } catch (error) {
