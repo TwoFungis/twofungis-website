@@ -652,6 +652,29 @@ async def get_suggested_actions(
     # Placeholder suggestions based on context
     suggestions = []
     
+    # General context suggestions (always shown for general)
+    if context_type == ContextType.GENERAL:
+        suggestions.extend([
+            SuggestedAction(
+                id="sa_gen_1",
+                title="View Company Overview",
+                description="See overall business status and metrics",
+                module="reports",
+                action="generate",
+                priority="medium",
+                context_type=ContextType.GENERAL
+            ),
+            SuggestedAction(
+                id="sa_gen_2",
+                title="Check Outstanding Items",
+                description="Review items requiring attention",
+                module="financial",
+                action="send_reminder",
+                priority="high",
+                context_type=ContextType.GENERAL
+            ),
+        ])
+    
     if context_type == ContextType.PROJECT or context_type is None:
         suggestions.extend([
             SuggestedAction(

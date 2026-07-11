@@ -8,7 +8,7 @@ Build "TradeOS," a financial tracking tool for contractors. The application incl
 - "Quick Add" functionality for expenses
 - PWA installation support
 - **Trial + Locked access monetization model** ✅ IMPLEMENTED
-- **TFCS Mainframe** - Internal operational system for Two Fungis Finishing ✅ SPEC 1.1 COMPLETE
+- **TFCS Mainframe** - Internal operational system for Two Fungis Finishing ✅ SPEC 1.2 COMPLETE
 
 ## User Personas
 - **Primary:** Independent contractors and small trade businesses
@@ -35,110 +35,125 @@ Build "TradeOS," a financial tracking tool for contractors. The application incl
 10. ✅ **Trial + Locked Access Model**
 11. ✅ **TFCS Mainframe Specification 1.0** (Backend Foundation)
 12. ✅ **TFCS Mainframe Specification 1.1** (Command Center Dashboard)
+13. ✅ **TFCS Mainframe Specification 1.2** (Company Brain Foundation)
 
 ---
 
-## TFCS Mainframe - Specification 1.1 COMPLETE (July 11, 2026)
+## TFCS Mainframe - Specification 1.2 COMPLETE (July 11, 2026)
 
-### Command Center Dashboard
-Premium "Mission Control" interface for Two Fungis Finishing operations.
+### Company Brain Foundation
+The permanent architecture for Company Brain - the operational intelligence of the company.
+
+### ONE BRAIN RULE
+- There is only ONE Company Brain
+- Projects, CRM, Financial never contain their own AI
+- Every AI interaction routes through ONE Company Brain
+- Company Brain calls modules; modules NEVER call Company Brain
+
+### UI Components ✅
+| Component | Status | Description |
+|-----------|--------|-------------|
+| **Global Side Panel** | ✅ | Collapsible panel accessible from anywhere via Brain button |
+| **Company Brief** | ✅ Placeholder | "Operational briefing will appear here." |
+| **Conversation** | ✅ Architecture | Input, send, microphone (disabled), message history |
+| **Context Selector** | ✅ | Switch between General, Project, Opportunity, etc. threads |
+| **Suggested Actions** | ✅ Placeholder | Context-aware action suggestions |
+| **Action History** | ✅ | Permanent history of Company Brain actions |
+
+### Action Pipeline Architecture
+```
+Intent → Plan → Permission Check → Execute → Activity Log → Result → Undo Window
+```
+
+### Module Contracts
+Company Brain can interact with these modules:
+| Module | Capabilities |
+|--------|-------------|
+| **Projects** | Create, Update, Assign, Archive, Search |
+| **Opportunities** | Create, Update, Submit, Search |
+| **Financial** | Create Invoice, Record Payment, Send Reminder |
+| **Expenses** | Create, Categorize, GST Summary |
+| **CRM** | Create Client/Contact, Update, Search |
+| **Production Library** | Search, Create, Update |
+| **Documents** | Search, Store, Summarize |
+| **Reports** | Generate, Export |
+| **Settings** | Read, Update |
+
+### Context Types
+- General, Project, Opportunity, Estimate, Financial, CRM, Production, Documents, Reports, Settings
+
+### Proactive Intelligence Categories (Architecture)
+- Deadlines, Late Tenders, Outstanding Invoices, Production Inconsistencies
+- Cash Flow, Scheduling Conflicts, Missing Documents, Follow-ups
+
+### API Endpoints
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/brain/health` | GET | Health check with capabilities |
+| `/api/brain/contracts` | GET | Get module contracts |
+| `/api/brain/threads` | GET | List conversation threads |
+| `/api/brain/threads/{context_type}` | GET | Get/create context thread |
+| `/api/brain/messages` | POST | Send message to Brain |
+| `/api/brain/messages/{thread_id}` | GET | Get thread messages |
+| `/api/brain/suggested-actions` | GET | Get suggested actions |
+| `/api/brain/action-history` | GET | Get action history |
+| `/api/brain/actions/queue` | POST | Queue action for execution |
+| `/api/brain/brief` | GET | Get company brief |
+| `/api/brain/proactive` | GET | Get proactive alerts |
+
+### Key Files
+- `/app/backend/routes/company_brain.py` - All Company Brain endpoints
+- `/app/frontend/src/components/brain/CompanyBrainPanel.jsx` - Global side panel
+- `/app/frontend/src/hooks/useBrainContext.js` - Context tracking
+- `/app/migrations/012_company_brain_foundation.sql` - Database schema (PENDING)
+
+### Migration Required
+Run `/app/migrations/012_company_brain_foundation.sql` in Supabase SQL Editor to create:
+- `company_brain_threads` - Conversation threads
+- `company_brain_messages` - Messages
+- `company_brain_actions` - Action history
+
+---
+
+## TFCS Mainframe - Specification 1.1 (Command Center Dashboard)
 
 ### UI Components ✅
 | Component | Status | Data Source |
 |-----------|--------|-------------|
-| **Header** | ✅ | Title, Notifications, Catch Me Up, Owner Access, Quick Add |
-| **Today's Focus** | ✅ Architecture | Empty state until priority logic implemented |
+| **Header** | ✅ | Title, Notifications, Catch Me Up, Owner Access, Quick Add, **Brain** |
+| **Today's Focus** | ✅ Architecture | Empty state until priority logic |
 | **Projects Card** | ✅ LIVE | Real data from `/api/projects` |
-| **Opportunities Card** | ✅ Architecture | Shows zeros until `/api/opportunities` endpoint exists |
-| **Company Brain** | ✅ Placeholder | "Company Brain will summarize activity here in a future specification." |
+| **Opportunities Card** | ✅ Architecture | Shows zeros until endpoint exists |
+| **Company Brain** | ✅ Placeholder | Points to Brain panel |
 | **Recent Activity** | ✅ LIVE | Real data from `/api/tfcs/activity` |
-| **Notifications Panel** | ✅ LIVE | Real data from `/api/tfcs/notifications` |
-| **Owner Access Panel** | ✅ LIVE | Real data from `/api/tfcs/role/me` |
-
-### Design Philosophy
-- Mission Control aesthetic, NOT accounting software
-- Dark theme with premium gold accents
-- High-density, industrial premium feel
-- Fully responsive (Desktop, Tablet, Mobile)
 
 ### Key Files
-- `/app/frontend/src/pages/app/MainframePage.jsx` - Command Center UI
-- `/app/frontend/src/components/layout/AppLayout.jsx` - TFCS Sidebar hierarchy
-- `/app/design_guidelines.json` - Design specifications
+- `/app/frontend/src/pages/app/MainframePage.jsx`
+- `/app/frontend/src/components/layout/AppLayout.jsx`
 
 ---
 
 ## TFCS Mainframe - Specification 1.0 (Backend Foundation)
 
-### Overview
-TFCS Mainframe is an internal operational system for Two Fungis Finishing that runs within TradeOS but is strictly separated from the customer-facing side.
-
 ### Architecture
-- **Separate workspace** from commercial TradeOS
-- **Role-Based Access Control (RBAC)** with 3 roles: Owner, Manager, Employee
-- **Activity Events** - Permanent operational history
-- **Notifications** - Temporary alerts derived from events
+- Role-Based Access Control (RBAC): Owner, Manager, Employee
+- Activity Events - Permanent operational history
+- Notifications - Temporary alerts
 
-### Roles
-| Role | Access Level |
-|------|-------------|
-| **Owner** | Full access to everything, manages users, sees private events |
-| **Manager** | Operational access, manages projects/employees, limited visibility |
-| **Employee** | Restricted to own data and assigned work |
-
-### API Endpoints
-| Endpoint | Method | Description | Auth |
-|----------|--------|-------------|------|
-| `/api/tfcs/health` | GET | Health check | None |
-| `/api/tfcs/role/me` | GET | Get current user's TFCS role | JWT |
-| `/api/tfcs/roles` | GET | List all TFCS roles | TFCS Role |
-| `/api/tfcs/roles/assign` | POST | Assign role (Owner only) | Owner |
-| `/api/tfcs/roles/{user_id}` | DELETE | Remove role (Owner only) | Owner |
-| `/api/tfcs/activity` | GET | Activity feed | TFCS Role |
-| `/api/tfcs/activity/log` | POST | Manual activity logging | TFCS Role |
-| `/api/tfcs/notifications` | GET | User's notifications | JWT |
-| `/api/tfcs/notifications/{id}/read` | PATCH | Mark as read | JWT |
-| `/api/tfcs/notifications/read-all` | PATCH | Mark all as read | JWT |
-| `/api/tfcs/init-owner` | POST | Initialize owner | JWT |
-| `/api/tfcs/diagnostics` | GET | System diagnostics | Owner |
-
-### Database Tables
-```
-tfcs_user_roles           - Role assignments
-tfcs_activity_events      - Permanent activity history
-tfcs_notifications        - Temporary alerts
-tfcs_settings             - System configuration
-tfcs_notification_preferences - Per-user preferences
-```
-
-### Backend Files
-- `/app/backend/routes/tfcs.py` - TFCS routes with RBAC
-- `/app/backend/routes/tfcs_activity.py` - Activity logging helper
-- `/app/migrations/011_tfcs_mainframe_foundation.sql` - Database migration
-
----
-
-## Trial + Locked Access Model
-
-### Access States
-- `ACTIVE`: Paid subscribers (pro, elite, lifetime, founding) OR grandfathered users
-- `TRIAL`: New users with 30-day PRO trial
-- `LOCKED`: Trial expired users
-
-### LOCKED Mode Restrictions
-- Create max 1 project, 1 quote, 1 invoice (total while locked)
-- Cannot send/issue quotes or invoices
-- AI Copilot: 3 messages/day, General Mode only (no project context)
-- Can view all existing data
+### Key Files
+- `/app/backend/routes/tfcs.py` - TFCS routes
+- `/app/backend/routes/tfcs_activity.py` - Activity logging
+- `/app/migrations/011_tfcs_mainframe_foundation.sql` - Database schema
 
 ---
 
 ## Upcoming Tasks (Priority Order)
 
-### P1 - TFCS AI Features (Company Brain)
-- "Catch Me Up" actual AI summaries based on Activity Events
-- Daily/project summaries using GPT-5.2
-- Replace placeholder text in Command Center
+### P1 - TFCS AI Integration (Specification 1.3)
+- Integrate GPT-5.2 for actual AI responses
+- "Catch Me Up" operational summaries
+- Context-aware conversations
+- Run migration 012
 
 ### P2 - Additional Features
 - Production Library (Single source of truth for estimating)
@@ -148,11 +163,10 @@ tfcs_notification_preferences - Per-user preferences
 
 ### P3 - Future/Backlog
 - Trust Pack Settings Tab
-- `/api/opportunities` endpoint for Opportunities card
+- `/api/opportunities` endpoint
 - Priority logic for Today's Focus
-- Complete AI Copilot enhancements
-- Delete Account functionality
-- Performance optimization
+- Company Brain Learning capabilities
+- Action execution engine
 
 ---
 
@@ -166,24 +180,31 @@ tfcs_notification_preferences - Per-user preferences
 
 ## Key Files Reference
 
-### TFCS Mainframe
-- `/app/frontend/src/pages/app/MainframePage.jsx` - Command Center Dashboard
-- `/app/frontend/src/components/layout/AppLayout.jsx` - TFCS Sidebar
-- `/app/backend/routes/tfcs.py` - TFCS routes with RBAC
-- `/app/backend/routes/tfcs_activity.py` - Activity logging helper
-- `/app/migrations/011_tfcs_mainframe_foundation.sql` - Database migration
-- `/app/design_guidelines.json` - Design specifications
-- `/app/backend/tests/test_tfcs_mainframe.py` - Backend test suite
+### Company Brain (Spec 1.2)
+- `/app/backend/routes/company_brain.py`
+- `/app/frontend/src/components/brain/CompanyBrainPanel.jsx`
+- `/app/frontend/src/hooks/useBrainContext.js`
+- `/app/migrations/012_company_brain_foundation.sql`
+- `/app/backend/tests/test_company_brain.py`
+
+### TFCS Mainframe (Spec 1.0-1.1)
+- `/app/frontend/src/pages/app/MainframePage.jsx`
+- `/app/frontend/src/components/layout/AppLayout.jsx`
+- `/app/backend/routes/tfcs.py`
+- `/app/backend/routes/tfcs_activity.py`
+- `/app/migrations/011_tfcs_mainframe_foundation.sql`
+- `/app/design_guidelines.json`
+- `/app/backend/tests/test_tfcs_mainframe.py`
 
 ### Access Control
-- `/app/backend/routes/access_control.py` - Core access state logic
-- `/app/backend/routes/profile.py` - `/api/profile/access-state` endpoint
+- `/app/backend/routes/access_control.py`
+- `/app/backend/routes/profile.py`
 
 ### Server-Side Enforcement
-- `/app/backend/routes/projects.py` - Create enforcement
-- `/app/backend/routes/quotes.py` - Create + send enforcement
-- `/app/backend/routes/invoices.py` - Create + send enforcement
-- `/app/backend/routes/copilot.py` - AI daily limit + mode enforcement
+- `/app/backend/routes/projects.py`
+- `/app/backend/routes/quotes.py`
+- `/app/backend/routes/invoices.py`
+- `/app/backend/routes/copilot.py`
 
 ### PWA
 - `/app/frontend/src/services/PWAInstallService.js`
