@@ -25,6 +25,7 @@ import {
   Shield
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
+import { supabase } from '../../lib/supabase';
 import { Logo, LogoIcon } from '../ui/Logo';
 import TrialCountdown from '../trial/TrialCountdown';
 import TrialExpiredModal from '../trial/TrialExpiredModal';
@@ -62,15 +63,21 @@ const AppLayout = () => {
     const checkTfcsAccess = async () => {
       // Only check for potential TFCS users
       if (!userEmail || !FOUNDER_EMAILS.map(e => e.toLowerCase()).includes(userEmail)) {
+        console.log('[TFCS] User not in founder list:', userEmail);
         return;
       }
 
       try {
-        const token = localStorage.getItem('supabase_token') || 
-          JSON.parse(localStorage.getItem('sb-oiocmchdtllqpszciuxh-auth-token') || '{}')?.access_token;
+        // Get token from Supabase session (the correct way)
+        const { data: { session } } = await supabase.auth.getSession();
+        const token = session?.access_token;
 
-        if (!token) return;
+        if (!token) {
+          console.log('[TFCS] No session token available');
+          return;
+        }
 
+        console.log('[TFCS] Checking role for:', userEmail);
         const response = await fetch(`${API_URL}/api/tfcs/role/me`, {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -80,10 +87,13 @@ const AppLayout = () => {
 
         if (response.ok) {
           const data = await response.json();
+          console.log('[TFCS] Role data:', data);
           setTfcsRole(data);
+        } else {
+          console.log('[TFCS] Role check failed:', response.status);
         }
       } catch (e) {
-        console.log('TFCS check failed:', e);
+        console.error('[TFCS] Check failed:', e);
       }
     };
 
