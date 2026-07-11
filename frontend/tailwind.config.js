@@ -7,12 +7,29 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        'sans': ['IBM Plex Sans', 'system-ui', 'sans-serif'],
+        'mono': ['JetBrains Mono', 'monospace'],
+      },
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)'
       },
       colors: {
+        // TFCS Mainframe Brand Colors
+        'tfcs': {
+          'black': '#050505',
+          'surface': '#0F0F12',
+          'surface-hover': '#1A1A1E',
+          'border': '#262626',
+          'red': '#FF3B30',
+          'red-muted': 'rgba(255, 59, 48, 0.15)',
+          'green': '#00FF66',
+          'green-muted': 'rgba(0, 255, 102, 0.15)',
+          'gold': '#D4AF37',
+          'gold-muted': 'rgba(212, 175, 55, 0.15)',
+        },
         // Light cloud grey backdrop
         'cloud': {
           50: '#fafbfc',

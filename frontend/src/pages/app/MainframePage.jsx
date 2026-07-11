@@ -1,161 +1,545 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Shield, 
-  Users, 
-  Activity, 
   Bell, 
-  Settings,
-  CheckCircle,
-  XCircle,
-  AlertTriangle,
+  Sparkles, 
+  Crown, 
+  Plus,
+  ChevronRight,
+  CheckCircle2,
+  X,
   Loader2,
-  Crown,
-  Briefcase,
-  UserCheck
+  User,
+  FolderKanban,
+  Target,
+  Shield,
+  DollarSign,
+  Users
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { supabase } from '../../lib/supabase';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
+// ============================================
+// HEADER COMPONENTS
+// ============================================
+
+const NotificationsPanel = ({ isOpen, onClose, notifications, onMarkRead }) => {
+  if (!isOpen) return null;
+  
+  return (
+    <div className="fixed inset-0 z-50 lg:relative lg:inset-auto">
+      <div className="fixed inset-0 bg-black/50 lg:hidden" onClick={onClose} />
+      <div className="fixed right-0 top-0 h-full w-full max-w-md bg-tfcs-surface border-l border-tfcs-border lg:absolute lg:top-full lg:right-0 lg:h-auto lg:max-h-[70vh] lg:mt-2 lg:rounded lg:border overflow-hidden">
+        <div className="flex items-center justify-between p-4 border-b border-tfcs-border">
+          <h3 className="font-semibold text-white">Notifications</h3>
+          <button onClick={onClose} className="text-zinc-400 hover:text-white" data-testid="close-notifications">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        <div className="overflow-y-auto max-h-[calc(100vh-80px)] lg:max-h-[50vh]">
+          {notifications.length === 0 ? (
+            <div className="p-8 text-center text-zinc-500">
+              <Bell className="w-8 h-8 mx-auto mb-2 opacity-50" />
+              <p>No new notifications</p>
+            </div>
+          ) : (
+            <div className="divide-y divide-tfcs-border">
+              {notifications.map((notif, i) => (
+                <div 
+                  key={i} 
+                  className="p-4 hover:bg-tfcs-surface-hover cursor-pointer transition-colors"
+                  onClick={() => onMarkRead(notif.id)}
+                >
+                  <p className="text-white text-sm">{notif.title}</p>
+                  <p className="text-zinc-500 text-xs mt-1 font-mono">{notif.time}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const CatchMeUpPanel = ({ isOpen, onClose }) => {
+  if (!isOpen) return null;
+  
+  return (
+    <div className="fixed inset-0 z-50 lg:relative lg:inset-auto">
+      <div className="fixed inset-0 bg-black/50 lg:hidden" onClick={onClose} />
+      <div className="fixed right-0 top-0 h-full w-full max-w-lg bg-tfcs-black border-l border-tfcs-border lg:absolute lg:top-full lg:right-0 lg:h-auto lg:mt-2 lg:rounded lg:border overflow-hidden">
+        <div className="flex items-center justify-between p-4 border-b border-tfcs-border">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-tfcs-gold" />
+            <h3 className="font-semibold text-white">Catch Me Up</h3>
+          </div>
+          <button onClick={onClose} className="text-zinc-400 hover:text-white" data-testid="close-catchmeup">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        <div className="p-6 font-mono text-sm text-zinc-400 bg-black">
+          <div className="flex flex-col items-center justify-center text-center py-8">
+            <Sparkles className="w-8 h-8 text-tfcs-gold/50 mb-4" />
+            <p className="text-zinc-500 leading-relaxed">
+              Company Brain will summarize activity here in a future specification.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const OwnerAccessPanel = ({ isOpen, onClose, roleData }) => {
+  if (!isOpen) return null;
+  
+  const permissions = [
+    { label: 'Full Access', enabled: true },
+    { label: 'Financial', enabled: true },
+    { label: 'User Management', enabled: true },
+    { label: 'Company Brain', enabled: true },
+    { label: 'System Settings', enabled: true },
+  ];
+  
+  return (
+    <div className="fixed inset-0 z-50 lg:relative lg:inset-auto">
+      <div className="fixed inset-0 bg-black/50 lg:hidden" onClick={onClose} />
+      <div className="fixed right-0 top-0 h-full w-full max-w-sm bg-tfcs-surface border-l border-tfcs-gold/30 lg:absolute lg:top-full lg:right-0 lg:h-auto lg:mt-2 lg:rounded lg:border overflow-hidden">
+        <div className="flex items-center justify-between p-4 border-b border-tfcs-gold/30 bg-tfcs-gold-muted">
+          <div className="flex items-center gap-2">
+            <Crown className="w-5 h-5 text-tfcs-gold" />
+            <h3 className="font-semibold text-tfcs-gold">Owner Access</h3>
+          </div>
+          <button onClick={onClose} className="text-zinc-400 hover:text-white" data-testid="close-owner">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        <div className="p-4 space-y-4">
+          <div>
+            <p className="text-xs text-zinc-500 uppercase tracking-wider font-mono">Owner</p>
+            <p className="text-white font-medium">{roleData?.user_name || 'Scott Marshall'}</p>
+          </div>
+          <div>
+            <p className="text-xs text-zinc-500 uppercase tracking-wider font-mono">Role</p>
+            <p className="text-tfcs-gold font-medium capitalize">{roleData?.role || 'Owner'}</p>
+          </div>
+          <div>
+            <p className="text-xs text-zinc-500 uppercase tracking-wider font-mono mb-2">Permissions</p>
+            <div className="space-y-1">
+              {permissions.map((perm, i) => (
+                <div key={i} className="flex items-center gap-2 text-sm">
+                  <CheckCircle2 className="w-4 h-4 text-tfcs-green" />
+                  <span className="text-white">{perm.label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const QuickAddPanel = ({ isOpen, onClose, onNavigate }) => {
+  if (!isOpen) return null;
+  
+  const items = [
+    { label: 'Project', icon: FolderKanban, href: '/app/projects/new' },
+    { label: 'Opportunity', icon: Target, href: '/app/opportunities/new' },
+    { label: 'Estimate', icon: DollarSign, href: '/app/estimates/new' },
+    { label: 'Client', icon: User, href: '/app/crm/new' },
+    { label: 'Employee', icon: Users, href: '/app/team/new' },
+  ];
+  
+  return (
+    <div className="fixed inset-0 z-50 lg:relative lg:inset-auto">
+      <div className="fixed inset-0 bg-black/50 lg:hidden" onClick={onClose} />
+      <div className="fixed right-0 top-0 h-full w-full max-w-xs bg-tfcs-surface border-l border-tfcs-border lg:absolute lg:top-full lg:right-0 lg:h-auto lg:mt-2 lg:rounded lg:border overflow-hidden">
+        <div className="flex items-center justify-between p-4 border-b border-tfcs-border">
+          <h3 className="font-semibold text-white">Quick Add</h3>
+          <button onClick={onClose} className="text-zinc-400 hover:text-white" data-testid="close-quickadd">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        <div className="p-2">
+          {items.map((item, i) => (
+            <button
+              key={i}
+              onClick={() => { onNavigate(item.href); onClose(); }}
+              className="w-full flex items-center gap-3 px-4 py-3 text-left text-white hover:bg-tfcs-surface-hover rounded transition-colors"
+              data-testid={`quickadd-${item.label.toLowerCase()}`}
+            >
+              <item.icon className="w-5 h-5 text-zinc-400" />
+              <span>{item.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ============================================
+// MAIN COMPONENTS
+// ============================================
+
+const TodaysFocus = ({ items }) => {
+  const getStatusColor = (priority) => {
+    switch (priority) {
+      case 'urgent': return { bg: 'bg-tfcs-red-muted', border: 'border-tfcs-red', dot: 'bg-tfcs-red' };
+      case 'success': return { bg: 'bg-tfcs-green-muted', border: 'border-tfcs-green', dot: 'bg-tfcs-green' };
+      case 'info': return { bg: 'bg-tfcs-gold-muted', border: 'border-tfcs-gold', dot: 'bg-tfcs-gold' };
+      default: return { bg: 'bg-tfcs-surface', border: 'border-tfcs-border', dot: 'bg-zinc-500' };
+    }
+  };
+  
+  // Empty state when no priority items exist
+  if (!items || items.length === 0) {
+    return (
+      <div className="bg-tfcs-surface border-l-4 border-l-tfcs-gold border border-tfcs-border p-6 rounded" data-testid="todays-focus">
+        <h2 className="text-xs font-mono uppercase tracking-wider text-zinc-500 mb-4">Today&apos;s Focus</h2>
+        <div className="flex items-center justify-center py-4">
+          <p className="text-zinc-500 text-sm">No priority items require attention today.</p>
+        </div>
+      </div>
+    );
+  }
+  
+  return (
+    <div className="bg-tfcs-surface border-l-4 border-l-tfcs-gold border border-tfcs-border p-4 rounded" data-testid="todays-focus">
+      <h2 className="text-xs font-mono uppercase tracking-wider text-zinc-500 mb-4">Today&apos;s Focus</h2>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {items.slice(0, 3).map((item, i) => {
+          const colors = getStatusColor(item.priority);
+          return (
+            <div 
+              key={i} 
+              className={`${colors.bg} border ${colors.border} rounded p-4 cursor-pointer hover:opacity-90 transition-opacity`}
+              data-testid={`focus-item-${i}`}
+            >
+              <div className="flex items-start gap-3">
+                <div className={`w-2 h-2 rounded-full ${colors.dot} mt-2 flex-shrink-0`} />
+                <div>
+                  <p className="text-white font-medium">{item.title}</p>
+                  <p className="text-zinc-400 text-sm mt-1">{item.subtitle}</p>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+const ProjectsCard = ({ data, onRowClick }) => {
+  const rows = [
+    { label: 'Starting Soon', key: 'starting_soon', count: data?.starting_soon || 0 },
+    { label: 'In Progress', key: 'in_progress', count: data?.in_progress || 0 },
+    { label: 'Deficiencies', key: 'deficiencies', count: data?.deficiencies || 0 },
+    { label: 'Completed', key: 'completed', count: data?.completed || 0 },
+  ];
+  
+  return (
+    <div className="bg-tfcs-surface border border-tfcs-border rounded" data-testid="projects-card">
+      <div className="px-4 py-3 border-b border-tfcs-border">
+        <h2 className="text-xs font-mono uppercase tracking-wider text-zinc-500">Projects</h2>
+      </div>
+      <div className="divide-y divide-tfcs-border">
+        {rows.map((row) => (
+          <button
+            key={row.key}
+            onClick={() => onRowClick('projects', row.key)}
+            className="w-full flex items-center justify-between px-4 py-3 hover:bg-tfcs-surface-hover transition-colors text-left"
+            data-testid={`project-row-${row.key}`}
+          >
+            <span className="text-white">{row.label}</span>
+            <div className="flex items-center gap-2">
+              <span className="text-lg font-mono text-white">{row.count}</span>
+              <ChevronRight className="w-4 h-4 text-zinc-500" />
+            </div>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const OpportunitiesCard = ({ data, onRowClick }) => {
+  const rows = [
+    { label: 'Invited', key: 'invited', count: data?.invited || 0 },
+    { label: 'Estimating', key: 'estimating', count: data?.estimating || 0 },
+    { label: 'Submitted', key: 'submitted', count: data?.submitted || 0 },
+    { label: 'Negotiating', key: 'negotiating', count: data?.negotiating || 0 },
+    { label: 'Awarded', key: 'awarded', count: data?.awarded || 0 },
+    { label: 'Lost', key: 'lost', count: data?.lost || 0 },
+  ];
+  
+  return (
+    <div className="bg-tfcs-surface border border-tfcs-border rounded" data-testid="opportunities-card">
+      <div className="px-4 py-3 border-b border-tfcs-border">
+        <h2 className="text-xs font-mono uppercase tracking-wider text-zinc-500">Opportunities</h2>
+      </div>
+      <div className="divide-y divide-tfcs-border">
+        {rows.map((row) => (
+          <button
+            key={row.key}
+            onClick={() => onRowClick('opportunities', row.key)}
+            className="w-full flex items-center justify-between px-4 py-3 hover:bg-tfcs-surface-hover transition-colors text-left"
+            data-testid={`opportunity-row-${row.key}`}
+          >
+            <span className="text-white">{row.label}</span>
+            <div className="flex items-center gap-2">
+              <span className="text-lg font-mono text-white">{row.count}</span>
+              <ChevronRight className="w-4 h-4 text-zinc-500" />
+            </div>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const AICatchMeUp = () => {
+  return (
+    <div className="bg-black border border-tfcs-border rounded" data-testid="ai-catchmeup">
+      <div className="px-4 py-3 border-b border-tfcs-border flex items-center gap-2">
+        <Sparkles className="w-4 h-4 text-tfcs-gold" />
+        <h2 className="text-xs font-mono uppercase tracking-wider text-zinc-500">Company Brain</h2>
+      </div>
+      <div className="p-6 font-mono text-sm text-zinc-500 min-h-[100px] flex items-center justify-center">
+        <p className="text-center leading-relaxed">
+          Company Brain will summarize activity here in a future specification.
+        </p>
+      </div>
+    </div>
+  );
+};
+
+const RecentActivity = ({ activities }) => {
+  const getActivityColor = (type) => {
+    switch (type) {
+      case 'create': return 'bg-tfcs-green';
+      case 'update': return 'bg-tfcs-gold';
+      case 'urgent': return 'bg-tfcs-red';
+      default: return 'bg-zinc-500';
+    }
+  };
+  
+  return (
+    <div className="bg-tfcs-surface border border-tfcs-border rounded" data-testid="recent-activity">
+      <div className="px-4 py-3 border-b border-tfcs-border">
+        <h2 className="text-xs font-mono uppercase tracking-wider text-zinc-500">Recent Activity</h2>
+      </div>
+      <div className="p-4">
+        {activities.length === 0 ? (
+          <p className="text-zinc-500 text-center py-4">No recent activity</p>
+        ) : (
+          <div className="relative">
+            {/* Timeline line */}
+            <div className="absolute left-[5px] top-2 bottom-2 w-px bg-tfcs-border" />
+            
+            <div className="space-y-4">
+              {activities.map((activity, i) => (
+                <div key={i} className="flex gap-4 relative">
+                  <div className={`w-3 h-3 rounded-full ${getActivityColor(activity.type)} flex-shrink-0 mt-1 z-10`} />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-white">
+                      <span className="font-medium">{activity.user}</span>
+                      <span className="text-zinc-400"> {activity.action}</span>
+                    </p>
+                    <p className="text-xs font-mono text-zinc-500 mt-1">{activity.time}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// ============================================
+// MAIN PAGE COMPONENT
+// ============================================
+
 const MainframePage = () => {
   const { user } = useAuthStore();
   const navigate = useNavigate();
+  
+  // Panel states
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [catchMeUpOpen, setCatchMeUpOpen] = useState(false);
+  const [ownerAccessOpen, setOwnerAccessOpen] = useState(false);
+  const [quickAddOpen, setQuickAddOpen] = useState(false);
+  
+  // Data states
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [roleData, setRoleData] = useState(null);
-  const [diagnostics, setDiagnostics] = useState(null);
+  const [notifications, setNotifications] = useState([]);
+  const [todaysFocus, setTodaysFocus] = useState([]); // Empty until priority logic implemented
+  const [projectsData, setProjectsData] = useState({});
+  const [opportunitiesData, setOpportunitiesData] = useState({}); // Empty until opportunities API implemented
+  const [activities, setActivities] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
 
-  useEffect(() => {
-    checkAccess();
-  }, []);
-
-  const checkAccess = async () => {
-    setLoading(true);
-    setError(null);
-
+  const fetchData = useCallback(async () => {
     try {
-      // Get token from Supabase session (unified approach)
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
-
+      
       if (!token) {
-        setError('Not authenticated');
-        setLoading(false);
+        navigate('/login');
         return;
       }
+      
+      const headers = {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      };
+      
+      // Fetch role data
+      const roleRes = await fetch(`${API_URL}/api/tfcs/role/me`, { headers });
+      if (roleRes.ok) {
+        const data = await roleRes.json();
+        setRoleData(data);
+      }
+      
+      // Fetch notifications
+      const notifRes = await fetch(`${API_URL}/api/tfcs/notifications?limit=10`, { headers });
+      if (notifRes.ok) {
+        const data = await notifRes.json();
+        setNotifications(data.notifications || []);
+        setUnreadCount(data.unread_count || 0);
+      }
+      
+      // Fetch activity events for Recent Activity
+      const activityRes = await fetch(`${API_URL}/api/tfcs/activity?limit=10`, { headers });
+      if (activityRes.ok) {
+        const data = await activityRes.json();
+        const formattedActivities = (data.events || []).map(event => ({
+          user: event.user_name || event.user_email?.split('@')[0] || 'User',
+          action: event.action,
+          time: formatTimeAgo(event.created_at),
+          type: event.action_type
+        }));
+        setActivities(formattedActivities);
+      }
+      
+      // Fetch projects summary from real projects API
+      try {
+        const projectsRes = await fetch(`${API_URL}/api/projects`, { headers });
+        if (projectsRes.ok) {
+          const data = await projectsRes.json();
+          const projects = data.projects || [];
+          // Map actual project statuses to dashboard categories
+          setProjectsData({
+            starting_soon: projects.filter(p => p.status === 'starting_soon' || p.status === 'pending' || p.status === 'planned').length,
+            in_progress: projects.filter(p => p.status === 'in_progress' || p.status === 'active').length,
+            deficiencies: projects.filter(p => p.status === 'deficiency' || p.status === 'on_hold').length,
+            completed: projects.filter(p => p.status === 'completed' || p.status === 'done').length,
+          });
+        }
+      } catch (e) {
+        console.log('Projects fetch error:', e);
+      }
+      
+      // Opportunities: Architecture ready, awaiting dedicated endpoint
+      // Currently no /api/opportunities endpoint exists
+      // Will show zeros until implemented
+      setOpportunitiesData({
+        invited: 0,
+        estimating: 0,
+        submitted: 0,
+        negotiating: 0,
+        awarded: 0,
+        lost: 0,
+      });
+      
+      // Today's Focus: Architecture ready, awaiting priority logic
+      // Will show empty state until priority calculation is implemented
+      setTodaysFocus([]);
+      
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [navigate]);
 
-      // Check role
-      const roleResponse = await fetch(`${API_URL}/api/tfcs/role/me`, {
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const formatTimeAgo = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const now = new Date();
+    const diff = Math.floor((now - date) / 1000);
+    
+    if (diff < 60) return 'Just now';
+    if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
+    if (diff < 172800) return 'Yesterday';
+    return date.toLocaleDateString();
+  };
+
+  const handleRowClick = (section, filter) => {
+    navigate(`/app/${section}?status=${filter}`);
+  };
+
+  const handleMarkRead = async (notifId) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) return;
+      
+      await fetch(`${API_URL}/api/tfcs/notifications/${notifId}/read`, {
+        method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
-
-      const roleResult = await roleResponse.json();
-      setRoleData(roleResult);
-
-      // If owner, fetch diagnostics
-      if (roleResult.has_role && roleResult.role === 'owner') {
-        try {
-          const diagResponse = await fetch(`${API_URL}/api/tfcs/diagnostics`, {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            }
-          });
-          
-          if (diagResponse.ok) {
-            const diagResult = await diagResponse.json();
-            setDiagnostics(diagResult.diagnostics);
-          }
-        } catch (e) {
-          console.log('Could not fetch diagnostics:', e);
-        }
-      }
-
-    } catch (err) {
-      console.error('Error checking TFCS access:', err);
-      setError(err.message || 'Failed to check access');
-    } finally {
-      setLoading(false);
+      
+      setNotifications(prev => prev.filter(n => n.id !== notifId));
+      setUnreadCount(prev => Math.max(0, prev - 1));
+    } catch (e) {
+      console.error('Error marking notification read:', e);
     }
   };
 
-  const getRoleIcon = (role) => {
-    switch (role) {
-      case 'owner':
-        return <Crown className="w-6 h-6 text-amber-400" />;
-      case 'manager':
-        return <Briefcase className="w-6 h-6 text-blue-400" />;
-      case 'employee':
-        return <UserCheck className="w-6 h-6 text-green-400" />;
-      default:
-        return <Users className="w-6 h-6 text-gray-400" />;
-    }
-  };
-
-  const getRoleColor = (role) => {
-    switch (role) {
-      case 'owner':
-        return 'from-amber-500/20 to-amber-600/10 border-amber-500/30';
-      case 'manager':
-        return 'from-blue-500/20 to-blue-600/10 border-blue-500/30';
-      case 'employee':
-        return 'from-green-500/20 to-green-600/10 border-green-500/30';
-      default:
-        return 'from-gray-500/20 to-gray-600/10 border-gray-500/30';
-    }
+  const closeAllPanels = () => {
+    setNotificationsOpen(false);
+    setCatchMeUpOpen(false);
+    setOwnerAccessOpen(false);
+    setQuickAddOpen(false);
   };
 
   if (loading) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-12 h-12 text-steel-500 animate-spin mx-auto mb-4" />
-          <p className="text-gray-400">Verifying TFCS Mainframe access...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-[60vh] flex items-center justify-center">
-        <div className="text-center max-w-md">
-          <XCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-white mb-2">Access Error</h2>
-          <p className="text-gray-400 mb-4">{error}</p>
-          <button
-            onClick={() => navigate('/app/dashboard')}
-            className="px-4 py-2 bg-charcoal-700 text-white rounded-lg hover:bg-charcoal-600 transition-colors"
-          >
-            Return to Dashboard
-          </button>
-        </div>
+      <div className="min-h-screen bg-tfcs-black flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-tfcs-gold animate-spin" />
       </div>
     );
   }
 
   if (!roleData?.has_role) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center">
+      <div className="min-h-screen bg-tfcs-black flex items-center justify-center p-4">
         <div className="text-center max-w-md">
-          <Shield className="w-16 h-16 text-gray-500 mx-auto mb-4" />
+          <Shield className="w-16 h-16 text-zinc-700 mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-white mb-2">Access Restricted</h2>
-          <p className="text-gray-400 mb-4">
-            {roleData?.tables_initialized === false 
-              ? 'TFCS Mainframe is not yet initialized. Please contact the system administrator.'
-              : 'You do not have a TFCS Mainframe role assigned. Contact your administrator for access.'}
+          <p className="text-zinc-400 mb-6">
+            You do not have access to TFCS Mainframe. Contact your administrator.
           </p>
-          {roleData?.message && (
-            <p className="text-sm text-gray-500 mb-4">{roleData.message}</p>
-          )}
           <button
             onClick={() => navigate('/app/dashboard')}
-            className="px-4 py-2 bg-charcoal-700 text-white rounded-lg hover:bg-charcoal-600 transition-colors"
+            className="px-4 py-2 bg-tfcs-surface border border-tfcs-border rounded text-white hover:bg-tfcs-surface-hover transition-colors"
           >
             Return to Dashboard
           </button>
@@ -164,159 +548,102 @@ const MainframePage = () => {
     );
   }
 
-  // User has access
   return (
-    <div className="space-y-6" data-testid="tfcs-mainframe">
+    <div className="min-h-screen bg-tfcs-black font-sans" data-testid="tfcs-command-center">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div className="p-3 bg-gradient-to-br from-steel-500/20 to-steel-600/10 rounded-xl border border-steel-500/30">
-            <Shield className="w-8 h-8 text-steel-400" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-white">TFCS Mainframe</h1>
-            <p className="text-gray-400">Two Fungis Finishing - Internal Operations</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Role Card */}
-      <div className={`bg-gradient-to-br ${getRoleColor(roleData.role)} rounded-xl border p-6`}>
-        <div className="flex items-center gap-4">
-          <div className="p-3 bg-charcoal-800/50 rounded-lg">
-            {getRoleIcon(roleData.role)}
-          </div>
-          <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <h2 className="text-xl font-semibold text-white capitalize">{roleData.role} Access</h2>
-              <CheckCircle className="w-5 h-5 text-green-400" />
+      <header className="sticky top-0 z-40 bg-tfcs-black border-b border-tfcs-border">
+        <div className="px-4 lg:px-6 py-4">
+          <div className="flex items-center justify-between">
+            {/* Left: Title */}
+            <div>
+              <h1 className="text-xl lg:text-2xl font-bold text-white tracking-tight">TFCS Mainframe</h1>
+              <p className="text-xs text-zinc-500 font-mono uppercase tracking-wider">Two Fungis Finishing</p>
             </div>
-            <p className="text-gray-400 text-sm">{roleData.user_email}</p>
-            {roleData.auto_assigned && (
-              <p className="text-xs text-amber-400 mt-1">Auto-assigned as initial owner</p>
-            )}
+            
+            {/* Right: Actions */}
+            <div className="flex items-center gap-2 lg:gap-4">
+              {/* Notifications */}
+              <button
+                onClick={() => { closeAllPanels(); setNotificationsOpen(true); }}
+                className="relative p-2 text-zinc-400 hover:text-white transition-colors"
+                data-testid="notifications-bell"
+              >
+                <Bell className="w-5 h-5" />
+                {unreadCount > 0 && (
+                  <span className="absolute top-1 right-1 w-2 h-2 bg-tfcs-red rounded-full" />
+                )}
+              </button>
+              
+              {/* Catch Me Up */}
+              <button
+                onClick={() => { closeAllPanels(); setCatchMeUpOpen(true); }}
+                className="p-2 text-zinc-400 hover:text-tfcs-gold transition-colors"
+                data-testid="catchmeup-btn"
+              >
+                <Sparkles className="w-5 h-5" />
+              </button>
+              
+              {/* Owner Access */}
+              <button
+                onClick={() => { closeAllPanels(); setOwnerAccessOpen(true); }}
+                className="p-2 text-tfcs-gold hover:text-tfcs-gold/80 transition-colors"
+                data-testid="owner-access-btn"
+              >
+                <Crown className="w-5 h-5" />
+              </button>
+              
+              {/* Quick Add */}
+              <button
+                onClick={() => { closeAllPanels(); setQuickAddOpen(true); }}
+                className="p-2 bg-tfcs-surface border border-tfcs-border rounded text-white hover:bg-tfcs-surface-hover transition-colors"
+                data-testid="quickadd-btn"
+              >
+                <Plus className="w-5 h-5" />
+              </button>
+            </div>
           </div>
         </div>
+      </header>
 
-        {/* Role Permissions */}
-        <div className="mt-4 pt-4 border-t border-white/10">
-          <h3 className="text-sm font-medium text-gray-300 mb-2">Permissions</h3>
-          <div className="flex flex-wrap gap-2">
-            {roleData.role === 'owner' && (
-              <>
-                <span className="px-2 py-1 bg-charcoal-800/50 rounded text-xs text-green-400">Full Access</span>
-                <span className="px-2 py-1 bg-charcoal-800/50 rounded text-xs text-green-400">Manage Users</span>
-                <span className="px-2 py-1 bg-charcoal-800/50 rounded text-xs text-green-400">View Private Events</span>
-                <span className="px-2 py-1 bg-charcoal-800/50 rounded text-xs text-green-400">System Settings</span>
-              </>
-            )}
-            {roleData.role === 'manager' && (
-              <>
-                <span className="px-2 py-1 bg-charcoal-800/50 rounded text-xs text-blue-400">Operational Access</span>
-                <span className="px-2 py-1 bg-charcoal-800/50 rounded text-xs text-blue-400">Manage Projects</span>
-                <span className="px-2 py-1 bg-charcoal-800/50 rounded text-xs text-blue-400">View Team Activity</span>
-              </>
-            )}
-            {roleData.role === 'employee' && (
-              <>
-                <span className="px-2 py-1 bg-charcoal-800/50 rounded text-xs text-gray-400">View Assigned Work</span>
-                <span className="px-2 py-1 bg-charcoal-800/50 rounded text-xs text-gray-400">Log Own Activity</span>
-              </>
-            )}
-          </div>
-        </div>
-      </div>
+      {/* Panels */}
+      <NotificationsPanel 
+        isOpen={notificationsOpen} 
+        onClose={() => setNotificationsOpen(false)}
+        notifications={notifications.map(n => ({ ...n, time: formatTimeAgo(n.created_at) }))}
+        onMarkRead={handleMarkRead}
+      />
+      <CatchMeUpPanel 
+        isOpen={catchMeUpOpen} 
+        onClose={() => setCatchMeUpOpen(false)}
+      />
+      <OwnerAccessPanel 
+        isOpen={ownerAccessOpen} 
+        onClose={() => setOwnerAccessOpen(false)}
+        roleData={roleData}
+      />
+      <QuickAddPanel 
+        isOpen={quickAddOpen} 
+        onClose={() => setQuickAddOpen(false)}
+        onNavigate={navigate}
+      />
 
-      {/* Foundation Verification Status */}
-      <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6">
-        <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-          <CheckCircle className="w-5 h-5 text-green-400" />
-          Foundation Verification
-        </h2>
+      {/* Main Content */}
+      <main className="px-4 lg:px-6 py-6 space-y-6">
+        {/* Today's Focus */}
+        <TodaysFocus items={todaysFocus} />
         
-        <div className="space-y-3">
-          <div className="flex items-center gap-3 p-3 bg-charcoal-700/50 rounded-lg">
-            <CheckCircle className="w-5 h-5 text-green-400" />
-            <span className="text-gray-300">Owner Login Verified</span>
-          </div>
-          <div className="flex items-center gap-3 p-3 bg-charcoal-700/50 rounded-lg">
-            <CheckCircle className="w-5 h-5 text-green-400" />
-            <span className="text-gray-300">TFCS Mainframe Accessible</span>
-          </div>
-          <div className="flex items-center gap-3 p-3 bg-charcoal-700/50 rounded-lg">
-            <CheckCircle className="w-5 h-5 text-green-400" />
-            <span className="text-gray-300">Owner Permissions Confirmed</span>
-          </div>
-          <div className="flex items-center gap-3 p-3 bg-charcoal-700/50 rounded-lg">
-            <CheckCircle className="w-5 h-5 text-green-400" />
-            <span className="text-gray-300">Role-Based Access Control Active</span>
-          </div>
+        {/* Two Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <ProjectsCard data={projectsData} onRowClick={handleRowClick} />
+          <OpportunitiesCard data={opportunitiesData} onRowClick={handleRowClick} />
         </div>
-      </div>
-
-      {/* Diagnostics (Owner Only) */}
-      {roleData.role === 'owner' && diagnostics && (
-        <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6">
-          <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-            <Activity className="w-5 h-5 text-steel-400" />
-            System Diagnostics
-          </h2>
-          
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-charcoal-700/50 rounded-lg p-4">
-              <p className="text-2xl font-bold text-white">{diagnostics.total_users_with_roles}</p>
-              <p className="text-sm text-gray-400">Total Users</p>
-            </div>
-            <div className="bg-charcoal-700/50 rounded-lg p-4">
-              <p className="text-2xl font-bold text-amber-400">{diagnostics.roles_breakdown?.owners || 0}</p>
-              <p className="text-sm text-gray-400">Owners</p>
-            </div>
-            <div className="bg-charcoal-700/50 rounded-lg p-4">
-              <p className="text-2xl font-bold text-blue-400">{diagnostics.roles_breakdown?.managers || 0}</p>
-              <p className="text-sm text-gray-400">Managers</p>
-            </div>
-            <div className="bg-charcoal-700/50 rounded-lg p-4">
-              <p className="text-2xl font-bold text-green-400">{diagnostics.roles_breakdown?.employees || 0}</p>
-              <p className="text-sm text-gray-400">Employees</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 mt-4">
-            <div className="bg-charcoal-700/50 rounded-lg p-4">
-              <p className="text-2xl font-bold text-white">{diagnostics.events_last_24h}</p>
-              <p className="text-sm text-gray-400">Events (24h)</p>
-            </div>
-            <div className="bg-charcoal-700/50 rounded-lg p-4">
-              <p className="text-2xl font-bold text-white">{diagnostics.unread_notifications}</p>
-              <p className="text-sm text-gray-400">Unread Notifications</p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Awaiting Dashboard */}
-      <div className="bg-gradient-to-br from-charcoal-800 to-charcoal-900 rounded-xl border border-charcoal-700 p-6">
-        <div className="flex items-center gap-3 mb-4">
-          <AlertTriangle className="w-6 h-6 text-amber-400" />
-          <h2 className="text-lg font-semibold text-white">Dashboard Pending</h2>
-        </div>
-        <p className="text-gray-400">
-          The TFCS Mainframe Dashboard will be developed after the foundation has been reviewed and approved.
-          The following pages are planned:
-        </p>
-        <div className="mt-4 flex flex-wrap gap-2">
-          {['Dashboard', 'Projects', 'Opportunities', 'Production Library', 'CRM', 'Documents', 'Employees', 'Settings'].map((page, i) => (
-            <span 
-              key={page} 
-              className={`px-3 py-1 rounded-full text-sm ${
-                i === 0 ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'bg-charcoal-700 text-gray-400'
-              }`}
-            >
-              {page}
-            </span>
-          ))}
-        </div>
-      </div>
+        
+        {/* Company Brain (Future AI) */}
+        <AICatchMeUp />
+        
+        {/* Recent Activity */}
+        <RecentActivity activities={activities} />
+      </main>
     </div>
   );
 };

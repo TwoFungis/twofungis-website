@@ -100,7 +100,22 @@ const AppLayout = () => {
     checkTfcsAccess();
   }, [userEmail]);
 
-  // Focused navigation - Core business functions only
+  // Check if user has TFCS access (for sidebar reorganization)
+  const hasTfcsAccess = tfcsRole?.has_role || FOUNDER_EMAILS.map(e => e.toLowerCase()).includes(userEmail);
+
+  // TFCS Mainframe Navigation (when user has access)
+  const tfcsNavItems = [
+    { path: '/app/mainframe', icon: LayoutDashboard, label: 'Dashboard' },
+    { path: '/app/projects', icon: FolderKanban, label: 'Projects' },
+    { path: '/app/estimating', icon: Calculator, label: 'Estimates' },
+    { path: '/app/invoices', icon: Receipt, label: 'Invoices' },
+    { path: '/app/receivables', icon: DollarSign, label: 'Financial' },
+    { path: '/app/expenses', icon: Wallet, label: 'Expenses' },
+    { path: '/app/documents', icon: FolderOpen, label: 'Documents' },
+    { path: '/app/reports', icon: BarChart3, label: 'Reports' },
+  ];
+
+  // Standard TradeOS navigation (non-TFCS users)
   const navItems = [
     { path: '/app/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { path: '/app/projects', icon: FolderKanban, label: 'Projects' },
@@ -114,6 +129,9 @@ const AppLayout = () => {
     { path: '/app/tax-summary', icon: PieChart, label: 'Tax Summary' },
     { path: '/app/reports', icon: BarChart3, label: 'Reports' },
   ];
+
+  // Use TFCS nav if user has access
+  const activeNavItems = hasTfcsAccess ? tfcsNavItems : navItems;
   
   const bottomNavItems = [
     { path: '/app/integrations', icon: Link2, label: 'Integrations' },
@@ -134,25 +152,39 @@ const AppLayout = () => {
   };
 
   return (
-    <div className="min-h-screen bg-cloud-100 flex">
+    <div className={`min-h-screen ${hasTfcsAccess ? 'bg-tfcs-black' : 'bg-cloud-100'} flex`}>
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex flex-col w-64 bg-charcoal-800 border-r border-charcoal-700" data-testid="desktop-sidebar">
-        <div className="p-5 border-b border-charcoal-700">
-          <Link to="/app" className="flex items-center justify-center">
-            <img src="/logo.png" alt="TradeOS" className="h-24 w-auto" />
-          </Link>
+      <aside className={`hidden lg:flex flex-col w-64 ${hasTfcsAccess ? 'bg-tfcs-surface border-r border-tfcs-border' : 'bg-charcoal-800 border-r border-charcoal-700'}`} data-testid="desktop-sidebar">
+        <div className={`p-5 border-b ${hasTfcsAccess ? 'border-tfcs-border' : 'border-charcoal-700'}`}>
+          {hasTfcsAccess ? (
+            <Link to="/app/mainframe" className="flex flex-col items-center">
+              <div className="flex items-center gap-2 mb-1">
+                <Shield className="w-6 h-6 text-tfcs-gold" />
+                <span className="text-lg font-bold text-white tracking-tight">TFCS</span>
+              </div>
+              <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-500">Two Fungis Finishing</span>
+            </Link>
+          ) : (
+            <Link to="/app" className="flex items-center justify-center">
+              <img src="/logo.png" alt="TradeOS" className="h-24 w-auto" />
+            </Link>
+          )}
         </div>
 
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-          {navItems.map((item) => (
+          {activeNavItems.map((item) => (
             <NavLink
               key={item.path}
               to={item.path}
               className={({ isActive }) =>
                 `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                   isActive
-                    ? 'bg-steel-500/20 text-steel-400'
-                    : 'text-gray-400 hover:text-white hover:bg-charcoal-700'
+                    ? hasTfcsAccess 
+                      ? 'bg-tfcs-gold/10 text-tfcs-gold border-l-2 border-tfcs-gold'
+                      : 'bg-steel-500/20 text-steel-400'
+                    : hasTfcsAccess
+                      ? 'text-zinc-400 hover:text-white hover:bg-tfcs-surface-hover'
+                      : 'text-gray-400 hover:text-white hover:bg-charcoal-700'
                 }`
               }
               data-testid={`nav-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
@@ -163,28 +195,7 @@ const AppLayout = () => {
           ))}
           
           {/* Separator */}
-          <div className="border-t border-charcoal-700 my-2"></div>
-          
-          {/* TFCS Mainframe - Only visible to users with TFCS access */}
-          {(tfcsRole?.has_role || FOUNDER_EMAILS.map(e => e.toLowerCase()).includes(userEmail)) && (
-            <NavLink
-              to="/app/mainframe"
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                  isActive
-                    ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                    : 'text-amber-400/70 hover:text-amber-400 hover:bg-amber-500/10'
-                }`
-              }
-              data-testid="nav-mainframe"
-            >
-              <Shield className="w-5 h-5" />
-              <span className="font-medium">TFCS Mainframe</span>
-              {tfcsRole?.role === 'owner' && (
-                <Crown className="w-4 h-4 ml-auto" />
-              )}
-            </NavLink>
-          )}
+          <div className={`border-t ${hasTfcsAccess ? 'border-tfcs-border' : 'border-charcoal-700'} my-2`}></div>
           
           {/* Bottom nav items */}
           {bottomNavItems.map((item) => (
@@ -194,8 +205,12 @@ const AppLayout = () => {
               className={({ isActive }) =>
                 `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                   isActive
-                    ? 'bg-steel-500/20 text-steel-400'
-                    : 'text-gray-400 hover:text-white hover:bg-charcoal-700'
+                    ? hasTfcsAccess
+                      ? 'bg-tfcs-gold/10 text-tfcs-gold'
+                      : 'bg-steel-500/20 text-steel-400'
+                    : hasTfcsAccess
+                      ? 'text-zinc-400 hover:text-white hover:bg-tfcs-surface-hover'
+                      : 'text-gray-400 hover:text-white hover:bg-charcoal-700'
                 }`
               }
               data-testid={`nav-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
@@ -206,14 +221,18 @@ const AppLayout = () => {
           ))}
         </nav>
 
-        <div className="p-4 border-t border-charcoal-700">
+        <div className={`p-4 border-t ${hasTfcsAccess ? 'border-tfcs-border' : 'border-charcoal-700'}`}>
           <NavLink
             to="/app/profile"
             className={({ isActive }) =>
               `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors mb-2 ${
                 isActive
-                  ? 'bg-steel-500/20 text-steel-400'
-                  : 'text-gray-400 hover:text-white hover:bg-charcoal-700'
+                  ? hasTfcsAccess
+                    ? 'bg-tfcs-gold/10 text-tfcs-gold'
+                    : 'bg-steel-500/20 text-steel-400'
+                  : hasTfcsAccess
+                    ? 'text-zinc-400 hover:text-white hover:bg-tfcs-surface-hover'
+                    : 'text-gray-400 hover:text-white hover:bg-charcoal-700'
               }`
             }
             data-testid="nav-profile"

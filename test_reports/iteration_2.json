@@ -1,0 +1,42 @@
+{
+  "summary": "Full end-to-end verification of TFCS Mainframe Command Center (Spec 1.1). Backend: 10/10 pytest tests passed against real endpoints (/api/tfcs/health, /api/tfcs/role/me, /api/tfcs/notifications, /api/tfcs/activity, /api/projects, /api/tfcs/diagnostics) including auth guards. Frontend: 25+ UI/integration checks passed. Owner login (inbox@twofungis.ca) authenticates, navigates to /app/mainframe, sees TFCS Mainframe title, empty Today's Focus, Projects & Opportunities cards with zero counts (no seed data), Company Brain placeholder, Recent Activity (empty), all four header panels (Notifications, Catch Me Up, Owner Access, Quick Add) open/close correctly with all 5 Quick Add options present. Project row click correctly navigates to /app/projects?status=in_progress. Sidebar shows TFCS branding with Shield icon. Responsive layouts render on tablet (768) and mobile (390).",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "MainframePage - Desktop 1920px", "issues": ["Floating 'QUICK EXPENSE' and 'AI SUPPORT' action buttons (bottom-right) overlap the Opportunities card 'Lost' row and 'Made with Emergent' badge overlaps footer. Same issue flagged in iteration_1 - still present."]},
+      {"screen": "MainframePage - Mobile 390px", "issues": ["Floating 'QUICK EXPENSE'/'AI SUPPORT' buttons overlap the Opportunities rows (Awarded/Lost partially obscured) and the bottom mobile nav bar sits over the 'Made with Emergent' badge causing visual crowding."]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_tfcs_mainframe.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "Optional (non-blocking): Adjust z-index / bottom-padding of MainframePage main container so floating QUICK EXPENSE / AI SUPPORT buttons and Emergent badge do not overlap the last dashboard card. Persistent across iterations 1 & 2.",
+    "Audit two 404 errors observed on initial page load (visible in console right after login on /app/dashboard). Non-blocking but noisy. Console message: 'Failed to load resource: 404' (endpoints not identified from stack).",
+    "Optional: 'Error fetching outstanding invoices: TypeError: Failed to fetch' appears once on /app/dashboard (not /app/mainframe). Unrelated to Spec 1.1 but should be investigated."
+  ],
+  "critical_code_review_comments": [
+    "MainframePage.jsx defines helper formatTimeAgo AFTER using it inside fetchData via useCallback. It works because JS function hoisting via `const formatTimeAgo = (dateString) => ...` is NOT hoisted, but fetchData captures it at call time (runtime). Currently formatTimeAgo is called inside the callback body which runs after render, so it works, but placing formatTimeAgo above fetchData would be cleaner and avoid TDZ-adjacent confusion. Also formatTimeAgo is not listed in fetchData's useCallback deps.",
+    "MainframePage uses supabase.auth.getSession() (good) - unified with AppLayout now, resolving iteration_1's dual-pattern comment for THIS file.",
+    "Opportunities data is set via a client-side hardcoded zero object inside fetchData (lines 454-461). Once /api/opportunities exists, this should be replaced. Currently correctly shows zeros per spec.",
+    "Projects status mapping in MainframePage (lines 441-444) buckets many statuses together (e.g. pending/planned -> starting_soon, active -> in_progress). Verify this matches backend project status enum to avoid mis-categorization when real data lands.",
+    "Recent Activity 'time' formatting relies on backend field created_at + client formatTimeAgo. Works but the timeline currently shows 'No recent activity' because /api/tfcs/activity returns []. Not a bug; just note that activity logging endpoints exist but no events have been logged yet.",
+    "Two console 404 errors on initial load (not on /app/mainframe itself) - should be located and removed."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_tfcs_mainframe.py (new file)"
+  ],
+  "success_rate": {"backend": "100% (10/10)", "frontend": "100% (25/25 checks)"},
+  "test_credentials": "inbox@twofungis.ca / TradeOS2024! (Owner role confirmed via /api/tfcs/role/me -> has_role=true, role=owner)",
+  "seed_data_creation": "None. Backend databases contain no projects, no opportunities, no notifications, no activity events for this owner - dashboard correctly shows 0 counts and empty states.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Backend test suite at /app/backend/tests/test_tfcs_mainframe.py - run with: `python -m pytest /app/backend/tests/test_tfcs_mainframe.py -v`. It logs in via Supabase password grant with the owner credentials and hits all TFCS endpoints. The /api/tfcs/role/me endpoint auto-assigns owner role to inbox@twofungis.ca on first call (already assigned in Supabase now). Frontend Mainframe fully works: all data-testids from spec present (tfcs-command-center, todays-focus, projects-card, opportunities-card, ai-catchmeup, recent-activity, notifications-bell, catchmeup-btn, owner-access-btn, quickadd-btn, project-row-{key}, opportunity-row-{key}, quickadd-{lbl}, close-notifications/catchmeup/owner/quickadd). Since backend has no seed data, all cards show zeros - if you need to verify real counts, either seed via POST /api/projects or POST /api/tfcs/activity/log first. When testing UI, allow ~3-5s after login for service worker + role check to settle.",
+  "rca_of_the_issue": "N/A - no failures. All Spec 1.1 acceptance criteria met."
+}
