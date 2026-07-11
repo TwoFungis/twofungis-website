@@ -182,14 +182,22 @@ Run `/app/migrations/012_company_brain_foundation.sql` in Supabase SQL Editor to
 
 ## Upcoming Tasks (Priority Order)
 
-### P1 - TFCS AI Integration (Specification 1.3)
-- Integrate GPT-5.2 for actual AI responses
+### P0 - Specification 1.3: Production Library (NEXT)
+The Company's first structured knowledge base. AI integration is intentionally postponed until Company Brain has meaningful company knowledge to operate on.
+
+**Why Production Library First:**
+- Establishes real company knowledge for AI to reason over
+- Single source of truth for estimating
+- Foundation for intelligent cost analysis
+- Makes future AI significantly more valuable
+
+### P1 - AI Integration (DEFERRED)
+- GPT-5.2 integration for Company Brain conversations
 - "Catch Me Up" operational summaries
-- Context-aware conversations
-- Run migration 012
+- Context-aware responses based on Production Library data
+- **Prerequisite:** Production Library must be populated first
 
 ### P2 - Additional Features
-- Production Library (Single source of truth for estimating)
 - Add second Owner role for 'Beau'
 - Estimate Templates + Production Rates
 - QuickBooks Sync (Sandbox-Ready)
