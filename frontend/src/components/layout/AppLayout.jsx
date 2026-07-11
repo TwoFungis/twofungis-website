@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Outlet, NavLink, useNavigate, Link } from 'react-router-dom';
+import { Outlet, NavLink, useNavigate, Link, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   FolderKanban, 
@@ -22,7 +22,8 @@ import {
   Briefcase,
   Link2,
   DollarSign,
-  Shield
+  Shield,
+  Brain
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { supabase } from '../../lib/supabase';
@@ -35,6 +36,8 @@ import QuickAddFab from '../app/QuickAddFab';
 import SyncIndicator from '../app/SyncIndicator';
 import UpdateBanner from '../app/UpdateBanner';
 import PWARedirectModal from '../app/PWARedirectModal';
+import CompanyBrainPanel from '../brain/CompanyBrainPanel';
+import { useBrainContext, getContextFromPath } from '../../hooks/useBrainContext';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -44,7 +47,16 @@ const AppLayout = () => {
   const [quickActionOpen, setQuickActionOpen] = useState(false);
   const [showQuickExpenseModal, setShowQuickExpenseModal] = useState(false);
   const [tfcsRole, setTfcsRole] = useState(null);
+  const [brainOpen, setBrainOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const { context, setContext } = useBrainContext();
+  
+  // Update brain context based on current path
+  useEffect(() => {
+    const pathContext = getContextFromPath(location.pathname);
+    setContext({ ...pathContext, path: location.pathname });
+  }, [location.pathname, setContext]);
   
   // Founder email check - use user.email from auth
   const FOUNDER_EMAILS = ["info@twofungis.ca", "swdmarshall@gmail.com", "carpenterbeau@hotmail.com", "inbox@twofungis.ca"];
@@ -282,6 +294,18 @@ const AppLayout = () => {
             {/* Trial Countdown Badge */}
             <TrialCountdown />
             
+            {/* Company Brain Button - Global Access */}
+            {hasTfcsAccess && (
+              <button
+                onClick={() => setBrainOpen(true)}
+                className="p-2 text-tfcs-gold hover:text-tfcs-gold/80 transition-colors relative"
+                data-testid="company-brain-btn"
+                title="Company Brain"
+              >
+                <Brain className="w-5 h-5" />
+              </button>
+            )}
+            
             {/* Quick Add Dropdown - includes Quick Expense */}
             <div className="relative">
               <button
@@ -445,6 +469,15 @@ const AppLayout = () => {
       
       {/* PWA Redirect Modal - Shows when user opens in browser but has app installed */}
       <PWARedirectModal />
+      
+      {/* Company Brain Panel - Global Collapsible Side Panel */}
+      {hasTfcsAccess && (
+        <CompanyBrainPanel
+          isOpen={brainOpen}
+          onClose={() => setBrainOpen(false)}
+          pageContext={context}
+        />
+      )}
     </div>
   );
 };

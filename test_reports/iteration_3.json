@@ -1,0 +1,60 @@
+{
+  "summary": "End-to-end verification of Company Brain Foundation (Spec 1.2). Backend: 22/22 pytest tests passed against real /api/brain/* endpoints (health, contracts, threads, threads/{context_type}, messages, suggested-actions, action-history, actions/queue, brief, proactive) including auth guards, invalid tokens, invalid contexts, invalid modules, and role-based permission on action queue. Frontend: TFCS owner logs in, Brain button visible in header, panel opens showing Company Brief placeholder, context selector defaulting to 'general', empty-state conversation view, input+disabled-mic+send buttons all present. Sending a message shows the user bubble AND the brain acknowledgment ('Company Brain is listening. AI capabilities will be added in a future specification.'). Suggested Actions section visible (correctly shows 'No suggestions for current context.' for general context per placeholder design), Action History is collapsed by default and expands on click showing 'No actions yet.' placeholder. Close (X) button dismisses the panel. Mobile (390x844) renders the panel full-width. Desktop (1920) renders it as a 448px right-anchored drawer.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "CompanyBrainPanel - Desktop 1920 (dashboard behind)",
+        "issues": [
+          "Floating 'AI SUPPORT' button (bottom-right) overlaps the Action History section header of the Brain panel, and 'Made with Emergent' badge overlaps the very bottom of the panel. Same overlap pattern reported in iterations 1 & 2 for MainframePage. Consider hiding the floating AI SUPPORT button when Company Brain panel is open (they are two entry points to conversational AI and are visually competing)."
+        ]
+      },
+      {
+        "screen": "CompanyBrainPanel - general context suggestions",
+        "issues": [
+          "When context_type='general' is sent from the frontend, /api/brain/suggested-actions returns 0 suggestions (backend logic only appends placeholder suggestions for project/opportunity/financial/crm/production contexts). UI correctly shows 'No suggestions for current context.' but this makes the General context feel empty. Consider either (a) adding a placeholder suggestion for 'general' in company_brain.py or (b) sending context_type=null for General so all placeholder suggestions surface. This is per-spec-placeholder behavior, not a bug."
+        ]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_company_brain.py",
+    "/app/test_reports/pytest/brain_results.xml"
+  ],
+  "action_items": [
+    "Optional (non-blocking): De-conflict floating 'AI SUPPORT' quick-action button with new Company Brain panel (hide it when brainOpen is true, or remove entirely now that Company Brain is the canonical entry point).",
+    "Optional (non-blocking): Placeholder suggestions for context_type='general' are empty. Add at least one placeholder in MODULE_CONTRACTS lookup or in get_suggested_actions() to make the General thread feel less empty.",
+    "Investigate two 404 errors on initial /app/dashboard load (persistent since iteration_1 and iteration_2 - not identified yet). Not blocking Spec 1.2.",
+    "Reminder: /app/migrations/012_company_brain_foundation.sql has NOT been executed. Endpoints correctly degrade to empty/mock responses (threads=[], actions=[], count=0). Before Spec 1.3 (AI integration), the SQL migration must be run to create company_brain_threads / company_brain_messages / company_brain_actions tables so conversations persist."
+  ],
+  "critical_code_review_comments": [
+    "routes/company_brain.py: send_message endpoint stores the USER message in the DB but never persists the brain_response. Once migration 012 is applied, the assistant reply will be missing from thread history when re-loading. Consider storing both roles.",
+    "routes/company_brain.py: send_message calls await get_or_create_thread(...) which itself opens an httpx client. The outer POST also opens a client but never uses it for the thread lookup. Minor - remove the outer AsyncClient (unused for thread creation) or reuse it.",
+    "routes/company_brain.py: get_user_from_token decodes the JWT without signature verification. This is acceptable for a placeholder but is unsafe for production - a forged JWT with any 'sub' would be accepted. Recommend verifying via Supabase's /auth/v1/user endpoint or JWKS before Spec 1.3.",
+    "routes/company_brain.py: queue_action returns 403 when user_role is None (no TFCS role assigned) even for module 'projects' which only requires 'employee'. role_hierarchy.get(user_role, 0) => 0 < 1, blocks the request. For non-TFCS founder emails or brand-new users this will silently fail. Consider a default 'employee' role for authenticated users.",
+    "CompanyBrainPanel.jsx: handleSelectThread resets messages to [] but no useEffect fetches messages for the newly selected thread. Once /api/brain/messages/{thread_id} is wired, switching contexts should reload history. Currently only the freshly-sent messages are shown in memory.",
+    "CompanyBrainPanel.jsx: Backdrop click (bg-black/50) closes on mobile but on lg:bg-transparent the backdrop is invisible yet still captures clicks, meaning any click anywhere on the desktop app area closes the panel. This is likely intentional but is unusual UX - consider adding pointer-events-none for lg breakpoint if intent was 'no backdrop on desktop'.",
+    "CompanyBrainPanel.jsx: fetchSuggestions has currentContext in its useCallback deps but the useEffect only depends on isOpen. When user changes context via handleSelectThread while panel is open, suggestions won't refetch automatically. Add currentContext.type to the effect deps.",
+    "AppLayout.jsx: hasTfcsAccess check gates both header Brain button AND panel render (good). But BRAIN_CONTEXTS is not synchronized in a single source of truth - it's duplicated in useBrainContext.js AND CompanyBrainPanel.jsx CONTEXT_TYPES AND backend ContextType enum. Any future context addition requires 3 updates.",
+    "useBrainContext.js: getContextFromPath uses substring match ('/projects' -> PROJECT). '/settings/projects-preferences' would also match PROJECT, not SETTINGS (SETTINGS check comes after PROJECT). Order sensitivity could cause misclassification. Consider more specific matching or router-based context injection.",
+    "Migration 012 not yet run - flag in action items. Endpoints defensively return empty arrays so no runtime errors."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_company_brain.py (new file - 22 pytest cases)"
+  ],
+  "success_rate": {
+    "backend": "100% (22/22)",
+    "frontend": "100% (17/17 checks - Brain button visible, panel opens, Company Brief, context selector, empty state, input+mic+send, message send + brain response, Suggested Actions, Action History collapsed then expandable, close X works, mobile full-width)"
+  },
+  "test_credentials": "inbox@twofungis.ca / TradeOS2024! (owner). Confirmed authenticated end-to-end with Supabase password grant.",
+  "seed_data_creation": "None. company_brain_* tables do not yet exist (migration 012 pending) - endpoints defensively return empty/mock responses. All assertions accommodate this.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Backend test suite: /app/backend/tests/test_company_brain.py - run with `python -m pytest backend/tests/test_company_brain.py -v`. All /api/brain/* endpoints validated. When migration 012_company_brain_foundation.sql is applied, re-run test_get_or_create_thread_general - it should return created=false on second call (currently always created=true because table is missing). Frontend data-testids verified: company-brain-btn, company-brain-panel, close-brain-panel, brain-context-selector, brain-input, brain-send. Panel is properly gated behind hasTfcsAccess in AppLayout.jsx. Note that the general context correctly shows empty suggestions - see design_issues[1] for whether main agent wants to change that. The floating AI SUPPORT button (bottom-right) overlaps the Action History section - existing issue since iteration_1.",
+  "rca_of_the_issue": "N/A - no failures. All Spec 1.2 acceptance criteria (19 items in review_request) verified functional."
+}
