@@ -22,7 +22,7 @@ import GoogleAuthCallback from './pages/auth/GoogleAuthCallback';
 import CommandCenterPage from './pages/app/CommandCenterPage';
 import ProjectsPage from './pages/app/ProjectsPage';
 import ProjectDetailPage from './pages/app/ProjectDetailPage';
-import EstimatingPage from './pages/app/EstimatingPage';
+import ProductionLibraryPage from './pages/app/ProductionLibraryPage';
 import ChangeOrdersPage from './pages/app/ChangeOrdersPage';
 import ReportsPage from './pages/app/ReportsPage';
 import SettingsPage from './pages/app/SettingsPage';
@@ -149,9 +149,10 @@ function App() {
             <Route path="projects" element={<ProjectsPage />} />
             <Route path="projects/:id" element={<ProjectDetailPage />} />
             
-            {/* Estimating */}
-            <Route path="estimating" element={<EstimatingPage />} />
-            <Route path="estimating/:id" element={<EstimatingPage />} />
+            {/* Production Library - Company Knowledge Engine */}
+            <Route path="estimating" element={<ProductionLibraryPage />} />
+            <Route path="estimating/:id" element={<ProductionLibraryPage />} />
+            <Route path="production-library" element={<ProductionLibraryPage />} />
             
             {/* Financial */}
             <Route path="invoices" element={<InvoicesPage />} />
