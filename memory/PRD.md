@@ -1,19 +1,25 @@
 # TradeOS - Product Requirements Document
 
 ## Original Problem Statement
-Build "TradeOS," a financial tracking tool for contractors. The application includes:
-- Profit Snapshot dashboard
-- Receivables/reminder system
-- "Activate Your Business" onboarding flow
-- "Quick Add" functionality for expenses
-- PWA installation support
-- **Trial + Locked access monetization model** ✅ IMPLEMENTED
-- **TFCS Mainframe** - Internal operational system for Two Fungis Finishing ✅ SPEC 1.2 COMPLETE
+Build "TradeOS," an end-to-end operating system for Canadian contractors. The application includes:
+- Project Management
+- Commercial Estimating
+- Client & CRM
+- Scheduling
+- Company Brain AI
+- Document Management
+- Invoicing & Expenses
+- Milestones & Receivables
+- Contractor Marketplace
+- Team Management
+- Business Intelligence
+- **TFCS Mainframe** - Enterprise command center for multi-project operations ✅ COMPLETE
 
-## Brand Identity (Updated July 11, 2026)
-- **Tagline:** "Built for Builders. Intelligence for Trades."
-- **Color Palette:** Black (#0a0a0a), Deep Charcoal (#111111), Emerald Green accents, Red accents
-- **Target Market:** Canadian contractors and small trade businesses
+## Brand Identity (Updated July 12, 2026)
+- **Positioning:** "The Operating System for Canadian Contractors"
+- **Tagline:** "Run Your Entire Business. One Platform."
+- **Color Palette:** Black (#0a0a0a), Deep Charcoal (#111111), Emerald Green accents
+- **Target Market:** Canadian commercial and residential contractors
 
 ## User Personas
 - **Primary:** Independent contractors and small trade businesses
@@ -22,15 +28,15 @@ Build "TradeOS," a financial tracking tool for contractors. The application incl
 
 ## Tech Stack
 - **Frontend:** React, TailwindCSS, Zustand, shadcn/ui
-- **Backend:** FastAPI (Python)
-- **Database:** Supabase (Postgres)
+- **Backend:** FastAPI (Python) - NO MongoDB (Supabase only)
+- **Database:** Supabase (Postgres) - SOLE production database
 - **Auth:** Supabase Auth
 - **Integrations:** Stripe (payments), Resend (email), OpenAI GPT-5.2 (AI Copilot via emergentintegrations)
 
 ## Core Features Implemented
 1. ✅ User authentication (Supabase) + Password visibility toggle
-2. ✅ Profit Snapshot dashboard
-3. ✅ Project management with quotes/invoices
+2. ✅ Project management with quotes/invoices
+3. ✅ Commercial Estimating
 4. ✅ Expense tracking with Quick Add
 5. ✅ AI Copilot (project-aware, GPT-5.2 powered)
 6. ✅ Receivables system with reminders
@@ -38,13 +44,42 @@ Build "TradeOS," a financial tracking tool for contractors. The application incl
 8. ✅ PWA support with service worker
 9. ✅ Subscription tiers (free, pro, elite, lifetime)
 10. ✅ **Trial + Locked Access Model**
-11. ✅ **TFCS Mainframe Specification 1.0** (Backend Foundation)
-12. ✅ **TFCS Mainframe Specification 1.1** (Command Center Dashboard)
-13. ✅ **TFCS Mainframe Specification 1.2** (Company Brain Foundation)
-14. ✅ **TFCS Mainframe Specification 1.2.1** (Owner Completion & Account Management)
-15. ✅ **Login Page Refresh** (Two Fungis Branding - July 11, 2026)
-16. ✅ **PWA Manifest Fix** (Corrected start_url routing - July 11, 2026)
-17. ✅ **Landing Page Refresh** (New tagline & emerald branding - July 11, 2026)
+11. ✅ **TFCS Mainframe Specification 1.0-1.2** (Complete)
+12. ✅ **Company Brain Foundation**
+13. ✅ **Login Page Refresh** (July 11, 2026)
+14. ✅ **PWA Manifest Fix** (July 11, 2026)
+15. ✅ **MongoDB Removal** (July 12, 2026) - Supabase is sole DB
+16. ✅ **Landing Page - Contractor OS Messaging** (July 12, 2026)
+17. ✅ **Two Fungis Code Cleanup** (July 12, 2026)
+
+---
+
+## Production Deployment Preparation (July 12, 2026)
+
+### Architecture Changes
+- **Removed MongoDB entirely** - All data now stored in Supabase
+- **Removed Two Fungis marketing files** - TradeOS is standalone
+- **Updated landing page messaging** - Positioned as contractor operating system
+
+### Environment Variables (Backend)
+- SUPABASE_URL ✅
+- SUPABASE_SERVICE_KEY ✅
+- SUPABASE_ANON_KEY ✅
+- STRIPE_SECRET_KEY ✅
+- STRIPE_WEBHOOK_SECRET ✅
+- STRIPE_PRO_PRICE_ID ✅
+- STRIPE_ELITE_PRICE_ID ✅
+- STRIPE_LIFETIME_PRICE_ID ✅
+- EMERGENT_LLM_KEY ✅
+- RESEND_API_KEY ✅
+- SENDER_EMAIL ✅
+- FRONTEND_URL ✅
+- CORS_ORIGINS ✅
+
+### Environment Variables (Frontend/Netlify)
+- REACT_APP_SUPABASE_URL
+- REACT_APP_SUPABASE_ANON_KEY
+- REACT_APP_BACKEND_URL (set after backend deploy)
 
 ---
 

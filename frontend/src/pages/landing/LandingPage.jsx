@@ -1,30 +1,33 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
-  TrendingUp, 
+  Briefcase,
+  Calculator, 
+  Users,
+  Calendar,
+  Brain,
   FileText, 
+  Receipt,
+  Target,
+  DollarSign,
+  Store,
+  UsersRound,
   BarChart3, 
-  Zap,
+  Cpu,
   Check,
   ChevronRight,
   Shield,
-  DollarSign,
-  Flag,
-  Receipt,
-  Calculator,
   Star,
-  Download
+  Download,
+  Zap
 } from 'lucide-react';
-import { LogoLink } from '../../components/ui/Logo';
 import { useAuthStore } from '../../store/authStore';
 import PWAInstallModal from '../../components/app/PWAInstallModal';
-import PWAInstallService from '../../services/PWAInstallService';
 
 // Background images
 const IMAGES = {
   hero: 'https://customer-assets.emergentagent.com/job_a1f6d561-54ac-4bcc-bc40-125db753bb76/artifacts/s7loht5o_istockphoto-1494480364-612x612.jpg',
   features: 'https://customer-assets.emergentagent.com/job_a1f6d561-54ac-4bcc-bc40-125db753bb76/artifacts/oi2sq5qa_iStock-911225858-2048x1365.jpg',
-  pricing: 'https://customer-assets.emergentagent.com/job_a1f6d561-54ac-4bcc-bc40-125db753bb76/artifacts/us5n0ifu_stock-photo-construction-site-with-crane-and-building.jpg',
   cta: 'https://customer-assets.emergentagent.com/job_a1f6d561-54ac-4bcc-bc40-125db753bb76/artifacts/vgvhz8qu_istockphoto-170961867-612x612.jpg'
 };
 
@@ -33,83 +36,109 @@ const LandingPage = () => {
   const navigate = useNavigate();
   const [showPWAModal, setShowPWAModal] = useState(false);
 
-  // Handle CTA click - if logged in, show PWA prompt; otherwise go to signup
   const handleCTAClick = (e) => {
     if (user) {
       e.preventDefault();
-      // User is logged in, trigger PWA install
       setShowPWAModal(true);
     }
-    // If not logged in, Link will navigate to /signup naturally
   };
 
   const handlePWAModalClose = () => {
     setShowPWAModal(false);
-    // Stay on current page after PWA modal closes
   };
 
   const features = [
     {
-      icon: TrendingUp,
-      title: 'Margin Intelligence',
-      description: 'Know your real profit on every project. Live cost tracking, expense allocation, and forecast margins before you lose money.'
-    },
-    {
-      icon: Flag,
-      title: 'Milestone Discipline',
-      description: 'Clear workflow from draft to paid. Auto-invoice when approved. Lock edits once invoiced. Stay in control.'
-    },
-    {
-      icon: FileText,
-      title: 'Change Order Control',
-      description: 'Capture scope changes before they cost you. Track approvals, impact on margin, and bill correctly every time.'
-    },
-    {
-      icon: Receipt,
-      title: 'Invoice & Receivables',
-      description: 'Create invoices from milestones or change orders. Auto-numbering, payment terms, and status tracking. Get paid faster.'
+      icon: Briefcase,
+      title: 'Project Management',
+      description: 'Track every job from bid to completion. Real-time status updates, team coordination, and deadline management.'
     },
     {
       icon: Calculator,
-      title: 'Tax-Ready Bookkeeping',
-      description: 'Categorized expenses, receipt capture, tax summary views. Quarterly projections ready for your accountant.'
+      title: 'Commercial Estimating',
+      description: 'Build accurate estimates with material costs, labor rates, and markup calculations. Win more profitable bids.'
+    },
+    {
+      icon: Users,
+      title: 'Client & CRM',
+      description: 'Manage leads, client communications, and project history. Build lasting relationships that drive referrals.'
+    },
+    {
+      icon: Calendar,
+      title: 'Scheduling',
+      description: 'Coordinate crews, equipment, and deliveries. Keep every project on track with visual timelines.'
+    },
+    {
+      icon: Brain,
+      title: 'Company Brain AI',
+      description: 'Your AI-powered business assistant. Get insights, suggestions, and automated workflows that save hours.'
+    },
+    {
+      icon: FileText,
+      title: 'Document Management',
+      description: 'Store contracts, permits, plans, and receipts. Everything organized, searchable, and accessible anywhere.'
+    },
+    {
+      icon: Receipt,
+      title: 'Invoicing',
+      description: 'Create and send professional invoices from milestones. Auto-numbering, payment tracking, and reminders.'
+    },
+    {
+      icon: DollarSign,
+      title: 'Expenses',
+      description: 'Capture receipts, categorize costs, and allocate expenses to projects. Tax-ready bookkeeping built in.'
+    },
+    {
+      icon: Target,
+      title: 'Milestones',
+      description: 'Set payment milestones, track completion, and trigger invoices automatically when work is approved.'
+    },
+    {
+      icon: Store,
+      title: 'Marketplace',
+      description: 'Connect with verified contractors, subcontractors, and suppliers across Canada.'
+    },
+    {
+      icon: UsersRound,
+      title: 'Team Management',
+      description: 'Manage roles, permissions, and access levels. Keep your team aligned and accountable.'
     },
     {
       icon: BarChart3,
-      title: 'Project Reports',
-      description: 'Profit by project, revenue by month, expense breakdowns. Export to PDF. Clear data for better decisions.'
+      title: 'Business Intelligence',
+      description: 'Real-time dashboards, profitability reports, and cash flow forecasting. Make data-driven decisions.'
     }
   ];
 
   const plans = [
     {
       name: 'Pro',
-      price: '$29',
+      price: '$39',
       period: '/month',
-      description: 'For growing trades getting organized.',
+      description: 'For growing contractors getting organized.',
       features: [
         'Unlimited projects',
-        'Estimates & invoicing',
+        'Estimating & invoicing',
         'Expense tracking',
         'Milestone management',
-        'Change order tracking',
         'Document vault (5GB)',
-        'Basic reports'
+        'Basic reporting',
+        'Email support'
       ]
     },
     {
       name: 'Elite',
-      price: '$49',
+      price: '$79',
       period: '/month',
-      description: 'For established trades scaling up.',
+      description: 'For established contractors scaling up.',
       popular: true,
       features: [
         'Everything in Pro',
-        'AI Copilot assistant',
+        'Company Brain AI',
         'Advanced analytics',
-        'Document vault (25GB)',
+        'Document vault (50GB)',
+        'Team management',
         'Priority support',
-        'Custom branding',
         'API access'
       ]
     }
@@ -117,17 +146,17 @@ const LandingPage = () => {
 
   const testimonials = [
     {
-      quote: "Finally, a tool that gets how contractors work. I know my margin before the job even starts now.",
+      quote: "TradeOS changed how we run our entire operation. We went from spreadsheets to a single system that handles everything.",
       author: "Mike D.",
       title: "General Contractor, ON"
     },
     {
-      quote: "TradeOS saved my bacon on change orders. I was leaking profit and didn't even know it.",
+      quote: "The estimating and invoicing alone saved us 20 hours a week. Now we can focus on actually building.",
       author: "Sarah M.",
       title: "Renovation Specialist, BC"
     },
     {
-      quote: "The milestone workflow keeps my invoicing on track. I get paid faster and nothing slips through.",
+      quote: "Finally, software built by people who understand how contractors work. This is how we run our business now.",
       author: "James R.",
       title: "Electrical Contractor, AB"
     }
@@ -177,7 +206,6 @@ const LandingPage = () => {
 
       {/* Hero Section */}
       <section className="relative pt-24 pb-20 px-4 min-h-[90vh] flex items-center overflow-hidden">
-        {/* Background with gradient overlay */}
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: `url(${IMAGES.hero})` }}
@@ -185,40 +213,40 @@ const LandingPage = () => {
           <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a]/90 via-[#0a0a0a]/85 to-[#0a0a0a]"></div>
         </div>
         
-        {/* Accent gradients */}
         <div className="absolute top-1/4 left-0 w-[600px] h-[600px] bg-gradient-to-br from-emerald-600/10 via-transparent to-transparent blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-gradient-to-tl from-red-600/8 via-transparent to-transparent blur-3xl pointer-events-none" />
         
         <div className="relative max-w-4xl mx-auto text-center">
-          {/* Logo */}
           <div className="flex justify-center mb-8">
             <div className="relative">
               <img 
                 src="/logo.png" 
-                alt="TradeOS - Built for Builders" 
+                alt="TradeOS" 
                 className="h-44 sm:h-56 lg:h-64 w-auto drop-shadow-2xl"
               />
-              {/* Subtle glow */}
               <div className="absolute inset-0 bg-emerald-500/10 blur-3xl rounded-full" />
             </div>
           </div>
           
-          {/* New Tagline */}
           <div className="mb-6">
+            <p className="text-emerald-400 font-medium text-lg mb-2">
+              The Operating System for Canadian Contractors
+            </p>
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-2 tracking-tight">
-              Built for Builders.
+              Run Your Entire Business.
             </h1>
             <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-emerald-400">
-              Intelligence for Trades.
+              One Platform.
             </p>
           </div>
           
           <p className="text-lg sm:text-xl text-gray-300 mb-4 max-w-2xl mx-auto">
-            Know your margin. Control your projects. Get paid faster.
+            Projects. Estimating. Scheduling. Invoicing. Documents. CRM. AI. 
+            Everything you need to run your contracting business.
           </p>
           
           <p className="text-base text-gray-400 mb-10 max-w-2xl mx-auto">
-            The contractor operating system that gives you clarity on every project, control over every dollar, and execution that protects your profit.
+            Stop juggling spreadsheets and disconnected tools. TradeOS brings your entire operation under one roof — 
+            so you can focus on building, not paperwork.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -236,15 +264,14 @@ const LandingPage = () => {
               href="#features" 
               className="bg-white/5 hover:bg-white/10 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all border border-white/10 hover:border-white/20"
             >
-              See Features
+              See All Features
             </a>
           </div>
           
           <p className="text-gray-500 text-sm mt-6">
-            No credit card required. Cancel anytime.
+            No credit card required. Free 14-day trial.
           </p>
           
-          {/* Trust indicators */}
           <div className="flex flex-wrap items-center justify-center gap-8 mt-12 text-sm text-gray-400">
             <div className="flex items-center gap-2">
               <Shield className="w-4 h-4 text-emerald-400" />
@@ -255,8 +282,8 @@ const LandingPage = () => {
               <span>4.9/5 rating</span>
             </div>
             <div className="flex items-center gap-2">
-              <DollarSign className="w-4 h-4 text-emerald-400" />
-              <span>$2M+ tracked</span>
+              <Zap className="w-4 h-4 text-emerald-400" />
+              <span>Setup in minutes</span>
             </div>
           </div>
         </div>
@@ -268,27 +295,18 @@ const LandingPage = () => {
           className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-5"
           style={{ backgroundImage: `url(${IMAGES.features})` }}
         />
-        {/* Shield decoration */}
-        <div className="absolute top-10 left-10 opacity-[0.03] pointer-events-none hidden lg:block">
-          <img src="/shield-icon.png" alt="" className="w-32 h-32" />
-        </div>
-        <div className="absolute bottom-10 right-10 opacity-[0.03] pointer-events-none hidden lg:block">
-          <img src="/shield-icon.png" alt="" className="w-32 h-32" />
-        </div>
         <div className="relative max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <img src="/shield-icon.png" alt="" className="w-10 h-10 opacity-30" />
-              <h2 className="text-3xl sm:text-4xl font-bold text-white">
-                Control. Clarity. Execution.
-              </h2>
-            </div>
+            <p className="text-emerald-400 font-medium mb-2">Complete Platform</p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+              Everything You Need to Run Your Business
+            </h2>
             <p className="text-gray-400 max-w-2xl mx-auto">
-              Every feature built to protect your margin and keep your projects on track.
+              From first estimate to final payment. TradeOS handles every aspect of your contracting operation.
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((feature, index) => (
               <div 
                 key={index}
@@ -302,6 +320,28 @@ const LandingPage = () => {
               </div>
             ))}
           </div>
+
+          {/* TFCS Mainframe Highlight */}
+          <div className="mt-12 bg-gradient-to-r from-emerald-500/10 via-[#111111] to-[#111111] rounded-xl border border-emerald-500/20 p-8">
+            <div className="flex flex-col md:flex-row items-center gap-6">
+              <div className="w-16 h-16 bg-emerald-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                <Cpu className="w-8 h-8 text-emerald-400" />
+              </div>
+              <div className="text-center md:text-left">
+                <h3 className="text-2xl font-bold text-white mb-2">TFCS Mainframe</h3>
+                <p className="text-gray-400">
+                  Enterprise command center for multi-project operations. Real-time oversight, team management, 
+                  and strategic business intelligence — all in one powerful dashboard.
+                </p>
+              </div>
+              <Link 
+                to="/signup"
+                className="flex-shrink-0 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 px-6 py-3 rounded-lg font-medium transition-colors"
+              >
+                Learn More
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -309,11 +349,12 @@ const LandingPage = () => {
       <section id="pricing" className="py-20 px-4 bg-[#0a0a0a]">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
+            <p className="text-emerald-400 font-medium mb-2">Simple Pricing</p>
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-              Simple, Transparent Pricing
+              Plans That Scale With You
             </h2>
             <p className="text-gray-400">
-              Choose the plan that fits your operation. No hidden fees.
+              No per-user fees. No hidden costs. Just straightforward pricing.
             </p>
           </div>
           
@@ -368,11 +409,12 @@ const LandingPage = () => {
       <section id="testimonials" className="py-20 px-4 bg-[#0f0f0f]">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
+            <p className="text-emerald-400 font-medium mb-2">Trusted by Contractors</p>
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-              Trusted by Canadian Trades
+              Built by Builders. For Builders.
             </h2>
             <p className="text-gray-400">
-              Hear from contractors who&apos;ve taken control of their business.
+              Hear from contractors who&apos;ve transformed their operations with TradeOS.
             </p>
           </div>
           
@@ -407,16 +449,16 @@ const LandingPage = () => {
           <div className="absolute inset-0 bg-[#0a0a0a]/95"></div>
         </div>
         
-        {/* Accent gradient */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-to-b from-emerald-600/10 via-transparent to-transparent blur-3xl pointer-events-none" />
         
         <div className="relative max-w-3xl mx-auto text-center">
           <img src="/shield-icon.png" alt="" className="w-16 h-16 mx-auto mb-6 opacity-20" />
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-            Take Control of Your Projects
+            Ready to Run Your Business Like a Pro?
           </h2>
           <p className="text-gray-300 text-lg mb-8">
-            Stop losing money on jobs you thought were profitable. Start your free trial and see your true margins.
+            Join hundreds of Canadian contractors who&apos;ve switched to TradeOS. 
+            Start your free trial today — no credit card required.
           </p>
           <Link
             to="/signup"
@@ -441,7 +483,7 @@ const LandingPage = () => {
               <img src="/shield-icon.png" alt="TradeOS" className="h-10 w-auto" />
               <div>
                 <span className="text-lg font-bold text-white">TRADEOS<span className="text-emerald-400 align-super text-xs">™</span></span>
-                <p className="text-gray-500 text-sm">Built for Builders.</p>
+                <p className="text-gray-500 text-sm">The Operating System for Contractors</p>
               </div>
             </div>
             <div className="flex items-center gap-8 text-sm">
@@ -451,12 +493,11 @@ const LandingPage = () => {
             </div>
           </div>
           <div className="border-t border-[#1a1a1a] mt-8 pt-8 text-center text-gray-500 text-sm">
-            <p>© {new Date().getFullYear()} TradeOS™. All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} TradeOS™. All rights reserved. Built in Canada.</p>
           </div>
         </div>
       </footer>
 
-      {/* PWA Install Modal - Shown when logged-in user clicks CTA */}
       <PWAInstallModal isOpen={showPWAModal} onClose={handlePWAModalClose} />
     </div>
   );
