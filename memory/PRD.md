@@ -69,16 +69,24 @@ Build "TradeOS," an end-to-end operating system for Canadian contractors. The ap
 - ✅ Tenders API (`/app/backend/routes/tenders.py`)
 - ✅ Routes registered in server.py
 
-**Frontend Complete:**
-- ✅ OpportunitiesPage.jsx - Pipeline list view with stats, filters, grid/list toggle
-- ✅ OpportunityWorkspace.jsx - Main workspace container
-- ✅ WorkspaceHeader.jsx - Sticky header with stage badge, value, due date
-- ✅ WorkspaceNav.jsx - Horizontal tab navigation
-- ✅ OverviewTab.jsx - Command center answering "What needs my attention?"
-- ✅ TenderWorkspaceTab.jsx - Active estimating workspace
-- ✅ Placeholder tabs for future implementation
-- ✅ Routes added to App.js (/app/opportunities, /app/opportunities/:id)
-- ✅ Sidebar navigation updated with "Opportunities" link
+**Frontend V2 Architecture Complete:**
+- ✅ WorkspaceShell.jsx - Universal workspace container with Focus Layer & Memory
+- ✅ CommandCenter.jsx - Priority queue answering "What should I work on next?"
+- ✅ TimelinePanel.jsx - Persistent right sidebar, always visible, filterable
+- ✅ TenderSection.jsx - Estimate builder with sub-tabs (Estimate, Proposal, History)
+- ✅ InformationSection.jsx - Consolidated reference material
+- ✅ Panel Dock system - Documents, RFIs, Communications, Site Notes as slide-up panels
+- ✅ OpportunitiesPage.jsx - Pipeline list with stats, filters
+- ✅ OpportunityWorkspaceV2.jsx - Main workspace using WorkspaceShell
+
+**Architecture V2 Features:**
+- 3 Primary Sections: Command Center, Tender, Information
+- Persistent Timeline (right panel, always visible)
+- Contextual Panel Dock (Documents, RFIs, Comms, Site Notes)
+- Focus Layer - Workspace knows what user is working on
+- Workspace Memory - Persists state between sessions (localStorage)
+- Progressive Disclosure - Complexity revealed when needed
+- Universal Template - Reusable for Client, Project, Invoice workspaces
 
 **Workflow Stages (not CRM stages):**
 ```

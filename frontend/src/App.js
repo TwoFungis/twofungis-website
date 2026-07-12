@@ -38,7 +38,7 @@ import MainframePage from './pages/app/MainframePage';
 
 // Opportunities (Vertical Slice 1)
 import OpportunitiesPage from './pages/app/opportunities/OpportunitiesPage';
-import OpportunityWorkspace from './pages/app/opportunities/OpportunityWorkspace';
+import OpportunityWorkspace from './pages/app/opportunities/OpportunityWorkspaceV2';
 
 // Layout
 import AppLayout from './components/layout/AppLayout';
