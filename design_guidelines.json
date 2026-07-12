@@ -1,118 +1,110 @@
 {
+  "app_name": "TradeOS Production Library",
   "theme": "dark",
-  "project_context": "TradeOS Opportunity Workspace - Premium Dashboard for Contractors",
   "typography": {
-    "font_families": {
-      "headings": "font-sans (IBM Plex Sans)",
-      "body": "font-sans (IBM Plex Sans)",
-      "mono_data": "font-mono (JetBrains Mono) - MUST use for all numbers, currency, dates, and small UI labels"
+    "primary_heading": {
+      "family": "Outfit, sans-serif",
+      "weights": ["400", "500", "600"],
+      "usage": "H1, H2, H3, Section Titles, Dashboard Overviews",
+      "anti_pattern": "Do not use Inter for headings."
+    },
+    "body": {
+      "family": "IBM Plex Sans, sans-serif",
+      "weights": ["400", "500"],
+      "usage": "Descriptions, general UI text, paragraphs, standard list items"
+    },
+    "data_codes": {
+      "family": "JetBrains Mono, monospace",
+      "weights": ["400", "500"],
+      "usage": "Production Item Codes, IDs, pricing data, historical metrics, search shortcuts"
     },
     "hierarchy": {
-      "h1_workspace_title": "text-3xl sm:text-4xl font-semibold tracking-tight text-white",
-      "h2_section": "text-xl sm:text-2xl font-medium tracking-tight text-white/90",
-      "h3_card_title": "text-base font-medium text-white/80",
-      "body": "text-sm text-white/70 leading-relaxed",
-      "label_overline": "text-xs font-mono uppercase tracking-[0.2em] text-white/50",
-      "metric_value": "text-3xl font-mono tracking-tight text-white"
-    },
-    "rules": [
-      "Never center align body text. Maintain left alignment for readability.",
-      "Use font-mono for all tabular data, dates, and financial figures.",
-      "Heading hierarchy gaps must not exceed 2 tailwind steps."
-    ]
+      "h1": "text-3xl sm:text-4xl tracking-tight text-white font-medium",
+      "h2": "text-xl sm:text-2xl tracking-tight text-neutral-100 font-medium",
+      "h3": "text-lg tracking-tight text-neutral-200 font-medium",
+      "body_main": "text-sm text-neutral-300 leading-relaxed",
+      "body_secondary": "text-xs text-neutral-400 uppercase tracking-widest font-medium",
+      "data_label": "text-[13px] font-mono text-emerald-400"
+    }
   },
   "colors": {
-    "backgrounds": {
-      "app_base": "#0a0a0a (Use bg-background, ensure it maps to this pure dark)",
-      "surface_card": "#111111 (Deep Charcoal for cards/panels)",
-      "surface_hover": "#1a1a1a"
+    "background": {
+      "app_bg": "#0A0A0A",
+      "surface": "#111111",
+      "surface_hover": "#1A1A1A",
+      "panel": "#141414",
+      "overlay": "rgba(10, 10, 10, 0.85)"
     },
-    "borders": {
-      "default": "#262626 (Use border-white/10 or border-[#262626])",
-      "focus": "#10b981"
+    "brand": {
+      "primary": "#10B981",
+      "primary_hover": "#059669",
+      "primary_muted": "rgba(16, 185, 129, 0.1)",
+      "brain_insight": "linear-gradient(135deg, #10B981 0%, #34D399 100%)",
+      "brain_text": "#34D399"
     },
-    "accents": {
-      "primary": "#10b981 (Emerald Green) - Use sparingly for 'Company Brain' accents, positive metrics, and primary CTAs.",
-      "muted_emerald": "rgba(16, 185, 129, 0.15) - Use for AI insight backgrounds",
-      "warning": "#d4af37 (Gold/Warning)",
-      "destructive": "#ff3b30 (Red/Risk)"
+    "border": {
+      "subtle": "#262626",
+      "medium": "#404040",
+      "focus": "#10B981"
     },
     "text": {
-      "primary": "text-white (or text-foreground)",
-      "secondary": "text-white/70",
-      "tertiary": "text-white/40"
+      "primary": "#F5F5F5",
+      "secondary": "#A3A3A3",
+      "tertiary": "#737373"
     }
   },
-  "visual_enhancers": {
-    "surfaces": [
-      "Cards must use 'Neumorphism Dark' variant: bg-[#111111] with 1px border-[#262626] and NO heavy shadows. Flat and crisp.",
-      "Company Brain Insights must use 'Crystal Glass' variant: backdrop-blur-xl bg-[#10b981]/5 border-[#10b981]/20."
-    ],
-    "corners": "rounded-xl for main cards, rounded-lg for internal elements, rounded-full for badges.",
-    "gradients": "Do NOT use full-surface gradients. Use subtle linear-gradients only for active state borders or AI insight highlights."
+  "layouts": {
+    "overall_structure": "Three-pane Master-Detail setup: Left Nav (fixed w-64) + Main Content Area + Right Detail Panel (sliding drawer or split-pane, w-96 to w-112).",
+    "left_navigation": "Organized sequentially: Knowledge Domains -> Production Items -> Assemblies -> Service Categories -> Templates -> Historical Production -> Archives. Use active states with an emerald left-border highlight. Text should be neutral-400 default, white on active. Spacing between sections must be generous (py-2).",
+    "production_grid": "NOT a spreadsheet. Use a refined List-Grid hybrid. Rows have generous padding (py-3 px-4), subtle border-b (border-neutral-800), and a responsive hover effect (hover:bg-neutral-900). Use flex layouts within rows for multi-column sortability. Emphasize data codes with monospace.",
+    "detail_panel": "Professional engineering record view. Clean visual hierarchy with H3 headings, mono-spaced data points for pricing/standards, visual pill tags for Categories, and a timeline-style UI for Revisions.",
+    "assembly_builder": "Indented visual node list (drag-and-drop feel), with connecting lines (border-l-2 border-neutral-800) to show hierarchy between Production Items."
   },
-  "components_to_build": [
-    {
-      "name": "WorkspaceHeader",
-      "description": "Sticky top command center. Includes Opportunity Name, Client, Workflow Badge (DISCOVERED, QUALIFYING, etc.), Mono-spaced Estimated Value, and primary CTAs.",
-      "instructions": "Use flex-row with justify-between. Left side: Context (Labels + Title). Right side: Actions."
-    },
-    {
-      "name": "HorizontalNav",
-      "description": "Persistent workspace navigation (Overview, Tender, Estimate, etc.).",
-      "instructions": "Use flex gap-8 border-b border-[#262626]. Active state must have an underline (framer-motion layoutId recommended) and brighter text. Inactive text-white/50."
-    },
-    {
-      "name": "OverviewTab",
-      "description": "Command Center grid. Must answer 'What needs my attention today?' within 5 seconds.",
-      "instructions": "Implement 'MODE B: High Density Grid'. 3-4 columns. Top row: North Star metrics. Left col: Outstanding items. Right col: Company Brain & Timeline."
-    },
-    {
-      "name": "CompanyBrainInsight",
-      "description": "Subtle AI assistant card.",
-      "instructions": "Do NOT make it look like a chat box. Use an Emerald tinted glassmorphism card. Icon: Sparkles (Emerald). Tone: 'Quiet assistance'."
-    },
-    {
-      "name": "ActivityTimeline",
-      "description": "Historical memory of the project.",
-      "instructions": "Vertical line on the left (border-l). Small circular nodes for events. Time in font-mono."
-    }
-  ],
-  "grids_and_layouts": {
-    "spacing_system": "Generous. Use p-6 or p-8 inside standard cards. Use gap-6 between grid items.",
-    "bento_grid_mode": "MODE B (High Density Grid): grid-cols-1 lg:grid-cols-4 gap-6. Primary data spans 2 cols, feeds/timelines span 1 col but 2 rows (row-span-2).",
-    "alignment": "Optical alignment over mathematical. Ensure numbers in columns align right."
+  "components_and_micro_themes": {
+    "surfaces": "No pure black transparency. Overlays (like Command Palette, Dialogs, Dropdowns, Sticky Headers) MUST use bg-[#0A0A0A]/90 backdrop-blur-xl border border-neutral-800. Never fully transparent to ensure readability.",
+    "global_search": "Notion-style Command Palette (triggered by `Ctrl/Cmd + K`). Instant search results broken down visually by categories (Domains, Items, Codes). High contrast matching terms (text-emerald-400).",
+    "company_brain": "Integrate natural intelligence organically. Do not build a chat window. Instead, inject insights naturally: e.g., a subtle 'sparkle' icon (lucide-react: Sparkles, color: emerald-400) next to auto-suggested categories, pricing anomalies, or a 'Brain Insights' sub-section in the detail panel.",
+    "buttons": "Modern, sleek. Primary: bg-emerald-500 text-black font-medium hover:bg-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)]. Secondary: bg-neutral-900 text-white border border-neutral-800 hover:bg-neutral-800.",
+    "badges": "Pill-shaped, text-xs font-medium px-2.5 py-0.5 rounded-full. Default: bg-neutral-900 border border-neutral-800. Active/Insight: bg-emerald-500/10 text-emerald-400 border border-emerald-500/20.",
+    "icons": "Use lucide-react exclusively. Stroke width 1.5 for a clean, sharp, professional look."
   },
-  "motion_and_interaction": {
-    "hover_states": "Cards: transition-all duration-200 hover:border-white/20 hover:-translate-y-[2px].",
-    "page_load": "Staggered fade-in-up for grid items. Use existing classes: animate-fade-in-up animation-delay-100, etc.",
-    "ai_reveal": "Subtle pulse on the Company Brain icon to indicate a new insight."
+  "motion": {
+    "hover": "Subtle and fast. Use transition-colors duration-200 ease-in-out.",
+    "lists": "Staggered fade-in for grid rows to make loading feel intentional and premium.",
+    "panels": "Slide in from right for the Detail Panel (transform translate-x duration-300 ease-out)."
   },
   "accessibility": {
-    "contrast": "Ensure text over #111111 meets APCA standards. Use white/90 for primary text, white/70 for secondary.",
-    "testing": "All interactive elements (tabs, buttons, AI cards) MUST have data-testid attributes (e.g., data-testid='tab-overview')."
+    "contrast": "Ensure text-neutral-400 passes APCA/WCAG against #0A0A0A. Use focus:outline-none focus:ring-2 focus:ring-emerald-500/50 for all interactive elements.",
+    "aria": "Use aria-expanded on accordions/dropdowns, aria-hidden on decorative icons (like the Brain sparkle)."
   },
-  "media": {
-    "image_urls": {
-      "avatars": [
-        "https://images.pexels.com/photos/12311581/pexels-photo-12311581.jpeg",
-        "https://images.pexels.com/photos/35129364/pexels-photo-35129364.jpeg",
-        "https://images.pexels.com/photos/29368584/pexels-photo-29368584.jpeg"
-      ],
-      "project_thumbnails": [
-        "https://images.pexels.com/photos/33324174/pexels-photo-33324174.jpeg",
-        "https://images.pexels.com/photos/5075276/pexels-photo-5075276.jpeg"
-      ]
-    },
-    "instructions": "Use avatars for 'Assigned Team' overlaps. Use project thumbnails subtly if project imagery is needed in the header or background."
-  },
-  "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
-    "You tend to converge toward generic, 'on distribution' outputs. Make this UI feel like a specialized, high-end operating system for contractors. It must not look like a generic Vercel template.",
-    "Enforce the 'Calm, premium and focused' mandate. Do not cram data. Use negative space (p-8) to separate sections.",
-    "Use framer-motion for tab transitions and card entrances if possible, or use the provided CSS animations.",
-    "Do NOT use transparent backgrounds for the sticky header; it must have a solid or frosted background to prevent text collision on scroll.",
-    "Never use AI assistant Emoji characters like 🤖🧠. Use lucide-react icons (e.g., Sparkles, Lightbulb).",
-    "Company Brain is QUIET. It should look like an integrated part of the UI, perhaps a muted green card with a subtle border, not a glowing chat bubble.",
-    "All interactive elements MUST have data-testid."
-  ]
+  "universal_guidelines_for_main_agent": [
+    "CRITICAL: All components must be written in `.jsx` or `.js` format, NOT `.tsx`.",
+    "CRITICAL: Every interactive element and key UI region MUST include a `data-testid` attribute (e.g., `data-testid=\"nav-domains-link\"`, `data-testid=\"global-search-input\"`, `data-testid=\"production-item-row\"`).",
+    "CRITICAL: Headers, Overlays, Command Palettes, and Dropdowns MUST have solid or blurred dark backgrounds (e.g., `bg-neutral-950/90 backdrop-blur-md`). NEVER fully transparent.",
+    "Avoid the 'AI slop' aesthetic. No generic centered layouts, simplistic large gradients, or uniform styling.",
+    "Create depth through layered design elements with z-index hierarchy and crisp 1px borders (border-neutral-800).",
+    "DO NOT use `transition: all`. Target specific properties like `transition-colors`, `transition-transform` to prevent visual bugs.",
+    "DO NOT center align the app container. No `.App { text-align: center; }`.",
+    "NEVER use generic emoji characters like 🤖🧠💭 for icons. Always use Lucide React icons.",
+    "Use 2-3x more spacing than feels comfortable. Cramped designs look like cheap spreadsheets. The tool needs to feel like a premium knowledge engine (Figma/Linear).",
+    "For toast notifications, use `sonner`."
+  ],
+  "image_urls": {
+    "avatars": [
+      {
+        "url": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop",
+        "description": "Professional avatar 1"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=150&auto=format&fit=crop",
+        "description": "Professional avatar 2"
+      }
+    ],
+    "empty_states": [
+      {
+        "url": "https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=800&auto=format&fit=crop",
+        "description": "Abstract architecture/construction structural lines for empty states or backgrounds"
+      }
+    ]
+  }
 }
