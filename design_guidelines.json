@@ -1,91 +1,118 @@
 {
   "theme": "dark",
-  "archetype": "The Performance Pro mixed with SaaS Noir",
+  "project_context": "TradeOS Opportunity Workspace - Premium Dashboard for Contractors",
   "typography": {
-    "fonts_to_install": ["@fontsource/cabinet-grotesk", "@fontsource/manrope"],
-    "heading": "Cabinet Grotesk, sans-serif",
-    "body": "Manrope, sans-serif",
+    "font_families": {
+      "headings": "font-sans (IBM Plex Sans)",
+      "body": "font-sans (IBM Plex Sans)",
+      "mono_data": "font-mono (JetBrains Mono) - MUST use for all numbers, currency, dates, and small UI labels"
+    },
     "hierarchy": {
-      "h1": "text-5xl sm:text-6xl md:text-7xl tracking-tighter font-black uppercase",
-      "h2": "text-3xl sm:text-4xl lg:text-5xl tracking-tight font-bold uppercase",
-      "h3": "text-xl sm:text-2xl tracking-tight font-semibold",
-      "overline": "text-xs tracking-[0.2em] uppercase font-bold text-yellow-500",
-      "body": "text-base md:text-lg leading-relaxed text-neutral-400"
-    }
+      "h1_workspace_title": "text-3xl sm:text-4xl font-semibold tracking-tight text-white",
+      "h2_section": "text-xl sm:text-2xl font-medium tracking-tight text-white/90",
+      "h3_card_title": "text-base font-medium text-white/80",
+      "body": "text-sm text-white/70 leading-relaxed",
+      "label_overline": "text-xs font-mono uppercase tracking-[0.2em] text-white/50",
+      "metric_value": "text-3xl font-mono tracking-tight text-white"
+    },
+    "rules": [
+      "Never center align body text. Maintain left alignment for readability.",
+      "Use font-mono for all tabular data, dates, and financial figures.",
+      "Heading hierarchy gaps must not exceed 2 tailwind steps."
+    ]
   },
   "colors": {
-    "background": "#050505",
-    "surface": "#0F0F12",
-    "surface_hover": "#1A1A1E",
-    "surface_glass": "bg-black/60 backdrop-blur-2xl border border-white/10",
-    "primary_accent": "#FACC15",
-    "primary_accent_hover": "#FEF08A",
-    "text_primary": "#FFFFFF",
-    "text_secondary": "#A1A1AA",
-    "border": "#262626"
-  },
-  "layouts": {
-    "hero": "Asymmetric layout with strong left-aligned typography. Text should sit on top of a dark overlay (bg-black/60 to bg-black/80 gradient) blending into a cinematic hero background image. Use 'The Swiss Grid' principles. Do not center-align the hero text.",
-    "features_bento": "MODE A: 'Tetris' Grid. Base grid-cols-1 md:grid-cols-12 gap-6 or gap-8. Mix tall (col-span-4 row-span-2), square (col-span-4 row-span-1), and wide (col-span-8 row-span-1) blocks. 1px technical border.",
-    "spacing": "Use p-8 to p-12 for bento containers. Use py-24 to py-32 for section vertical rhythm."
+    "backgrounds": {
+      "app_base": "#0a0a0a (Use bg-background, ensure it maps to this pure dark)",
+      "surface_card": "#111111 (Deep Charcoal for cards/panels)",
+      "surface_hover": "#1a1a1a"
+    },
+    "borders": {
+      "default": "#262626 (Use border-white/10 or border-[#262626])",
+      "focus": "#10b981"
+    },
+    "accents": {
+      "primary": "#10b981 (Emerald Green) - Use sparingly for 'Company Brain' accents, positive metrics, and primary CTAs.",
+      "muted_emerald": "rgba(16, 185, 129, 0.15) - Use for AI insight backgrounds",
+      "warning": "#d4af37 (Gold/Warning)",
+      "destructive": "#ff3b30 (Red/Risk)"
+    },
+    "text": {
+      "primary": "text-white (or text-foreground)",
+      "secondary": "text-white/70",
+      "tertiary": "text-white/40"
+    }
   },
   "visual_enhancers": {
-    "surfaces": "Use Glassmorphism for Sticky Header (bg-black/60 backdrop-blur-xl border-b border-white/10). Use Grid Borders for Feature Cards (flat dark background #0F0F12, 1px border-white/10, hover:border-yellow-500/50).",
-    "motion": "Use Framer Motion for staggered entrance animations. Consider a 'Tracing Beam' effect for high-tier Pricing Cards.",
-    "buttons": "Sharp edges or extremely minimal rounding (rounded-sm). Primary button must be Electric Yellow (bg-yellow-400) with solid black text. Hover state should lift (-translate-y-1) with a yellow drop shadow."
+    "surfaces": [
+      "Cards must use 'Neumorphism Dark' variant: bg-[#111111] with 1px border-[#262626] and NO heavy shadows. Flat and crisp.",
+      "Company Brain Insights must use 'Crystal Glass' variant: backdrop-blur-xl bg-[#10b981]/5 border-[#10b981]/20."
+    ],
+    "corners": "rounded-xl for main cards, rounded-lg for internal elements, rounded-full for badges.",
+    "gradients": "Do NOT use full-surface gradients. Use subtle linear-gradients only for active state borders or AI insight highlights."
   },
-  "motion": {
-    "stagger_children": "Use Framer Motion to stagger bento grid items by 0.1s.",
-    "hover_states": "Hovering bento items should slightly brighten the border (border-white/20) and subtly scale an inner element/icon.",
-    "scroll": "Elements should gently fade in and translate-y-4 into place as they enter the viewport."
+  "components_to_build": [
+    {
+      "name": "WorkspaceHeader",
+      "description": "Sticky top command center. Includes Opportunity Name, Client, Workflow Badge (DISCOVERED, QUALIFYING, etc.), Mono-spaced Estimated Value, and primary CTAs.",
+      "instructions": "Use flex-row with justify-between. Left side: Context (Labels + Title). Right side: Actions."
+    },
+    {
+      "name": "HorizontalNav",
+      "description": "Persistent workspace navigation (Overview, Tender, Estimate, etc.).",
+      "instructions": "Use flex gap-8 border-b border-[#262626]. Active state must have an underline (framer-motion layoutId recommended) and brighter text. Inactive text-white/50."
+    },
+    {
+      "name": "OverviewTab",
+      "description": "Command Center grid. Must answer 'What needs my attention today?' within 5 seconds.",
+      "instructions": "Implement 'MODE B: High Density Grid'. 3-4 columns. Top row: North Star metrics. Left col: Outstanding items. Right col: Company Brain & Timeline."
+    },
+    {
+      "name": "CompanyBrainInsight",
+      "description": "Subtle AI assistant card.",
+      "instructions": "Do NOT make it look like a chat box. Use an Emerald tinted glassmorphism card. Icon: Sparkles (Emerald). Tone: 'Quiet assistance'."
+    },
+    {
+      "name": "ActivityTimeline",
+      "description": "Historical memory of the project.",
+      "instructions": "Vertical line on the left (border-l). Small circular nodes for events. Time in font-mono."
+    }
+  ],
+  "grids_and_layouts": {
+    "spacing_system": "Generous. Use p-6 or p-8 inside standard cards. Use gap-6 between grid items.",
+    "bento_grid_mode": "MODE B (High Density Grid): grid-cols-1 lg:grid-cols-4 gap-6. Primary data spans 2 cols, feeds/timelines span 1 col but 2 rows (row-span-2).",
+    "alignment": "Optical alignment over mathematical. Ensure numbers in columns align right."
   },
-  "components_to_use": {
-    "ui_library": "shadcn/ui",
-    "components": ["accordion", "button", "card", "badge", "dialog"],
-    "custom_instructions": "Strip the Vercel-look from Shadcn components. Override default radius to rounded-none or rounded-sm. Override default borders to border-white/10."
+  "motion_and_interaction": {
+    "hover_states": "Cards: transition-all duration-200 hover:border-white/20 hover:-translate-y-[2px].",
+    "page_load": "Staggered fade-in-up for grid items. Use existing classes: animate-fade-in-up animation-delay-100, etc.",
+    "ai_reveal": "Subtle pulse on the Company Brain icon to indicate a new insight."
   },
   "accessibility": {
-    "contrast": "Ensure yellow text/buttons have dark text inside them (black). Do not use dark text on dark backgrounds.",
-    "testing": "All interactive elements MUST have data-testid attributes (e.g., data-testid='hero-cta-button', data-testid='pricing-card-pro')."
+    "contrast": "Ensure text over #111111 meets APCA standards. Use white/90 for primary text, white/70 for secondary.",
+    "testing": "All interactive elements (tabs, buttons, AI cards) MUST have data-testid attributes (e.g., data-testid='tab-overview')."
   },
   "media": {
-    "images": [
-      {
-        "category": "hero_background",
-        "url": "https://images.pexels.com/photos/18162494/pexels-photo-18162494.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
-        "description": "High-rise construction site, use with heavy bg-black/70 overlay to ensure text readability."
-      },
-      {
-        "category": "ai_section_background",
-        "url": "https://images.unsplash.com/photo-1768527858342-037cff722276?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA3MDB8MHwxfHNlYXJjaHwyfHxhYnN0cmFjdCUyMG5lb24lMjBnbG93aW5nJTIwZ3JpZCUyMDNkfGVufDB8fHx8MTc4MzgyMzYwOHww&ixlib=rb-4.1.0&q=85",
-        "description": "Abstract neon grid pattern, use for the 'Company Brain (AI)' and 'Future AI Automation' bento block background."
-      },
-      {
-        "category": "testimonial_portrait_1",
-        "url": "https://images.unsplash.com/photo-1672748341520-6a839e6c05bb?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1ODh8MHwxfHNlYXJjaHwxfHxjb250cmFjdG9yJTIwcG9ydHJhaXR8ZW58MHx8fHwxNzgzODIzNTkxfDA&ixlib=rb-4.1.0&q=85",
-        "description": "Contractor in red hard hat."
-      },
-      {
-        "category": "testimonial_portrait_2",
-        "url": "https://images.unsplash.com/photo-1679679811837-c28b2586f533?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1ODh8MHwxfHNlYXJjaHwzfHxjb250cmFjdG9yJTIwcG9ydHJhaXR8ZW58MHx8fHwxNzgzODIzNTkxfDA&ixlib=rb-4.1.0&q=85",
-        "description": "Smiling contractor."
-      },
-      {
-        "category": "sponsor_logo_1",
-        "url": "https://images.unsplash.com/photo-1772760110621-d7b6f54c1e42?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2MTJ8MHwxfHNlYXJjaHwyfHxtb2Rlcm4lMjBjb21wYW55JTIwYnJhbmQlMjBsb2dvfGVufDB8fHx8MTc4MzgyMzYwN3ww&ixlib=rb-4.1.0&q=85",
-        "description": "Sony logo illuminated"
-      }
-    ],
-    "icons": "Use @phosphor-icons/react for duotone/bold industrial feeling icons. Install with: yarn add @phosphor-icons/react. lucide-react is also acceptable."
+    "image_urls": {
+      "avatars": [
+        "https://images.pexels.com/photos/12311581/pexels-photo-12311581.jpeg",
+        "https://images.pexels.com/photos/35129364/pexels-photo-35129364.jpeg",
+        "https://images.pexels.com/photos/29368584/pexels-photo-29368584.jpeg"
+      ],
+      "project_thumbnails": [
+        "https://images.pexels.com/photos/33324174/pexels-photo-33324174.jpeg",
+        "https://images.pexels.com/photos/5075276/pexels-photo-5075276.jpeg"
+      ]
+    },
+    "instructions": "Use avatars for 'Assigned Team' overlaps. Use project thumbnails subtly if project imagery is needed in the header or background."
   },
   "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
-    "NEVER use generic centered layouts or simplistic gradients.",
-    "NEVER use AI emojis (🤖🧠💭). Use proper SVG icons.",
-    "NEVER apply 'transition: all'. Explicitly state transition properties.",
-    "DO NOT center align the app container in CSS.",
-    "Use 2-3x more spacing (p-8 to p-16) for a premium feel.",
-    "Include data-testid on every interactive element.",
-    "Rely heavily on subtle border colors (border-white/10) to define dark mode sections, not massive background shifts.",
-    "Do not use complete transparent backgrounds for headers or dropdowns."
+    "You tend to converge toward generic, 'on distribution' outputs. Make this UI feel like a specialized, high-end operating system for contractors. It must not look like a generic Vercel template.",
+    "Enforce the 'Calm, premium and focused' mandate. Do not cram data. Use negative space (p-8) to separate sections.",
+    "Use framer-motion for tab transitions and card entrances if possible, or use the provided CSS animations.",
+    "Do NOT use transparent backgrounds for the sticky header; it must have a solid or frosted background to prevent text collision on scroll.",
+    "Never use AI assistant Emoji characters like 🤖🧠. Use lucide-react icons (e.g., Sparkles, Lightbulb).",
+    "Company Brain is QUIET. It should look like an integrated part of the UI, perhaps a muted green card with a subtle border, not a glowing chat bubble.",
+    "All interactive elements MUST have data-testid."
   ]
 }
