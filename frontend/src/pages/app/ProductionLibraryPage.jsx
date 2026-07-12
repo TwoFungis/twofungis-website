@@ -767,12 +767,14 @@ const ProductionLibraryPage = () => {
           item={editingItem}
           onClose={() => setShowItemModal(false)}
           onSave={(item) => {
+            let updatedItems;
             if (editingItem) {
-              setProductionItems(prev => prev.map(i => i.id === item.id ? item : i));
+              updatedItems = productionItems.map(i => i.id === item.id ? item : i);
             } else {
-              setProductionItems(prev => [...prev, { ...item, id: Date.now().toString() }]);
+              updatedItems = [...productionItems, { ...item, id: Date.now().toString() }];
             }
-            localStorage.setItem('tradeos_production_items', JSON.stringify(productionItems));
+            setProductionItems(updatedItems);
+            localStorage.setItem('tradeos_production_items', JSON.stringify(updatedItems));
             setShowItemModal(false);
             toast.success(editingItem ? 'Item updated' : 'Item added to Production Library');
           }}

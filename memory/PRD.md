@@ -70,22 +70,35 @@ The TradeOS V2 Foundation has been officially locked and stabilized.
 - ❌ `AICopilot.jsx` - Deleted (replaced by Company Brain)
 - ❌ `QuickAddFab.jsx` - Deleted (replaced by Quick Add panel)
 - ❌ `DashboardRedirect.jsx` - Deleted (routing now direct)
+- ❌ `EstimatingPage.jsx` - Deleted (replaced by Production Library)
 
-**Routing Changes:**
-- `/app` → Redirects to `/app/command-center`
-- `/app/dashboard` → Redirects to `/app/command-center`
-- `/app/mainframe` → Redirects to `/app/command-center`
-- All authenticated users get same navigation and theme
+---
 
-**AppLayout Consolidation:**
-- Removed all `hasWorkspaceAccess` conditional logic
-- Single dark theme with emerald accents for ALL users
-- Company Brain button visible for ALL authenticated users
-- V2 workflow navigation for ALL users
+### Phase 2: Company Knowledge Engine ✅ COMPLETE (July 12, 2026)
+**Build knowledge first, not quotes. The Production Library is the foundation.**
+
+**Production Library Workspace:**
+- ✅ Replaced legacy EstimatingPage with ProductionLibraryPage
+- ✅ Company Knowledge Engine header with AI insight banner
+- ✅ 8 workspace tabs: Production Library, Assemblies, Scope Library, Labour Standards, Pricing, Templates, Imports, Estimate Builder (Soon)
+- ✅ Empty states with actionable CTAs for each section
+- ✅ Production Item modal for adding/editing items
+- ✅ Import section with CSV template downloads
+
+**Company Brain V2 Styling:**
+- ✅ Updated from gold/black legacy styling to emerald accents
+- ✅ Consistent with workspace styling and typography
+- ✅ Native feel integrated with TradeOS (not a separate application)
+
+**Architecture Principle:**
+```
+Production Library → Production Assemblies → Estimate → Quote → Completed Project
+                                                        ↓
+                                              Production Library becomes smarter
+```
 
 **Test Results:**
-- Backend: 100% (13/13 tests)
-- Frontend: 100% (11/11 acceptance criteria)
+- Frontend: 100% (10/10 acceptance criteria verified)
 
 ---
 
@@ -603,18 +616,15 @@ Run `/app/migrations/012_company_brain_foundation.sql` in Supabase SQL Editor to
 
 ## Upcoming Tasks (Priority Order)
 
-### P0 - Production Library (Immediate Next Focus)
-Per user directive, this is now the highest-value system remaining after Command Center completion.
-The Production Library is foundational infrastructure that will power:
-- Estimating
-- Budgeting
-- Production assemblies
-- Labour calculations
-- Company Brain recommendations
-- Opportunity creation
-- Historical pricing
-- Future automation
-- Company intelligence
+### P0 - Production Library Backend (Immediate Next)
+Create Supabase database tables and API endpoints for:
+- `production_items` table
+- `assemblies` table
+- `scope_library` table
+- `labour_rates` table
+- `templates` table
+- `historical_pricing` table
+- CSV import endpoints
 
 ### P1 - Phase 4: New Opportunity Experience Design
 Before building the traditional form, design the entire Opportunity Creation Experience:
@@ -664,6 +674,11 @@ Apply WorkspaceShell pattern to:
 - `/app/frontend/src/hooks/useBrainContext.js`
 - `/app/migrations/012_company_brain_foundation.sql`
 - `/app/backend/tests/test_company_brain.py`
+
+### Production Library (July 12, 2026)
+- `/app/frontend/src/pages/app/ProductionLibraryPage.jsx` - Company Knowledge Engine workspace
+- Routes: `/app/estimating`, `/app/production-library`
+- Data-testids: production-library-page, tab-{library|assemblies|scopes|labour|pricing|templates|imports|builder}, production-item-modal
 
 ### Command Center (July 12, 2026)
 - `/app/backend/routes/command_center.py` - Dashboard aggregation API
