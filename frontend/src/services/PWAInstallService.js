@@ -1,180 +1,202 @@
 /**
- * TradeOS PWA Install Service
- * Handles PWA installation prompts and detection
+ * TradeOS PWA Install Service v2.0
  * 
- * Installation detection strategy:
- * 1. Primary: Check if running in standalone mode (display-mode: standalone)
- * 2. Secondary: Check iOS standalone mode (navigator.standalone)
- * 3. The beforeinstallprompt event indicates app is NOT installed
- * 4. localStorage flag is set on appinstalled event but cleared when prompt fires
+ * Provides a native-feeling installation experience across all platforms.
+ * 
+ * Strategy:
+ * - Desktop/Android: Trigger native browser prompt immediately
+ * - iOS: Present minimal visual guide (Share → Add to Home Screen)
+ * - Already installed: Show "Open App" instead
+ * 
+ * Detection:
+ * - Standalone mode (display-mode: standalone)
+ * - iOS standalone (navigator.standalone)
+ * - beforeinstallprompt event (indicates NOT installed)
+ * - Related apps API (where available)
  */
 
 let deferredPrompt = null;
 let installPromptFired = false;
+let installListeners = [];
 
 export const PWAInstallService = {
-  // Store the deferred prompt event
+  // Initialize event listeners
   init: () => {
-    if (typeof window !== 'undefined') {
-      window.addEventListener('beforeinstallprompt', (e) => {
-        // Prevent Chrome 67+ from automatically showing the prompt
-        e.preventDefault();
-        // Stash the event so it can be triggered later
-        deferredPrompt = e;
-        installPromptFired = true;
-        console.log('[PWA] Install prompt ready - app is NOT installed');
-        
-        // Clear any stale "installed" flag since prompt firing proves it's not installed
-        localStorage.removeItem('tradeos_pwa_installed');
-        
-        // Dispatch custom event for components to listen
-        window.dispatchEvent(new CustomEvent('pwa-install-available'));
-      });
+    if (typeof window === 'undefined') return;
+    
+    // Capture the beforeinstallprompt event
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installPromptFired = true;
+      localStorage.removeItem('tradeos_pwa_installed');
+      
+      // Notify listeners
+      PWAInstallService._notifyListeners('prompt-available');
+    });
 
-      window.addEventListener('appinstalled', () => {
-        console.log('[PWA] App was installed');
-        deferredPrompt = null;
-        installPromptFired = false;
-        localStorage.setItem('tradeos_pwa_installed', 'true');
-        localStorage.setItem('tradeos_pwa_install_time', Date.now().toString());
-        window.dispatchEvent(new CustomEvent('pwa-installed'));
-      });
+    // Listen for successful installation
+    window.addEventListener('appinstalled', () => {
+      deferredPrompt = null;
+      installPromptFired = false;
+      localStorage.setItem('tradeos_pwa_installed', 'true');
+      localStorage.setItem('tradeos_pwa_install_time', Date.now().toString());
+      
+      // Notify listeners
+      PWAInstallService._notifyListeners('installed');
+    });
+
+    // Check related apps for more accurate detection
+    PWAInstallService._checkRelatedApps();
+  },
+
+  // Subscribe to install events
+  subscribe: (callback) => {
+    installListeners.push(callback);
+    return () => {
+      installListeners = installListeners.filter(cb => cb !== callback);
+    };
+  },
+
+  _notifyListeners: (event) => {
+    installListeners.forEach(cb => cb(event));
+  },
+
+  // Check if related apps are installed (more accurate on some platforms)
+  _checkRelatedApps: async () => {
+    if ('getInstalledRelatedApps' in navigator) {
+      try {
+        const relatedApps = await navigator.getInstalledRelatedApps();
+        if (relatedApps.length > 0) {
+          localStorage.setItem('tradeos_pwa_installed', 'true');
+        }
+      } catch (e) {
+        // API not supported or failed
+      }
     }
   },
 
-  // Check if PWA install prompt is available
-  isInstallAvailable: () => {
-    return deferredPrompt !== null;
+  // Platform detection
+  getPlatform: () => {
+    const ua = navigator.userAgent || navigator.vendor;
+    
+    if (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) {
+      return 'ios';
+    }
+    if (/android/i.test(ua)) {
+      return 'android';
+    }
+    if (/Macintosh|MacIntel|MacPPC|Mac68K/.test(ua)) {
+      return 'macos';
+    }
+    if (/Win32|Win64|Windows|WinCE/.test(ua)) {
+      return 'windows';
+    }
+    return 'other';
   },
 
-  // Check if currently running as PWA (standalone mode)
+  // Check if currently running as installed PWA
   isRunningAsStandalone: () => {
-    // Check CSS media query for standalone mode
     if (window.matchMedia('(display-mode: standalone)').matches) {
       return true;
     }
-    // Check iOS Safari standalone
     if (window.navigator.standalone === true) {
+      return true;
+    }
+    // Check if opened from TWA (Trusted Web Activity)
+    if (document.referrer.includes('android-app://')) {
       return true;
     }
     return false;
   },
 
-  // Check if PWA is installed - use multiple signals
+  // Check if native install prompt is available
+  isNativePromptAvailable: () => {
+    return deferredPrompt !== null;
+  },
+
+  // Comprehensive installation status check
   isInstalled: () => {
-    // If currently running in standalone mode, definitely installed
+    // Definitely installed if running standalone
     if (PWAInstallService.isRunningAsStandalone()) {
       return true;
     }
     
-    // If beforeinstallprompt fired this session, app is NOT installed
+    // If prompt fired this session, NOT installed
     if (installPromptFired || deferredPrompt !== null) {
       return false;
     }
     
-    // Fallback to localStorage flag (set on appinstalled event)
-    // This is less reliable as user may have uninstalled
+    // Check localStorage (less reliable, user may have uninstalled)
     return localStorage.getItem('tradeos_pwa_installed') === 'true';
   },
 
-  // Clear installed status (when user indicates they uninstalled)
+  // Clear installation status
   clearInstalledStatus: () => {
     localStorage.removeItem('tradeos_pwa_installed');
     localStorage.removeItem('tradeos_pwa_install_time');
     installPromptFired = false;
-    console.log('[PWA] Install status cleared');
   },
 
-  // Trigger the install prompt
-  promptInstall: async () => {
+  // Trigger native install prompt (Desktop/Android)
+  triggerNativeInstall: async () => {
     if (!deferredPrompt) {
-      console.log('[PWA] No install prompt available');
-      // For iOS or when prompt is not available, show manual instructions
-      return { outcome: 'not-available', showManualInstructions: true };
+      return { success: false, reason: 'no-prompt' };
     }
 
     try {
-      // Show the install prompt
       deferredPrompt.prompt();
-      
-      // Wait for the user to respond to the prompt
       const { outcome } = await deferredPrompt.userChoice;
-      
-      console.log(`[PWA] User response to install prompt: ${outcome}`);
-      
-      // Clear the prompt (can only be used once)
       deferredPrompt = null;
       
       if (outcome === 'accepted') {
         installPromptFired = false;
+        return { success: true, outcome: 'accepted' };
       }
       
-      return { outcome, showManualInstructions: false };
+      return { success: false, outcome: 'dismissed' };
     } catch (err) {
-      console.error('[PWA] Error showing install prompt:', err);
-      return { outcome: 'error', showManualInstructions: true };
+      return { success: false, reason: 'error', error: err };
     }
   },
 
-  // Get platform-specific install instructions
-  getInstallInstructions: () => {
-    const ua = navigator.userAgent || navigator.vendor;
+  // Get the best installation method for current platform
+  getInstallMethod: () => {
+    const platform = PWAInstallService.getPlatform();
     
-    // iOS
-    if (/iPad|iPhone|iPod/.test(ua)) {
-      return {
-        platform: 'ios',
-        steps: [
-          'Tap the Share button at the bottom of Safari',
-          'Scroll down and tap "Add to Home Screen"',
-          'Tap "Add" in the top right corner'
-        ]
-      };
+    if (PWAInstallService.isInstalled()) {
+      return { method: 'already-installed', platform };
     }
     
-    // Android Chrome
-    if (/android/i.test(ua) && /chrome/i.test(ua)) {
-      return {
-        platform: 'android',
-        steps: [
-          'Tap the three-dot menu in the top right',
-          'Tap "Add to Home Screen" or "Install App"',
-          'Tap "Install" to confirm'
-        ]
-      };
+    if (deferredPrompt) {
+      return { method: 'native-prompt', platform };
     }
     
-    // Desktop Chrome/Edge
-    if (/chrome|edg/i.test(ua)) {
-      return {
-        platform: 'desktop',
-        steps: [
-          'Click the install icon in the address bar',
-          'Or click the three-dot menu and select "Install TradeOS"',
-          'Click "Install" to confirm'
-        ]
-      };
+    if (platform === 'ios') {
+      return { method: 'ios-manual', platform };
     }
     
-    // Firefox
-    if (/firefox/i.test(ua)) {
-      return {
-        platform: 'firefox',
-        steps: [
-          'Firefox does not support PWA install on desktop',
-          'Please use Chrome, Edge, or Safari for the best experience'
-        ]
-      };
-    }
+    // Fallback for when prompt hasn't fired yet
+    return { method: 'manual', platform };
+  },
+
+  // Get browser name for display
+  getBrowserName: () => {
+    const ua = navigator.userAgent;
     
-    // Default
-    return {
-      platform: 'other',
-      steps: [
-        'Use the browser menu to add this app to your home screen',
-        'Look for "Add to Home Screen" or "Install App" option'
-      ]
-    };
+    if (ua.includes('Safari') && !ua.includes('Chrome')) {
+      return 'Safari';
+    }
+    if (ua.includes('Chrome')) {
+      return 'Chrome';
+    }
+    if (ua.includes('Firefox')) {
+      return 'Firefox';
+    }
+    if (ua.includes('Edg')) {
+      return 'Edge';
+    }
+    return 'your browser';
   }
 };
 

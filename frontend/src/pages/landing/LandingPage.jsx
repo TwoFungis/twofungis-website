@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   Briefcase,
@@ -19,10 +19,12 @@ import {
   Shield,
   Star,
   Download,
-  Zap
+  Zap,
+  ExternalLink
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import PWAInstallModal from '../../components/app/PWAInstallModal';
+import PWAInstallService from '../../services/PWAInstallService';
 
 // Background images
 const IMAGES = {
@@ -35,10 +37,36 @@ const LandingPage = () => {
   const { user } = useAuthStore();
   const navigate = useNavigate();
   const [showPWAModal, setShowPWAModal] = useState(false);
+  const [isAppInstalled, setIsAppInstalled] = useState(false);
+
+  // Check if app is already installed
+  useEffect(() => {
+    setIsAppInstalled(PWAInstallService.isInstalled());
+    
+    // Listen for installation events
+    const unsubscribe = PWAInstallService.subscribe((event) => {
+      if (event === 'installed') {
+        setIsAppInstalled(true);
+      } else if (event === 'prompt-available') {
+        setIsAppInstalled(false);
+      }
+    });
+    
+    return unsubscribe;
+  }, []);
 
   const handleCTAClick = (e) => {
     if (user) {
       e.preventDefault();
+      setShowPWAModal(true);
+    }
+  };
+
+  const handleDownloadClick = () => {
+    if (isAppInstalled) {
+      // If already installed, navigate to the app
+      navigate('/app/command-center');
+    } else {
       setShowPWAModal(true);
     }
   };
@@ -188,12 +216,21 @@ const LandingPage = () => {
                 Get Started Free
               </Link>
               <button 
-                onClick={() => setShowPWAModal(true)}
+                onClick={handleDownloadClick}
                 className="bg-white/5 hover:bg-white/10 text-white px-5 py-2.5 rounded-lg font-medium transition-all border border-white/10 hover:border-white/20 flex items-center gap-2"
                 data-testid="download-app-btn"
               >
-                <Download className="w-4 h-4" />
-                Download App
+                {isAppInstalled ? (
+                  <>
+                    <ExternalLink className="w-4 h-4" />
+                    Open App
+                  </>
+                ) : (
+                  <>
+                    <Download className="w-4 h-4" />
+                    Download App
+                  </>
+                )}
               </button>
             </nav>
             <div className="md:hidden flex items-center gap-2">
@@ -206,11 +243,15 @@ const LandingPage = () => {
                 Get Started
               </Link>
               <button 
-                onClick={() => setShowPWAModal(true)}
+                onClick={handleDownloadClick}
                 className="bg-white/5 text-white p-2 rounded-lg border border-white/10"
                 data-testid="download-app-mobile-btn"
               >
-                <Download className="w-4 h-4" />
+                {isAppInstalled ? (
+                  <ExternalLink className="w-4 h-4" />
+                ) : (
+                  <Download className="w-4 h-4" />
+                )}
               </button>
             </div>
           </div>
@@ -273,12 +314,21 @@ const LandingPage = () => {
               <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
             <button 
-              onClick={() => setShowPWAModal(true)}
+              onClick={handleDownloadClick}
               className="bg-white/5 hover:bg-white/10 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all border border-white/10 hover:border-white/20 flex items-center justify-center gap-2"
               data-testid="hero-download-btn"
             >
-              <Download className="w-5 h-5" />
-              Download App
+              {isAppInstalled ? (
+                <>
+                  <ExternalLink className="w-5 h-5" />
+                  Open App
+                </>
+              ) : (
+                <>
+                  <Download className="w-5 h-5" />
+                  Download App
+                </>
+              )}
             </button>
           </div>
           
