@@ -78,6 +78,9 @@ from routes.google_auth import router as google_auth_router
 # Import Storage routes (Emergent Object Storage)
 from routes.storage import router as storage_router
 
+# Import AI Chat routes (OpenAI GPT integration)
+from routes.ai_chat import router as ai_chat_router
+
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env', override=False)
 
@@ -244,6 +247,9 @@ app.include_router(google_auth_router)
 
 # Include Storage routes (Emergent Object Storage)
 app.include_router(storage_router)
+
+# Include AI Chat routes (OpenAI GPT integration)
+app.include_router(ai_chat_router)
 
 app.add_middleware(
     CORSMiddleware,

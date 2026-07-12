@@ -105,6 +105,14 @@ The TradeOS V2 Foundation has been officially locked and stabilized.
 - **50MB max file size**: Images, PDFs, documents, CAD files supported
 - **Supabase metadata**: File references stored in database with soft-delete support
 
+**Phase 3.4: OpenAI Chat Models Integration** ✅ (July 12, 2026)
+- **Company Brain AI**: GPT-5.4 powered AI assistant for construction operations
+- **Multi-turn conversations**: Session-based chat with history persistence
+- **Context-aware prompts**: Construction industry knowledge built into system prompt
+- **Multiple endpoints**: `/api/ai/chat/completions`, `/api/ai/chat/company-brain`, `/api/ai/chat/quick-assist`
+- **Model selection**: Support for GPT-5.4, GPT-4o, Claude, Gemini models
+- **React hook**: `useAIChat` for easy frontend integration
+
 **Key Files Created/Modified:**
 - `/app/backend/routes/workspace.py` - New workspace context API
 - `/app/frontend/src/pages/app/CommandCenterPage.jsx` - New Command Center
