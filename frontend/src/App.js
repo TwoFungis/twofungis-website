@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './store/authStore';
+import { OrganizationProvider } from './hooks/useOrganization';
 
 // Landing Pages
 import LandingPage from './pages/landing/LandingPage';
@@ -97,50 +98,52 @@ function App() {
   }, [initialize, initialized]);
 
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/privacy" element={<PrivacyPage />} />
-        <Route path="/terms" element={<TermsPage />} />
-        <Route path="/client/review/:token" element={<ClientReviewPage />} />
-        
-        {/* Auth Routes */}
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignUpPage />} />
-        <Route path="/onboarding" element={<OnboardingPage />} />
-        <Route path="/activate" element={<ActivateBusinessFlow />} />
-        
-        {/* App Routes - Core Business Functions */}
-        <Route path="/app" element={
-          <ProtectedRoute>
-            <AppLayout />
-          </ProtectedRoute>
-        }>
-          <Route index element={<DashboardRedirect />} />
-          <Route path="dashboard" element={<DashboardPage />} />
-          <Route path="projects" element={<ProjectsPage />} />
-          <Route path="projects/:id" element={<ProjectDetailPage />} />
-          <Route path="estimating" element={<EstimatingPage />} />
-          <Route path="estimating/:id" element={<EstimatingPage />} />
-          <Route path="change-orders" element={<ChangeOrdersPage />} />
-          <Route path="milestones" element={<MilestonesPage />} />
-          <Route path="invoices" element={<InvoicesPage />} />
-          <Route path="receivables" element={<ReceivablesPage />} />
-          <Route path="expenses" element={<ExpensesPage />} />
-          <Route path="documents" element={<DocumentsPage />} />
-          <Route path="tax-summary" element={<TaxSummaryPage />} />
-          <Route path="reports" element={<ReportsPage />} />
-          <Route path="integrations" element={<IntegrationsPage />} />
-          <Route path="settings" element={<SettingsPage />} />
-          <Route path="profile" element={<ProfilePage />} />
-          <Route path="mainframe" element={<MainframePage />} />
-        </Route>
+    <OrganizationProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/client/review/:token" element={<ClientReviewPage />} />
+          
+          {/* Auth Routes */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignUpPage />} />
+          <Route path="/onboarding" element={<OnboardingPage />} />
+          <Route path="/activate" element={<ActivateBusinessFlow />} />
+          
+          {/* App Routes - Core Business Functions */}
+          <Route path="/app" element={
+            <ProtectedRoute>
+              <AppLayout />
+            </ProtectedRoute>
+          }>
+            <Route index element={<DashboardRedirect />} />
+            <Route path="dashboard" element={<DashboardPage />} />
+            <Route path="projects" element={<ProjectsPage />} />
+            <Route path="projects/:id" element={<ProjectDetailPage />} />
+            <Route path="estimating" element={<EstimatingPage />} />
+            <Route path="estimating/:id" element={<EstimatingPage />} />
+            <Route path="change-orders" element={<ChangeOrdersPage />} />
+            <Route path="milestones" element={<MilestonesPage />} />
+            <Route path="invoices" element={<InvoicesPage />} />
+            <Route path="receivables" element={<ReceivablesPage />} />
+            <Route path="expenses" element={<ExpensesPage />} />
+            <Route path="documents" element={<DocumentsPage />} />
+            <Route path="tax-summary" element={<TaxSummaryPage />} />
+            <Route path="reports" element={<ReportsPage />} />
+            <Route path="integrations" element={<IntegrationsPage />} />
+            <Route path="settings" element={<SettingsPage />} />
+            <Route path="profile" element={<ProfilePage />} />
+            <Route path="mainframe" element={<MainframePage />} />
+          </Route>
 
-        {/* Catch all - redirect to home */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </BrowserRouter>
+          {/* Catch all - redirect to home */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </OrganizationProvider>
   );
 }
 

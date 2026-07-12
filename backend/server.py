@@ -60,6 +60,9 @@ from routes.tfcs import router as tfcs_router
 # Import Company Brain routes
 from routes.company_brain import router as company_brain_router
 
+# Import Organizations routes (Phase 1A)
+from routes.organizations import router as organizations_router
+
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env', override=False)
 
@@ -209,6 +212,9 @@ app.include_router(tfcs_router)
 # Include Company Brain routes
 app.include_router(company_brain_router)
 
+# Include Organizations routes (Phase 1A)
+app.include_router(organizations_router)
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
@@ -226,4 +232,6 @@ logger = logging.getLogger(__name__)
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
-    client.close()
+    # MongoDB has been removed - this is now a no-op
+    # Supabase connections are handled by httpx and don't need explicit cleanup
+    logger.info("Application shutting down - cleanup complete")
