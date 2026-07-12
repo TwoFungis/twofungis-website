@@ -63,6 +63,12 @@ from routes.company_brain import router as company_brain_router
 # Import Organizations routes (Phase 1A)
 from routes.organizations import router as organizations_router
 
+# Import Opportunities routes (Vertical Slice 1)
+from routes.opportunities import router as opportunities_router
+
+# Import Tenders routes (Vertical Slice 1)
+from routes.tenders import router as tenders_router
+
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env', override=False)
 
@@ -214,6 +220,12 @@ app.include_router(company_brain_router)
 
 # Include Organizations routes (Phase 1A)
 app.include_router(organizations_router)
+
+# Include Opportunities routes (Vertical Slice 1)
+app.include_router(opportunities_router)
+
+# Include Tenders routes (Vertical Slice 1)
+app.include_router(tenders_router)
 
 app.add_middleware(
     CORSMiddleware,

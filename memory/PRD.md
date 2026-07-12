@@ -43,22 +43,79 @@ Build "TradeOS," an end-to-end operating system for Canadian contractors. The ap
 - **First-Class External Users:** Clients, Builders, etc. are full authenticated users
 
 ### Implementation Sequence
-1. Multi-Tenant Foundation (Spec 1.5) ← **IN PROGRESS**
-2. Opportunity Foundation (Spec 2.0 Phase 1)
+1. Multi-Tenant Foundation (Spec 1.5) ✅ **COMPLETE**
+2. Opportunity Foundation (Spec 2.0 Phase 1) ← **IN PROGRESS**
 3. Tender Workspace (Spec 2.0 Phase 2-3)
 4. Project Conversion (Spec 2.0 Phase 4)
 5. Company Brain Integration (Spec 2.0 Phase 5)
 6. Production Library (Spec 2.1 - Future)
 
-### Phase 1A Status (July 12, 2026)
+### Phase 1A Status - COMPLETE (July 12, 2026)
 **Organization Foundation Implementation**
 - ✅ Database migration created (`013_organization_foundation.sql`)
 - ✅ Backend routes created (`/app/backend/routes/organizations.py`)
 - ✅ Frontend hook created (`useOrganization`)
 - ✅ Workspace Switcher component created
 - ✅ App.js updated with OrganizationProvider
-- ⏳ **PENDING:** Run migration in Supabase
-- ⏳ **PENDING:** Execute `assign_scott_marshall_roles()` for dual identity
+- ✅ User executed migration in Supabase
+- ✅ User executed `assign_scott_marshall_roles()`
+
+### Phase 1B Status - Vertical Slice 1 (July 12, 2026)
+**Opportunity Workspace Foundation**
+
+**Backend Complete:**
+- ✅ Database migration created (`014_opportunity_tender_foundation.sql` v2.0.0)
+- ✅ Opportunities API (`/app/backend/routes/opportunities.py`)
+- ✅ Tenders API (`/app/backend/routes/tenders.py`)
+- ✅ Routes registered in server.py
+
+**Workflow Stages (not CRM stages):**
+```
+DISCOVERED → QUALIFYING → TENDERING → SUBMITTED → NEGOTIATION → AWARDED → PROJECT
+                                                                  ↓
+                                               DECLINED | LOST | ARCHIVED
+```
+
+**Database Tables (10 total):**
+- `opportunities` - Parent workspace container
+- `opportunity_documents` - Drawings, specs, photos
+- `opportunity_communications` - Emails, calls, meetings
+- `opportunity_rfis` - Requests for information
+- `opportunity_site_notes` - Site visit notes
+- `opportunity_activity` - Audit trail
+- `tenders` - Estimates/quotes
+- `tender_sections` - Organizational groupings
+- `tender_line_items` - FULL cost structure
+- `tender_versions` - Immutable submission history
+
+**Full Estimate Line Item Structure:**
+Category, Scope, Description, Quantity, Unit, Labor (hours, rate, burden), Material (qty, unit, cost), Equipment, Subcontractor, Production Rate, Crew, Duration, Waste, Markup, Overhead, Profit, Contingency, Tax, Notes, Attachments, Production Library reference, Company Brain reference
+
+**API Endpoints:**
+- `GET /api/opportunities/health` - Health check
+- `GET /api/opportunities/workflow-stages` - Get all workflow stages
+- `GET /api/opportunities` - List opportunities
+- `POST /api/opportunities` - Create opportunity
+- `GET /api/opportunities/{id}` - Get opportunity workspace
+- `PATCH /api/opportunities/{id}` - Update opportunity
+- `POST /api/opportunities/{id}/status` - Change workflow stage
+- `GET/POST /api/opportunities/{id}/activity` - Activity timeline
+- `DELETE /api/opportunities/{id}` - Delete opportunity
+- `GET /api/opportunities/stats/pipeline` - Pipeline statistics
+- `GET /api/tenders/health` - Health check
+- `POST /api/tenders` - Create tender
+- `GET /api/tenders/{id}` - Get tender with sections/items
+- `PATCH /api/tenders/{id}` - Update tender
+- `POST /api/tenders/{id}/sections` - Create section
+- `PATCH/DELETE /api/tenders/{id}/sections/{id}` - Update/delete section
+- `POST /api/tenders/{id}/items` - Create line item
+- `PATCH/DELETE /api/tenders/{id}/items/{id}` - Update/delete item
+- `POST /api/tenders/{id}/items/reorder` - Reorder items
+- `POST /api/tenders/{id}/submit` - Submit tender
+- `POST /api/tenders/{id}/revise` - Create revision
+
+⏳ **PENDING:** User runs `014_opportunity_tender_foundation.sql` in Supabase
+⏳ **PENDING:** Frontend Opportunity Workspace UI
 
 ---
 
