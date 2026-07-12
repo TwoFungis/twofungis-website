@@ -4,15 +4,15 @@ import { Card } from './ui/card';
 
 const WhyChooseUs = () => {
   const reasons = [
-    { icon: FileText,      title: 'Professional Tendering',     description: 'Clean, documented bids with scope clarity that estimators and PMs can actually rely on.' },
-    { icon: ClipboardList, title: 'Detailed Scope Review',      description: 'We review drawings, specs and exclusions carefully before contract — no surprises at closeout.' },
+    { icon: FileText,      title: 'Professional Tendering',     description: 'Clean, documented bids with scope clarity your estimators and PMs can review with confidence.' },
+    { icon: ClipboardList, title: 'Detailed Scope Review',      description: 'We review drawings, specs and exclusions carefully before contract — so there are no surprises at closeout.' },
     { icon: Handshake,     title: 'Transparent Inclusions',     description: 'Inclusions and exclusions are written plainly. What you see in the bid is what you get on site.' },
-    { icon: CalendarCheck, title: 'Reliable Scheduling',        description: 'Crews integrate with the GC schedule, hit milestones, and communicate early when conditions change.' },
-    { icon: Wrench,        title: 'Quality Workmanship',        description: 'Finish work that holds up to deficiency reviews, owner walkthroughs and long-term occupancy.' },
-    { icon: Users,         title: 'Project Coordination',       description: 'Coordination with site supers, trades and consultants — we work with the team, not around it.' },
-    { icon: MessageCircle, title: 'Responsive Communication',   description: 'Fast replies, clear documentation, and a single point of contact through to closeout.' },
-    { icon: ShieldCheck,   title: 'Safety & Compliance',    description: 'WorkSafeBC compliant, $5M liability coverage, and the documentation commercial work requires.' },
-    { icon: HardHat,       title: 'Relationship-Driven',        description: 'We&apos;d rather earn repeat work from well-run developers and GCs than chase volume.' }
+    { icon: CalendarCheck, title: 'Dependable Scheduling',      description: 'Crews integrate with the GC schedule, hit milestones, and communicate early when conditions change.' },
+    { icon: Wrench,        title: 'Consistent Quality',         description: 'Finish work that holds up to deficiency reviews, owner walkthroughs and long-term occupancy.' },
+    { icon: Users,         title: 'Site Coordination',          description: 'Coordinated with site supers, trades and consultants — we work with the team, not around it.' },
+    { icon: MessageCircle, title: 'Proactive Communication',    description: 'Fast replies, clear documentation, and a single point of contact from tender through closeout.' },
+    { icon: ShieldCheck,   title: 'Safety &amp; Compliance',    description: 'WorkSafeBC compliant, $5M liability coverage, and the documentation commercial work requires.' },
+    { icon: HardHat,       title: 'Long-Term Relationships',    description: 'We&apos;d rather earn repeat work from well-run developers, GCs and homeowners than chase volume.' }
   ];
 
   return (
@@ -29,7 +29,7 @@ const WhyChooseUs = () => {
             </div>
             <div className="w-24 h-1 bg-red-600 mx-auto mb-6"></div>
             <p className="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-              Built around how developers and general contractors actually want finishing trades to operate.
+              Built around the standards general contractors, developers, construction managers and homeowners expect from a finishing subcontractor.
             </p>
           </div>
 

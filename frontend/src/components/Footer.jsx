@@ -20,7 +20,7 @@ const Footer = () => {
                 />
               </Link>
               <p className="text-gray-400 mb-4" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                Two Fungis Finishing is a British Columbia finishing contractor — supporting commercial and multifamily projects from Vancouver and the Fraser Valley through the Okanagan to Vancouver Island.
+                A British Columbia finishing contractor supporting general contractors, developers and homeowners on commercial, multifamily and select residential projects — from Vancouver and the Fraser Valley through the Okanagan to Vancouver Island.
               </p>
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full" style={{ backgroundColor: 'rgba(34, 139, 34, 0.2)', border: '1px solid rgba(34, 139, 34, 0.5)' }}>
                 <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#228B22' }}></div>

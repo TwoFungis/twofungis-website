@@ -63,6 +63,9 @@ const Portfolio = () => {
               </h2>
             </div>
             <div className="w-24 h-1 bg-red-600 mx-auto mb-6"></div>
+            <p className="text-base sm:text-lg text-gray-300 max-w-2xl mx-auto" style={{ fontFamily: 'Open Sans, sans-serif' }}>
+              A selection of finish carpentry, architectural millwork and interior finishing completed across British Columbia.
+            </p>
           </div>
 
           {/* Grid */}

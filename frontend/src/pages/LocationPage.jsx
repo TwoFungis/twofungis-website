@@ -197,30 +197,30 @@ const LocationPage = () => {
             
             <div className="prose prose-lg max-w-none">
               <p className="text-gray-700 leading-relaxed mb-4" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                Two Fungis Finishing is proud to serve {location.city} and surrounding areas in {location.region}. With over 20 years of combined experience, our founders Scott Marshall and Beau Suprun bring unparalleled expertise in interior finishing, commercial millwork, and precision carpentry to every project.
+                Two Fungis Finishing supports general contractors, developers, construction managers and homeowners on commercial, multifamily and select residential projects in {location.city} and throughout {location.region}. Founded in 2017 by Scott Marshall and Beau Suprun, we operate the way well-run builders expect a finishing subcontractor to operate — organized, communicative, and easy to work with from tender through closeout.
               </p>
               
               <h3 className="text-2xl font-bold text-black mb-4 mt-8" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
-                Our Services in {location.city}
+                Services Available in {location.city}
               </h3>
               
               <ul className="space-y-3 mb-8">
                 <li className="flex items-start">
                   <CheckCircle2 style={{ color: '#228B22' }} className="mr-3 flex-shrink-0 mt-1" size={20} />
                   <span className="text-gray-700" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                    <strong>Finish Carpentry:</strong> Trim, casing, baseboards, crown, stairs and built-ins for commercial and multi-family projects in {location.city}
+                    <strong>Finish Carpentry:</strong> Trim, casing, base, crown, stairs, handrails and built-ins for commercial and multifamily projects in {location.city}
                   </span>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle2 style={{ color: '#228B22' }} className="mr-3 flex-shrink-0 mt-1" size={20} />
                   <span className="text-gray-700" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                    <strong>Architectural Millwork:</strong> Custom millwork installation — feature walls, reception desks, custom cabinetry and bespoke joinery
+                    <strong>Architectural Millwork:</strong> Shop-drawing coordination, supply and field installation — feature walls, reception millwork, custom casework and bespoke joinery
                   </span>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle2 style={{ color: '#228B22' }} className="mr-3 flex-shrink-0 mt-1" size={20} />
                   <span className="text-gray-700" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                    <strong>Doors &amp; Hardware:</strong> Commercial and fire-rated doors with full hardware scheduling and install
+                    <strong>Doors &amp; Hardware:</strong> Commercial and fire-rated assemblies with full hardware scheduling and field installation
                   </span>
                 </li>
                 <li className="flex items-start">
@@ -238,17 +238,17 @@ const LocationPage = () => {
                 <li className="flex items-start">
                   <CheckCircle2 style={{ color: '#228B22' }} className="mr-3 flex-shrink-0 mt-1" size={20} />
                   <span className="text-gray-700" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                    <strong>Deficiency Completion:</strong> Punch-lists, warranty repairs and documented closeout for {location.city} projects
+                    <strong>Deficiency Completion:</strong> Punch-lists, warranty work and documented closeout for {location.city} projects
                   </span>
                 </li>
               </ul>
 
               <h3 className="text-2xl font-bold text-black mb-4 mt-8" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
-                Why Choose Two Fungis Finishing in {location.city}?
+                How We Work in {location.city}
               </h3>
               
               <p className="text-gray-700 leading-relaxed mb-4" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                We're not just contractors – we're craftsmen who take pride in every detail. Our team brings together Scott Marshall's 20 years of hands-on experience in millwork and finishing carpentry, and Beau Suprun's exceptional eye for detail as a master craftsman and machinist. This combination of experience and precision ensures your project in {location.city} exceeds expectations.
+                We treat every project as a reflection of the builder who hired us. That means careful scope review before contract, clear inclusions and exclusions, dependable scheduling on site, proactive communication when conditions change, and a clean, documented handover. Our aim is to make each project easier for the team we&apos;re on — not harder.
               </p>
 
               {location.projectTypes && location.projectTypes.length > 0 && (
@@ -269,10 +269,10 @@ const LocationPage = () => {
 
               <div className="bg-gray-50 p-6 rounded-lg mt-8">
                 <h3 className="text-xl font-bold text-black mb-3" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
-                  Working in {location.city}?
+                  Have a project in {location.city}?
                 </h3>
                 <p className="text-gray-700 mb-4" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                  Invite Two Fungis Finishing to tender your next commercial or multifamily project. $5 million liability coverage, WorkSafeBC compliant, and ready to support GCs and developers across British Columbia.
+                  We&apos;d welcome the opportunity to tender your next commercial, multifamily or residential finishing scope. $5 million liability coverage, WorkSafeBC compliant, and ready to work with GCs, developers and homeowners across British Columbia.
                 </p>
                 <div className="grid sm:grid-cols-2 gap-3 mb-4">
                   <a href="tel:778-268-4920" className="flex items-center font-semibold text-sm" style={{ color: '#228B22' }} data-testid="loc-call-scott">

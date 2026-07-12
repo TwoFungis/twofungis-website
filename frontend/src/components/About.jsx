@@ -15,7 +15,7 @@ const About = () => {
             </div>
             <div className="w-24 h-1 bg-red-600 mx-auto mb-6"></div>
             <p className="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-              A professional commercial and multifamily finishing contractor supporting projects throughout British Columbia.
+              A commercial and multifamily finishing contractor supporting general contractors, developers and homeowners on projects across British Columbia.
             </p>
           </div>
 
@@ -26,16 +26,16 @@ const About = () => {
                 Our Approach
               </h3>
               <p className="text-gray-700 mb-4 leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                Two Fungis Finishing partners with developers, general contractors and construction managers to deliver finish carpentry, architectural millwork, doors &amp; hardware, deficiency completion and interior finishing on commercial and multifamily projects across British Columbia.
+                Two Fungis Finishing works alongside developers, general contractors and construction managers to deliver finish carpentry, architectural millwork, doors &amp; hardware, deficiency completion and interior finishing on commercial, multifamily and select residential projects across British Columbia.
               </p>
               <p className="text-gray-700 mb-4 leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                Established in 2017 and led by Scott Marshall and Beau Suprun, the company is built around quiet professionalism — clear communication, careful scope review, transparent inclusions, reliable scheduling and clean documented closeout. We take the time to understand the project, integrate with the GC&apos;s schedule, and leave a finished building that reflects well on the entire team.
+                Established in 2017 and led by Scott Marshall and Beau Suprun, the company is built around a straightforward standard — clear communication, careful scope review, transparent inclusions, dependable scheduling and clean documented closeout. We take the time to understand each project, integrate with the site team, and finish a building that reflects well on everyone who worked on it.
               </p>
               <p className="text-gray-700 mb-4 leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                Our crews carry $5 million liability coverage, are WorkSafeBC compliant, and operate with the documentation and coordination that commercial work demands. We&apos;d rather earn long-term relationships with a handful of well-run developers and GCs than chase volume.
+                Our crews carry $5 million liability coverage, are WorkSafeBC compliant, and operate with the documentation and coordination that commercial and multifamily work requires. We treat every client&apos;s reputation as if it were our own, and we&apos;d rather earn long-term relationships with a handful of well-run builders than chase volume.
               </p>
               <p className="text-gray-700 leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                If you are tendering a project in BC and want a finishing contractor that takes scope, schedule and communication seriously — we&apos;d like to be on your bid list.
+                If you are tendering a project in BC and want a finishing subcontractor that takes scope, schedule and communication seriously — we would like to be on your bid list.
               </p>
             </div>
             <div className="relative">

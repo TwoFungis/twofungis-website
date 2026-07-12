@@ -76,7 +76,7 @@ const Services = () => {
             </div>
             <div className="w-24 h-1 bg-red-600 mx-auto mb-6"></div>
             <p className="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-              Serving commercial, multifamily, institutional and select residential projects throughout British Columbia.
+              Working with general contractors, developers, construction managers and homeowners on commercial, multifamily, institutional and select residential projects throughout British Columbia.
             </p>
           </div>
 
@@ -145,7 +145,7 @@ const Services = () => {
                   Subcontractor Prequalification
                 </h3>
                 <p className="text-gray-300 text-sm leading-relaxed mb-6" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                  Two Fungis Finishing maintains a current Subcontractor Prequalification Package for General Contractors, Developers, Construction Managers, Procurement Teams, and Property Managers.
+                  We maintain a current Subcontractor Prequalification Package for General Contractors, Developers, Construction Managers, Procurement Teams and Property Managers — provided directly on request so the information is always accurate and up to date.
                 </p>
                 <button
                   type="button"

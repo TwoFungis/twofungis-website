@@ -25,7 +25,7 @@ const Contact = () => {
             </div>
             <div className="w-24 h-1 bg-red-600 mx-auto mb-6"></div>
             <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-              For tender invitations, project consultations, commercial pricing, site meetings or general inquiries — please reach out.
+              For tender invitations, project consultations, commercial pricing, site meetings or general inquiries — we&apos;re here and happy to talk.
             </p>
             <div className="flex flex-wrap justify-center gap-2 mt-5 max-w-3xl mx-auto">
               {[
@@ -97,10 +97,10 @@ const Contact = () => {
               {/* RED insurance box */}
               <div className="bg-red-600 text-white p-6 rounded-lg mb-8">
                 <p className="text-lg font-semibold mb-2" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
-                  $5 Million Liability Insurance
+                  $5 Million Liability Coverage
                 </p>
                 <p className="text-sm" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-                  Fully insured for your peace of mind
+                  WorkSafeBC compliant. Documentation and certificates available on request.
                 </p>
               </div>
             </div>
