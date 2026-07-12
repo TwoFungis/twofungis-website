@@ -1,0 +1,62 @@
+{
+  "summary": "Frontend-only smoke of the new ProductionLibraryWorkspace flagship UI at /app/estimating and /app/production-library. All 9 requirements from the review_request PASSED. Login succeeds with inbox@twofungis.ca / TradeOS2024! and redirects to /app/command-center; navigation to /app/estimating renders <ProductionLibraryWorkspace> with data-testid='production-library-workspace'. Header shows 'Production Library' + 'Company Knowledge Engine'. Four view tabs (view-tab-items, view-tab-domains, view-tab-assemblies, view-tab-categories) render inside the header pill and all four are clickable and toggle the activeView state. Because the Supabase Production Library tables still do not exist (blocker from iteration 10 - GET /api/production-library/items etc. return 404/500), items.length===0 so the EmptyState renders: 'Build Your Production Library' + 'Import your company's production knowledge to get started...' + Import Knowledge (data-testid='import-knowledge-btn') and Add Manually buttons (verified visually in the screenshots and by successful click on import-knowledge-btn). Cmd+K opens the CommandPalette overlay (data-testid='command-palette'), the search input (data-testid='command-palette-input') accepts text ('hello world' typed and echoed), shows the 'No results found' branch for the empty dataset, and Escape closes the palette. The header's Search button (data-testid='open-command-palette') also opens the palette on click. Clicking Import Knowledge navigates to /app/production-library?tab=import (URL confirmed) and continues to render the same workspace (the ImportWizard is not yet embedded inside the new workspace - see action items). /app/production-library also renders the workspace. No blocker in the new frontend code.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {
+        "flow": "Import Knowledge button -> Import Wizard",
+        "issue": "Clicking Import Knowledge navigates to /app/production-library?tab=import (correct URL), but ProductionLibraryWorkspace.jsx does NOT read the 'tab' query param and does NOT render the ImportWizard component - it just shows the same empty state again. The user ends up in a dead-end: nothing visibly changes after the click. Either (a) wire useSearchParams to read ?tab=import and swap in ImportWizard, or (b) route /app/production-library?tab=import to the legacy ProductionLibraryPage which still owns the ImportWizard.",
+        "affected_selectors": ["[data-testid=\"import-knowledge-btn\"]"]
+      },
+      {
+        "flow": "Data fetch on mount",
+        "issue": "ProductionLibraryWorkspace.fetchData() fires four parallel GETs (/production-library/items, /domains, /service-categories, /assemblies). All four currently 404/500 because Supabase tables are missing (blocker documented in iteration_10). fetchData swallows errors with only console.error - no user-facing toast. The workspace silently falls through to the EmptyState which is misleading (looks like 'no data' when actually the API is broken)."
+      }
+    ],
+    "design_issues": [
+      {
+        "screen": "ProductionLibraryWorkspace header",
+        "issues": [
+          "The LeftNavigation component (w-64 sidebar with Knowledge / Organization / History sections and 'New Item' CTA) is DEFINED in the file (lines 102-236) but is NEVER RENDERED in the main return - the JSX only outputs the top bar + main content area. The PRD explicitly requests 'Left Navigation organized around knowledge hierarchy' so this is a functional miss, not just a design nit.",
+          "The DetailPanel is also defined but only renders when selectedItem is set. With no items in the DB, it can never be exercised in this environment."
+        ]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_production_library_import.py (from iteration_10, still valid)"
+  ],
+  "action_items": [
+    "HIGH: Wire ProductionLibraryWorkspace to render ImportWizard when ?tab=import is present in the URL (useSearchParams). Currently clicking 'Import Knowledge' updates the URL but the UI does nothing - dead-end UX.",
+    "HIGH: Render <LeftNavigation> in the main return (currently defined but never used). The PRD calls this out as the primary navigation surface.",
+    "MEDIUM: In fetchData(), when any of the four fetches returns >=500 or 404, surface a toast.error so users know the backend is broken (currently silent).",
+    "MEDIUM: Add a visible 'API unavailable / schema missing' banner instead of falling through to the EmptyState when the API calls fail - the current UX is indistinguishable from 'no data'.",
+    "MEDIUM (still open from iteration_10): Apply Supabase migrations for measurement_units, knowledge_domains, service_categories, production_items, production_assemblies, and their join tables so this workspace can actually be exercised beyond the empty state.",
+    "LOW: In fetchData(), the counts update reads from the pre-setState `items`, `domains`, ... closures so `counts` is always the previous render's counts (always {items:0, domains:0, ...} on first load). Move setCounts into a useEffect that depends on items/domains/categories/assemblies, or derive counts from state directly.",
+    "LOW: The `assemblies` state is loaded but never rendered anywhere in the main content area (view-tab-assemblies has no distinct view - activeView tab state exists but only 'items' view is implemented). Same for view-tab-domains and view-tab-categories - the tabs update activeView but the main area always shows the items grid or the EmptyState. Consider disabling not-yet-implemented tabs or wiring them to actual views."
+  ],
+  "critical_code_review_comments": [
+    "ProductionLibraryWorkspace.jsx L1104-1109: setCounts uses stale items/domains/... from the closure captured when fetchData was created (fetchData deps are []). On first mount all four values will be 0. Should derive counts via useMemo(() => ({items:items.length,...}), [items,domains,categories,assemblies]) or read from the newly-fetched local variables instead of state.",
+    "ProductionLibraryWorkspace.jsx L102-236: LeftNavigation component is fully implemented but never rendered in the JSX return (L1217-1379). The PRD requires it. Either delete the dead code or add <LeftNavigation ... /> to the render.",
+    "ProductionLibraryWorkspace.jsx L1213-1215 handleImport(): navigates to /app/production-library?tab=import but the component itself does not consume the ?tab= query param, so the navigate is a no-op UX-wise. Either add useSearchParams handling to swap in <ImportWizard/> or route the URL to the legacy ProductionLibraryPage.",
+    "ProductionLibraryWorkspace.jsx L1233-1258: The view tabs (items/domains/assemblies/categories) all set activeView but the main content area (L1287-1355) ignores activeView entirely - it only branches on loading/items.length. Result: all 4 tabs render the same content. Either wire per-view renderers or hide inactive tabs until implemented.",
+    "ProductionLibraryWorkspace.jsx L1079-1084: Four Promise.all fetches. On any 4xx/5xx, the errors are only console.error'd inside the catch. No user feedback, no retry. Should toast.error and offer a retry.",
+    "ProductionLibraryWorkspace.jsx L66: `const API_URL = process.env.REACT_APP_BACKEND_URL;` - fine, but not defensive if env var missing. Consider throwing at import-time or using a shared apiClient.",
+    "ProductionLibraryWorkspace.jsx L242-394 CommandPalette: no keyboard navigation (↑/↓/Enter) is implemented despite the hint text showing '↑↓ Navigate  Enter Select'. Users can only click. Add useState selectedIndex + arrow-key handler."
+  ],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "not tested (frontend-only request)",
+    "frontend": "9/9 review_request items PASS. All required data-testids render, keyboard shortcuts work, palette open/close/search cycle works, both /app/estimating and /app/production-library routes render the workspace, Import Knowledge click navigates correctly. Underlying data is blocked by Supabase schema (already reported in iteration_10) so grid/detail-panel paths were not exercised."
+  },
+  "test_credentials": "inbox@twofungis.ca / TradeOS2024! (Scott Marshall) - working",
+  "seed_data_creation": "None - EmptyState rendered because Supabase Production Library tables still missing (blocker from iteration_10).",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Frontend workspace shell (ProductionLibraryWorkspace.jsx) is solid - all data-testids from the review_request are present and interactive. The gaps to exercise next iteration: (1) LeftNavigation is not rendered in JSX, (2) Import Knowledge deep-link ?tab=import is a no-op, (3) tabs don't branch content, (4) Supabase tables still missing so items grid, list-view sort, filters, bulk actions, detail panel, and CommandPalette search results have never been rendered against real data. Once Supabase migrations are applied and at least one production_item exists, retest: view-mode-list vs view-mode-grid toggle, grid-search-input, filter-toggle-btn, filter-domain/category/status/company-standard, sort by clicking list headers, select-item-{id} checkboxes -> bulk-actions-bar, open detail-panel by clicking a row, close via close-detail-panel. Data-testids to reuse: production-library-workspace, open-command-palette, command-palette, command-palette-input, view-tab-{items|domains|assemblies|categories}, import-knowledge-btn, add-production-item-btn, new-item-btn, grid-search-input, filter-toggle-btn, filter-panel, filter-domain, filter-category, filter-status, filter-company-standard, clear-filters-btn, view-mode-list, view-mode-grid, bulk-actions-bar, production-item-row-{id}, production-item-card-{id}, select-item-{id}, detail-panel, close-detail-panel, left-navigation (once wired), nav-{id}, nav-section-{id}, collapse-nav-btn, expand-nav-btn.",
+  "rca of the issue": "No new regressions in the flagship workspace. Two design misses in the E1 implementation: (a) LeftNavigation component defined but not rendered - fix by adding <LeftNavigation activeView={activeView} onViewChange={setActiveView} counts={counts} collapsed={navCollapsed} onToggleCollapse={()=>setNavCollapsed(!navCollapsed)} /> inside the main flex container before the top bar area; (b) handleImport navigates to ?tab=import but the component doesn't consume useSearchParams - fix by importing useSearchParams from react-router-dom and rendering <ImportWizard/> when searchParams.get('tab')==='import'. Underlying blocker (Supabase Production Library schema missing) remains from iteration_10."
+}
