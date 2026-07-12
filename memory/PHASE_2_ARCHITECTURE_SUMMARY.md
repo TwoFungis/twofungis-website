@@ -213,17 +213,41 @@ PHASE 2 IMPLEMENTATION ORDER
 
 ---
 
-## OPEN QUESTIONS (Require User Decision)
+## OPEN QUESTIONS — ALL RESOLVED
 
-### From Spec 1.5
-1. **TFCS Role Migration:** Migrate existing `tfcs_user_roles` to `organization_members` now, or maintain both during transition?
+Per **Final Product Decisions** (July 12, 2026), all architectural questions have been permanently resolved:
 
-### From Spec 2.0
-1. **Kanban vs. List:** Default view for Opportunities?
-2. **Tender Templates:** Include in Phase 1 or defer?
-3. **Multi-tender:** Allow multiple tender versions per opportunity?
-4. **Production Library First:** Build library before Tender Workspace, or add manual rates first?
-5. **PDF Branding:** Include company logo in tender PDFs?
+| Question | Decision |
+|----------|----------|
+| TFCS Migration | Migrate to Organization model |
+| Opportunity Views | Kanban AND List (user choice) |
+| Tender Templates | Include from V1 |
+| Tender Versioning | Full version history |
+| Production Library | Build first, foundational |
+| PDF Branding | Organization owns branding |
+
+See `/app/memory/FINAL_PRODUCT_DECISIONS.md` for complete rationale.
+
+---
+
+## IMPLEMENTATION STRATEGY
+
+**Approach:** Vertical Slices (not horizontal layers)
+
+**Vertical Slice 1:** Opportunity → Tender Workspace → Estimate → Proposal → Submission
+
+This establishes the quality standard for every future module.
+
+**Definition of Done:**
+- Workflow complete
+- UX polished
+- AI integrated
+- Automation complete
+- Documentation updated
+- Company Brain connected
+- Mobile responsive
+- Security reviewed
+- Acceptance criteria satisfied
 
 ---
 
@@ -233,29 +257,36 @@ PHASE 2 IMPLEMENTATION ORDER
 |--------|--------|
 | Constitutional Compliance | ✅ All specs compliant |
 | Internal Consistency | ✅ No conflicts between specs |
-| Implementation Ready | ✅ Ready to begin |
-| Open Questions | ⚠️ 6 questions pending user decision |
+| Open Questions | ✅ All resolved |
+| Implementation Ready | ✅ **READY TO BEGIN** |
 
 ---
 
 ## NEXT ACTIONS
 
-1. **User Decision:** Resolve open questions above
-2. **Implementation:** Begin Step 1 (Multi-Tenant Foundation)
-3. **Future Spec:** Draft Specification 2.1 (Production Library) when ready
+1. **Begin Vertical Slice 1:** Opportunity → Tender Workspace → Estimate → Proposal
+2. **Phase 1 Foundation:** Multi-tenant tables, Production Library, Templates
+3. **Phase 2 Opportunity:** Tables, API, UI (Kanban + List)
+4. **Phase 3 Tender:** Workspace UI, line items, versioning
+5. **Phase 4 Proposal:** Builder, PDF generation, submission
+6. **Phase 5 Brain:** Integrate Company Brain touchpoints
 
 ---
 
 ## SUMMARY
 
-TradeOS Phase 2 architecture is **internally consistent and ready for implementation**.
+TradeOS Phase 2 architecture is **complete and ready for implementation**.
 
-The foundation is:
-- **Constitution v1.0** — Permanent architectural philosophy
-- **Spec 1.5 v1.5.1** — Multi-tenant platform foundation
-- **Spec 2.0 v2.0.1** — Opportunity lifecycle and Tender Workspace
+**Governing Documents:**
+- Constitution v1.0 — Permanent architectural philosophy
+- Spec 1.5 v1.5.1 — Multi-tenant platform foundation
+- Spec 2.0 v2.0.1 — Opportunity lifecycle and Tender Workspace
+- Final Product Decisions — All open questions resolved
 
-All documents align with Constitutional principles. Implementation may begin upon resolution of open questions.
+**Implementation Approach:** Vertical Slices
+**First Slice:** Opportunity → Tender Workspace → Estimate → Proposal → Submission
+
+All documents align. All questions resolved. Implementation begins now.
 
 ---
 

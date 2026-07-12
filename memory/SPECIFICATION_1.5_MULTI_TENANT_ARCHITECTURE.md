@@ -1103,9 +1103,13 @@ The following questions were resolved by TradeOS Constitution v1.0:
 | Lightweight portal users? | **NO** — External users are first-class authenticated users | Article VII |
 | Separate admin app? | **NO** — Platform Admin is hidden workspace in same app | Article IV |
 
-## OPEN QUESTIONS (Remaining)
+## OPEN QUESTIONS (All Resolved)
 
-1. **TFCS Role Migration:** The current `tfcs_user_roles` table has Owner/Manager/Employee. Migrate to new `organization_members` table, or keep both temporarily during transition?
+All open questions have been resolved per **Final Product Decisions** (July 12, 2026):
+
+| Question | Decision |
+|----------|----------|
+| TFCS Role Migration | Migrate to Organization model. Maintain backward compatibility during transition. |
 
 ---
 

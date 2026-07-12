@@ -696,17 +696,17 @@ TradeOS advantage: **Estimates become project baselines, actuals feed back to im
 
 ---
 
-## OPEN QUESTIONS FOR APPROVAL
+## OPEN QUESTIONS (All Resolved)
 
-1. **Kanban vs. List:** Should the Opportunities view default to kanban (columns by status) or list view?
+All open questions have been resolved per **Final Product Decisions** (July 12, 2026):
 
-2. **Tender Templates:** Should we support saving tender templates for common job types? (Deferred or Phase 1?)
-
-3. **Multi-tender per Opportunity:** The spec allows multiple tender versions. Is this needed, or is one tender per opportunity sufficient?
-
-4. **Production Library Dependency:** Build Production Library first, or build Tender Workspace with manual rate entry and add Production Library integration later?
-
-5. **PDF Branding:** Should tender PDFs include company logo/branding, or start with a clean default template?
+| Question | Decision |
+|----------|----------|
+| Kanban vs. List | **Both.** Support multiple views (Kanban, List). Future: Calendar, Timeline, Map. |
+| Tender Templates | **Include from V1.** Templates are biggest time-saver. |
+| Multi-tender versions | **Yes.** Full version history. Nothing ever overwritten. |
+| Production Library first | **Yes.** Foundational. Build first with manual data. |
+| PDF Branding | **Organization owns branding.** TradeOS provides professional defaults. |
 
 ---
 
