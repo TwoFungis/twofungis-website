@@ -81,6 +81,9 @@ from routes.storage import router as storage_router
 # Import AI Chat routes (OpenAI GPT integration)
 from routes.ai_chat import router as ai_chat_router
 
+# Import Command Center routes (TradeOS Operational Headquarters)
+from routes.command_center import router as command_center_router
+
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env', override=False)
 
@@ -250,6 +253,9 @@ app.include_router(storage_router)
 
 # Include AI Chat routes (OpenAI GPT integration)
 app.include_router(ai_chat_router)
+
+# Include Command Center routes (TradeOS Operational Headquarters)
+app.include_router(command_center_router)
 
 app.add_middleware(
     CORSMiddleware,
