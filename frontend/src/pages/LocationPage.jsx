@@ -7,6 +7,7 @@ import Portfolio from '../components/Portfolio';
 import Contact from '../components/Contact';
 import Footer from '../components/Footer';
 import PrequalificationModal from '../components/PrequalificationModal';
+import TradeOSBanner from '../components/TradeOSBanner';
 import { Button } from '../components/ui/button';
 import { MapPin, Phone, Mail, CheckCircle2, ChevronRight } from 'lucide-react';
 
@@ -110,6 +111,7 @@ const LocationPage = () => {
 
   return (
     <div className="min-h-screen bg-white">
+      <TradeOSBanner />
       <Header />
       
       {/* Location Hero */}
