@@ -843,72 +843,205 @@ async def remove_assembly_item(
 # IMPORT / EXPORT
 # =====================================================
 
-@router.get("/import/templates")
-async def get_import_templates(authorization: str = Header(...)):
-    """Get CSV import templates"""
+@router.get("/import/template/download")
+async def download_import_template(authorization: str = Header(...)):
+    """
+    Download the official TradeOS CSV Template for Production Items import.
+    
+    This is the standardized import format for TradeOS Version 1.
+    All imports must follow this exact structure.
+    """
     await verify_token_and_get_org(authorization)
+    
+    # Official TradeOS CSV Template Columns
+    template_columns = [
+        "Production Code",
+        "Production Name", 
+        "Knowledge Domain",
+        "Service Categories",
+        "Measurement Unit",
+        "Production Per Day",
+        "Crew Size",
+        "Labour Hours",
+        "Standard Rate",
+        "Premium Rate",
+        "Complex Rate",
+        "Company Standard",
+        "Notes"
+    ]
+    
+    # Example rows demonstrating proper format
+    example_rows = [
+        {
+            "Production Code": "FC-001",
+            "Production Name": "Door Casing Installation",
+            "Knowledge Domain": "Finish Carpentry",
+            "Service Categories": "Residential,Commercial",
+            "Measurement Unit": "LF",
+            "Production Per Day": "120",
+            "Crew Size": "1",
+            "Labour Hours": "0.0667",
+            "Standard Rate": "8.50",
+            "Premium Rate": "10.50",
+            "Complex Rate": "12.50",
+            "Company Standard": "true",
+            "Notes": "Standard 3-1/4\" colonial casing"
+        },
+        {
+            "Production Code": "FC-002",
+            "Production Name": "Base Trim Installation",
+            "Knowledge Domain": "Finish Carpentry",
+            "Service Categories": "Residential,Multifamily",
+            "Measurement Unit": "LF",
+            "Production Per Day": "150",
+            "Crew Size": "1",
+            "Labour Hours": "0.0533",
+            "Standard Rate": "6.50",
+            "Premium Rate": "8.00",
+            "Complex Rate": "10.00",
+            "Company Standard": "true",
+            "Notes": "5-1/4\" MDF baseboard"
+        },
+        {
+            "Production Code": "DH-001",
+            "Production Name": "Interior Door Installation - Single",
+            "Knowledge Domain": "Doors & Hardware",
+            "Service Categories": "Residential,Commercial,Tenant Improvement",
+            "Measurement Unit": "EA",
+            "Production Per Day": "8",
+            "Crew Size": "1",
+            "Labour Hours": "1.0",
+            "Standard Rate": "175.00",
+            "Premium Rate": "225.00",
+            "Complex Rate": "295.00",
+            "Company Standard": "true",
+            "Notes": "Pre-hung hollow core door"
+        }
+    ]
     
     return {
         "success": True,
-        "templates": {
-            "production_items": {
-                "description": "Production Items import template",
-                "columns": [
-                    "production_code",
-                    "production_name",
-                    "description",
-                    "knowledge_domain",
-                    "measurement_unit",
-                    "production_per_day",
-                    "crew_size",
-                    "labour_hours",
-                    "standard_rate",
-                    "premium_rate",
-                    "complex_rate",
-                    "is_company_standard",
-                    "notes"
-                ],
-                "sample_row": "FC-001,Door Casing Installation,Install door casing trim,Finish Carpentry,LF,120,1,0.0667,8.50,10.50,12.50,true,Standard door casing"
+        "template": {
+            "name": "TradeOS Production Items Import Template v1.0",
+            "columns": template_columns,
+            "column_descriptions": {
+                "Production Code": "Unique identifier for this production item (required, max 50 chars)",
+                "Production Name": "Human-readable name (required, max 255 chars)",
+                "Knowledge Domain": "Primary classification - must match existing domain name or code (required)",
+                "Service Categories": "Comma-separated list of applicable service categories (optional)",
+                "Measurement Unit": "Unit of measure - EA, LF, SF, LS, DAY, HR, SET, KIT, PAIR, or COST (required)",
+                "Production Per Day": "Units a single worker can produce per 8-hour day (optional)",
+                "Crew Size": "Typical crew size for this work (default: 1)",
+                "Labour Hours": "Hours required to complete one unit (optional)",
+                "Standard Rate": "Standard pricing per unit in dollars (optional)",
+                "Premium Rate": "Premium/rush pricing per unit (optional)",
+                "Complex Rate": "Complex conditions pricing per unit (optional)",
+                "Company Standard": "Mark as company standard - true/false/yes/no (optional)",
+                "Notes": "Additional notes or specifications (optional)"
             },
-            "knowledge_domains": {
-                "description": "Knowledge Domains import template",
-                "columns": ["code", "name", "description", "sort_order"],
-                "sample_row": "FC,Finish Carpentry,All finish carpentry work,1"
-            },
-            "service_categories": {
-                "description": "Service Categories import template",
-                "columns": ["code", "name", "description", "sort_order"],
-                "sample_row": "RES,Residential,Residential projects,1"
-            }
+            "valid_measurement_units": ["EA", "LF", "SF", "LS", "DAY", "HR", "SET", "KIT", "PAIR", "COST"],
+            "example_rows": example_rows,
+            "csv_header": ",".join(template_columns),
+            "csv_content": "\n".join([
+                ",".join(template_columns),
+                *[",".join([f'"{row[col]}"' for col in template_columns]) for row in example_rows]
+            ])
         }
     }
 
-@router.post("/import/items")
-async def import_production_items(
+@router.post("/import/validate")
+async def validate_import(
     file: UploadFile = File(...),
-    authorization: str = Header(...),
-    update_existing: bool = Query(False),
-    dry_run: bool = Query(True)
+    authorization: str = Header(...)
 ):
-    """Import production items from CSV"""
+    """
+    Validate a CSV file against the TradeOS Production Items template.
+    
+    This performs full validation WITHOUT committing any data.
+    Returns detailed error reports with Row, Column, Issue, and Recommended Fix.
+    
+    Official TradeOS CSV Template columns:
+    - Production Code (required)
+    - Production Name (required)
+    - Knowledge Domain (required)
+    - Service Categories (optional, comma-separated)
+    - Measurement Unit (required: EA, LF, SF, LS, DAY, HR, SET, KIT, PAIR, COST)
+    - Production Per Day (optional)
+    - Crew Size (optional, default: 1)
+    - Labour Hours (optional)
+    - Standard Rate (optional)
+    - Premium Rate (optional)
+    - Complex Rate (optional)
+    - Company Standard (optional: true/false)
+    - Notes (optional)
+    """
     context = await verify_token_and_get_org(authorization)
     org_id = context['organization_id']
-    user_id = context['user_id']
+    
+    VALID_UNITS = ['EA', 'LF', 'SF', 'LS', 'DAY', 'HR', 'SET', 'KIT', 'PAIR', 'COST']
+    
+    # Column name mapping (allow both formats)
+    COLUMN_MAPPING = {
+        'production code': 'production_code',
+        'production_code': 'production_code',
+        'production name': 'production_name',
+        'production_name': 'production_name',
+        'knowledge domain': 'knowledge_domain',
+        'knowledge_domain': 'knowledge_domain',
+        'service categories': 'service_categories',
+        'service_categories': 'service_categories',
+        'measurement unit': 'measurement_unit',
+        'measurement_unit': 'measurement_unit',
+        'production per day': 'production_per_day',
+        'production_per_day': 'production_per_day',
+        'crew size': 'crew_size',
+        'crew_size': 'crew_size',
+        'labour hours': 'labour_hours',
+        'labour_hours': 'labour_hours',
+        'standard rate': 'standard_rate',
+        'standard_rate': 'standard_rate',
+        'premium rate': 'premium_rate',
+        'premium_rate': 'premium_rate',
+        'complex rate': 'complex_rate',
+        'complex_rate': 'complex_rate',
+        'company standard': 'is_company_standard',
+        'is_company_standard': 'is_company_standard',
+        'notes': 'notes'
+    }
     
     try:
         # Read CSV
         content = await file.read()
-        text = content.decode('utf-8')
+        try:
+            text = content.decode('utf-8')
+        except UnicodeDecodeError:
+            text = content.decode('utf-8-sig')  # Handle BOM
+        
         reader = csv.DictReader(io.StringIO(text))
         
+        # Normalize column names
+        if reader.fieldnames:
+            normalized_fieldnames = []
+            for fn in reader.fieldnames:
+                normalized = COLUMN_MAPPING.get(fn.lower().strip(), fn.lower().strip().replace(' ', '_'))
+                normalized_fieldnames.append(normalized)
+        
         results = {
+            "file_name": file.filename,
             "total_rows": 0,
-            "valid": 0,
-            "errors": 0,
-            "created": 0,
-            "updated": 0,
-            "error_details": [],
-            "preview": []
+            "valid_rows": 0,
+            "error_rows": 0,
+            "warning_rows": 0,
+            "errors": [],        # Detailed errors with row/column/issue/fix
+            "warnings": [],      # Warnings that don't prevent import
+            "preview": [],       # First 20 valid rows for preview
+            "summary": {
+                "production_codes": [],
+                "duplicate_codes": [],
+                "domains_found": set(),
+                "categories_found": set(),
+                "units_found": set()
+            }
         }
         
         async with httpx.AsyncClient(timeout=30.0) as client:
@@ -919,113 +1052,513 @@ async def import_production_items(
                 f"{SUPABASE_URL}/rest/v1/knowledge_domains?organization_id=eq.{org_id}",
                 headers=headers
             )
-            domains = {d['name'].lower(): d['id'] for d in domains_resp.json()} if domains_resp.status_code == 200 else {}
+            domains = {}
+            domain_names = []
+            if domains_resp.status_code == 200:
+                for d in domains_resp.json():
+                    domains[d['name'].lower()] = d
+                    domain_names.append(d['name'])
+                    if d.get('code'):
+                        domains[d['code'].lower()] = d
+            
+            cats_resp = await client.get(
+                f"{SUPABASE_URL}/rest/v1/service_categories?organization_id=eq.{org_id}",
+                headers=headers
+            )
+            categories = {}
+            category_names = []
+            if cats_resp.status_code == 200:
+                for c in cats_resp.json():
+                    categories[c['name'].lower()] = c
+                    category_names.append(c['name'])
+                    if c.get('code'):
+                        categories[c['code'].lower()] = c
             
             units_resp = await client.get(
                 f"{SUPABASE_URL}/rest/v1/measurement_units?is_active=eq.true",
                 headers=headers
             )
-            units = {u['code']: u['id'] for u in units_resp.json()} if units_resp.status_code == 200 else {}
+            units = {}
+            if units_resp.status_code == 200:
+                for u in units_resp.json():
+                    units[u['code'].upper()] = u
             
-            rows = []
+            # Check if library is seeded
+            if not domains:
+                return {
+                    "success": False,
+                    "error": "library_not_initialized",
+                    "message": "Production Library has not been initialized. Please click 'Initialize Production Library' first.",
+                    "action_required": "seed"
+                }
+            
+            seen_codes = set()
+            validated_items = []
+            
             for i, row in enumerate(reader, 1):
                 results['total_rows'] += 1
+                row_has_errors = False
+                row_has_warnings = False
+                
+                # Normalize row keys
+                normalized_row = {}
+                for key, value in row.items():
+                    norm_key = COLUMN_MAPPING.get(key.lower().strip(), key.lower().strip().replace(' ', '_'))
+                    normalized_row[norm_key] = (value or '').strip()
+                
+                # Helper to add error
+                def add_error(column, issue, fix):
+                    nonlocal row_has_errors
+                    row_has_errors = True
+                    results['errors'].append({
+                        "row": i,
+                        "column": column,
+                        "value": normalized_row.get(COLUMN_MAPPING.get(column.lower(), column), ''),
+                        "issue": issue,
+                        "recommended_fix": fix
+                    })
+                
+                # Helper to add warning
+                def add_warning(column, issue, fix):
+                    nonlocal row_has_warnings
+                    row_has_warnings = True
+                    results['warnings'].append({
+                        "row": i,
+                        "column": column,
+                        "value": normalized_row.get(COLUMN_MAPPING.get(column.lower(), column), ''),
+                        "issue": issue,
+                        "recommended_fix": fix
+                    })
+                
+                # ===== REQUIRED FIELD VALIDATION =====
+                
+                # Production Code
+                production_code = normalized_row.get('production_code', '')
+                if not production_code:
+                    add_error("Production Code", "Required field is empty", "Enter a unique code like 'FC-001' or 'DH-001'")
+                elif len(production_code) > 50:
+                    add_error("Production Code", f"Code too long ({len(production_code)} chars, max 50)", "Shorten the production code")
+                elif production_code.upper() in seen_codes:
+                    add_error("Production Code", f"Duplicate code in file", f"Change to a unique code. '{production_code}' already appears in this file")
+                    results['summary']['duplicate_codes'].append(production_code)
+                else:
+                    seen_codes.add(production_code.upper())
+                    results['summary']['production_codes'].append(production_code)
+                
+                # Production Name
+                production_name = normalized_row.get('production_name', '')
+                if not production_name:
+                    add_error("Production Name", "Required field is empty", "Enter a descriptive name like 'Door Casing Installation'")
+                elif len(production_name) > 255:
+                    add_error("Production Name", f"Name too long ({len(production_name)} chars, max 255)", "Shorten the production name")
+                
+                # Knowledge Domain
+                knowledge_domain = normalized_row.get('knowledge_domain', '')
+                domain_id = None
+                if not knowledge_domain:
+                    add_error("Knowledge Domain", "Required field is empty", f"Enter a valid domain. Options: {', '.join(domain_names[:5])}{'...' if len(domain_names) > 5 else ''}")
+                else:
+                    domain_match = domains.get(knowledge_domain.lower())
+                    if not domain_match:
+                        similar = [d for d in domain_names if knowledge_domain.lower() in d.lower()]
+                        fix = f"Did you mean: {similar[0]}?" if similar else f"Valid options: {', '.join(domain_names[:5])}"
+                        add_error("Knowledge Domain", f"'{knowledge_domain}' not found in your domains", fix)
+                    else:
+                        domain_id = domain_match['id']
+                        results['summary']['domains_found'].add(knowledge_domain)
+                
+                # Measurement Unit
+                measurement_unit = normalized_row.get('measurement_unit', '').upper()
+                unit_id = None
+                if not measurement_unit:
+                    add_error("Measurement Unit", "Required field is empty", f"Enter a valid unit: {', '.join(VALID_UNITS)}")
+                elif measurement_unit not in VALID_UNITS:
+                    add_error("Measurement Unit", f"'{measurement_unit}' is not a valid unit", f"Use one of: {', '.join(VALID_UNITS)}")
+                else:
+                    unit_match = units.get(measurement_unit)
+                    if unit_match:
+                        unit_id = unit_match['id']
+                        results['summary']['units_found'].add(measurement_unit)
+                
+                # ===== OPTIONAL FIELD VALIDATION =====
+                
+                # Parse numeric fields
+                def parse_numeric(field_name, display_name, allow_zero=True, allow_negative=False):
+                    value = normalized_row.get(field_name, '')
+                    if not value:
+                        return None
+                    try:
+                        cleaned = value.replace(',', '').replace('$', '').strip()
+                        num = float(cleaned)
+                        if not allow_negative and num < 0:
+                            add_warning(display_name, f"Value is negative ({num})", "Verify this is intentional or change to positive")
+                        if not allow_zero and num == 0:
+                            add_warning(display_name, "Value is zero", "Consider adding a valid value or leave empty")
+                        return num
+                    except ValueError:
+                        add_error(display_name, f"'{value}' is not a valid number", "Enter a numeric value like '8.50' or '120'")
+                        return None
+                
+                production_per_day = parse_numeric('production_per_day', 'Production Per Day')
+                crew_size = parse_numeric('crew_size', 'Crew Size') or 1
+                labour_hours = parse_numeric('labour_hours', 'Labour Hours')
+                standard_rate = parse_numeric('standard_rate', 'Standard Rate')
+                premium_rate = parse_numeric('premium_rate', 'Premium Rate')
+                complex_rate = parse_numeric('complex_rate', 'Complex Rate')
+                
+                # Rate hierarchy validation
+                if standard_rate and premium_rate and premium_rate < standard_rate:
+                    add_warning("Premium Rate", f"Premium rate (${premium_rate}) is less than standard rate (${standard_rate})", "Premium rate should typically be higher than standard rate")
+                if standard_rate and complex_rate and complex_rate < standard_rate:
+                    add_warning("Complex Rate", f"Complex rate (${complex_rate}) is less than standard rate (${standard_rate})", "Complex rate should typically be higher than standard rate")
+                
+                # Service Categories
+                service_category_ids = []
+                service_cats_raw = normalized_row.get('service_categories', '')
+                if service_cats_raw:
+                    for cat in service_cats_raw.split(','):
+                        cat = cat.strip()
+                        if cat:
+                            cat_match = categories.get(cat.lower())
+                            if cat_match:
+                                service_category_ids.append(cat_match['id'])
+                                results['summary']['categories_found'].add(cat)
+                            else:
+                                add_warning("Service Categories", f"'{cat}' not found", f"Valid categories: {', '.join(category_names[:5])}")
+                
+                # Company Standard (boolean)
+                is_company_standard = normalized_row.get('is_company_standard', '').lower() in ('true', 'yes', '1', 'y')
+                
+                # Notes
+                notes = normalized_row.get('notes', '') or None
+                
+                # Track results
+                if row_has_errors:
+                    results['error_rows'] += 1
+                else:
+                    results['valid_rows'] += 1
+                    if row_has_warnings:
+                        results['warning_rows'] += 1
+                    
+                    # Build validated item
+                    validated_item = {
+                        "row": i,
+                        "production_code": production_code,
+                        "production_name": production_name,
+                        "knowledge_domain": knowledge_domain,
+                        "knowledge_domain_id": domain_id,
+                        "measurement_unit": measurement_unit,
+                        "measurement_unit_id": unit_id,
+                        "service_categories": service_cats_raw,
+                        "service_category_ids": service_category_ids,
+                        "production_per_day": production_per_day,
+                        "crew_size": crew_size,
+                        "labour_hours": labour_hours,
+                        "standard_rate": standard_rate,
+                        "premium_rate": premium_rate,
+                        "complex_rate": complex_rate,
+                        "is_company_standard": is_company_standard,
+                        "notes": notes
+                    }
+                    validated_items.append(validated_item)
+                    
+                    # Add to preview (max 20)
+                    if len(results['preview']) < 20:
+                        results['preview'].append(validated_item)
+            
+            # Convert sets to lists for JSON serialization
+            results['summary']['domains_found'] = list(results['summary']['domains_found'])
+            results['summary']['categories_found'] = list(results['summary']['categories_found'])
+            results['summary']['units_found'] = list(results['summary']['units_found'])
+            
+            # Check for duplicates against existing database items
+            if results['summary']['production_codes']:
+                existing_check = await client.get(
+                    f"{SUPABASE_URL}/rest/v1/production_items?"
+                    f"organization_id=eq.{org_id}&"
+                    f"select=production_code",
+                    headers=headers
+                )
+                if existing_check.status_code == 200:
+                    existing_codes = {item['production_code'].upper() for item in existing_check.json()}
+                    for code in results['summary']['production_codes']:
+                        if code.upper() in existing_codes:
+                            results['warnings'].append({
+                                "row": "N/A",
+                                "column": "Production Code",
+                                "value": code,
+                                "issue": f"'{code}' already exists in your Production Library",
+                                "recommended_fix": "This item will be skipped unless 'Update Existing' is enabled"
+                            })
+            
+            return {
+                "success": True,
+                "validation_passed": results['error_rows'] == 0,
+                "can_import": results['valid_rows'] > 0,
+                "results": results,
+                "validated_items": validated_items
+            }
+            
+    except Exception as e:
+        logger.error(f"Validation error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/import/commit")
+async def commit_import(
+    file: UploadFile = File(...),
+    authorization: str = Header(...),
+    update_existing: bool = Query(False)
+):
+    """
+    Commit a validated CSV import to the Production Library.
+    
+    This endpoint should only be called after successful validation.
+    It performs the actual database writes for production items.
+    """
+    context = await verify_token_and_get_org(authorization)
+    org_id = context['organization_id']
+    user_id = context['user_id']
+    
+    COLUMN_MAPPING = {
+        'production code': 'production_code',
+        'production_code': 'production_code',
+        'production name': 'production_name',
+        'production_name': 'production_name',
+        'knowledge domain': 'knowledge_domain',
+        'knowledge_domain': 'knowledge_domain',
+        'service categories': 'service_categories',
+        'service_categories': 'service_categories',
+        'measurement unit': 'measurement_unit',
+        'measurement_unit': 'measurement_unit',
+        'production per day': 'production_per_day',
+        'production_per_day': 'production_per_day',
+        'crew size': 'crew_size',
+        'crew_size': 'crew_size',
+        'labour hours': 'labour_hours',
+        'labour_hours': 'labour_hours',
+        'standard rate': 'standard_rate',
+        'standard_rate': 'standard_rate',
+        'premium rate': 'premium_rate',
+        'premium_rate': 'premium_rate',
+        'complex rate': 'complex_rate',
+        'complex_rate': 'complex_rate',
+        'company standard': 'is_company_standard',
+        'is_company_standard': 'is_company_standard',
+        'notes': 'notes'
+    }
+    
+    try:
+        content = await file.read()
+        try:
+            text = content.decode('utf-8')
+        except UnicodeDecodeError:
+            text = content.decode('utf-8-sig')
+        
+        reader = csv.DictReader(io.StringIO(text))
+        
+        results = {
+            "created": 0,
+            "updated": 0,
+            "skipped": 0,
+            "errors": 0,
+            "import_errors": []
+        }
+        
+        async with httpx.AsyncClient(timeout=120.0) as client:
+            headers = await get_service_headers()
+            
+            # Get lookup tables
+            domains_resp = await client.get(
+                f"{SUPABASE_URL}/rest/v1/knowledge_domains?organization_id=eq.{org_id}",
+                headers=headers
+            )
+            domains = {}
+            if domains_resp.status_code == 200:
+                for d in domains_resp.json():
+                    domains[d['name'].lower()] = d['id']
+                    if d.get('code'):
+                        domains[d['code'].lower()] = d['id']
+            
+            cats_resp = await client.get(
+                f"{SUPABASE_URL}/rest/v1/service_categories?organization_id=eq.{org_id}",
+                headers=headers
+            )
+            categories = {}
+            if cats_resp.status_code == 200:
+                for c in cats_resp.json():
+                    categories[c['name'].lower()] = c['id']
+                    if c.get('code'):
+                        categories[c['code'].lower()] = c['id']
+            
+            units_resp = await client.get(
+                f"{SUPABASE_URL}/rest/v1/measurement_units?is_active=eq.true",
+                headers=headers
+            )
+            units = {}
+            if units_resp.status_code == 200:
+                for u in units_resp.json():
+                    units[u['code'].upper()] = u['id']
+            
+            for i, row in enumerate(reader, 1):
+                # Normalize row keys
+                normalized_row = {}
+                for key, value in row.items():
+                    norm_key = COLUMN_MAPPING.get(key.lower().strip(), key.lower().strip().replace(' ', '_'))
+                    normalized_row[norm_key] = (value or '').strip()
+                
+                production_code = normalized_row.get('production_code', '')
+                production_name = normalized_row.get('production_name', '')
+                knowledge_domain = normalized_row.get('knowledge_domain', '')
+                measurement_unit = normalized_row.get('measurement_unit', '').upper()
+                
+                # Skip invalid rows
+                if not production_code or not production_name or not knowledge_domain or not measurement_unit:
+                    continue
+                
+                domain_id = domains.get(knowledge_domain.lower())
+                unit_id = units.get(measurement_unit)
+                
+                if not domain_id or not unit_id:
+                    continue
+                
+                # Parse numeric fields
+                def parse_float(value):
+                    if not value:
+                        return None
+                    try:
+                        return float(value.replace(',', '').replace('$', '').strip())
+                    except ValueError:
+                        return None
+                
+                # Parse service categories
+                service_category_ids = []
+                service_cats_raw = normalized_row.get('service_categories', '')
+                if service_cats_raw:
+                    for cat in service_cats_raw.split(','):
+                        cat = cat.strip()
+                        if cat:
+                            cat_id = categories.get(cat.lower())
+                            if cat_id:
+                                service_category_ids.append(cat_id)
+                
+                item_data = {
+                    "organization_id": org_id,
+                    "production_code": production_code,
+                    "production_name": production_name,
+                    "knowledge_domain_id": domain_id,
+                    "measurement_unit_id": unit_id,
+                    "production_per_day": parse_float(normalized_row.get('production_per_day')),
+                    "crew_size": parse_float(normalized_row.get('crew_size')) or 1,
+                    "labour_hours": parse_float(normalized_row.get('labour_hours')),
+                    "standard_rate": parse_float(normalized_row.get('standard_rate')),
+                    "premium_rate": parse_float(normalized_row.get('premium_rate')),
+                    "complex_rate": parse_float(normalized_row.get('complex_rate')),
+                    "is_company_standard": normalized_row.get('is_company_standard', '').lower() in ('true', 'yes', '1', 'y'),
+                    "notes": normalized_row.get('notes') or None,
+                    "created_by": user_id
+                }
                 
                 try:
-                    # Validate required fields
-                    if not row.get('production_code'):
-                        raise ValueError("production_code is required")
-                    if not row.get('production_name'):
-                        raise ValueError("production_name is required")
-                    if not row.get('knowledge_domain'):
-                        raise ValueError("knowledge_domain is required")
-                    if not row.get('measurement_unit'):
-                        raise ValueError("measurement_unit is required")
-                    
-                    # Lookup domain
-                    domain_id = domains.get(row['knowledge_domain'].lower())
-                    if not domain_id:
-                        raise ValueError(f"Unknown knowledge domain: {row['knowledge_domain']}")
-                    
-                    # Lookup unit
-                    unit_id = units.get(row['measurement_unit'].upper())
-                    if not unit_id:
-                        raise ValueError(f"Invalid measurement unit: {row['measurement_unit']}")
-                    
-                    item_data = {
-                        "organization_id": org_id,
-                        "production_code": row['production_code'].strip(),
-                        "production_name": row['production_name'].strip(),
-                        "description": row.get('description', '').strip() or None,
-                        "knowledge_domain_id": domain_id,
-                        "measurement_unit_id": unit_id,
-                        "production_per_day": float(row['production_per_day']) if row.get('production_per_day') else None,
-                        "crew_size": float(row['crew_size']) if row.get('crew_size') else 1,
-                        "labour_hours": float(row['labour_hours']) if row.get('labour_hours') else None,
-                        "standard_rate": float(row['standard_rate']) if row.get('standard_rate') else None,
-                        "premium_rate": float(row['premium_rate']) if row.get('premium_rate') else None,
-                        "complex_rate": float(row['complex_rate']) if row.get('complex_rate') else None,
-                        "is_company_standard": row.get('is_company_standard', '').lower() == 'true',
-                        "notes": row.get('notes', '').strip() or None,
-                        "created_by": user_id
-                    }
-                    
-                    rows.append(item_data)
-                    results['valid'] += 1
-                    
-                    if len(results['preview']) < 5:
-                        results['preview'].append({
-                            "row": i,
-                            "production_code": item_data['production_code'],
-                            "production_name": item_data['production_name']
-                        })
-                    
-                except Exception as e:
-                    results['errors'] += 1
-                    results['error_details'].append({
-                        "row": i,
-                        "error": str(e)
-                    })
-            
-            # If not dry run, actually import
-            if not dry_run and rows:
-                for item_data in rows:
                     # Check if exists
                     existing_resp = await client.get(
                         f"{SUPABASE_URL}/rest/v1/production_items?"
                         f"organization_id=eq.{org_id}&"
-                        f"production_code=eq.{item_data['production_code']}",
+                        f"production_code=eq.{production_code}",
                         headers=headers
                     )
                     
                     if existing_resp.status_code == 200 and existing_resp.json():
                         if update_existing:
-                            # Update
+                            existing_item = existing_resp.json()[0]
+                            update_data = {k: v for k, v in item_data.items() 
+                                         if k not in ['organization_id', 'created_by'] and v is not None}
+                            update_data['updated_by'] = user_id
+                            update_data['updated_at'] = datetime.now(timezone.utc).isoformat()
+                            
                             await client.patch(
-                                f"{SUPABASE_URL}/rest/v1/production_items?"
-                                f"organization_id=eq.{org_id}&"
-                                f"production_code=eq.{item_data['production_code']}",
+                                f"{SUPABASE_URL}/rest/v1/production_items?id=eq.{existing_item['id']}",
                                 headers=headers,
-                                json={k: v for k, v in item_data.items() if k not in ['organization_id', 'created_by']}
+                                json=update_data
                             )
+                            
+                            # Update service categories
+                            if service_category_ids:
+                                await client.delete(
+                                    f"{SUPABASE_URL}/rest/v1/production_item_service_categories?"
+                                    f"production_item_id=eq.{existing_item['id']}",
+                                    headers=headers
+                                )
+                                for sc_id in service_category_ids:
+                                    await client.post(
+                                        f"{SUPABASE_URL}/rest/v1/production_item_service_categories",
+                                        headers=headers,
+                                        json={"production_item_id": existing_item['id'], "service_category_id": sc_id}
+                                    )
+                            
                             results['updated'] += 1
+                        else:
+                            results['skipped'] += 1
                     else:
-                        # Create
-                        await client.post(
+                        # Create new
+                        create_resp = await client.post(
                             f"{SUPABASE_URL}/rest/v1/production_items",
                             headers=headers,
                             json=item_data
                         )
-                        results['created'] += 1
+                        
+                        if create_resp.status_code == 201:
+                            created_item = create_resp.json()[0]
+                            
+                            # Create service category links
+                            for sc_id in service_category_ids:
+                                await client.post(
+                                    f"{SUPABASE_URL}/rest/v1/production_item_service_categories",
+                                    headers=headers,
+                                    json={"production_item_id": created_item['id'], "service_category_id": sc_id}
+                                )
+                            
+                            # Create initial revision
+                            await client.post(
+                                f"{SUPABASE_URL}/rest/v1/production_item_revisions",
+                                headers=headers,
+                                json={
+                                    "production_item_id": created_item['id'],
+                                    "version": 1,
+                                    "snapshot": created_item,
+                                    "change_type": "created",
+                                    "change_reason": "Imported from CSV",
+                                    "created_by": user_id
+                                }
+                            )
+                            
+                            results['created'] += 1
+                        else:
+                            results['errors'] += 1
+                            results['import_errors'].append({
+                                "row": i,
+                                "production_code": production_code,
+                                "error": f"Database error: {create_resp.status_code}"
+                            })
+                            
+                except Exception as e:
+                    results['errors'] += 1
+                    results['import_errors'].append({
+                        "row": i,
+                        "production_code": production_code,
+                        "error": str(e)
+                    })
+        
+        total_imported = results['created'] + results['updated']
         
         return {
             "success": True,
-            "dry_run": dry_run,
+            "message": f"Successfully imported {total_imported} production items",
             "results": results
         }
         
     except Exception as e:
-        logger.error(f"Import error: {e}")
+        logger.error(f"Import commit error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 # =====================================================
@@ -1094,3 +1627,197 @@ async def get_production_library_stats(authorization: str = Header(...)):
 async def production_library_health():
     """Health check for production library service"""
     return {"status": "healthy", "service": "production-library", "version": "1.0.0"}
+
+# =====================================================
+# SEEDING / INITIALIZATION
+# =====================================================
+
+# Default Knowledge Domains for finish carpentry contractors
+DEFAULT_KNOWLEDGE_DOMAINS = [
+    {"code": "FC", "name": "Finish Carpentry", "description": "Trim, moldings, and finish woodwork", "sort_order": 1},
+    {"code": "DH", "name": "Doors & Hardware", "description": "Door installation and hardware", "sort_order": 2},
+    {"code": "AM", "name": "Architectural Millwork", "description": "Custom millwork and built-ins", "sort_order": 3},
+    {"code": "CB", "name": "Cabinetry", "description": "Cabinet installation and modifications", "sort_order": 4},
+    {"code": "FL", "name": "Flooring", "description": "Flooring installation and finishing", "sort_order": 5},
+    {"code": "CT", "name": "Countertops", "description": "Countertop installation", "sort_order": 6},
+    {"code": "SR", "name": "Stairs & Railings", "description": "Staircase and railing work", "sort_order": 7},
+    {"code": "FW", "name": "Feature Walls", "description": "Accent walls and feature installations", "sort_order": 8},
+    {"code": "WA", "name": "Washroom Accessories", "description": "Bathroom accessory installation", "sort_order": 9},
+    {"code": "GC", "name": "General Conditions", "description": "Project overhead and general conditions", "sort_order": 10},
+    {"code": "MB", "name": "Mobilization", "description": "Site setup and mobilization", "sort_order": 11},
+    {"code": "CO", "name": "Closeout", "description": "Project closeout and demobilization", "sort_order": 12},
+    {"code": "TR", "name": "Travel", "description": "Travel time and expenses", "sort_order": 13},
+    {"code": "MS", "name": "Miscellaneous", "description": "Other production items", "sort_order": 99},
+]
+
+# Default Service Categories
+DEFAULT_SERVICE_CATEGORIES = [
+    {"code": "RES", "name": "Residential", "description": "Single-family residential projects", "sort_order": 1},
+    {"code": "MF", "name": "Multifamily", "description": "Multi-unit residential buildings", "sort_order": 2},
+    {"code": "COM", "name": "Commercial", "description": "Commercial office and retail", "sort_order": 3},
+    {"code": "HOS", "name": "Hospitality", "description": "Hotels, restaurants, entertainment", "sort_order": 4},
+    {"code": "INS", "name": "Institutional", "description": "Schools, government, public buildings", "sort_order": 5},
+    {"code": "HC", "name": "Healthcare", "description": "Medical facilities and clinics", "sort_order": 6},
+    {"code": "RET", "name": "Retail", "description": "Retail stores and shopping centers", "sort_order": 7},
+    {"code": "IND", "name": "Industrial", "description": "Industrial and manufacturing facilities", "sort_order": 8},
+    {"code": "TI", "name": "Tenant Improvement", "description": "Interior tenant improvements", "sort_order": 9},
+    {"code": "RST", "name": "Restoration", "description": "Historic restoration and renovation", "sort_order": 10},
+    {"code": "SM", "name": "Service & Maintenance", "description": "Service calls and maintenance work", "sort_order": 11},
+]
+
+@router.post("/seed")
+async def seed_production_library(
+    authorization: str = Header(...),
+    force: bool = Query(False, description="Force re-seeding even if data exists")
+):
+    """
+    Seed the Production Library with default Knowledge Domains and Service Categories.
+    This should be run once when setting up a new organization.
+    """
+    context = await verify_token_and_get_org(authorization)
+    org_id = context['organization_id']
+    user_id = context['user_id']
+    
+    results = {
+        "knowledge_domains": {"created": 0, "existing": 0, "errors": []},
+        "service_categories": {"created": 0, "existing": 0, "errors": []}
+    }
+    
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            headers = await get_service_headers()
+            
+            # Check existing domains
+            existing_domains_resp = await client.get(
+                f"{SUPABASE_URL}/rest/v1/knowledge_domains?"
+                f"organization_id=eq.{org_id}&select=code",
+                headers=headers
+            )
+            existing_domain_codes = set()
+            if existing_domains_resp.status_code == 200:
+                existing_domain_codes = {d['code'] for d in existing_domains_resp.json() if d.get('code')}
+            
+            # Seed Knowledge Domains
+            for domain in DEFAULT_KNOWLEDGE_DOMAINS:
+                if domain['code'] in existing_domain_codes and not force:
+                    results['knowledge_domains']['existing'] += 1
+                    continue
+                    
+                try:
+                    resp = await client.post(
+                        f"{SUPABASE_URL}/rest/v1/knowledge_domains",
+                        headers=headers,
+                        json={
+                            "organization_id": org_id,
+                            "created_by": user_id,
+                            **domain
+                        }
+                    )
+                    if resp.status_code == 201:
+                        results['knowledge_domains']['created'] += 1
+                    elif resp.status_code == 409:
+                        results['knowledge_domains']['existing'] += 1
+                    else:
+                        results['knowledge_domains']['errors'].append(f"{domain['code']}: {resp.status_code}")
+                except Exception as e:
+                    results['knowledge_domains']['errors'].append(f"{domain['code']}: {str(e)}")
+            
+            # Check existing service categories
+            existing_cats_resp = await client.get(
+                f"{SUPABASE_URL}/rest/v1/service_categories?"
+                f"organization_id=eq.{org_id}&select=code",
+                headers=headers
+            )
+            existing_cat_codes = set()
+            if existing_cats_resp.status_code == 200:
+                existing_cat_codes = {c['code'] for c in existing_cats_resp.json() if c.get('code')}
+            
+            # Seed Service Categories
+            for category in DEFAULT_SERVICE_CATEGORIES:
+                if category['code'] in existing_cat_codes and not force:
+                    results['service_categories']['existing'] += 1
+                    continue
+                    
+                try:
+                    resp = await client.post(
+                        f"{SUPABASE_URL}/rest/v1/service_categories",
+                        headers=headers,
+                        json={
+                            "organization_id": org_id,
+                            "created_by": user_id,
+                            **category
+                        }
+                    )
+                    if resp.status_code == 201:
+                        results['service_categories']['created'] += 1
+                    elif resp.status_code == 409:
+                        results['service_categories']['existing'] += 1
+                    else:
+                        results['service_categories']['errors'].append(f"{category['code']}: {resp.status_code}")
+                except Exception as e:
+                    results['service_categories']['errors'].append(f"{category['code']}: {str(e)}")
+            
+            return {
+                "success": True,
+                "message": "Production Library seeded successfully",
+                "results": results
+            }
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Seeding error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/seed/status")
+async def get_seed_status(authorization: str = Header(...)):
+    """Check if the Production Library has been seeded"""
+    context = await verify_token_and_get_org(authorization)
+    org_id = context['organization_id']
+    
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            headers = await get_service_headers()
+            
+            # Check domains
+            domains_resp = await client.get(
+                f"{SUPABASE_URL}/rest/v1/knowledge_domains?"
+                f"organization_id=eq.{org_id}&select=id",
+                headers={**headers, "Prefer": "count=exact"}
+            )
+            domains_count = int(domains_resp.headers.get('content-range', '0-0/0').split('/')[-1])
+            
+            # Check service categories
+            cats_resp = await client.get(
+                f"{SUPABASE_URL}/rest/v1/service_categories?"
+                f"organization_id=eq.{org_id}&select=id",
+                headers={**headers, "Prefer": "count=exact"}
+            )
+            cats_count = int(cats_resp.headers.get('content-range', '0-0/0').split('/')[-1])
+            
+            # Check production items
+            items_resp = await client.get(
+                f"{SUPABASE_URL}/rest/v1/production_items?"
+                f"organization_id=eq.{org_id}&select=id",
+                headers={**headers, "Prefer": "count=exact"}
+            )
+            items_count = int(items_resp.headers.get('content-range', '0-0/0').split('/')[-1])
+            
+            is_seeded = domains_count > 0 and cats_count > 0
+            
+            return {
+                "success": True,
+                "is_seeded": is_seeded,
+                "has_production_items": items_count > 0,
+                "counts": {
+                    "knowledge_domains": domains_count,
+                    "service_categories": cats_count,
+                    "production_items": items_count
+                }
+            }
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Seed status error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))

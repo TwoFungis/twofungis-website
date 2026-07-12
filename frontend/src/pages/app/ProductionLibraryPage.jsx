@@ -43,11 +43,13 @@ import {
   FolderOpen,
   Tag,
   Sparkles,
-  X
+  X,
+  PackageOpen
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuthStore } from '../../store/authStore';
 import { toast } from 'sonner';
+import ImportWizard from '../../components/production/ImportWizard';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -61,7 +63,7 @@ const WORKSPACE_TABS = [
   { id: 'labour', label: 'Labour Standards', icon: Clock, description: 'Labour rates & crews' },
   { id: 'pricing', label: 'Pricing', icon: DollarSign, description: 'Historical pricing' },
   { id: 'templates', label: 'Templates', icon: FileText, description: 'Estimate templates' },
-  { id: 'imports', label: 'Imports', icon: Upload, description: 'Import data' },
+  { id: 'import', label: 'Import', icon: PackageOpen, description: 'Import company knowledge' },
   { id: 'builder', label: 'Estimate Builder', icon: Package, description: 'Create estimates', comingSoon: true },
 ];
 
@@ -496,99 +498,14 @@ const TemplatesTab = ({ templates, loading, onAddTemplate }) => {
 };
 
 // ============================================
-// IMPORTS TAB
+// IMPORT TAB - Premium Knowledge Import Experience
 // ============================================
-const ImportsTab = ({ onImport }) => {
+const ImportTab = ({ onImportComplete }) => {
   return (
-    <div className="space-y-6">
-      <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6">
-        <h4 className="text-lg font-medium text-white mb-2">Import Production Data</h4>
-        <p className="text-zinc-500 text-sm mb-6">
-          Upload CSV files to quickly populate your Production Library with existing data.
-        </p>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <button
-            onClick={() => onImport('production_items')}
-            className="flex items-center gap-4 p-4 bg-zinc-800/50 border border-zinc-700 rounded-lg hover:bg-zinc-800 transition-colors text-left"
-            data-testid="import-production-items"
-          >
-            <div className="w-12 h-12 bg-emerald-500/20 rounded-lg flex items-center justify-center">
-              <Library className="w-6 h-6 text-emerald-400" />
-            </div>
-            <div>
-              <h5 className="font-medium text-white">Production Items</h5>
-              <p className="text-xs text-zinc-500">Items, categories, units, rates</p>
-            </div>
-          </button>
-          
-          <button
-            onClick={() => onImport('labour_rates')}
-            className="flex items-center gap-4 p-4 bg-zinc-800/50 border border-zinc-700 rounded-lg hover:bg-zinc-800 transition-colors text-left"
-            data-testid="import-labour-rates"
-          >
-            <div className="w-12 h-12 bg-amber-500/20 rounded-lg flex items-center justify-center">
-              <Users className="w-6 h-6 text-amber-400" />
-            </div>
-            <div>
-              <h5 className="font-medium text-white">Labour Rates</h5>
-              <p className="text-xs text-zinc-500">Roles, hourly rates, crews</p>
-            </div>
-          </button>
-          
-          <button
-            onClick={() => onImport('scope_library')}
-            className="flex items-center gap-4 p-4 bg-zinc-800/50 border border-zinc-700 rounded-lg hover:bg-zinc-800 transition-colors text-left"
-            data-testid="import-scope-library"
-          >
-            <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
-              <BookOpen className="w-6 h-6 text-blue-400" />
-            </div>
-            <div>
-              <h5 className="font-medium text-white">Scope Library</h5>
-              <p className="text-xs text-zinc-500">Scope items and descriptions</p>
-            </div>
-          </button>
-          
-          <button
-            onClick={() => onImport('historical_pricing')}
-            className="flex items-center gap-4 p-4 bg-zinc-800/50 border border-zinc-700 rounded-lg hover:bg-zinc-800 transition-colors text-left"
-            data-testid="import-historical-pricing"
-          >
-            <div className="w-12 h-12 bg-cyan-500/20 rounded-lg flex items-center justify-center">
-              <DollarSign className="w-6 h-6 text-cyan-400" />
-            </div>
-            <div>
-              <h5 className="font-medium text-white">Historical Pricing</h5>
-              <p className="text-xs text-zinc-500">Past project pricing data</p>
-            </div>
-          </button>
-        </div>
-      </div>
-      
-      <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-4">
-        <div className="flex items-start gap-3">
-          <Download className="w-5 h-5 text-zinc-500 mt-0.5" />
-          <div>
-            <h5 className="font-medium text-white mb-1">Download Templates</h5>
-            <p className="text-sm text-zinc-500 mb-3">
-              Download CSV templates to see the expected format for each import type.
-            </p>
-            <div className="flex flex-wrap gap-2">
-              <button className="text-xs text-emerald-400 hover:text-emerald-300 underline">
-                production_items_template.csv
-              </button>
-              <button className="text-xs text-emerald-400 hover:text-emerald-300 underline">
-                labour_rates_template.csv
-              </button>
-              <button className="text-xs text-emerald-400 hover:text-emerald-300 underline">
-                scope_library_template.csv
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <ImportWizard 
+      onComplete={onImportComplete}
+      onClose={null}
+    />
   );
 };
 
@@ -741,10 +658,6 @@ const ProductionLibraryPage = () => {
     toast.info('Template creation coming soon');
   };
   
-  const handleImport = (type) => {
-    toast.info(`${type} import coming soon`);
-  };
-  
   // Render active tab content
   const renderTabContent = () => {
     switch (activeTab) {
@@ -796,9 +709,14 @@ const ProductionLibraryPage = () => {
             onAddTemplate={handleAddTemplate}
           />
         );
-      case 'imports':
+      case 'import':
         return (
-          <ImportsTab onImport={handleImport} />
+          <ImportTab 
+            onImportComplete={() => {
+              setActiveTab('library');
+              fetchData();
+            }} 
+          />
         );
       default:
         return null;
