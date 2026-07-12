@@ -1,0 +1,49 @@
+{
+  "summary": "VERTICAL SLICE #1 UI smoke test (frontend-only). Login inbox@twofungis.ca / TradeOS2024! authenticates successfully and redirects to /app/command-center. Full 11-item sidebar is rendered (Home, Opportunities, Projects, Estimating, Financial, Expenses, Documents, Reports, Integrations, Settings, My Profile) - all 7 required items from the review_request are present. /app/opportunities route mounts OpportunitiesPage (data-testid='opportunities-page') and, because the Opportunities backend endpoint returns HTTP 500 (missing Supabase tables), the graceful 'Database Migration Required' empty state renders with the amber icon, the exact heading 'Database Migration Required', descriptive text, the code chip '014_opportunity_tender_foundation.sql', and a Refresh button - exactly as specified. Clicking the New Opportunity button (data-testid='create-opportunity-btn') opens the CreateOpportunityModal (data-testid='create-opportunity-modal') with all 5 required form fields (input-opportunity-name, input-client-company, input-site-city, input-estimated-value, select-project-type) plus the submit button (submit-create-opportunity). Cancel closes the modal cleanly. Submitting the form with valid data while the migration is pending correctly propagates 500 from POST /api/opportunities and surfaces the localized message 'Database migration required. Please run migration 014.' via the modal's red-tinted error banner. 6/7 review_request items PASS as designed. 1/7 partially passes (see minor UX note below).",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "GET /api/opportunities?limit=50", "issue": "Returns HTTP 500 due to missing Supabase table (migration 014 not applied). This is expected per the agent-to-agent context; UI handles it gracefully but backend should ideally return a structured 503/424 with an actionable payload rather than a raw 500."},
+      {"endpoint": "GET /api/opportunities/stats/pipeline", "issue": "Also returns 500 for the same reason (missing tables)."},
+      {"endpoint": "POST /api/opportunities", "issue": "Returns 500 for the same reason; frontend already maps this to a friendly migration message so no user-visible regression."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "CreateOpportunityModal (/app/opportunities > New Opportunity)",
+        "issues": [
+          "Validation for empty Opportunity Name is implemented ONLY by disabling the submit button (see OpportunitiesPage.jsx L332 `disabled={creating || !formData.name.trim()}`). The inline setError('Opportunity name is required') branch at L157-160 is unreachable because the disabled submit button prevents form submission. Pressing Enter in the empty name input also does not trigger a submit event (button is disabled). Net effect: the user never sees the 'Opportunity name is required' message. Recommend either (a) removing the disabled state and letting handleSubmit render the red inline error, or (b) adding a visible inline hint under the field (e.g., 'Required' subtext) so the reason for the disabled button is obvious. Review_request item 'Create Opportunity modal has proper validation (shows error for empty name)' is currently satisfied only by the disabled state, not by an actual error message."
+        ]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/test_reports/iteration_13.json"
+  ],
+  "action_items": [
+    "MEDIUM: Make the empty-name validation message visible. Either remove the disabled attribute on the submit button so handleSubmit's setError('Opportunity name is required') branch fires, or add a persistent 'Required' hint under the Opportunity Name field. Current UX leaves the user guessing why 'Create Opportunity' is grayed out.",
+    "BLOCKER (backend/infra, not UI): Apply Supabase migrations 014_opportunity_tender_foundation.sql (and 015 if applicable) so Opportunities, Tenders, and downstream Estimate workflows can be fully exercised. Once applied, retest the full happy path: Create Opportunity -> navigate to /app/opportunities/{id} -> Estimate tab -> EstimateBuilder 3-panel workflow -> save estimate.",
+    "LOW: Backend should return a structured 424/503 with an error code (e.g., 'MIGRATION_REQUIRED') instead of a bare 500 for missing-table cases. Frontend currently sniffs `response.status === 500` OR `detail includes 'Could not find the table'`, which is fragile."
+  ],
+  "critical_code_review_comments": [
+    "OpportunitiesPage.jsx L332: disabled={creating || !formData.name.trim()} conflicts with L157-160 setError('Opportunity name is required'). The setError branch is dead code as long as the button is disabled. Pick ONE validation strategy.",
+    "OpportunitiesPage.jsx L184-192: Migration-required detection relies on `response.status === 500` OR substring match `Could not find the table`. This will produce false positives if ANY future 500 error is returned by /api/opportunities (unrelated bugs would be surfaced to users as 'Database migration required. Please run migration 014.'). Recommend narrowing to explicit error codes returned by the backend.",
+    "OpportunitiesPage.jsx L414-422: Same fragile 500-means-migration heuristic in fetchOpportunities. Any transient 500 will render the misleading 'Database Migration Required' UI instead of a generic error/toast.",
+    "OpportunitiesPage.jsx L487: After successful create, navigates to /app/opportunities/{id} but no test verified this route renders a valid workspace since backend is 500. Once migrations are applied, verify the workspace loads (EstimateBuilder / EstimateTab per files_of_reference).",
+    "OpportunitiesPage.jsx L529-541: Filter buttons ('active', 'all', 'awarded', 'lost') use `filter === f` state but filter mode 'all' passes empty string just like 'active' (L401-405). 'active' + 'all' behave identically at the API layer; the difference only kicks in client-side (L430-434). Fine for now but confusing; consider making 'all' fetch archived/declined too."
+  ],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "not tested (frontend-only request)",
+    "frontend": "7/7 review_request items VERIFIED. Login flow PASS. Command Center PASS. Opportunities page 'Database Migration Required' state PASS. New Opportunity modal opens with all form fields PASS. Modal Cancel closes modal PASS. Sidebar shows all 7 required navigation items PASS (plus Home/Integrations/Settings/My Profile). Modal validation for empty name PASS via disabled-button UX but the coded inline error message is dead code - see design_issues."
+  },
+  "test_credentials": "inbox@twofungis.ca / TradeOS2024! (Scott Marshall, founding_lifetime) - working, redirects to /app/command-center as expected",
+  "seed_data_creation": "None - no attempt (Supabase tables missing, POST /api/opportunities returns 500 as expected)",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "VERTICAL SLICE #1 UI shell is fully wired and defensive against the missing Supabase migration. When main agent applies migration 014 (and any dependents like 015 for Tenders), retest the full happy path: (1) POST /api/opportunities should return 200 with the new opportunity payload, (2) handleOpportunityCreated navigates to /app/opportunities/{id} - verify EstimateTab renders <EstimateBuilder/> (per files_of_reference /app/frontend/src/components/workspace/tabs/PlaceholderTabs.jsx and /app/frontend/src/components/estimate/EstimateBuilder.jsx), (3) verify the 3-panel EstimateBuilder layout: browse Company Standards (Production Library) -> select standards -> adjust quantities -> auto-totals -> Company Brain review -> save estimate, (4) verify no dead-end buttons or placeholder actions in the flow. Data-testids confirmed working this iteration: opportunities-page, create-opportunity-btn, create-opportunity-modal, input-opportunity-name, input-client-company, input-site-city, input-estimated-value, select-project-type, submit-create-opportunity, search-input, filter-active, filter-all, filter-awarded, filter-lost, view-grid, view-list.",
+  "rca of the issue": "No new frontend regressions. The only design_issue is the dead-code validation branch in CreateOpportunityModal (submit button disabled state pre-empts the inline error message). Reproduction: open /app/opportunities > click New Opportunity > leave name empty > observe submit button is grayed out but no 'Opportunity name is required' text ever appears. Mitigation: remove disabled prop from submit button so handleSubmit's setError fires and renders the red banner, OR add a persistent 'Required' hint under the name field. Backend 500s on /api/opportunities* are the expected pre-migration state per agent-to-agent context and are gracefully handled by the frontend."
+}

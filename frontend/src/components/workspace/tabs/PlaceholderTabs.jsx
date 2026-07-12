@@ -1,7 +1,8 @@
 /**
  * Placeholder Tabs for Opportunity Workspace
  * ==========================================
- * These will be fully implemented in future iterations.
+ * EstimateTab is NOW FULLY FUNCTIONAL (Vertical Slice #1)
+ * Other tabs will be fully implemented in future iterations.
  * Each tab maintains the workspace design language.
  */
 
@@ -18,6 +19,7 @@ import {
   Construction,
   Clock
 } from 'lucide-react';
+import EstimateBuilder from '../../estimate/EstimateBuilder';
 
 // Placeholder component for tabs under construction
 function PlaceholderTab({ title, icon: Icon, description, testId }) {
@@ -36,14 +38,16 @@ function PlaceholderTab({ title, icon: Icon, description, testId }) {
   );
 }
 
+// VERTICAL SLICE #1 - FULLY FUNCTIONAL ESTIMATE TAB
 export function EstimateTab({ opportunity, workspaceSummary, onRefresh, session }) {
   return (
-    <PlaceholderTab
-      title="Estimate"
-      icon={DollarSign}
-      description="Build detailed cost estimates with labor, materials, equipment, and subcontractor costs. Connect to the Production Library for accurate production rates."
-      testId="estimate-tab"
-    />
+    <div className="h-[calc(100vh-200px)]" data-testid="estimate-tab">
+      <EstimateBuilder
+        opportunity={opportunity}
+        session={session}
+        onRefresh={onRefresh}
+      />
+    </div>
   );
 }
 

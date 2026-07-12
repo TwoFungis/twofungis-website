@@ -1,6 +1,7 @@
 /**
  * OpportunitiesPage.jsx
  * =====================
+ * VERTICAL SLICE #1: Working Opportunities List with Create Flow
  * List view for all opportunities in the organization.
  * Pipeline overview with filtering and quick actions.
  */
@@ -22,7 +23,8 @@ import {
   Target,
   TrendingUp,
   LayoutGrid,
-  List
+  List,
+  X
 } from 'lucide-react';
 import { useAuthStore } from '../../../store/authStore';
 
@@ -136,6 +138,215 @@ function OpportunityCard({ opportunity, onClick }) {
   );
 }
 
+// Create Opportunity Modal - VERTICAL SLICE #1
+function CreateOpportunityModal({ isOpen, onClose, onCreated, session }) {
+  const [formData, setFormData] = useState({
+    name: '',
+    client_company: '',
+    client_name: '',
+    site_city: '',
+    estimated_value: '',
+    project_type: 'commercial',
+    trade_category: 'Finishing'
+  });
+  const [creating, setCreating] = useState(false);
+  const [error, setError] = useState(null);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.name.trim()) {
+      setError('Opportunity name is required');
+      return;
+    }
+
+    if (!session?.access_token) {
+      setError('Session expired. Please refresh the page.');
+      return;
+    }
+
+    try {
+      setCreating(true);
+      setError(null);
+
+      const response = await fetch(`${API_URL}/api/opportunities`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          ...formData,
+          estimated_value: formData.estimated_value ? parseFloat(formData.estimated_value) : null,
+          status: 'discovered'
+        })
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => null);
+        // Check for database migration error
+        if (data?.detail?.includes?.('Could not find the table') || 
+            response.status === 500) {
+          throw new Error('Database migration required. Please run migration 014.');
+        }
+        throw new Error(data?.detail || 'Failed to create opportunity');
+      }
+
+      const data = await response.json();
+      onCreated(data.opportunity);
+      onClose();
+      
+      // Reset form
+      setFormData({
+        name: '',
+        client_company: '',
+        client_name: '',
+        site_city: '',
+        estimated_value: '',
+        project_type: 'commercial',
+        trade_category: 'Finishing'
+      });
+    } catch (err) {
+      console.error('Error creating opportunity:', err);
+      setError(err.message);
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center" data-testid="create-opportunity-modal">
+      {/* Backdrop */}
+      <div 
+        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      
+      {/* Modal */}
+      <div className="relative w-full max-w-lg mx-4 bg-[#111111] border border-[#262626] rounded-2xl shadow-2xl">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#262626]">
+          <h2 className="text-lg font-semibold text-white">New Opportunity</h2>
+          <button
+            onClick={onClose}
+            className="p-2 text-white/50 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="p-6 space-y-5">
+          {error && (
+            <div className="px-4 py-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm">
+              {error}
+            </div>
+          )}
+
+          {/* Opportunity Name */}
+          <div>
+            <label className="block text-sm text-white/70 mb-2">
+              Opportunity Name <span className="text-red-400">*</span>
+            </label>
+            <input
+              type="text"
+              value={formData.name}
+              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+              placeholder="e.g., Downtown Office Tower - Finishing"
+              className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#262626] rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-emerald-500/50"
+              autoFocus
+              data-testid="input-opportunity-name"
+            />
+          </div>
+
+          {/* Client Company */}
+          <div>
+            <label className="block text-sm text-white/70 mb-2">Client / Builder</label>
+            <input
+              type="text"
+              value={formData.client_company}
+              onChange={(e) => setFormData(prev => ({ ...prev, client_company: e.target.value }))}
+              placeholder="e.g., Acme Construction Ltd."
+              className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#262626] rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-emerald-500/50"
+              data-testid="input-client-company"
+            />
+          </div>
+
+          {/* Location & Value */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm text-white/70 mb-2">City</label>
+              <input
+                type="text"
+                value={formData.site_city}
+                onChange={(e) => setFormData(prev => ({ ...prev, site_city: e.target.value }))}
+                placeholder="e.g., Vancouver"
+                className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#262626] rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-emerald-500/50"
+                data-testid="input-site-city"
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-white/70 mb-2">Estimated Value</label>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50">$</span>
+                <input
+                  type="number"
+                  value={formData.estimated_value}
+                  onChange={(e) => setFormData(prev => ({ ...prev, estimated_value: e.target.value }))}
+                  placeholder="0"
+                  className="w-full pl-8 pr-4 py-3 bg-[#0a0a0a] border border-[#262626] rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-emerald-500/50"
+                  data-testid="input-estimated-value"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Project Type */}
+          <div>
+            <label className="block text-sm text-white/70 mb-2">Project Type</label>
+            <select
+              value={formData.project_type}
+              onChange={(e) => setFormData(prev => ({ ...prev, project_type: e.target.value }))}
+              className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#262626] rounded-lg text-white focus:outline-none focus:border-emerald-500/50"
+              data-testid="select-project-type"
+            >
+              <option value="commercial">Commercial</option>
+              <option value="residential">Residential</option>
+              <option value="industrial">Industrial</option>
+              <option value="institutional">Institutional</option>
+            </select>
+          </div>
+
+          {/* Actions */}
+          <div className="flex items-center justify-end gap-3 pt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-5 py-2.5 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={creating || !formData.name.trim()}
+              className="inline-flex items-center gap-2 px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-xl transition-colors"
+              data-testid="submit-create-opportunity"
+            >
+              {creating ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Plus className="w-4 h-4" />
+              )}
+              Create Opportunity
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 // Pipeline Stats Bar
 function PipelineStats({ stats }) {
   if (!stats) return null;
@@ -177,6 +388,7 @@ export default function OpportunitiesPage() {
   const [filter, setFilter] = useState('active');
   const [search, setSearch] = useState('');
   const [viewMode, setViewMode] = useState('grid');
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   // Fetch opportunities
   const fetchOpportunities = useCallback(async () => {
@@ -199,7 +411,17 @@ export default function OpportunitiesPage() {
         }
       });
 
-      if (!response.ok) throw new Error('Failed to fetch opportunities');
+      if (!response.ok) {
+        // Check if it's a database schema issue
+        const errorData = await response.json().catch(() => null);
+        if (errorData?.detail?.includes?.('Could not find the table') || 
+            response.status === 500) {
+          setError('migration_required');
+          setLoading(false);
+          return;
+        }
+        throw new Error('Failed to fetch opportunities');
+      }
       
       const data = await response.json();
       
@@ -252,11 +474,17 @@ export default function OpportunitiesPage() {
     );
   });
 
-  // Handle create new
+  // Handle create new - VERTICAL SLICE #1: Opens modal
   const handleCreate = () => {
-    // For now, navigate to a create form (to be implemented)
-    // This will be replaced with a modal or dedicated page
-    navigate('/app/opportunities/new');
+    setShowCreateModal(true);
+  };
+
+  // Handle opportunity created - navigate to workspace
+  const handleOpportunityCreated = (opportunity) => {
+    // Add to list
+    setOpportunities(prev => [opportunity, ...prev]);
+    // Navigate to workspace to start estimating
+    navigate(`/app/opportunities/${opportunity.id}`);
   };
 
   return (
@@ -350,8 +578,32 @@ export default function OpportunitiesPage() {
           </div>
         )}
 
-        {/* Error */}
-        {error && (
+        {/* Migration Required State */}
+        {error === 'migration_required' && (
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center mb-6">
+              <AlertCircle className="w-8 h-8 text-amber-400" />
+            </div>
+            <h2 className="text-xl font-semibold text-white mb-3">
+              Database Migration Required
+            </h2>
+            <p className="text-white/50 mb-6 max-w-lg leading-relaxed">
+              The Opportunities module requires database tables that haven't been created yet.
+              Please run the migration script <code className="px-2 py-1 bg-white/10 rounded text-emerald-400 font-mono text-sm">014_opportunity_tender_foundation.sql</code> in your Supabase project.
+            </p>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={fetchOpportunities}
+                className="px-4 py-2 text-sm text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+              >
+                Refresh
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Error (other errors) */}
+        {error && error !== 'migration_required' && (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <AlertCircle className="w-8 h-8 text-red-500 mb-4" />
             <p className="text-white/70">{error}</p>
@@ -408,6 +660,14 @@ export default function OpportunitiesPage() {
           </div>
         )}
       </main>
+
+      {/* Create Opportunity Modal */}
+      <CreateOpportunityModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onCreated={handleOpportunityCreated}
+        session={session}
+      />
     </div>
   );
 }

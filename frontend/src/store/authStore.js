@@ -21,6 +21,7 @@ const waitForSession = async (maxAttempts = 5, delayMs = 500) => {
 export const useAuthStore = create((set, get) => ({
   user: null,
   profile: null,
+  session: null, // Add session tracking for API calls
   loading: true,
   initialized: false,
   
@@ -191,7 +192,7 @@ export const useAuthStore = create((set, get) => ({
         console.error('Session error:', error);
       }
       if (session?.user) {
-        set({ user: session.user });
+        set({ user: session.user, session: session });
         await get().fetchProfile();
       }
     } catch (error) {
@@ -211,14 +212,14 @@ export const useAuthStore = create((set, get) => ({
       console.log('Auth event:', event);
       if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
         if (session?.user) {
-          set({ user: session.user });
+          set({ user: session.user, session: session });
           // Delay profile fetch to ensure session is fully propagated
           setTimeout(() => get().fetchProfile(), 100);
         }
       } else if (event === 'SIGNED_OUT') {
-        set({ user: null, profile: null });
+        set({ user: null, profile: null, session: null });
       } else if (session?.user) {
-        set({ user: session.user });
+        set({ user: session.user, session: session });
       }
     });
 
