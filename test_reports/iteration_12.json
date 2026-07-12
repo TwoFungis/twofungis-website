@@ -1,0 +1,44 @@
+{
+  "summary": "Frontend-only smoke of Phase 3.5 ProductionLibraryWorkspace at /app/estimating. 10 of 13 review_request items verified end-to-end in the browser. 3 items (Detail Panel tabs, Company Brain insights, Add to Estimate footer) exist in code but are not UI-exercisable in this environment because Supabase production_items/knowledge_domains/service_categories/production_assemblies tables still return 404 (blocker documented in iteration_10/11) so no items can be selected to open the DetailPanel. Login inbox@twofungis.ca / TradeOS2024! works and redirects to /app/command-center. /app/estimating renders <ProductionLibraryWorkspace> with data-testid='production-library-workspace'. Header shows 'Production Library' + subtitle 'Company Knowledge Engine'. Left Navigation is now RENDERED (fixed since iteration_11) with all 5 nav items visible: Company Standards, Knowledge Domains, Assemblies, Service Categories, Templates (data-testids nav-standards / nav-domains / nav-assemblies / nav-categories / nav-templates). Clicking each nav item swaps the main content area to a dedicated view: DomainsView shows 'Knowledge Domains' header + descriptive empty state, AssembliesView shows 'Production Assemblies' + 'Create First Assembly' purple CTA, CategoriesView shows 'Service Categories' + description, TemplatesView shows 'Estimate Templates' + 'Coming in Estimate Builder' disabled pill. Cmd+K AND Ctrl+K both open the CommandPalette (data-testid='command-palette') showing all three Quick Actions: Create Company Standard (N), Create Assembly (A), Import Knowledge (I). Arrow-down keyboard navigation moves the highlight through actions (verified visually - Import Knowledge highlighted after 2x ArrowDown). Escape closes the palette. All new features from Phase 3.5 that are exercisable without seeded data are working.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {
+        "flow": "Data fetch on mount",
+        "issue": "Four Promise.all GETs (/api/production-library/items, /domains, /service-categories, /assemblies) return 404 because Supabase tables are missing. fetchData swallows errors with only console.error - still no user-facing toast/banner. UX indistinguishable from 'no data'. This was previously flagged in iteration_11 and is still not addressed.",
+        "affected_selectors": ["[data-testid=\"production-library-workspace\"]"]
+      }
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_production_library_import.py (from iteration_10, still valid - backend not tested this iteration)"
+  ],
+  "action_items": [
+    "BLOCKER (still open from iteration_10): Apply Supabase migrations for measurement_units, knowledge_domains, service_categories, production_items, production_assemblies. Without these tables, the DetailPanel (tabs Overview/Pricing/Productivity/Usage/History), Company Brain mock insights, and 'Add to Estimate' footer button cannot be UI-exercised - they exist in code but never render because selectedItem stays null.",
+    "MEDIUM: In fetchData(), when any of the four fetches returns >=500 or 404, surface a toast.error or an inline banner so users know the backend is broken. Currently silent and misleading.",
+    "LOW: DomainsView empty state hint 'Initialize your Production Library to create default domains' has no clickable action - the sentence dead-ends. Consider making 'Initialize your Production Library' a button that triggers the domain seed endpoint (or link to Import Knowledge)."
+  ],
+  "critical_code_review_comments": [
+    "ProductionLibraryWorkspace.jsx: Since iteration_11, LeftNavigation is now correctly rendered (L2006-2013), CommandPalette has keyboard navigation with ArrowUp/ArrowDown/Enter/Escape (L389-416), and view switching via renderViewContent() dispatches to DomainsView/AssembliesView/CategoriesView/TemplatesView (L1962-2001). Previous iteration_11 review comments addressed.",
+    "ProductionLibraryWorkspace.jsx L1345-1755 DetailPanel: cannot be UI-tested because no items exist in the DB. Code inspection confirms tabs array at L1348-1352 (overview/pricing/productivity/usage/history), Company Brain section at L1482-1486, and 'Add to Estimate' footer button at L1744 all exist as specified. Once Supabase tables exist and at least one production_item is seeded, clicking a row/card sets selectedItem and DetailPanel will render.",
+    "ProductionLibraryWorkspace.jsx handleImport still navigates to /app/production-library?tab=import but the workspace does not consume useSearchParams to render an <ImportWizard/>. Same dead-end reported in iteration_11 - Import Knowledge button click updates URL but no visible change. (Not in the current review_request scope but still a lingering bug.)",
+    "ProductionLibraryWorkspace.jsx L1798+ - `assemblies` state is loaded but no fetchData retry / error banner if the 4 parallel GETs fail. All 404s are silently swallowed - user just sees the empty state.",
+    "File is 2081 lines - approaching size limits. Consider splitting per view (CompanyStandardsView, DomainsView, AssembliesView, CategoriesView, TemplatesView, DetailPanel, CommandPalette, LeftNavigation) into separate files under /pages/app/production-library/ to keep this file <700 lines per <code_review_gudielines>."
+  ],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "not tested (frontend-only request)",
+    "frontend": "10/13 review_request items PASS end-to-end. 3/13 items (Detail Panel tabs, Company Brain insights, Add to Estimate) verified via code inspection only - cannot be UI-exercised until Supabase Production Library tables are created and at least one item is seeded (blocker from iteration_10)."
+  },
+  "test_credentials": "inbox@twofungis.ca / TradeOS2024! (Scott Marshall) - working",
+  "seed_data_creation": "None created - Supabase Production Library tables still return 404 so no rows can be inserted through the app.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "The 5 dedicated views (CompanyStandards / Domains / Assemblies / Categories / Templates) are wired and rendering empty states correctly. Once Supabase migrations are applied AND at least one production_item is seeded, retest these unexercised paths: (1) click a production-item row/card -> DetailPanel opens with 5 tabs (data-testids not yet found for tabs - check code around L1345 to add tab-overview/tab-pricing/tab-productivity/tab-usage/tab-history testids if missing), (2) verify Company Brain insights section renders inside the Overview tab with the mock observations (mockObservations at L138-146), (3) verify 'Add to Estimate' footer button renders and click handler fires (handleAddToEstimate), (4) verify DomainsView renders actual domain cards (data-testid='domain-card-{id}') instead of empty state, (5) verify CategoriesView renders category-card-{id}, (6) verify AssembliesView renders assembly-card-{id} when assemblies exist. Data-testids present and verified this iteration: production-library-workspace, left-navigation, nav-standards, nav-domains, nav-assemblies, nav-categories, nav-templates, open-command-palette, command-palette, command-palette-input, import-knowledge-btn, new-standard-btn, expand-nav-btn, collapse-nav-btn.",
+  "rca of the issue": "No frontend regressions. All Phase 3.5 rewrites work as specified. The only outstanding blocker for full validation is unchanged: Supabase Production Library schema (production_items, knowledge_domains, service_categories, production_assemblies, measurement_units) still returns 404 from the backend API, so DetailPanel/Company Brain/Add to Estimate cannot be exercised in the browser. Fix requires main agent to apply the pending Supabase migrations, then seed at least one row per table for end-to-end testing."
+}
