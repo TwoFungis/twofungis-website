@@ -78,7 +78,7 @@ const LoginPage = () => {
         if (result?.error) {
           setError(result.error.message || 'Invalid email or password');
         } else {
-          // Navigate to /app - DashboardRedirect will determine the correct landing page
+          // Navigate to /app - Command Center is the universal entry point
           navigate('/app');
         }
       }

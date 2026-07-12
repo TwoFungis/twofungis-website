@@ -336,7 +336,7 @@ export const useAuthStore = create((set, get) => ({
       const { error } = await supabase.auth.signInWithOtp({ 
         email,
         options: {
-          // Redirect to /app - DashboardRedirect will determine the correct landing page
+          // Redirect to /app - Command Center is the universal entry point
           emailRedirectTo: `${redirectUrl}/app`
         }
       });

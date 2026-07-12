@@ -467,6 +467,63 @@ const CompanyBrainCard = ({ insights, onAskBrain }) => {
 };
 
 // ============================================
+// WELCOME / GETTING STARTED CARD (Progressive Onboarding)
+// ============================================
+
+const WelcomeCard = ({ hasOrganization, onCreateOrganization, onNavigate }) => {
+  // Only show for users who need onboarding guidance
+  if (hasOrganization) return null;
+  
+  return (
+    <div className="bg-gradient-to-br from-emerald-500/10 to-zinc-900 border border-emerald-500/20 rounded-lg p-6" data-testid="welcome-card">
+      <div className="flex items-start gap-4">
+        <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
+          <Sparkles className="w-6 h-6 text-emerald-400" />
+        </div>
+        <div className="flex-1">
+          <h2 className="text-xl font-bold text-white mb-2">Welcome to TradeOS</h2>
+          <p className="text-zinc-400 text-sm mb-4">
+            The operating system for Canadian contractors. Let&apos;s get your workspace set up.
+          </p>
+          
+          <div className="space-y-3">
+            <button
+              onClick={onCreateOrganization}
+              className="w-full flex items-center gap-3 p-4 bg-emerald-500/20 border border-emerald-500/30 rounded-lg hover:bg-emerald-500/30 transition-colors text-left group"
+              data-testid="create-organization-btn"
+            >
+              <div className="w-10 h-10 bg-emerald-500/30 rounded-lg flex items-center justify-center">
+                <FolderKanban className="w-5 h-5 text-emerald-400" />
+              </div>
+              <div className="flex-1">
+                <span className="text-white font-medium block">Create Your Organization</span>
+                <span className="text-zinc-500 text-xs">Set up your company workspace</span>
+              </div>
+              <ArrowRight className="w-5 h-5 text-emerald-500/50 group-hover:text-emerald-400 transition-colors" />
+            </button>
+            
+            <button
+              onClick={() => onNavigate('/app/opportunities')}
+              className="w-full flex items-center gap-3 p-4 bg-zinc-800/50 border border-zinc-700 rounded-lg hover:bg-zinc-800 transition-colors text-left group"
+              data-testid="explore-opportunities-btn"
+            >
+              <div className="w-10 h-10 bg-zinc-700 rounded-lg flex items-center justify-center">
+                <Target className="w-5 h-5 text-zinc-400" />
+              </div>
+              <div className="flex-1">
+                <span className="text-white font-medium block">Explore Opportunities</span>
+                <span className="text-zinc-500 text-xs">Start tracking potential work</span>
+              </div>
+              <ArrowRight className="w-5 h-5 text-zinc-600 group-hover:text-zinc-400 transition-colors" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ============================================
 // RECENT ACTIVITY TIMELINE
 // ============================================
 
@@ -637,6 +694,12 @@ const CommandCenterPage = () => {
 
   const organizationName = dashboardData?.organization_name || profile?.company_name || 'Your Company';
   const userName = dashboardData?.user_name || profile?.full_name?.split(' ')[0] || 'there';
+  const hasOrganization = dashboardData?.organization_name || dashboardData?.has_organization;
+  
+  const handleCreateOrganization = () => {
+    // Navigate to settings/organization creation
+    navigate('/app/settings?tab=organization');
+  };
 
   return (
     <div className="min-h-screen bg-black font-sans" data-testid="tradeos-command-center">
@@ -711,6 +774,13 @@ const CommandCenterPage = () => {
             </button>
           </div>
         )}
+        
+        {/* Welcome Card - Progressive Onboarding for new users */}
+        <WelcomeCard 
+          hasOrganization={hasOrganization}
+          onCreateOrganization={handleCreateOrganization}
+          onNavigate={navigate}
+        />
         
         {/* Today's Focus */}
         <TodaysFocus 

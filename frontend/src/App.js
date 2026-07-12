@@ -18,9 +18,8 @@ import OnboardingPage from './pages/auth/OnboardingPage';
 import ActivateBusinessFlow from './pages/auth/ActivateBusinessFlow';
 import GoogleAuthCallback from './pages/auth/GoogleAuthCallback';
 
-// App Pages
-import DashboardPage from './pages/app/DashboardPage';
-import DashboardRedirect from './components/routing/DashboardRedirect';
+// App Pages - TradeOS V2 Operating System
+import CommandCenterPage from './pages/app/CommandCenterPage';
 import ProjectsPage from './pages/app/ProjectsPage';
 import ProjectDetailPage from './pages/app/ProjectDetailPage';
 import EstimatingPage from './pages/app/EstimatingPage';
@@ -35,23 +34,29 @@ import DocumentsPage from './pages/app/DocumentsPage';
 import TaxSummaryPage from './pages/app/TaxSummaryPage';
 import IntegrationsPage from './pages/app/IntegrationsPage';
 import ReceivablesPage from './pages/app/ReceivablesPage';
-import MainframePage from './pages/app/MainframePage';
-import CommandCenterPage from './pages/app/CommandCenterPage';
 
-// Opportunities (Vertical Slice 1)
+// Opportunities (V2 Workspace)
 import OpportunitiesPage from './pages/app/opportunities/OpportunitiesPage';
 import OpportunityWorkspace from './pages/app/opportunities/OpportunityWorkspaceV2';
 
 // Layout
 import AppLayout from './components/layout/AppLayout';
 
+/**
+ * ProtectedRoute - Authentication Guard
+ * 
+ * TradeOS V2 Architecture:
+ * - All authenticated users enter the same application
+ * - No conditional routing based on organization membership
+ * - Onboarding happens INSIDE the application, not through separate pages
+ */
 const ProtectedRoute = ({ children }) => {
   const { user, profile, loading, initialized } = useAuthStore();
 
   if (!initialized || loading) {
     return (
-      <div className="min-h-screen bg-charcoal-900 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-steel-500"></div>
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
       </div>
     );
   }
@@ -120,36 +125,58 @@ function App() {
           <Route path="/activate" element={<ActivateBusinessFlow />} />
           <Route path="/auth/google/callback" element={<GoogleAuthCallback />} />
           
-          {/* App Routes - Core Business Functions */}
+          {/* 
+            TradeOS V2 Operating System
+            ============================
+            All authenticated users enter the same application.
+            Command Center is the universal entry point.
+            The application adapts to user data, not user type.
+          */}
           <Route path="/app" element={
             <ProtectedRoute>
               <AppLayout />
             </ProtectedRoute>
           }>
-            <Route index element={<DashboardRedirect />} />
-            <Route path="dashboard" element={<DashboardPage />} />
+            {/* Command Center - Universal Entry Point */}
+            <Route index element={<Navigate to="/app/command-center" replace />} />
+            <Route path="command-center" element={<CommandCenterPage />} />
             
-            {/* Opportunities - Vertical Slice 1 */}
+            {/* Opportunities - V2 Workspace */}
             <Route path="opportunities" element={<OpportunitiesPage />} />
             <Route path="opportunities/:id" element={<OpportunityWorkspace />} />
             
+            {/* Projects */}
             <Route path="projects" element={<ProjectsPage />} />
             <Route path="projects/:id" element={<ProjectDetailPage />} />
+            
+            {/* Estimating */}
             <Route path="estimating" element={<EstimatingPage />} />
             <Route path="estimating/:id" element={<EstimatingPage />} />
-            <Route path="change-orders" element={<ChangeOrdersPage />} />
-            <Route path="milestones" element={<MilestonesPage />} />
+            
+            {/* Financial */}
             <Route path="invoices" element={<InvoicesPage />} />
             <Route path="receivables" element={<ReceivablesPage />} />
+            <Route path="milestones" element={<MilestonesPage />} />
+            <Route path="change-orders" element={<ChangeOrdersPage />} />
+            
+            {/* Expenses */}
             <Route path="expenses" element={<ExpensesPage />} />
-            <Route path="documents" element={<DocumentsPage />} />
             <Route path="tax-summary" element={<TaxSummaryPage />} />
+            
+            {/* Documents */}
+            <Route path="documents" element={<DocumentsPage />} />
+            
+            {/* Reports */}
             <Route path="reports" element={<ReportsPage />} />
+            
+            {/* System */}
             <Route path="integrations" element={<IntegrationsPage />} />
             <Route path="settings" element={<SettingsPage />} />
             <Route path="profile" element={<ProfilePage />} />
-            <Route path="mainframe" element={<MainframePage />} />
-            <Route path="command-center" element={<CommandCenterPage />} />
+            
+            {/* Legacy route redirects - these existed before, redirect to Command Center */}
+            <Route path="dashboard" element={<Navigate to="/app/command-center" replace />} />
+            <Route path="mainframe" element={<Navigate to="/app/command-center" replace />} />
           </Route>
 
           {/* Catch all - redirect to home */}

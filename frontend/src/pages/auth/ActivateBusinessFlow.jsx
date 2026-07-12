@@ -353,7 +353,7 @@ const ActivateBusinessFlow = () => {
       }
     }
     
-    // Navigate to /app - DashboardRedirect will determine the correct landing page
+    // Navigate to /app - Command Center is the universal entry point
     navigate('/app');
   };
 
