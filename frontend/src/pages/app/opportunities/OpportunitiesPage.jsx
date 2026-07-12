@@ -254,10 +254,15 @@ function CreateOpportunityModal({ isOpen, onClose, onCreated, session }) {
               value={formData.name}
               onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
               placeholder="e.g., Downtown Office Tower - Finishing"
-              className="w-full px-4 py-3 bg-[#0a0a0a] border border-[#262626] rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-emerald-500/50"
+              className={`w-full px-4 py-3 bg-[#0a0a0a] border rounded-lg text-white placeholder-white/30 focus:outline-none ${
+                !formData.name.trim() ? 'border-amber-500/30' : 'border-[#262626] focus:border-emerald-500/50'
+              }`}
               autoFocus
               data-testid="input-opportunity-name"
             />
+            {!formData.name.trim() && (
+              <p className="mt-1.5 text-xs text-amber-400/70">Required to create opportunity</p>
+            )}
           </div>
 
           {/* Client Company */}
@@ -588,7 +593,7 @@ export default function OpportunitiesPage() {
               Database Migration Required
             </h2>
             <p className="text-white/50 mb-6 max-w-lg leading-relaxed">
-              The Opportunities module requires database tables that haven't been created yet.
+              The Opportunities module requires database tables that have not been created yet.
               Please run the migration script <code className="px-2 py-1 bg-white/10 rounded text-emerald-400 font-mono text-sm">014_opportunity_tender_foundation.sql</code> in your Supabase project.
             </p>
             <div className="flex items-center gap-3">

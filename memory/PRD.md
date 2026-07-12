@@ -282,6 +282,93 @@ The TradeOS V2 Foundation has been officially locked and stabilized.
 - Frontend shows actionable "Database Migration Required" message
 - Prevents silent failures when schema is not applied
 
+---
+
+## PHASE 4: VERTICAL SLICE #1 - FIRST COMPLETE TRADEOS WORKFLOW 🚧 IN PROGRESS (July 12, 2026)
+
+**Development Strategy Change:**
+> "Stop building around the workflow. Start building through the workflow."
+> Every sprint should complete ONE working workflow from beginning to end.
+> Not another framework. Not another shell. Not another placeholder.
+> A complete workflow.
+
+### Target Workflow:
+```
+Create Opportunity
+       ↓
+Open Estimate
+       ↓
+Browse Company Standards
+       ↓
+Select Standards
+       ↓
+Adjust Quantities
+       ↓
+Automatic Totals
+       ↓
+Company Brain Review
+       ↓
+Estimate Saved
+```
+
+### Architectural Rules (Phase 4):
+1. **Estimates NEVER exist independently** - Always tied to an Opportunity
+2. **Flat Area structure** (v1) - No Phases/Divisions yet
+3. **Combined Unit Pricing** - Single unit cost, no labor/material breakdown yet
+4. **No Proposal Generation** - Focus strictly on estimating workflow (Phase 5)
+5. **Company Brain as Senior Estimator** - Mock intelligent review insights
+
+### Components Built:
+
+**1. Create Opportunity Modal** ✅ COMPLETE
+- File: `/app/frontend/src/pages/app/opportunities/OpportunitiesPage.jsx`
+- Working form with: Name, Client/Builder, City, Estimated Value, Project Type
+- Proper validation with "Required" hint for empty name
+- Creates opportunity and navigates to workspace
+
+**2. Estimate Builder (3-Panel Layout)** ✅ COMPLETE
+- File: `/app/frontend/src/components/estimate/EstimateBuilder.jsx`
+- Left Panel: Company Standards Browser (search, domain filter, add to estimate)
+- Center Panel: Estimate with line items (quantity adjust, totals)
+- Right Panel: Company Brain Review (mock insights)
+- Summary Footer: Subtotal, Markup, Tax, Total with Save button
+
+**3. EstimateTab Integration** ✅ COMPLETE
+- File: `/app/frontend/src/components/workspace/tabs/PlaceholderTabs.jsx`
+- EstimateTab now renders real EstimateBuilder (not placeholder)
+- Session properly tracked in authStore
+
+**4. Graceful Migration Error Handling** ✅ COMPLETE
+- Opportunities page detects missing database tables
+- Shows "Database Migration Required" with migration file reference
+- Create Opportunity modal shows clear migration error message
+
+### ⚠️ BLOCKER: Database Migration Required
+The Vertical Slice #1 code is complete, but requires database tables to be created:
+
+```
+Required Migration Files:
+1. /app/migrations/014_opportunity_tender_foundation.sql (Opportunities, Tenders, Tender Line Items)
+2. /app/migrations/015_production_library_foundation.sql (Production Library - Company Standards)
+
+Run in: Supabase SQL Editor (https://supabase.com/dashboard)
+```
+
+**Tables Created by Migration 014:**
+- `opportunities` - Parent workspace for estimates
+- `tenders` - Estimate versions (tied to opportunity)
+- `tender_sections` - Flat areas in estimate
+- `tender_line_items` - Line items with full cost structure
+- `opportunity_contacts`, `opportunity_documents`, `opportunity_communications`, `opportunity_site_notes`, `opportunity_rfis`, `opportunity_activity_log`
+
+### Next Steps After Migration:
+1. Run both migration files in Supabase SQL Editor
+2. Test full workflow: Create Opportunity → Open Estimate → Add Standards → Adjust Quantities → Save
+3. Verify Company Brain review insights appear
+4. Verify automatic totals calculate correctly
+
+---
+
 **Frontend Updated:**
 - `ProductionLibraryPage.jsx` now uses real API instead of localStorage
 - Full production item modal with all required fields
