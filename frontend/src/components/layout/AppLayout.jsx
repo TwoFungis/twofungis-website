@@ -23,7 +23,8 @@ import {
   Link2,
   DollarSign,
   Shield,
-  Brain
+  Brain,
+  Target
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { supabase } from '../../lib/supabase';
@@ -122,6 +123,7 @@ const AppLayout = () => {
   // TFCS Mainframe Navigation (when user has access)
   const tfcsNavItems = [
     { path: '/app/mainframe', icon: LayoutDashboard, label: 'Dashboard' },
+    { path: '/app/opportunities', icon: Target, label: 'Opportunities' },
     { path: '/app/projects', icon: FolderKanban, label: 'Projects' },
     { path: '/app/estimating', icon: Calculator, label: 'Estimates' },
     { path: '/app/invoices', icon: Receipt, label: 'Invoices' },
@@ -134,6 +136,7 @@ const AppLayout = () => {
   // Standard TradeOS navigation (non-TFCS users)
   const navItems = [
     { path: '/app/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+    { path: '/app/opportunities', icon: Target, label: 'Opportunities' },
     { path: '/app/projects', icon: FolderKanban, label: 'Projects' },
     { path: '/app/estimating', icon: Calculator, label: 'Estimates' },
     { path: '/app/change-orders', icon: FileText, label: 'Change Orders' },

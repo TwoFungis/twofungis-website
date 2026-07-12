@@ -69,6 +69,17 @@ Build "TradeOS," an end-to-end operating system for Canadian contractors. The ap
 - ✅ Tenders API (`/app/backend/routes/tenders.py`)
 - ✅ Routes registered in server.py
 
+**Frontend Complete:**
+- ✅ OpportunitiesPage.jsx - Pipeline list view with stats, filters, grid/list toggle
+- ✅ OpportunityWorkspace.jsx - Main workspace container
+- ✅ WorkspaceHeader.jsx - Sticky header with stage badge, value, due date
+- ✅ WorkspaceNav.jsx - Horizontal tab navigation
+- ✅ OverviewTab.jsx - Command center answering "What needs my attention?"
+- ✅ TenderWorkspaceTab.jsx - Active estimating workspace
+- ✅ Placeholder tabs for future implementation
+- ✅ Routes added to App.js (/app/opportunities, /app/opportunities/:id)
+- ✅ Sidebar navigation updated with "Opportunities" link
+
 **Workflow Stages (not CRM stages):**
 ```
 DISCOVERED → QUALIFYING → TENDERING → SUBMITTED → NEGOTIATION → AWARDED → PROJECT
@@ -115,7 +126,8 @@ Category, Scope, Description, Quantity, Unit, Labor (hours, rate, burden), Mater
 - `POST /api/tenders/{id}/revise` - Create revision
 
 ⏳ **PENDING:** User runs `014_opportunity_tender_foundation.sql` in Supabase
-⏳ **PENDING:** Frontend Opportunity Workspace UI
+⏳ **PENDING:** New Opportunity create form/modal
+⏳ **PENDING:** Full implementation of remaining workspace tabs
 
 ---
 

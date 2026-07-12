@@ -36,6 +36,10 @@ import IntegrationsPage from './pages/app/IntegrationsPage';
 import ReceivablesPage from './pages/app/ReceivablesPage';
 import MainframePage from './pages/app/MainframePage';
 
+// Opportunities (Vertical Slice 1)
+import OpportunitiesPage from './pages/app/opportunities/OpportunitiesPage';
+import OpportunityWorkspace from './pages/app/opportunities/OpportunityWorkspace';
+
 // Layout
 import AppLayout from './components/layout/AppLayout';
 
@@ -121,6 +125,11 @@ function App() {
           }>
             <Route index element={<DashboardRedirect />} />
             <Route path="dashboard" element={<DashboardPage />} />
+            
+            {/* Opportunities - Vertical Slice 1 */}
+            <Route path="opportunities" element={<OpportunitiesPage />} />
+            <Route path="opportunities/:id" element={<OpportunityWorkspace />} />
+            
             <Route path="projects" element={<ProjectsPage />} />
             <Route path="projects/:id" element={<ProjectDetailPage />} />
             <Route path="estimating" element={<EstimatingPage />} />
