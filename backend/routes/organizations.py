@@ -112,28 +112,22 @@ async def verify_jwt_token(authorization: str) -> str:
         raise HTTPException(status_code=401, detail="Authentication failed")
 
 async def is_platform_admin(user_id: str) -> bool:
-    """Check if user is a platform administrator"""
+    """Check if user is a platform administrator (system-level, not org-based)"""
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/organization_members?"
+                f"{SUPABASE_URL}/rest/v1/platform_admins?"
                 f"user_id=eq.{user_id}&"
-                f"role=eq.platform_admin&"
                 f"is_active=eq.true&"
-                f"select=id,organization_id,organizations!inner(is_platform)",
+                f"select=id,role",
                 headers=await get_service_headers()
             )
             
             if response.status_code != 200:
                 return False
             
-            members = response.json()
-            # Check if any membership is for a platform organization
-            for member in members:
-                org = member.get('organizations', {})
-                if org.get('is_platform'):
-                    return True
-            return False
+            admins = response.json()
+            return len(admins) > 0
     except Exception as e:
         logger.error(f"Error checking platform admin: {e}")
         return False
@@ -188,19 +182,40 @@ async def get_my_organizations(authorization: str = Header(...)):
     Get all organizations the current user belongs to.
     This powers the Workspace Switcher.
     
-    Returns organizations sorted with primary first, then by name.
+    Returns:
+    - organizations: List of companies the user belongs to
+    - is_platform_admin: Whether user has platform-level access (separate from orgs)
+    - primary_organization_id: User's default workspace
     """
     user_id = await verify_jwt_token(authorization)
     
     try:
         async with httpx.AsyncClient() as client:
-            # Get all memberships with organization details
+            # Check platform admin status (system-level, separate from orgs)
+            platform_admin = await is_platform_admin(user_id)
+            
+            # Get platform role if admin
+            platform_role = None
+            if platform_admin:
+                platform_response = await client.get(
+                    f"{SUPABASE_URL}/rest/v1/platform_admins?"
+                    f"user_id=eq.{user_id}&"
+                    f"is_active=eq.true&"
+                    f"select=role",
+                    headers=await get_service_headers()
+                )
+                if platform_response.status_code == 200:
+                    platform_data = platform_response.json()
+                    if platform_data:
+                        platform_role = platform_data[0].get('role')
+            
+            # Get all organization memberships
             response = await client.get(
                 f"{SUPABASE_URL}/rest/v1/organization_members?"
                 f"user_id=eq.{user_id}&"
                 f"is_active=eq.true&"
                 f"select=id,role,is_primary,organization_id,"
-                f"organizations(id,name,slug,is_platform,subscription_tier),"
+                f"organizations(id,name,slug,subscription_tier),"
                 f"organization_settings:organization_id(logo_url)",
                 headers=await get_service_headers()
             )
@@ -212,18 +227,13 @@ async def get_my_organizations(authorization: str = Header(...)):
                         "success": True,
                         "organizations": [],
                         "primary_organization_id": None,
+                        "is_platform_admin": False,
+                        "platform_role": None,
                         "message": "Organization tables not yet initialized"
                     }
                 raise HTTPException(status_code=500, detail="Failed to fetch organizations")
             
             memberships = response.json()
-            
-            if not memberships:
-                return {
-                    "success": True,
-                    "organizations": [],
-                    "primary_organization_id": None
-                }
             
             # Transform to response format
             organizations = []
@@ -242,7 +252,6 @@ async def get_my_organizations(authorization: str = Header(...)):
                     "slug": org.get('slug'),
                     "role": membership.get('role'),
                     "is_primary": membership.get('is_primary', False),
-                    "is_platform": org.get('is_platform', False),
                     "subscription_tier": org.get('subscription_tier'),
                     "logo_url": settings.get('logo_url') if isinstance(settings, dict) else None
                 }
@@ -252,28 +261,23 @@ async def get_my_organizations(authorization: str = Header(...)):
                 if membership.get('is_primary'):
                     primary_org_id = org.get('id')
             
-            # Sort: primary first, then platforms, then by name
+            # Sort: primary first, then alphabetical
             organizations.sort(key=lambda x: (
-                not x.get('is_primary', False),  # Primary first
-                not x.get('is_platform', False),  # Then platforms
-                x.get('name', '').lower()  # Then alphabetical
+                not x.get('is_primary', False),
+                x.get('name', '').lower()
             ))
             
-            # If no primary set, use the first non-platform org
+            # If no primary set, use the first org
             if not primary_org_id and organizations:
-                for org in organizations:
-                    if not org.get('is_platform'):
-                        primary_org_id = org['id']
-                        break
-                # If all are platform orgs, use first one
-                if not primary_org_id:
-                    primary_org_id = organizations[0]['id']
+                primary_org_id = organizations[0]['id']
             
             return {
                 "success": True,
                 "organizations": organizations,
                 "primary_organization_id": primary_org_id,
-                "count": len(organizations)
+                "count": len(organizations),
+                "is_platform_admin": platform_admin,
+                "platform_role": platform_role
             }
             
     except HTTPException:

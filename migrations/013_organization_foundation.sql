@@ -1,21 +1,19 @@
 -- =====================================================
--- TRADEOS PHASE 1A - Organization Foundation
--- Version: 1.0.0
+-- TRADEOS PHASE 1A - Organization Foundation (Revised)
+-- Version: 1.1.0
 -- Date: July 12, 2026
 -- =====================================================
 --
--- This migration establishes the multi-tenant organization layer.
--- It is ADDITIVE and maintains backward compatibility with existing TFCS tables.
+-- REVISION NOTES (v1.1.0):
+-- - Removed "TradeOS Platform" as an organization
+-- - Platform administration is now a separate system context
+-- - Added platform_admins table for platform-level roles
+-- - Updated Province to British Columbia
+-- - Updated Timezone to America/Vancouver
 --
--- WHAT THIS CREATES:
--- 1. organizations - Company/tenant records
--- 2. organization_members - User-to-organization relationships with roles
--- 3. organization_settings - Per-organization configuration (branding, etc.)
---
--- COMPATIBILITY:
--- - Existing tfcs_user_roles table remains functional
--- - Existing application continues to work
--- - New organization tables operate alongside existing system
+-- ARCHITECTURAL PRINCIPLE:
+-- Platform exists ABOVE organizations, not alongside them.
+-- Organizations are tenant companies. Platform is the system itself.
 --
 -- =====================================================
 
@@ -28,7 +26,7 @@ CREATE TABLE IF NOT EXISTS organizations (
     
     -- Basic Info
     name TEXT NOT NULL,
-    slug TEXT UNIQUE,  -- URL-friendly identifier (optional, not used in URLs per Constitution)
+    slug TEXT UNIQUE,
     
     -- Business Details
     primary_trade TEXT,
@@ -48,13 +46,12 @@ CREATE TABLE IF NOT EXISTS organizations (
     postal_code TEXT,
     
     -- Subscription
-    subscription_tier TEXT DEFAULT 'free',  -- free, pro, elite, lifetime, enterprise
-    subscription_status TEXT DEFAULT 'active',  -- active, past_due, canceled, trialing
+    subscription_tier TEXT DEFAULT 'free',
+    subscription_status TEXT DEFAULT 'active',
     stripe_customer_id TEXT,
     stripe_subscription_id TEXT,
     
-    -- Platform Flags
-    is_platform BOOLEAN DEFAULT false,  -- True only for TradeOS Platform org
+    -- Status
     is_active BOOLEAN DEFAULT true,
     
     -- Metadata
@@ -67,11 +64,6 @@ CREATE TABLE IF NOT EXISTS organizations (
 -- STEP 2: CREATE ORGANIZATION_MEMBERS TABLE
 -- =====================================================
 
--- Organization Roles (expanded from TFCS roles)
--- Platform Roles: platform_admin, platform_support
--- Company Roles: owner, admin, estimator, project_manager, foreman, office_admin, accounting, employee
--- External Roles: client, builder, subcontractor, architect, consultant, inspector
-
 CREATE TABLE IF NOT EXISTS organization_members (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     
@@ -79,7 +71,9 @@ CREATE TABLE IF NOT EXISTS organization_members (
     organization_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
     user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
     
-    -- Role
+    -- Role (company roles only, not platform roles)
+    -- Valid: owner, admin, estimator, project_manager, foreman, office_admin, accounting, employee
+    -- External: client, builder, subcontractor, architect, consultant, inspector
     role TEXT NOT NULL,
     
     -- User Display Info (cached for performance)
@@ -88,7 +82,7 @@ CREATE TABLE IF NOT EXISTS organization_members (
     
     -- Status
     is_active BOOLEAN DEFAULT true,
-    is_primary BOOLEAN DEFAULT false,  -- User's default/primary organization
+    is_primary BOOLEAN DEFAULT false,
     
     -- Assignment Tracking
     invited_by UUID REFERENCES auth.users(id),
@@ -118,8 +112,8 @@ CREATE TABLE IF NOT EXISTS organization_settings (
     
     -- Branding
     logo_url TEXT,
-    primary_color TEXT DEFAULT '#10b981',  -- Emerald green default
-    secondary_color TEXT DEFAULT '#0a0a0a',  -- Black default
+    primary_color TEXT DEFAULT '#10b981',
+    secondary_color TEXT DEFAULT '#0a0a0a',
     
     -- Document Branding
     letterhead_url TEXT,
@@ -128,13 +122,13 @@ CREATE TABLE IF NOT EXISTS organization_settings (
     email_signature TEXT,
     
     -- Business Defaults
-    default_tax_rate DECIMAL(5,2) DEFAULT 13.00,  -- Ontario HST
+    default_tax_rate DECIMAL(5,2) DEFAULT 12.00,  -- BC PST+GST
     default_markup_percent DECIMAL(5,2) DEFAULT 25.00,
     default_overhead_percent DECIMAL(5,2) DEFAULT 10.00,
     default_contingency_percent DECIMAL(5,2) DEFAULT 5.00,
     
     -- Preferences
-    timezone TEXT DEFAULT 'America/Toronto',
+    timezone TEXT DEFAULT 'America/Vancouver',
     currency TEXT DEFAULT 'CAD',
     date_format TEXT DEFAULT 'YYYY-MM-DD',
     
@@ -147,7 +141,41 @@ CREATE TABLE IF NOT EXISTS organization_settings (
 );
 
 -- =====================================================
--- STEP 4: CREATE INDEXES
+-- STEP 4: CREATE PLATFORM_ADMINS TABLE
+-- =====================================================
+-- Platform administration is a SYSTEM context, not an organization.
+-- This table tracks users with platform-level access.
+
+CREATE TABLE IF NOT EXISTS platform_admins (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    
+    -- User
+    user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE UNIQUE,
+    
+    -- Role: platform_admin, platform_support, platform_developer
+    role TEXT NOT NULL DEFAULT 'platform_admin',
+    
+    -- User Info (cached)
+    user_email TEXT,
+    user_name TEXT,
+    
+    -- Status
+    is_active BOOLEAN DEFAULT true,
+    
+    -- Audit
+    granted_by UUID REFERENCES auth.users(id),
+    granted_at TIMESTAMPTZ DEFAULT NOW(),
+    revoked_at TIMESTAMPTZ,
+    revoked_by UUID REFERENCES auth.users(id),
+    
+    -- Metadata
+    notes TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- =====================================================
+-- STEP 5: CREATE INDEXES
 -- =====================================================
 
 CREATE INDEX IF NOT EXISTS idx_organizations_slug ON organizations(slug) WHERE slug IS NOT NULL;
@@ -163,17 +191,39 @@ CREATE INDEX IF NOT EXISTS idx_org_members_org_user ON organization_members(orga
 
 CREATE INDEX IF NOT EXISTS idx_org_settings_org_id ON organization_settings(organization_id);
 
+CREATE INDEX IF NOT EXISTS idx_platform_admins_user_id ON platform_admins(user_id);
+CREATE INDEX IF NOT EXISTS idx_platform_admins_active ON platform_admins(is_active) WHERE is_active = true;
+
 -- =====================================================
--- STEP 5: ENABLE ROW LEVEL SECURITY
+-- STEP 6: ENABLE ROW LEVEL SECURITY
 -- =====================================================
 
 ALTER TABLE organizations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE organization_members ENABLE ROW LEVEL SECURITY;
 ALTER TABLE organization_settings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE platform_admins ENABLE ROW LEVEL SECURITY;
 
 -- =====================================================
--- STEP 6: CREATE HELPER FUNCTIONS
+-- STEP 7: CREATE HELPER FUNCTIONS
 -- =====================================================
+
+-- Check if user is platform admin (simplified - no org join needed)
+DROP FUNCTION IF EXISTS is_platform_admin(UUID);
+CREATE OR REPLACE FUNCTION is_platform_admin(check_user_id UUID)
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+SECURITY DEFINER
+STABLE
+AS $$
+BEGIN
+    RETURN EXISTS (
+        SELECT 1 
+        FROM platform_admins 
+        WHERE user_id = check_user_id 
+        AND is_active = true
+    );
+END;
+$$;
 
 -- Get user's organization IDs
 DROP FUNCTION IF EXISTS get_user_organization_ids(UUID);
@@ -233,27 +283,6 @@ BEGIN
 END;
 $$;
 
--- Check if user has platform admin role
-DROP FUNCTION IF EXISTS is_platform_admin(UUID);
-CREATE OR REPLACE FUNCTION is_platform_admin(check_user_id UUID)
-RETURNS BOOLEAN
-LANGUAGE plpgsql
-SECURITY DEFINER
-STABLE
-AS $$
-BEGIN
-    RETURN EXISTS (
-        SELECT 1 
-        FROM organization_members om
-        JOIN organizations o ON o.id = om.organization_id
-        WHERE om.user_id = check_user_id 
-        AND o.is_platform = true
-        AND om.role = 'platform_admin'
-        AND om.is_active = true
-    );
-END;
-$$;
-
 -- Get user's primary organization
 DROP FUNCTION IF EXISTS get_primary_organization(UUID);
 CREATE OR REPLACE FUNCTION get_primary_organization(check_user_id UUID)
@@ -265,7 +294,6 @@ AS $$
 DECLARE
     primary_org_id UUID;
 BEGIN
-    -- First try to get explicitly marked primary
     SELECT organization_id INTO primary_org_id
     FROM organization_members
     WHERE user_id = check_user_id
@@ -273,7 +301,6 @@ BEGIN
     AND is_active = true
     LIMIT 1;
     
-    -- If no primary marked, return most recently active
     IF primary_org_id IS NULL THEN
         SELECT organization_id INTO primary_org_id
         FROM organization_members
@@ -287,8 +314,28 @@ BEGIN
 END;
 $$;
 
+-- Get user's platform role (if any)
+DROP FUNCTION IF EXISTS get_platform_role(UUID);
+CREATE OR REPLACE FUNCTION get_platform_role(check_user_id UUID)
+RETURNS TEXT
+LANGUAGE plpgsql
+SECURITY DEFINER
+STABLE
+AS $$
+DECLARE
+    admin_role TEXT;
+BEGIN
+    SELECT role INTO admin_role
+    FROM platform_admins
+    WHERE user_id = check_user_id
+    AND is_active = true
+    LIMIT 1;
+    RETURN admin_role;
+END;
+$$;
+
 -- =====================================================
--- STEP 7: CREATE RLS POLICIES
+-- STEP 8: CREATE RLS POLICIES
 -- =====================================================
 
 -- Organizations: Members can view their organizations, platform admins see all
@@ -327,40 +374,42 @@ DROP POLICY IF EXISTS "Service role full access to org settings" ON organization
 CREATE POLICY "Service role full access to org settings" ON organization_settings
     FOR ALL USING (true) WITH CHECK (true);
 
+-- Platform Admins: Only platform admins can view this table
+DROP POLICY IF EXISTS "Platform admins view platform_admins" ON platform_admins;
+CREATE POLICY "Platform admins view platform_admins" ON platform_admins
+    FOR SELECT USING (
+        is_platform_admin(auth.uid())
+        OR user_id = auth.uid()  -- Users can see their own platform status
+    );
+
+DROP POLICY IF EXISTS "Service role full access to platform_admins" ON platform_admins;
+CREATE POLICY "Service role full access to platform_admins" ON platform_admins
+    FOR ALL USING (true) WITH CHECK (true);
+
 -- =====================================================
--- STEP 8: GRANTS
+-- STEP 9: GRANTS
 -- =====================================================
 
 GRANT ALL ON organizations TO service_role;
 GRANT ALL ON organization_members TO service_role;
 GRANT ALL ON organization_settings TO service_role;
+GRANT ALL ON platform_admins TO service_role;
 
 GRANT SELECT ON organizations TO authenticated;
 GRANT SELECT ON organization_members TO authenticated;
 GRANT SELECT ON organization_settings TO authenticated;
+GRANT SELECT ON platform_admins TO authenticated;
 
+GRANT EXECUTE ON FUNCTION is_platform_admin TO authenticated;
 GRANT EXECUTE ON FUNCTION get_user_organization_ids TO authenticated;
 GRANT EXECUTE ON FUNCTION is_org_member TO authenticated;
 GRANT EXECUTE ON FUNCTION get_org_role TO authenticated;
-GRANT EXECUTE ON FUNCTION is_platform_admin TO authenticated;
 GRANT EXECUTE ON FUNCTION get_primary_organization TO authenticated;
+GRANT EXECUTE ON FUNCTION get_platform_role TO authenticated;
 
 -- =====================================================
--- STEP 9: SEED INITIAL DATA
+-- STEP 10: SEED INITIAL DATA
 -- =====================================================
-
--- Create TradeOS Platform organization (for platform administration)
-INSERT INTO organizations (id, name, slug, is_platform, subscription_tier, subscription_status, created_at)
-VALUES (
-    'a0000000-0000-0000-0000-000000000001',
-    'TradeOS Platform',
-    'tradeos-platform',
-    true,
-    'enterprise',
-    'active',
-    NOW()
-)
-ON CONFLICT (slug) DO NOTHING;
 
 -- Create Two Fungis Finishing organization
 INSERT INTO organizations (id, name, slug, primary_trade, province, country, subscription_tier, subscription_status, created_at)
@@ -369,7 +418,7 @@ VALUES (
     'Two Fungis Finishing',
     'two-fungis',
     'Finishing',
-    'Ontario',
+    'British Columbia',
     'CA',
     'founding_lifetime',
     'active',
@@ -378,49 +427,58 @@ VALUES (
 ON CONFLICT (slug) DO NOTHING;
 
 -- Create settings for Two Fungis
-INSERT INTO organization_settings (organization_id, primary_color, secondary_color, timezone, currency)
+INSERT INTO organization_settings (organization_id, primary_color, secondary_color, default_tax_rate, timezone, currency)
 VALUES (
     'a0000000-0000-0000-0000-000000000002',
-    '#10b981',  -- Emerald green
-    '#0a0a0a',  -- Black
-    'America/Toronto',
+    '#10b981',
+    '#0a0a0a',
+    12.00,  -- BC PST+GST
+    'America/Vancouver',
     'CAD'
 )
 ON CONFLICT (organization_id) DO NOTHING;
 
 -- =====================================================
--- STEP 10: VERIFICATION
+-- STEP 11: VERIFICATION
 -- =====================================================
 
 DO $$
 DECLARE
-    platform_org_exists BOOLEAN;
     twofungis_org_exists BOOLEAN;
+    tables_created INTEGER;
 BEGIN
-    SELECT EXISTS(SELECT 1 FROM organizations WHERE slug = 'tradeos-platform') INTO platform_org_exists;
     SELECT EXISTS(SELECT 1 FROM organizations WHERE slug = 'two-fungis') INTO twofungis_org_exists;
+    SELECT COUNT(*) INTO tables_created FROM information_schema.tables 
+    WHERE table_schema = 'public' 
+    AND table_name IN ('organizations', 'organization_members', 'organization_settings', 'platform_admins');
     
     RAISE NOTICE '========================================';
     RAISE NOTICE 'TRADEOS PHASE 1A - Organization Foundation Complete';
+    RAISE NOTICE 'Version: 1.1.0 (Revised Architecture)';
     RAISE NOTICE '========================================';
-    RAISE NOTICE 'Tables Created: organizations, organization_members, organization_settings';
-    RAISE NOTICE 'Functions: get_user_organization_ids, is_org_member, get_org_role, is_platform_admin, get_primary_organization';
+    RAISE NOTICE 'Tables Created: % of 4', tables_created;
+    RAISE NOTICE '  - organizations';
+    RAISE NOTICE '  - organization_members';
+    RAISE NOTICE '  - organization_settings';
+    RAISE NOTICE '  - platform_admins';
     RAISE NOTICE '========================================';
-    RAISE NOTICE 'Platform Organization: %', CASE WHEN platform_org_exists THEN 'CREATED' ELSE 'MISSING' END;
     RAISE NOTICE 'Two Fungis Organization: %', CASE WHEN twofungis_org_exists THEN 'CREATED' ELSE 'MISSING' END;
+    RAISE NOTICE '  Province: British Columbia';
+    RAISE NOTICE '  Timezone: America/Vancouver';
+    RAISE NOTICE '========================================';
+    RAISE NOTICE 'ARCHITECTURE NOTE:';
+    RAISE NOTICE 'Platform exists ABOVE organizations as a system context.';
+    RAISE NOTICE 'Platform admins are tracked in platform_admins table.';
     RAISE NOTICE '========================================';
     RAISE NOTICE 'NEXT STEPS:';
-    RAISE NOTICE '1. Run assign_scott_marshall_roles() to set up dual identity';
-    RAISE NOTICE '2. The existing TFCS system remains functional';
-    RAISE NOTICE '3. New organization-based features will use these tables';
+    RAISE NOTICE '1. Run assign_scott_marshall_roles() to set up roles';
+    RAISE NOTICE '2. Existing TFCS system remains functional';
     RAISE NOTICE '========================================';
 END $$;
 
 -- =====================================================
--- STEP 11: USER ASSIGNMENT FUNCTION
+-- STEP 12: USER ASSIGNMENT FUNCTION
 -- =====================================================
--- This function assigns Scott Marshall to both organizations
--- Run this AFTER confirming his user_id exists in auth.users
 
 DROP FUNCTION IF EXISTS assign_scott_marshall_roles();
 CREATE OR REPLACE FUNCTION assign_scott_marshall_roles()
@@ -430,8 +488,8 @@ SECURITY DEFINER
 AS $$
 DECLARE
     scott_user_id UUID;
-    platform_org_id UUID := 'a0000000-0000-0000-0000-000000000001';
     twofungis_org_id UUID := 'a0000000-0000-0000-0000-000000000002';
+    result_message TEXT := '';
 BEGIN
     -- Find Scott's user ID by email
     SELECT id INTO scott_user_id
@@ -443,28 +501,30 @@ BEGIN
         RETURN 'ERROR: User inbox@twofungis.ca not found. Please ensure the user has logged in at least once.';
     END IF;
     
-    -- Assign Platform Administrator role
-    INSERT INTO organization_members (
-        organization_id, user_id, role, user_email, user_name, 
-        is_active, is_primary, accepted_at, created_at
+    -- 1. Assign Platform Administrator role (system-level)
+    INSERT INTO platform_admins (
+        user_id, role, user_email, user_name,
+        is_active, granted_at, created_at
     )
     VALUES (
-        platform_org_id, scott_user_id, 'platform_admin', 'inbox@twofungis.ca', 'Scott Marshall',
-        true, false, NOW(), NOW()
+        scott_user_id, 'platform_admin', 'inbox@twofungis.ca', 'Scott Marshall',
+        true, NOW(), NOW()
     )
-    ON CONFLICT (organization_id, user_id) DO UPDATE SET
+    ON CONFLICT (user_id) DO UPDATE SET
         role = 'platform_admin',
         is_active = true,
         updated_at = NOW();
     
-    -- Assign Company Owner role (this is the PRIMARY workspace)
+    result_message := result_message || 'Platform Admin: ASSIGNED' || chr(10);
+    
+    -- 2. Assign Company Owner role for Two Fungis
     INSERT INTO organization_members (
         organization_id, user_id, role, user_email, user_name,
         is_active, is_primary, accepted_at, created_at
     )
     VALUES (
         twofungis_org_id, scott_user_id, 'owner', 'inbox@twofungis.ca', 'Scott Marshall',
-        true, true, NOW(), NOW()  -- is_primary = true (default workspace)
+        true, true, NOW(), NOW()
     )
     ON CONFLICT (organization_id, user_id) DO UPDATE SET
         role = 'owner',
@@ -472,11 +532,19 @@ BEGIN
         is_primary = true,
         updated_at = NOW();
     
-    RETURN 'SUCCESS: Scott Marshall assigned as Platform Admin and Two Fungis Owner. Primary workspace: Two Fungis.';
+    result_message := result_message || 'Two Fungis Owner: ASSIGNED (Primary Workspace)' || chr(10);
+    
+    RETURN 'SUCCESS:' || chr(10) || result_message || chr(10) || 
+           'Scott Marshall now has:' || chr(10) ||
+           '  - Platform Administrator access (system-level)' || chr(10) ||
+           '  - Company Owner role at Two Fungis Finishing (primary workspace)';
 END;
 $$;
 
 GRANT EXECUTE ON FUNCTION assign_scott_marshall_roles TO service_role;
 
--- Output verification
-SELECT 'Phase 1A Migration completed successfully!' as status;
+-- =====================================================
+-- OUTPUT
+-- =====================================================
+
+SELECT 'Phase 1A Migration (v1.1.0) completed successfully!' as status;

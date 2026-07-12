@@ -19,6 +19,8 @@ export const OrganizationProvider = ({ children }) => {
   const [organizations, setOrganizations] = useState([]);
   const [currentOrg, setCurrentOrg] = useState(null);
   const [currentRole, setCurrentRole] = useState(null);
+  const [isPlatformAdmin, setIsPlatformAdmin] = useState(false);
+  const [platformRole, setPlatformRole] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -55,6 +57,10 @@ export const OrganizationProvider = ({ children }) => {
       const data = await response.json();
       const orgs = data.organizations || [];
       setOrganizations(orgs);
+      
+      // Platform admin is separate from organizations
+      setIsPlatformAdmin(data.is_platform_admin || false);
+      setPlatformRole(data.platform_role || null);
 
       // Determine current organization
       const savedOrgId = localStorage.getItem('tradeos_current_org');
@@ -62,7 +68,6 @@ export const OrganizationProvider = ({ children }) => {
 
       const current = orgs.find(o => o.id === savedOrgId)
                     || orgs.find(o => o.id === primaryOrgId)
-                    || orgs.find(o => !o.is_platform)  // Prefer non-platform
                     || orgs[0];
 
       if (current) {
@@ -133,7 +138,6 @@ export const OrganizationProvider = ({ children }) => {
   }, [fetchOrganizations]);
 
   // Utility checks
-  const isPlatformAdmin = currentOrg?.is_platform && currentRole === 'platform_admin';
   const isOwner = currentRole === 'owner';
   const isAdmin = currentRole === 'admin' || currentRole === 'owner';
   const hasMultipleOrgs = organizations.length > 1;
@@ -143,6 +147,8 @@ export const OrganizationProvider = ({ children }) => {
     organizations,
     currentOrg,
     currentRole,
+    isPlatformAdmin,  // System-level admin, separate from orgs
+    platformRole,
     loading,
     error,
     
@@ -151,7 +157,6 @@ export const OrganizationProvider = ({ children }) => {
     refreshOrganizations,
     
     // Utilities
-    isPlatformAdmin,
     isOwner,
     isAdmin,
     hasMultipleOrgs,
