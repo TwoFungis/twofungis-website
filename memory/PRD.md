@@ -13,7 +13,7 @@ Build "TradeOS," an end-to-end operating system for Canadian contractors. The ap
 - Contractor Marketplace
 - Team Management
 - Business Intelligence
-- **TFCS Mainframe** - Enterprise command center for multi-project operations ✅ COMPLETE
+- **Command Center** - Enterprise command center for multi-project operations ✅ COMPLETE
 
 ## Brand Identity (Updated July 12, 2026)
 - **Positioning:** "The Operating System for Canadian Contractors"
@@ -24,6 +24,42 @@ Build "TradeOS," an end-to-end operating system for Canadian contractors. The ap
 ---
 
 ## PHASE 2 ARCHITECTURE (July 12, 2026)
+
+### TradeOS Operating System Transition ✅ COMPLETE (July 12, 2026)
+**Complete architectural transition from legacy TFCS Mainframe to TradeOS OS**
+
+**Phase 1: Legacy Authorization Removal** ✅
+- Removed all `tfcs_user_roles` dependency from frontend routing
+- Created new `/api/workspace/context` endpoint for organization-based auth
+- Authorization now uses `organization_members` and `platform_admins` tables
+- Login redirects to `/app/command-center` (not `/app/mainframe`)
+- No more "Access Restricted" screens for organization members
+
+**Phase 2: Workflow Navigation** ✅
+- New sidebar with workflow-oriented navigation:
+  - Home (Command Center)
+  - Opportunities
+  - Projects
+  - Estimating
+  - Financial
+  - Expenses
+  - Documents
+  - Reports
+  - Integrations
+  - Settings
+- Dark theme with emerald green accents for workspace users
+
+**Phase 3: Download Experience** ✅
+- Landing page now has dual CTAs: "Get Started Free" + "Download App"
+- Download App triggers PWA install modal (no account required)
+- Available in both header navigation and hero section
+
+**Key Files Created/Modified:**
+- `/app/backend/routes/workspace.py` - New workspace context API
+- `/app/frontend/src/pages/app/CommandCenterPage.jsx` - New Command Center
+- `/app/frontend/src/components/routing/DashboardRedirect.jsx` - Updated routing
+- `/app/frontend/src/components/layout/AppLayout.jsx` - New navigation structure
+- `/app/frontend/src/pages/landing/LandingPage.jsx` - Download App CTAs
 
 ### Governing Documents
 | Document | Version | Purpose |
