@@ -83,6 +83,8 @@ The TradeOS V2 Foundation has been officially locked and stabilized.
 - All tables have RLS policies for multi-tenant isolation
 - Triggers for assembly totals and revision history
 
+**⚠️ MIGRATION REQUIRED:** User must run the migration SQL in their Supabase database before Production Library features will work.
+
 **Four-Level Hierarchy:**
 - Level 1: Knowledge Domain (Finish Carpentry, Doors & Hardware, etc.)
 - Level 2: Service Category (Residential, Commercial, etc.)
@@ -97,8 +99,53 @@ The TradeOS V2 Foundation has been officially locked and stabilized.
 - `/api/production-library/items/{id}/revisions` - Revision history
 - `/api/production-library/assemblies` - Assemblies CRUD
 - `/api/production-library/assemblies/{id}/items` - Assembly items management
-- `/api/production-library/import/items` - CSV import
+- `/api/production-library/seed` - Initialize library with default domains/categories
+- `/api/production-library/seed/status` - Check if library is initialized (with schema error detection)
+- `/api/production-library/import/template/download` - Get official TradeOS CSV template
+- `/api/production-library/import/validate` - Validate CSV before import
+- `/api/production-library/import/commit` - Commit validated import to database
 - `/api/production-library/stats` - Library statistics
+
+### Import Wizard v1.0 ✅ UI COMPLETE (July 12, 2026)
+**Premium onboarding experience for importing company knowledge into TradeOS**
+
+**Component:** `/app/frontend/src/components/production/ImportWizard.jsx`
+
+**Wizard Steps:**
+1. **Initialize Production Library** - Seed foundational data (domains, categories, units)
+2. **Download TradeOS CSV Template** - Official standardized import format
+3. **Upload CSV** - Drag & drop interface
+4. **Validate & Preview** - Pre-import validation with detailed error reporting
+5. **Import Summary** - Success confirmation with next action buttons
+
+**TradeOS CSV Template Columns:**
+| Column | Required | Description |
+|--------|----------|-------------|
+| Production Code | Yes | Unique identifier (max 50 chars) |
+| Production Name | Yes | Human-readable name (max 255 chars) |
+| Knowledge Domain | Yes | Must match existing domain |
+| Service Categories | No | Comma-separated list |
+| Measurement Unit | Yes | EA, LF, SF, LS, DAY, HR, SET, KIT, PAIR, COST |
+| Production Per Day | No | Units per 8-hour day |
+| Crew Size | No | Default: 1 |
+| Labour Hours | No | Hours per unit |
+| Standard Rate | No | Base pricing |
+| Premium Rate | No | Rush pricing |
+| Complex Rate | No | Complex conditions pricing |
+| Company Standard | No | true/false |
+| Notes | No | Additional specs |
+
+**Validation Features:**
+- Row-by-row validation before database write
+- Each error shows: Row Number, Column, Issue, Recommended Fix
+- Warnings for non-critical issues (still allow import)
+- Duplicate detection (both in-file and against existing database)
+- Rate hierarchy validation (premium > standard > complex)
+
+**Schema Error Handling:**
+- Backend detects missing tables (PGRST205 Supabase error)
+- Frontend shows actionable "Database Migration Required" message
+- Prevents silent failures when schema is not applied
 
 **Frontend Updated:**
 - `ProductionLibraryPage.jsx` now uses real API instead of localStorage
@@ -108,11 +155,16 @@ The TradeOS V2 Foundation has been officially locked and stabilized.
 - Pricing tiers (Standard, Premium, Complex)
 - Production standards (Per Day, Crew Size, Labour Hours)
 - Company Standard toggle
+- **Import tab now features the full Import Wizard v1.0**
 
 **Architecture Spec:**
 - Full specification at `/app/memory/PRODUCTION_LIBRARY_SPEC.md`
 
-**NOTE: Database migration must be run in Supabase to create the tables.**
+**⚠️ REQUIRED ACTION: Database migration must be run in Supabase to create the tables.**
+```
+File: /app/migrations/015_production_library_foundation.sql
+Run in: Supabase SQL Editor (https://supabase.com/dashboard)
+```
 
 ---
 

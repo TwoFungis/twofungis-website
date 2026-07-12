@@ -1696,6 +1696,14 @@ async def seed_production_library(
             existing_domain_codes = set()
             if existing_domains_resp.status_code == 200:
                 existing_domain_codes = {d['code'] for d in existing_domains_resp.json() if d.get('code')}
+            elif existing_domains_resp.status_code == 404:
+                # Table doesn't exist
+                error_body = existing_domains_resp.json() if existing_domains_resp.content else {}
+                if error_body.get('code') == 'PGRST205' or 'Could not find' in error_body.get('message', ''):
+                    raise HTTPException(
+                        status_code=500,
+                        detail="Production Library tables do not exist. Please run the database migration: /app/migrations/015_production_library_foundation.sql"
+                    )
             
             # Seed Knowledge Domains
             for domain in DEFAULT_KNOWLEDGE_DOMAINS:
@@ -1717,10 +1725,21 @@ async def seed_production_library(
                         results['knowledge_domains']['created'] += 1
                     elif resp.status_code == 409:
                         results['knowledge_domains']['existing'] += 1
+                    elif resp.status_code == 404:
+                        # Table doesn't exist
+                        error_body = resp.json() if resp.content else {}
+                        if error_body.get('code') == 'PGRST205' or 'Could not find' in error_body.get('message', ''):
+                            raise HTTPException(
+                                status_code=500,
+                                detail="Production Library tables do not exist. Please run the database migration: /app/migrations/015_production_library_foundation.sql"
+                            )
+                        results['knowledge_domains']['errors'].append(f"{domain['code']}: {resp.status_code}")
                     else:
                         results['knowledge_domains']['errors'].append(f"{domain['code']}: {resp.status_code}")
+                except HTTPException:
+                    raise
                 except Exception as e:
-                    results['knowledge_domains']['errors'].append(f"{domain['code']}: {str(e)}")
+                    results['knowledge_domains']['errors'].append(f"{domain['code']}: {str(e)})")
             
             # Check existing service categories
             existing_cats_resp = await client.get(
@@ -1752,10 +1771,33 @@ async def seed_production_library(
                         results['service_categories']['created'] += 1
                     elif resp.status_code == 409:
                         results['service_categories']['existing'] += 1
+                    elif resp.status_code == 404:
+                        # Table doesn't exist
+                        error_body = resp.json() if resp.content else {}
+                        if error_body.get('code') == 'PGRST205' or 'Could not find' in error_body.get('message', ''):
+                            raise HTTPException(
+                                status_code=500,
+                                detail="Production Library tables do not exist. Please run the migration: /app/migrations/015_production_library_foundation.sql"
+                            )
+                        results['service_categories']['errors'].append(f"{category['code']}: {resp.status_code}")
                     else:
                         results['service_categories']['errors'].append(f"{category['code']}: {resp.status_code}")
+                except HTTPException:
+                    raise
                 except Exception as e:
                     results['service_categories']['errors'].append(f"{category['code']}: {str(e)}")
+            
+            # Determine success based on actual results
+            total_created = results['knowledge_domains']['created'] + results['service_categories']['created']
+            total_existing = results['knowledge_domains']['existing'] + results['service_categories']['existing']
+            total_errors = len(results['knowledge_domains']['errors']) + len(results['service_categories']['errors'])
+            
+            # If nothing was created and nothing existed and we have errors, it's a failure
+            if total_created == 0 and total_existing == 0 and total_errors > 0:
+                raise HTTPException(
+                    status_code=500,
+                    detail=f"Failed to seed Production Library. Errors: {results['knowledge_domains']['errors'][:3] + results['service_categories']['errors'][:3]}"
+                )
             
             return {
                 "success": True,
@@ -1785,7 +1827,25 @@ async def get_seed_status(authorization: str = Header(...)):
                 f"organization_id=eq.{org_id}&select=id",
                 headers={**headers, "Prefer": "count=exact"}
             )
-            domains_count = int(domains_resp.headers.get('content-range', '0-0/0').split('/')[-1])
+            
+            # Check if tables exist (404 with PGRST205 means table doesn't exist)
+            if domains_resp.status_code == 404:
+                error_body = domains_resp.json() if domains_resp.content else {}
+                if error_body.get('code') == 'PGRST205' or 'Could not find' in error_body.get('message', ''):
+                    return {
+                        "success": False,
+                        "is_seeded": False,
+                        "schema_error": True,
+                        "error": "database_schema_missing",
+                        "message": "Production Library tables do not exist in the database. Please run the migration: /app/migrations/015_production_library_foundation.sql",
+                        "counts": {
+                            "knowledge_domains": 0,
+                            "service_categories": 0,
+                            "production_items": 0
+                        }
+                    }
+            
+            domains_count = int(domains_resp.headers.get('content-range', '0-0/0').split('/')[-1]) if domains_resp.status_code == 200 else 0
             
             # Check service categories
             cats_resp = await client.get(
@@ -1793,7 +1853,24 @@ async def get_seed_status(authorization: str = Header(...)):
                 f"organization_id=eq.{org_id}&select=id",
                 headers={**headers, "Prefer": "count=exact"}
             )
-            cats_count = int(cats_resp.headers.get('content-range', '0-0/0').split('/')[-1])
+            
+            if cats_resp.status_code == 404:
+                error_body = cats_resp.json() if cats_resp.content else {}
+                if error_body.get('code') == 'PGRST205' or 'Could not find' in error_body.get('message', ''):
+                    return {
+                        "success": False,
+                        "is_seeded": False,
+                        "schema_error": True,
+                        "error": "database_schema_missing",
+                        "message": "Production Library tables do not exist in the database. Please run the migration.",
+                        "counts": {
+                            "knowledge_domains": domains_count,
+                            "service_categories": 0,
+                            "production_items": 0
+                        }
+                    }
+            
+            cats_count = int(cats_resp.headers.get('content-range', '0-0/0').split('/')[-1]) if cats_resp.status_code == 200 else 0
             
             # Check production items
             items_resp = await client.get(
@@ -1801,7 +1878,24 @@ async def get_seed_status(authorization: str = Header(...)):
                 f"organization_id=eq.{org_id}&select=id",
                 headers={**headers, "Prefer": "count=exact"}
             )
-            items_count = int(items_resp.headers.get('content-range', '0-0/0').split('/')[-1])
+            
+            if items_resp.status_code == 404:
+                error_body = items_resp.json() if items_resp.content else {}
+                if error_body.get('code') == 'PGRST205' or 'Could not find' in error_body.get('message', ''):
+                    return {
+                        "success": False,
+                        "is_seeded": False,
+                        "schema_error": True,
+                        "error": "database_schema_missing",
+                        "message": "Production Library tables do not exist in the database. Please run the migration.",
+                        "counts": {
+                            "knowledge_domains": domains_count,
+                            "service_categories": cats_count,
+                            "production_items": 0
+                        }
+                    }
+            
+            items_count = int(items_resp.headers.get('content-range', '0-0/0').split('/')[-1]) if items_resp.status_code == 200 else 0
             
             is_seeded = domains_count > 0 and cats_count > 0
             

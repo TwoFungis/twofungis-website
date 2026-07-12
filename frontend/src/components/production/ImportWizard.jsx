@@ -90,6 +90,7 @@ const StepIndicator = ({ steps, currentStep }) => {
 // ============================================
 const InitializeStep = ({ seedStatus, onInitialize, initializing, onNext }) => {
   const isSeeded = seedStatus?.is_seeded;
+  const hasSchemaError = seedStatus?.schema_error;
   const counts = seedStatus?.counts || {};
   
   return (
@@ -105,7 +106,26 @@ const InitializeStep = ({ seedStatus, onInitialize, initializing, onNext }) => {
         </p>
       </div>
       
-      {isSeeded ? (
+      {hasSchemaError ? (
+        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-6 max-w-lg mx-auto">
+          <div className="flex items-start gap-4">
+            <AlertCircle className="w-6 h-6 text-red-400 flex-shrink-0 mt-0.5" />
+            <div>
+              <h3 className="font-semibold text-red-400 mb-2">Database Migration Required</h3>
+              <p className="text-sm text-zinc-400 mb-4">
+                The Production Library tables do not exist in your database. 
+                An administrator needs to run the database migration first.
+              </p>
+              <div className="bg-zinc-900/80 rounded-lg p-3 font-mono text-xs text-zinc-300">
+                /app/migrations/015_production_library_foundation.sql
+              </div>
+              <p className="text-xs text-zinc-500 mt-3">
+                Contact your system administrator to apply this migration to your Supabase database.
+              </p>
+            </div>
+          </div>
+        </div>
+      ) : isSeeded ? (
         <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-6 max-w-lg mx-auto">
           <div className="flex items-start gap-4">
             <CheckCircle2 className="w-6 h-6 text-emerald-400 flex-shrink-0 mt-0.5" />
@@ -155,7 +175,15 @@ const InitializeStep = ({ seedStatus, onInitialize, initializing, onNext }) => {
       )}
       
       <div className="flex justify-center gap-4">
-        {!isSeeded ? (
+        {hasSchemaError ? (
+          <button
+            disabled
+            className="bg-zinc-700 text-zinc-400 cursor-not-allowed font-semibold px-8 py-3 rounded-lg flex items-center gap-2"
+          >
+            <Database className="w-5 h-5" />
+            Migration Required
+          </button>
+        ) : !isSeeded ? (
           <button
             onClick={onInitialize}
             disabled={initializing}
@@ -838,27 +866,51 @@ const ImportWizard = ({ onComplete, onClose }) => {
       
       if (response.ok) {
         const data = await response.json();
-        toast.success('Production Library initialized successfully');
         
-        // Refresh status
+        // Refresh status to verify initialization succeeded
         const statusRes = await fetch(`${API_URL}/api/production-library/seed/status`, { headers });
         if (statusRes.ok) {
-          setSeedStatus(await statusRes.json());
-        }
-        
-        // Fetch template
-        const templateRes = await fetch(`${API_URL}/api/production-library/import/template/download`, { headers });
-        if (templateRes.ok) {
-          const templateData = await templateRes.json();
-          setTemplate(templateData.template);
+          const statusData = await statusRes.json();
+          setSeedStatus(statusData);
+          
+          // Verify initialization actually worked
+          if (statusData.schema_error) {
+            toast.error('Database migration required. Please contact your administrator.');
+            return;
+          }
+          
+          if (!statusData.is_seeded) {
+            toast.error('Initialization failed. The server reported success but no data was created. Please contact support.');
+            return;
+          }
+          
+          toast.success('Production Library initialized successfully');
+          
+          // Fetch template
+          const templateRes = await fetch(`${API_URL}/api/production-library/import/template/download`, { headers });
+          if (templateRes.ok) {
+            const templateData = await templateRes.json();
+            setTemplate(templateData.template);
+          }
         }
       } else {
         const error = await response.json();
-        toast.error(error.detail || 'Failed to initialize library');
+        
+        // Check for schema error
+        if (error.detail?.includes('tables do not exist') || error.detail?.includes('migration')) {
+          toast.error('Database migration required. Please run the migration file first.');
+          // Refresh status to show schema error UI
+          const statusRes = await fetch(`${API_URL}/api/production-library/seed/status`, { headers });
+          if (statusRes.ok) {
+            setSeedStatus(await statusRes.json());
+          }
+        } else {
+          toast.error(error.detail || 'Failed to initialize library');
+        }
       }
     } catch (error) {
       console.error('Error initializing:', error);
-      toast.error('Failed to initialize library');
+      toast.error('Failed to initialize library. Please try again.');
     } finally {
       setInitializing(false);
     }
