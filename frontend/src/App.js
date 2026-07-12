@@ -16,6 +16,7 @@ import LoginPage from './pages/auth/LoginPage';
 import SignUpPage from './pages/auth/SignUpPage';
 import OnboardingPage from './pages/auth/OnboardingPage';
 import ActivateBusinessFlow from './pages/auth/ActivateBusinessFlow';
+import GoogleAuthCallback from './pages/auth/GoogleAuthCallback';
 
 // App Pages
 import DashboardPage from './pages/app/DashboardPage';
@@ -117,6 +118,7 @@ function App() {
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/onboarding" element={<OnboardingPage />} />
           <Route path="/activate" element={<ActivateBusinessFlow />} />
+          <Route path="/auth/google/callback" element={<GoogleAuthCallback />} />
           
           {/* App Routes - Core Business Functions */}
           <Route path="/app" element={

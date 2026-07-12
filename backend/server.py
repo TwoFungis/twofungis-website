@@ -72,6 +72,12 @@ from routes.tenders import router as tenders_router
 # Import Workspace routes (TradeOS OS - replaces TFCS role checks)
 from routes.workspace import router as workspace_router
 
+# Import Google Auth routes (Emergent OAuth)
+from routes.google_auth import router as google_auth_router
+
+# Import Storage routes (Emergent Object Storage)
+from routes.storage import router as storage_router
+
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env', override=False)
 
@@ -232,6 +238,12 @@ app.include_router(tenders_router)
 
 # Include Workspace routes (TradeOS OS)
 app.include_router(workspace_router)
+
+# Include Google Auth routes (Emergent OAuth)
+app.include_router(google_auth_router)
+
+# Include Storage routes (Emergent Object Storage)
+app.include_router(storage_router)
 
 app.add_middleware(
     CORSMiddleware,

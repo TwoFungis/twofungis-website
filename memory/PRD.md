@@ -91,6 +91,20 @@ The TradeOS V2 Foundation has been officially locked and stabilized.
 - **Premium UX**: Minimal text, visual icons, no technical jargon
 - **Platform-aware**: Automatically detects iOS/Android/Desktop and shows appropriate flow
 
+**Phase 3.2: Google OAuth Integration** ✅ (July 12, 2026)
+- **Sign in with Google**: Button added to Login and SignUp pages
+- **Emergent OAuth**: Uses Emergent-managed Google authentication
+- **Session handling**: Backend exchanges session_id for user data
+- **User creation**: Automatically creates profile for new Google users
+- **Existing user linking**: Links Google account to existing email users
+
+**Phase 3.3: File & Media Storage Integration** ✅ (July 12, 2026)
+- **Emergent Object Storage**: File uploads using Emergent storage API
+- **Organization-scoped paths**: `tradeos/{org_id}/uploads/{category}/{uuid}.{ext}`
+- **File categories**: documents, drawings, photos, receipts, avatars, general
+- **50MB max file size**: Images, PDFs, documents, CAD files supported
+- **Supabase metadata**: File references stored in database with soft-delete support
+
 **Key Files Created/Modified:**
 - `/app/backend/routes/workspace.py` - New workspace context API
 - `/app/frontend/src/pages/app/CommandCenterPage.jsx` - New Command Center
