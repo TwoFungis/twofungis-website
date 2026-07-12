@@ -132,16 +132,17 @@ const EmptyState = ({ icon: Icon, title, description, actionLabel, onAction }) =
 // ============================================
 const ProductionLibraryTab = ({ items, loading, onAddItem, onEditItem }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [domainFilter, setDomainFilter] = useState('all');
   
-  const categories = [...new Set(items.map(i => i.category).filter(Boolean))];
+  const domains = [...new Set(items.map(i => i.knowledge_domains?.name).filter(Boolean))];
   
   const filteredItems = items.filter(item => {
     const matchesSearch = !searchQuery || 
-      item.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.production_code?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.production_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.description?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = categoryFilter === 'all' || item.category === categoryFilter;
-    return matchesSearch && matchesCategory;
+    const matchesDomain = domainFilter === 'all' || item.knowledge_domains?.name === domainFilter;
+    return matchesSearch && matchesDomain;
   });
   
   if (loading) {
@@ -180,14 +181,14 @@ const ProductionLibraryTab = ({ items, loading, onAddItem, onEditItem }) => {
           />
         </div>
         <select
-          value={categoryFilter}
-          onChange={(e) => setCategoryFilter(e.target.value)}
+          value={domainFilter}
+          onChange={(e) => setDomainFilter(e.target.value)}
           className="bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500/50"
-          data-testid="category-filter"
+          data-testid="domain-filter"
         >
-          <option value="all">All Categories</option>
-          {categories.map(cat => (
-            <option key={cat} value={cat}>{cat}</option>
+          <option value="all">All Domains</option>
+          {domains.map(d => (
+            <option key={d} value={d}>{d}</option>
           ))}
         </select>
         <button
@@ -211,9 +212,12 @@ const ProductionLibraryTab = ({ items, loading, onAddItem, onEditItem }) => {
           >
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center gap-2">
-                {item.category && (
+                <span className="text-xs font-mono bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded">
+                  {item.production_code}
+                </span>
+                {item.knowledge_domains?.name && (
                   <span className="text-xs bg-zinc-800 text-zinc-400 px-2 py-0.5 rounded">
-                    {item.category}
+                    {item.knowledge_domains.name}
                   </span>
                 )}
               </div>
@@ -224,26 +228,33 @@ const ProductionLibraryTab = ({ items, loading, onAddItem, onEditItem }) => {
                 <MoreVertical className="w-4 h-4" />
               </button>
             </div>
-            <h4 className="font-medium text-white mb-1">{item.name}</h4>
+            <h4 className="font-medium text-white mb-1">{item.production_name}</h4>
             <p className="text-sm text-zinc-500 line-clamp-2 mb-3">{item.description}</p>
             <div className="flex items-center gap-4 text-xs text-zinc-600">
               <span className="flex items-center gap-1">
                 <Package className="w-3 h-3" />
-                {item.unit || 'EA'}
+                {item.measurement_units?.code || 'EA'}
               </span>
-              {item.labour_rate && (
+              {item.production_per_day && (
                 <span className="flex items-center gap-1">
                   <Clock className="w-3 h-3" />
-                  ${item.labour_rate}/hr
+                  {item.production_per_day}/day
                 </span>
               )}
-              {item.avg_price && (
+              {item.standard_rate && (
                 <span className="flex items-center gap-1">
                   <DollarSign className="w-3 h-3" />
-                  ${item.avg_price}
+                  ${item.standard_rate}
                 </span>
               )}
             </div>
+            {item.is_company_standard && (
+              <div className="mt-2">
+                <span className="text-[10px] bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded uppercase font-mono">
+                  Company Standard
+                </span>
+              </div>
+            )}
           </div>
         ))}
       </div>
@@ -602,34 +613,102 @@ const ProductionLibraryPage = () => {
   const [showItemModal, setShowItemModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   
+  // Reference data
+  const [knowledgeDomains, setKnowledgeDomains] = useState([]);
+  const [serviceCategories, setServiceCategories] = useState([]);
+  const [measurementUnits, setMeasurementUnits] = useState([]);
+  const [stats, setStats] = useState(null);
+  
+  // Get auth token
+  const getAuthHeaders = useCallback(async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    return {
+      'Authorization': `Bearer ${session?.access_token}`,
+      'Content-Type': 'application/json'
+    };
+  }, []);
+  
+  // Fetch reference data (domains, categories, units)
+  const fetchReferenceData = useCallback(async () => {
+    try {
+      const headers = await getAuthHeaders();
+      
+      const [domainsRes, categoriesRes, unitsRes, statsRes] = await Promise.all([
+        fetch(`${API_URL}/api/production-library/domains`, { headers }),
+        fetch(`${API_URL}/api/production-library/service-categories`, { headers }),
+        fetch(`${API_URL}/api/production-library/units`, { headers }),
+        fetch(`${API_URL}/api/production-library/stats`, { headers })
+      ]);
+      
+      if (domainsRes.ok) {
+        const data = await domainsRes.json();
+        setKnowledgeDomains(data.domains || []);
+      }
+      if (categoriesRes.ok) {
+        const data = await categoriesRes.json();
+        setServiceCategories(data.categories || []);
+      }
+      if (unitsRes.ok) {
+        const data = await unitsRes.json();
+        setMeasurementUnits(data.units || []);
+      }
+      if (statsRes.ok) {
+        const data = await statsRes.json();
+        setStats(data.stats || null);
+      }
+    } catch (error) {
+      console.error('Error fetching reference data:', error);
+    }
+  }, [getAuthHeaders]);
+  
+  // Fetch production items
+  const fetchProductionItems = useCallback(async () => {
+    try {
+      const headers = await getAuthHeaders();
+      const response = await fetch(`${API_URL}/api/production-library/items?per_page=100`, { headers });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setProductionItems(data.items || []);
+      }
+    } catch (error) {
+      console.error('Error fetching production items:', error);
+    }
+  }, [getAuthHeaders]);
+  
+  // Fetch assemblies
+  const fetchAssemblies = useCallback(async () => {
+    try {
+      const headers = await getAuthHeaders();
+      const response = await fetch(`${API_URL}/api/production-library/assemblies`, { headers });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setAssemblies(data.assemblies || []);
+      }
+    } catch (error) {
+      console.error('Error fetching assemblies:', error);
+    }
+  }, [getAuthHeaders]);
+  
   // Fetch all data
   const fetchData = useCallback(async () => {
     if (!user) return;
     setLoading(true);
     
     try {
-      // For now, use localStorage as placeholder until backend is built
-      // This will be replaced with actual Supabase queries
-      
-      const storedItems = localStorage.getItem('tradeos_production_items');
-      const storedAssemblies = localStorage.getItem('tradeos_assemblies');
-      const storedScopes = localStorage.getItem('tradeos_scopes');
-      const storedLabour = localStorage.getItem('tradeos_labour_rates');
-      const storedTemplates = localStorage.getItem('tradeos_templates');
-      
-      setProductionItems(storedItems ? JSON.parse(storedItems) : []);
-      setAssemblies(storedAssemblies ? JSON.parse(storedAssemblies) : []);
-      setScopes(storedScopes ? JSON.parse(storedScopes) : []);
-      setLabourRates(storedLabour ? JSON.parse(storedLabour) : []);
-      setTemplates(storedTemplates ? JSON.parse(storedTemplates) : []);
-      
+      await Promise.all([
+        fetchReferenceData(),
+        fetchProductionItems(),
+        fetchAssemblies()
+      ]);
     } catch (error) {
       console.error('Error fetching production data:', error);
       toast.error('Failed to load production library');
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, fetchReferenceData, fetchProductionItems, fetchAssemblies]);
   
   useEffect(() => {
     fetchData();
@@ -761,22 +840,54 @@ const ProductionLibraryPage = () => {
         {renderTabContent()}
       </div>
       
-      {/* Production Item Modal (placeholder) */}
+      {/* Production Item Modal */}
       {showItemModal && (
         <ProductionItemModal
           item={editingItem}
+          knowledgeDomains={knowledgeDomains}
+          measurementUnits={measurementUnits}
+          serviceCategories={serviceCategories}
           onClose={() => setShowItemModal(false)}
-          onSave={(item) => {
-            let updatedItems;
-            if (editingItem) {
-              updatedItems = productionItems.map(i => i.id === item.id ? item : i);
-            } else {
-              updatedItems = [...productionItems, { ...item, id: Date.now().toString() }];
+          onSave={async (itemData) => {
+            try {
+              const headers = await getAuthHeaders();
+              
+              if (editingItem) {
+                // Update existing item
+                const response = await fetch(`${API_URL}/api/production-library/items/${editingItem.id}`, {
+                  method: 'PUT',
+                  headers,
+                  body: JSON.stringify(itemData)
+                });
+                
+                if (response.ok) {
+                  toast.success('Item updated');
+                  fetchProductionItems();
+                } else {
+                  toast.error('Failed to update item');
+                }
+              } else {
+                // Create new item
+                const response = await fetch(`${API_URL}/api/production-library/items`, {
+                  method: 'POST',
+                  headers,
+                  body: JSON.stringify(itemData)
+                });
+                
+                if (response.ok) {
+                  toast.success('Item added to Production Library');
+                  fetchProductionItems();
+                } else {
+                  const error = await response.json();
+                  toast.error(error.detail || 'Failed to create item');
+                }
+              }
+              
+              setShowItemModal(false);
+            } catch (error) {
+              console.error('Error saving item:', error);
+              toast.error('Failed to save item');
             }
-            setProductionItems(updatedItems);
-            localStorage.setItem('tradeos_production_items', JSON.stringify(updatedItems));
-            setShowItemModal(false);
-            toast.success(editingItem ? 'Item updated' : 'Item added to Production Library');
           }}
         />
       )}
@@ -787,31 +898,80 @@ const ProductionLibraryPage = () => {
 // ============================================
 // PRODUCTION ITEM MODAL
 // ============================================
-const ProductionItemModal = ({ item, onClose, onSave }) => {
+const ProductionItemModal = ({ item, knowledgeDomains, measurementUnits, serviceCategories, onClose, onSave }) => {
   const [form, setForm] = useState({
-    name: item?.name || '',
+    production_code: item?.production_code || '',
+    production_name: item?.production_name || '',
     description: item?.description || '',
-    category: item?.category || '',
-    subcategory: item?.subcategory || '',
-    unit: item?.unit || 'EA',
-    labour_rate: item?.labour_rate || '',
-    avg_price: item?.avg_price || '',
+    knowledge_domain_id: item?.knowledge_domain_id || '',
+    measurement_unit_id: item?.measurement_unit_id || '',
+    production_per_day: item?.production_per_day || '',
+    crew_size: item?.crew_size || '1',
+    labour_hours: item?.labour_hours || '',
+    standard_rate: item?.standard_rate || '',
+    premium_rate: item?.premium_rate || '',
+    complex_rate: item?.complex_rate || '',
+    is_company_standard: item?.is_company_standard || false,
     notes: item?.notes || '',
+    service_category_ids: item?.service_categories?.map(sc => sc.id) || []
   });
+  const [saving, setSaving] = useState(false);
   
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.name.trim()) {
-      toast.error('Name is required');
+    if (!form.production_code.trim()) {
+      toast.error('Production Code is required');
       return;
     }
-    onSave({ ...item, ...form });
+    if (!form.production_name.trim()) {
+      toast.error('Production Name is required');
+      return;
+    }
+    if (!form.knowledge_domain_id) {
+      toast.error('Knowledge Domain is required');
+      return;
+    }
+    if (!form.measurement_unit_id) {
+      toast.error('Measurement Unit is required');
+      return;
+    }
+    
+    setSaving(true);
+    try {
+      await onSave({
+        production_code: form.production_code.trim(),
+        production_name: form.production_name.trim(),
+        description: form.description.trim() || null,
+        knowledge_domain_id: form.knowledge_domain_id,
+        measurement_unit_id: form.measurement_unit_id,
+        production_per_day: form.production_per_day ? parseFloat(form.production_per_day) : null,
+        crew_size: form.crew_size ? parseFloat(form.crew_size) : 1,
+        labour_hours: form.labour_hours ? parseFloat(form.labour_hours) : null,
+        standard_rate: form.standard_rate ? parseFloat(form.standard_rate) : null,
+        premium_rate: form.premium_rate ? parseFloat(form.premium_rate) : null,
+        complex_rate: form.complex_rate ? parseFloat(form.complex_rate) : null,
+        is_company_standard: form.is_company_standard,
+        notes: form.notes.trim() || null,
+        service_category_ids: form.service_category_ids
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+  
+  const toggleServiceCategory = (catId) => {
+    setForm(prev => ({
+      ...prev,
+      service_category_ids: prev.service_category_ids.includes(catId)
+        ? prev.service_category_ids.filter(id => id !== catId)
+        : [...prev.service_category_ids, catId]
+    }));
   };
   
   return (
     <>
       <div className="fixed inset-0 bg-black/50 z-40" onClick={onClose} />
-      <div className="fixed inset-4 lg:inset-y-8 lg:left-1/2 lg:-translate-x-1/2 lg:w-full lg:max-w-lg bg-zinc-900 border border-zinc-800 rounded-xl z-50 flex flex-col overflow-hidden" data-testid="production-item-modal">
+      <div className="fixed inset-4 lg:inset-y-8 lg:left-1/2 lg:-translate-x-1/2 lg:w-full lg:max-w-2xl bg-zinc-900 border border-zinc-800 rounded-xl z-50 flex flex-col overflow-hidden" data-testid="production-item-modal">
         <div className="flex items-center justify-between p-4 border-b border-zinc-800">
           <h2 className="text-lg font-semibold text-white">
             {item ? 'Edit Production Item' : 'Add Production Item'}
@@ -822,84 +982,143 @@ const ProductionItemModal = ({ item, onClose, onSave }) => {
         </div>
         
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-zinc-400 mb-1.5">Name *</label>
-            <input
-              type="text"
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500/50"
-              placeholder="e.g., Standard Drywall Install"
-              required
-            />
+          {/* Code and Name */}
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-zinc-400 mb-1.5">Production Code *</label>
+              <input
+                type="text"
+                value={form.production_code}
+                onChange={(e) => setForm({ ...form, production_code: e.target.value })}
+                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500/50"
+                placeholder="e.g., FC-001"
+                required
+              />
+            </div>
+            <div className="col-span-2">
+              <label className="block text-sm font-medium text-zinc-400 mb-1.5">Production Name *</label>
+              <input
+                type="text"
+                value={form.production_name}
+                onChange={(e) => setForm({ ...form, production_name: e.target.value })}
+                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500/50"
+                placeholder="e.g., Door Casing Installation"
+                required
+              />
+            </div>
           </div>
           
+          {/* Description */}
           <div>
             <label className="block text-sm font-medium text-zinc-400 mb-1.5">Description</label>
             <textarea
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
-              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500/50 h-20 resize-none"
+              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500/50 h-16 resize-none"
               placeholder="Describe this production item..."
             />
           </div>
           
+          {/* Knowledge Domain and Unit */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-zinc-400 mb-1.5">Category</label>
-              <input
-                type="text"
-                value={form.category}
-                onChange={(e) => setForm({ ...form, category: e.target.value })}
-                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500/50"
-                placeholder="e.g., Drywall"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-zinc-400 mb-1.5">Subcategory</label>
-              <input
-                type="text"
-                value={form.subcategory}
-                onChange={(e) => setForm({ ...form, subcategory: e.target.value })}
-                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500/50"
-                placeholder="e.g., Installation"
-              />
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-zinc-400 mb-1.5">Unit</label>
+              <label className="block text-sm font-medium text-zinc-400 mb-1.5">Knowledge Domain *</label>
               <select
-                value={form.unit}
-                onChange={(e) => setForm({ ...form, unit: e.target.value })}
+                value={form.knowledge_domain_id}
+                onChange={(e) => setForm({ ...form, knowledge_domain_id: e.target.value })}
                 className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500/50"
+                required
               >
-                <option value="EA">EA (Each)</option>
-                <option value="SF">SF (Sq Ft)</option>
-                <option value="LF">LF (Lin Ft)</option>
-                <option value="HR">HR (Hour)</option>
-                <option value="LS">LS (Lump Sum)</option>
-                <option value="CY">CY (Cubic Yard)</option>
+                <option value="">Select domain...</option>
+                {knowledgeDomains.map(d => (
+                  <option key={d.id} value={d.id}>{d.name}</option>
+                ))}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-zinc-400 mb-1.5">Labour Rate ($/hr)</label>
+              <label className="block text-sm font-medium text-zinc-400 mb-1.5">Measurement Unit *</label>
+              <select
+                value={form.measurement_unit_id}
+                onChange={(e) => setForm({ ...form, measurement_unit_id: e.target.value })}
+                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500/50"
+                required
+              >
+                <option value="">Select unit...</option>
+                {measurementUnits.map(u => (
+                  <option key={u.id} value={u.id}>{u.code} - {u.name}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+          
+          {/* Production Standards */}
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-zinc-400 mb-1.5">Production/Day</label>
               <input
                 type="number"
-                value={form.labour_rate}
-                onChange={(e) => setForm({ ...form, labour_rate: e.target.value })}
+                value={form.production_per_day}
+                onChange={(e) => setForm({ ...form, production_per_day: e.target.value })}
+                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500/50"
+                placeholder="Units/day"
+                step="0.01"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-zinc-400 mb-1.5">Crew Size</label>
+              <input
+                type="number"
+                value={form.crew_size}
+                onChange={(e) => setForm({ ...form, crew_size: e.target.value })}
+                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500/50"
+                placeholder="1"
+                step="0.5"
+                min="0.5"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-zinc-400 mb-1.5">Labour Hours/Unit</label>
+              <input
+                type="number"
+                value={form.labour_hours}
+                onChange={(e) => setForm({ ...form, labour_hours: e.target.value })}
+                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500/50"
+                placeholder="0.00"
+                step="0.0001"
+              />
+            </div>
+          </div>
+          
+          {/* Pricing Tiers */}
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-zinc-400 mb-1.5">Standard Rate ($)</label>
+              <input
+                type="number"
+                value={form.standard_rate}
+                onChange={(e) => setForm({ ...form, standard_rate: e.target.value })}
                 className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500/50"
                 placeholder="0.00"
                 step="0.01"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-zinc-400 mb-1.5">Avg Price</label>
+              <label className="block text-sm font-medium text-zinc-400 mb-1.5">Premium Rate ($)</label>
               <input
                 type="number"
-                value={form.avg_price}
-                onChange={(e) => setForm({ ...form, avg_price: e.target.value })}
+                value={form.premium_rate}
+                onChange={(e) => setForm({ ...form, premium_rate: e.target.value })}
+                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500/50"
+                placeholder="0.00"
+                step="0.01"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-zinc-400 mb-1.5">Complex Rate ($)</label>
+              <input
+                type="number"
+                value={form.complex_rate}
+                onChange={(e) => setForm({ ...form, complex_rate: e.target.value })}
                 className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500/50"
                 placeholder="0.00"
                 step="0.01"
@@ -907,14 +1126,54 @@ const ProductionItemModal = ({ item, onClose, onSave }) => {
             </div>
           </div>
           
+          {/* Service Categories */}
+          {serviceCategories.length > 0 && (
+            <div>
+              <label className="block text-sm font-medium text-zinc-400 mb-1.5">Service Categories</label>
+              <div className="flex flex-wrap gap-2">
+                {serviceCategories.map(cat => (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    onClick={() => toggleServiceCategory(cat.id)}
+                    className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
+                      form.service_category_ids.includes(cat.id)
+                        ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                        : 'bg-zinc-800 text-zinc-400 border border-zinc-700 hover:border-zinc-600'
+                    }`}
+                  >
+                    {cat.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {/* Notes */}
           <div>
             <label className="block text-sm font-medium text-zinc-400 mb-1.5">Notes</label>
             <textarea
               value={form.notes}
               onChange={(e) => setForm({ ...form, notes: e.target.value })}
-              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500/50 h-20 resize-none"
-              placeholder="Additional notes, specifications, or considerations..."
+              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500/50 h-16 resize-none"
+              placeholder="Additional notes..."
             />
+          </div>
+          
+          {/* Company Standard Toggle */}
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setForm({ ...form, is_company_standard: !form.is_company_standard })}
+              className={`w-10 h-6 rounded-full transition-colors relative ${
+                form.is_company_standard ? 'bg-emerald-500' : 'bg-zinc-700'
+              }`}
+            >
+              <span className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${
+                form.is_company_standard ? 'left-5' : 'left-1'
+              }`} />
+            </button>
+            <span className="text-sm text-zinc-400">Mark as Company Standard</span>
           </div>
         </form>
         
@@ -923,16 +1182,18 @@ const ProductionItemModal = ({ item, onClose, onSave }) => {
             type="button"
             onClick={onClose}
             className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white py-2.5 rounded-lg font-medium transition-colors"
+            disabled={saving}
           >
             Cancel
           </button>
           <button
             type="submit"
             onClick={handleSubmit}
-            className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-black py-2.5 rounded-lg font-medium transition-colors"
+            disabled={saving}
+            className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-black py-2.5 rounded-lg font-medium transition-colors disabled:opacity-50"
             data-testid="save-item-btn"
           >
-            {item ? 'Update Item' : 'Add to Library'}
+            {saving ? 'Saving...' : (item ? 'Update Item' : 'Add to Library')}
           </button>
         </div>
       </div>

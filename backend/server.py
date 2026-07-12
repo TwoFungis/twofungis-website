@@ -84,6 +84,9 @@ from routes.ai_chat import router as ai_chat_router
 # Import Command Center routes (TradeOS Operational Headquarters)
 from routes.command_center import router as command_center_router
 
+# Import Production Library routes (Company Knowledge Engine)
+from routes.production_library import router as production_library_router
+
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env', override=False)
 
@@ -256,6 +259,9 @@ app.include_router(ai_chat_router)
 
 # Include Command Center routes (TradeOS Operational Headquarters)
 app.include_router(command_center_router)
+
+# Include Production Library routes (Company Knowledge Engine)
+app.include_router(production_library_router)
 
 app.add_middleware(
     CORSMiddleware,

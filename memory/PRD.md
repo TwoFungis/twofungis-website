@@ -74,31 +74,45 @@ The TradeOS V2 Foundation has been officially locked and stabilized.
 
 ---
 
-### Phase 2: Company Knowledge Engine ✅ COMPLETE (July 12, 2026)
+### Phase 2: Company Knowledge Engine ✅ FOUNDATION COMPLETE (July 12, 2026)
 **Build knowledge first, not quotes. The Production Library is the foundation.**
 
-**Production Library Workspace:**
-- ✅ Replaced legacy EstimatingPage with ProductionLibraryPage
-- ✅ Company Knowledge Engine header with AI insight banner
-- ✅ 8 workspace tabs: Production Library, Assemblies, Scope Library, Labour Standards, Pricing, Templates, Imports, Estimate Builder (Soon)
-- ✅ Empty states with actionable CTAs for each section
-- ✅ Production Item modal for adding/editing items
-- ✅ Import section with CSV template downloads
+**Database Schema Created:**
+- Migration: `/app/migrations/015_production_library_foundation.sql`
+- Tables: `measurement_units`, `knowledge_domains`, `service_categories`, `production_items`, `production_item_service_categories`, `production_item_revisions`, `production_item_attachments`, `production_assemblies`, `assembly_items`, `historical_production_records`
+- All tables have RLS policies for multi-tenant isolation
+- Triggers for assembly totals and revision history
 
-**Company Brain V2 Styling:**
-- ✅ Updated from gold/black legacy styling to emerald accents
-- ✅ Consistent with workspace styling and typography
-- ✅ Native feel integrated with TradeOS (not a separate application)
+**Four-Level Hierarchy:**
+- Level 1: Knowledge Domain (Finish Carpentry, Doors & Hardware, etc.)
+- Level 2: Service Category (Residential, Commercial, etc.)
+- Level 3: Production Item (the knowledge records)
+- Level 4: Measurement Unit (EA, LF, SF, LS, DAY, HR, SET, KIT, PAIR, COST)
 
-**Architecture Principle:**
-```
-Production Library → Production Assemblies → Estimate → Quote → Completed Project
-                                                        ↓
-                                              Production Library becomes smarter
-```
+**API Endpoints Created:**
+- `/api/production-library/units` - Controlled measurement unit lookup
+- `/api/production-library/domains` - Knowledge domains CRUD
+- `/api/production-library/service-categories` - Service categories CRUD
+- `/api/production-library/items` - Production items CRUD with pagination
+- `/api/production-library/items/{id}/revisions` - Revision history
+- `/api/production-library/assemblies` - Assemblies CRUD
+- `/api/production-library/assemblies/{id}/items` - Assembly items management
+- `/api/production-library/import/items` - CSV import
+- `/api/production-library/stats` - Library statistics
 
-**Test Results:**
-- Frontend: 100% (10/10 acceptance criteria verified)
+**Frontend Updated:**
+- `ProductionLibraryPage.jsx` now uses real API instead of localStorage
+- Full production item modal with all required fields
+- Knowledge Domain and Measurement Unit dropdowns
+- Service Category multi-select
+- Pricing tiers (Standard, Premium, Complex)
+- Production standards (Per Day, Crew Size, Labour Hours)
+- Company Standard toggle
+
+**Architecture Spec:**
+- Full specification at `/app/memory/PRODUCTION_LIBRARY_SPEC.md`
+
+**NOTE: Database migration must be run in Supabase to create the tables.**
 
 ---
 
@@ -616,15 +630,17 @@ Run `/app/migrations/012_company_brain_foundation.sql` in Supabase SQL Editor to
 
 ## Upcoming Tasks (Priority Order)
 
-### P0 - Production Library Backend (Immediate Next)
-Create Supabase database tables and API endpoints for:
-- `production_items` table
-- `assemblies` table
-- `scope_library` table
-- `labour_rates` table
-- `templates` table
-- `historical_pricing` table
-- CSV import endpoints
+### P0 - Run Production Library Database Migration
+The migration file has been created at `/app/migrations/015_production_library_foundation.sql`.
+This needs to be executed in Supabase to create the tables.
+
+### P0 - Seed Initial Knowledge Domains & Service Categories
+After migration, seed the organization with:
+- Knowledge Domains: Finish Carpentry, Doors & Hardware, Architectural Millwork, Cabinetry, Flooring, Countertops, Stairs & Railings, etc.
+- Service Categories: Residential, Multifamily, Commercial, Hospitality, Institutional, Healthcare, Retail, Industrial, etc.
+
+### P0 - Import Existing Production Library
+Import the existing production library data that represents years of operational knowledge.
 
 ### P1 - Phase 4: New Opportunity Experience Design
 Before building the traditional form, design the entire Opportunity Creation Experience:
