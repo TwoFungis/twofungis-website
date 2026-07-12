@@ -19,12 +19,14 @@ import {
   Crown,
   User,
   PieChart,
-  Briefcase,
   Link2,
   DollarSign,
-  Shield,
   Brain,
-  Target
+  Target,
+  Users,
+  Calendar,
+  Store,
+  Home
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { supabase } from '../../lib/supabase';
@@ -42,17 +44,12 @@ import { useBrainContext, getContextFromPath } from '../../hooks/useBrainContext
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
-// Founder emails - defined outside component to avoid re-creation on each render
-const FOUNDER_EMAILS = ["info@twofungis.ca", "swdmarshall@gmail.com", "carpenterbeau@hotmail.com", "inbox@twofungis.ca"];
-
 const AppLayout = () => {
   const { profile, signOut, user } = useAuthStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  // Quick Add controls - only for non-TFCS users
   const [quickActionOpen, setQuickActionOpen] = useState(false);
   const [showQuickExpenseModal, setShowQuickExpenseModal] = useState(false);
-  const [tfcsRole, setTfcsRole] = useState(null);
-  // Company Brain - TFCS users only
+  const [workspaceContext, setWorkspaceContext] = useState(null);
   const [brainOpen, setBrainOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -64,93 +61,79 @@ const AppLayout = () => {
     setContext({ ...pathContext, path: location.pathname });
   }, [location.pathname, setContext]);
   
-  // Founder email check - use user.email from auth
-  const userEmail = (user?.email || '').toLowerCase();
-  const isFounder = FOUNDER_EMAILS.map(e => e.toLowerCase()).includes(userEmail);
-  const tier = (profile?.subscription_tier || '').toLowerCase();
-  const isElite = isFounder || tier.includes('elite') || tier.includes('lifetime') || tier.includes('founding');
-  const displayPlan = isFounder || tier.includes('lifetime') || tier.includes('founding') 
-    ? 'Lifetime Elite' 
-    : tier === 'elite' 
-      ? 'Elite' 
-      : 'Pro';
-
-  // Check TFCS Mainframe access for designated users
+  // Fetch workspace context on mount
   useEffect(() => {
-    const checkTfcsAccess = async () => {
-      // Only check for potential TFCS users
-      if (!userEmail || !FOUNDER_EMAILS.map(e => e.toLowerCase()).includes(userEmail)) {
-        console.log('[TFCS] User not in founder list:', userEmail);
-        return;
-      }
-
+    const fetchWorkspaceContext = async () => {
       try {
-        // Get token from Supabase session (the correct way)
         const { data: { session } } = await supabase.auth.getSession();
         const token = session?.access_token;
-
-        if (!token) {
-          console.log('[TFCS] No session token available');
-          return;
-        }
-
-        console.log('[TFCS] Checking role for:', userEmail);
-        const response = await fetch(`${API_URL}/api/tfcs/role/me`, {
+        
+        if (!token) return;
+        
+        const response = await fetch(`${API_URL}/api/workspace/context`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           }
         });
-
+        
         if (response.ok) {
           const data = await response.json();
-          console.log('[TFCS] Role data:', data);
-          setTfcsRole(data);
-        } else {
-          console.log('[TFCS] Role check failed:', response.status);
+          setWorkspaceContext(data);
         }
       } catch (e) {
-        console.error('[TFCS] Check failed:', e);
+        console.error('[AppLayout] Workspace context error:', e);
       }
     };
+    
+    fetchWorkspaceContext();
+  }, []);
+  
+  // Determine if user has workspace access (organization member or platform admin)
+  const hasWorkspaceAccess = workspaceContext?.has_access || 
+                             workspaceContext?.has_organization || 
+                             workspaceContext?.is_platform_admin;
+  
+  const isOwner = workspaceContext?.is_owner || 
+                  workspaceContext?.organization_role === 'owner';
+  
+  // Subscription tier display
+  const tier = (profile?.subscription_tier || '').toLowerCase();
+  const isFounderOrElite = tier.includes('lifetime') || 
+                           tier.includes('founding') ||
+                           tier === 'elite';
+  const displayPlan = tier.includes('lifetime') || tier.includes('founding') 
+    ? 'Lifetime Elite' 
+    : tier === 'elite' 
+      ? 'Elite' 
+      : 'Pro';
 
-    checkTfcsAccess();
-  }, [userEmail]);
-
-  // Check if user has TFCS access (for sidebar reorganization)
-  const hasTfcsAccess = tfcsRole?.has_role || FOUNDER_EMAILS.map(e => e.toLowerCase()).includes(userEmail);
-
-  // TFCS Mainframe Navigation (when user has access)
-  const tfcsNavItems = [
-    { path: '/app/mainframe', icon: LayoutDashboard, label: 'Dashboard' },
+  // TradeOS Navigation - Workflow-Oriented (Phase 2)
+  // This is the new operating system navigation structure
+  const tradeOSNavItems = [
+    { path: '/app/command-center', icon: Home, label: 'Home' },
     { path: '/app/opportunities', icon: Target, label: 'Opportunities' },
     { path: '/app/projects', icon: FolderKanban, label: 'Projects' },
-    { path: '/app/estimating', icon: Calculator, label: 'Estimates' },
-    { path: '/app/invoices', icon: Receipt, label: 'Invoices' },
-    { path: '/app/receivables', icon: DollarSign, label: 'Financial' },
+    { path: '/app/estimating', icon: Calculator, label: 'Estimating' },
+    { path: '/app/invoices', icon: Receipt, label: 'Financial' },
     { path: '/app/expenses', icon: Wallet, label: 'Expenses' },
     { path: '/app/documents', icon: FolderOpen, label: 'Documents' },
     { path: '/app/reports', icon: BarChart3, label: 'Reports' },
   ];
 
-  // Standard TradeOS navigation (non-TFCS users)
-  const navItems = [
+  // Standard TradeOS navigation (users without org membership - onboarding)
+  const standardNavItems = [
     { path: '/app/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-    { path: '/app/opportunities', icon: Target, label: 'Opportunities' },
     { path: '/app/projects', icon: FolderKanban, label: 'Projects' },
     { path: '/app/estimating', icon: Calculator, label: 'Estimates' },
-    { path: '/app/change-orders', icon: FileText, label: 'Change Orders' },
-    { path: '/app/milestones', icon: Flag, label: 'Milestones' },
     { path: '/app/invoices', icon: Receipt, label: 'Invoices' },
-    { path: '/app/receivables', icon: DollarSign, label: 'Receivables' },
     { path: '/app/expenses', icon: Wallet, label: 'Expenses' },
-    { path: '/app/documents', icon: FolderOpen, label: 'Document Vault' },
-    { path: '/app/tax-summary', icon: PieChart, label: 'Tax Summary' },
+    { path: '/app/documents', icon: FolderOpen, label: 'Documents' },
     { path: '/app/reports', icon: BarChart3, label: 'Reports' },
   ];
 
-  // Use TFCS nav if user has access
-  const activeNavItems = hasTfcsAccess ? tfcsNavItems : navItems;
+  // Use TradeOS nav if user has workspace access, otherwise standard
+  const activeNavItems = hasWorkspaceAccess ? tradeOSNavItems : standardNavItems;
   
   const bottomNavItems = [
     { path: '/app/integrations', icon: Link2, label: 'Integrations' },
@@ -161,7 +144,6 @@ const AppLayout = () => {
     { label: 'Quick Expense', action: () => setShowQuickExpenseModal(true), icon: Wallet, highlight: true },
     { label: 'New Estimate', path: '/app/estimating?new=true', icon: FileSpreadsheet },
     { label: 'New Project', path: '/app/projects?new=true', icon: FolderKanban },
-    { label: 'New Change Order', path: '/app/change-orders?new=true', icon: FileText },
     { label: 'New Invoice', path: '/app/invoices?new=true', icon: Receipt },
   ];
 
@@ -170,24 +152,16 @@ const AppLayout = () => {
     navigate('/');
   };
 
+  const organizationName = workspaceContext?.organization_name || profile?.company_name || 'My Company';
+
   return (
-    <div className={`min-h-screen ${hasTfcsAccess ? 'bg-tfcs-black' : 'bg-cloud-100'} flex`}>
+    <div className={`min-h-screen ${hasWorkspaceAccess ? 'bg-black' : 'bg-cloud-100'} flex`}>
       {/* Desktop Sidebar */}
-      <aside className={`hidden lg:flex flex-col w-64 ${hasTfcsAccess ? 'bg-tfcs-surface border-r border-tfcs-border' : 'bg-charcoal-800 border-r border-charcoal-700'}`} data-testid="desktop-sidebar">
-        <div className={`p-5 border-b ${hasTfcsAccess ? 'border-tfcs-border' : 'border-charcoal-700'}`}>
-          {hasTfcsAccess ? (
-            <Link to="/app/mainframe" className="flex flex-col items-center">
-              <div className="flex items-center gap-2 mb-1">
-                <Shield className="w-6 h-6 text-tfcs-gold" />
-                <span className="text-lg font-bold text-white tracking-tight">TFCS</span>
-              </div>
-              <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-500">Two Fungis Finishing</span>
-            </Link>
-          ) : (
-            <Link to="/app" className="flex items-center justify-center">
-              <img src="/logo.png" alt="TradeOS" className="h-24 w-auto" />
-            </Link>
-          )}
+      <aside className={`hidden lg:flex flex-col w-64 ${hasWorkspaceAccess ? 'bg-zinc-900 border-r border-zinc-800' : 'bg-charcoal-800 border-r border-charcoal-700'}`} data-testid="desktop-sidebar">
+        <div className={`p-5 border-b ${hasWorkspaceAccess ? 'border-zinc-800' : 'border-charcoal-700'}`}>
+          <Link to={hasWorkspaceAccess ? "/app/command-center" : "/app"} className="flex items-center justify-center">
+            <img src="/logo.png" alt="TradeOS" className="h-20 w-auto" />
+          </Link>
         </div>
 
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
@@ -198,11 +172,11 @@ const AppLayout = () => {
               className={({ isActive }) =>
                 `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                   isActive
-                    ? hasTfcsAccess 
-                      ? 'bg-tfcs-gold/10 text-tfcs-gold border-l-2 border-tfcs-gold'
+                    ? hasWorkspaceAccess 
+                      ? 'bg-emerald-500/10 text-emerald-400 border-l-2 border-emerald-500'
                       : 'bg-steel-500/20 text-steel-400'
-                    : hasTfcsAccess
-                      ? 'text-zinc-400 hover:text-white hover:bg-tfcs-surface-hover'
+                    : hasWorkspaceAccess
+                      ? 'text-zinc-400 hover:text-white hover:bg-zinc-800'
                       : 'text-gray-400 hover:text-white hover:bg-charcoal-700'
                 }`
               }
@@ -214,7 +188,7 @@ const AppLayout = () => {
           ))}
           
           {/* Separator */}
-          <div className={`border-t ${hasTfcsAccess ? 'border-tfcs-border' : 'border-charcoal-700'} my-2`}></div>
+          <div className={`border-t ${hasWorkspaceAccess ? 'border-zinc-800' : 'border-charcoal-700'} my-2`}></div>
           
           {/* Bottom nav items */}
           {bottomNavItems.map((item) => (
@@ -224,11 +198,11 @@ const AppLayout = () => {
               className={({ isActive }) =>
                 `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                   isActive
-                    ? hasTfcsAccess
-                      ? 'bg-tfcs-gold/10 text-tfcs-gold'
+                    ? hasWorkspaceAccess
+                      ? 'bg-emerald-500/10 text-emerald-400'
                       : 'bg-steel-500/20 text-steel-400'
-                    : hasTfcsAccess
-                      ? 'text-zinc-400 hover:text-white hover:bg-tfcs-surface-hover'
+                    : hasWorkspaceAccess
+                      ? 'text-zinc-400 hover:text-white hover:bg-zinc-800'
                       : 'text-gray-400 hover:text-white hover:bg-charcoal-700'
                 }`
               }
@@ -240,17 +214,17 @@ const AppLayout = () => {
           ))}
         </nav>
 
-        <div className={`p-4 border-t ${hasTfcsAccess ? 'border-tfcs-border' : 'border-charcoal-700'}`}>
+        <div className={`p-4 border-t ${hasWorkspaceAccess ? 'border-zinc-800' : 'border-charcoal-700'}`}>
           <NavLink
             to="/app/profile"
             className={({ isActive }) =>
               `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors mb-2 ${
                 isActive
-                  ? hasTfcsAccess
-                    ? 'bg-tfcs-gold/10 text-tfcs-gold'
+                  ? hasWorkspaceAccess
+                    ? 'bg-emerald-500/10 text-emerald-400'
                     : 'bg-steel-500/20 text-steel-400'
-                  : hasTfcsAccess
-                    ? 'text-zinc-400 hover:text-white hover:bg-tfcs-surface-hover'
+                  : hasWorkspaceAccess
+                    ? 'text-zinc-400 hover:text-white hover:bg-zinc-800'
                     : 'text-gray-400 hover:text-white hover:bg-charcoal-700'
               }`
             }
@@ -259,15 +233,15 @@ const AppLayout = () => {
             <User className="w-5 h-5" />
             <span className="font-medium">My Profile</span>
           </NavLink>
-          <div className="bg-charcoal-700 rounded-lg p-4 mb-4">
-            <p className="text-sm text-gray-400 truncate">{profile?.company_name || 'My Company'}</p>
-            <p className="text-xs text-gray-500 capitalize">
+          <div className={`${hasWorkspaceAccess ? 'bg-zinc-800' : 'bg-charcoal-700'} rounded-lg p-4 mb-4`}>
+            <p className={`text-sm ${hasWorkspaceAccess ? 'text-zinc-300' : 'text-gray-400'} truncate`}>{organizationName}</p>
+            <p className={`text-xs ${hasWorkspaceAccess ? 'text-zinc-500' : 'text-gray-500'} capitalize`}>
               {displayPlan} Plan
             </p>
           </div>
           <button
             onClick={handleSignOut}
-            className="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-charcoal-700 transition-colors"
+            className={`flex items-center gap-3 w-full px-4 py-3 rounded-lg ${hasWorkspaceAccess ? 'text-zinc-400 hover:text-white hover:bg-zinc-800' : 'text-gray-400 hover:text-white hover:bg-charcoal-700'} transition-colors`}
             data-testid="signout-btn"
           >
             <LogOut className="w-5 h-5" />
@@ -279,10 +253,10 @@ const AppLayout = () => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-h-screen">
         {/* Top Bar */}
-        <header className="bg-charcoal-800 border-b border-charcoal-700 px-4 lg:px-8 py-4 flex items-center justify-between">
+        <header className={`${hasWorkspaceAccess ? 'bg-zinc-900 border-b border-zinc-800' : 'bg-charcoal-800 border-b border-charcoal-700'} px-4 lg:px-8 py-4 flex items-center justify-between`}>
           <button
             onClick={() => setMobileMenuOpen(true)}
-            className="lg:hidden text-gray-400 hover:text-white"
+            className={`lg:hidden ${hasWorkspaceAccess ? 'text-zinc-400 hover:text-white' : 'text-gray-400 hover:text-white'}`}
             data-testid="mobile-menu-btn"
           >
             <Menu className="w-6 h-6" />
@@ -298,14 +272,14 @@ const AppLayout = () => {
             {/* Sync Indicator */}
             <SyncIndicator />
             
-            {/* Trial Countdown Badge - Non-TFCS users only */}
-            {!hasTfcsAccess && <TrialCountdown />}
+            {/* Trial Countdown Badge - only for users without workspace access */}
+            {!hasWorkspaceAccess && <TrialCountdown />}
             
-            {/* TFCS Users: Company Brain is the single operational interface */}
-            {hasTfcsAccess ? (
+            {/* Company Brain Button - for users with workspace access */}
+            {hasWorkspaceAccess ? (
               <button
                 onClick={() => setBrainOpen(true)}
-                className="bg-tfcs-gold/20 hover:bg-tfcs-gold/30 text-tfcs-gold px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 border border-tfcs-gold/30"
+                className="bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 border border-emerald-500/30"
                 data-testid="company-brain-btn"
                 title="Company Brain - Your Operations Partner"
               >
@@ -313,7 +287,7 @@ const AppLayout = () => {
                 <span className="hidden sm:inline">Brain</span>
               </button>
             ) : (
-              /* Non-TFCS Users: Traditional Quick Add */
+              /* Standard Quick Add for users without workspace */
               <div className="relative">
                 <button
                   onClick={() => setQuickActionOpen(!quickActionOpen)}
@@ -366,15 +340,15 @@ const AppLayout = () => {
           </div>
         </header>
 
-        {/* Page Content with Shield Backdrop */}
-        <main className="flex-1 p-4 lg:p-8 pb-20 lg:pb-8 overflow-auto relative">
-          {/* Large Shield Watermark - Centered Background - More Visible */}
+        {/* Page Content */}
+        <main className={`flex-1 p-4 lg:p-8 pb-20 lg:pb-8 overflow-auto relative ${hasWorkspaceAccess ? 'bg-black' : ''}`}>
+          {/* Large Shield Watermark - Centered Background */}
           <div 
             className="fixed inset-0 pointer-events-none z-0 flex items-center justify-center"
             style={{ marginLeft: '200px' }}
           >
             <div 
-              className="w-[700px] h-[700px] opacity-[0.06]"
+              className="w-[700px] h-[700px] opacity-[0.03]"
               style={{
                 backgroundImage: 'url(/shield-icon.png)',
                 backgroundSize: 'contain',
@@ -389,14 +363,16 @@ const AppLayout = () => {
         </main>
 
         {/* Mobile Bottom Nav */}
-        <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-charcoal-800 border-t border-charcoal-700 flex justify-around py-2 z-30">
-          {navItems.slice(0, 5).map((item) => (
+        <nav className={`lg:hidden fixed bottom-0 left-0 right-0 ${hasWorkspaceAccess ? 'bg-zinc-900 border-t border-zinc-800' : 'bg-charcoal-800 border-t border-charcoal-700'} flex justify-around py-2 z-30`}>
+          {activeNavItems.slice(0, 5).map((item) => (
             <NavLink
               key={item.path}
               to={item.path}
               className={({ isActive }) =>
                 `flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${
-                  isActive ? 'text-steel-400' : 'text-gray-500'
+                  isActive 
+                    ? hasWorkspaceAccess ? 'text-emerald-400' : 'text-steel-400' 
+                    : hasWorkspaceAccess ? 'text-zinc-500' : 'text-gray-500'
                 }`
               }
             >
@@ -414,16 +390,16 @@ const AppLayout = () => {
             className="fixed inset-0 bg-black/50 z-40 lg:hidden" 
             onClick={() => setMobileMenuOpen(false)} 
           />
-          <aside className="fixed inset-y-0 left-0 w-72 bg-charcoal-800 z-50 lg:hidden flex flex-col">
-            <div className="p-4 border-b border-charcoal-700 flex items-center justify-between">
+          <aside className={`fixed inset-y-0 left-0 w-72 ${hasWorkspaceAccess ? 'bg-zinc-900' : 'bg-charcoal-800'} z-50 lg:hidden flex flex-col`}>
+            <div className={`p-4 border-b ${hasWorkspaceAccess ? 'border-zinc-800' : 'border-charcoal-700'} flex items-center justify-between`}>
               <Logo size="sm" showText={false} />
-              <button onClick={() => setMobileMenuOpen(false)} className="text-gray-400">
+              <button onClick={() => setMobileMenuOpen(false)} className={hasWorkspaceAccess ? 'text-zinc-400' : 'text-gray-400'}>
                 <X className="w-6 h-6" />
               </button>
             </div>
 
             <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-              {navItems.map((item) => (
+              {activeNavItems.map((item) => (
                 <NavLink
                   key={item.path}
                   to={item.path}
@@ -431,8 +407,12 @@ const AppLayout = () => {
                   className={({ isActive }) =>
                     `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                       isActive
-                        ? 'bg-steel-500/20 text-steel-400'
-                        : 'text-gray-400 hover:text-white hover:bg-charcoal-700'
+                        ? hasWorkspaceAccess
+                          ? 'bg-emerald-500/10 text-emerald-400'
+                          : 'bg-steel-500/20 text-steel-400'
+                        : hasWorkspaceAccess
+                          ? 'text-zinc-400 hover:text-white hover:bg-zinc-800'
+                          : 'text-gray-400 hover:text-white hover:bg-charcoal-700'
                     }`
                   }
                 >
@@ -442,10 +422,10 @@ const AppLayout = () => {
               ))}
             </nav>
 
-            <div className="p-4 border-t border-charcoal-700">
+            <div className={`p-4 border-t ${hasWorkspaceAccess ? 'border-zinc-800' : 'border-charcoal-700'}`}>
               <button
                 onClick={handleSignOut}
-                className="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-charcoal-700 transition-colors"
+                className={`flex items-center gap-3 w-full px-4 py-3 rounded-lg ${hasWorkspaceAccess ? 'text-zinc-400 hover:text-white hover:bg-zinc-800' : 'text-gray-400 hover:text-white hover:bg-charcoal-700'} transition-colors`}
               >
                 <LogOut className="w-5 h-5" />
                 <span className="font-medium">Sign Out</span>
@@ -455,22 +435,22 @@ const AppLayout = () => {
         </>
       )}
 
-      {/* Trial Expired Modal - Non-TFCS users only */}
-      {!hasTfcsAccess && <TrialExpiredModal />}
+      {/* Trial Expired Modal - only for users without workspace access */}
+      {!hasWorkspaceAccess && <TrialExpiredModal />}
 
-      {/* Quick Add Expense Modal - Non-TFCS users only */}
-      {!hasTfcsAccess && showQuickExpenseModal && (
+      {/* Quick Add Expense Modal */}
+      {showQuickExpenseModal && (
         <QuickAddExpenseModal 
           onClose={() => setShowQuickExpenseModal(false)}
           onSuccess={() => setShowQuickExpenseModal(false)}
         />
       )}
       
-      {/* AI Copilot - Non-TFCS users only (TFCS uses Company Brain) */}
-      {!hasTfcsAccess && <AICopilot />}
+      {/* AI Copilot - only for users without workspace access */}
+      {!hasWorkspaceAccess && <AICopilot />}
       
-      {/* Quick Add FAB (Floating Action Button) - Non-TFCS users only */}
-      {!hasTfcsAccess && <QuickAddFab />}
+      {/* Quick Add FAB - only for users without workspace access */}
+      {!hasWorkspaceAccess && <QuickAddFab />}
       
       {/* Update Banner - Shows when service worker update is available */}
       <UpdateBanner />
@@ -478,8 +458,8 @@ const AppLayout = () => {
       {/* PWA Redirect Modal - Shows when user opens in browser but has app installed */}
       <PWARedirectModal />
       
-      {/* Company Brain Panel - TFCS users only - Single operational interface */}
-      {hasTfcsAccess && (
+      {/* Company Brain Panel - for users with workspace access */}
+      {hasWorkspaceAccess && (
         <CompanyBrainPanel
           isOpen={brainOpen}
           onClose={() => setBrainOpen(false)}

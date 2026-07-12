@@ -69,6 +69,9 @@ from routes.opportunities import router as opportunities_router
 # Import Tenders routes (Vertical Slice 1)
 from routes.tenders import router as tenders_router
 
+# Import Workspace routes (TradeOS OS - replaces TFCS role checks)
+from routes.workspace import router as workspace_router
+
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env', override=False)
 
@@ -226,6 +229,9 @@ app.include_router(opportunities_router)
 
 # Include Tenders routes (Vertical Slice 1)
 app.include_router(tenders_router)
+
+# Include Workspace routes (TradeOS OS)
+app.include_router(workspace_router)
 
 app.add_middleware(
     CORSMiddleware,

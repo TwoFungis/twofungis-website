@@ -183,11 +183,18 @@ const LandingPage = () => {
                 to="/signup" 
                 onClick={handleCTAClick}
                 className="bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white px-5 py-2.5 rounded-lg font-medium transition-all hover:shadow-lg hover:shadow-emerald-500/25 flex items-center gap-2"
+                data-testid="get-started-btn"
+              >
+                Get Started Free
+              </Link>
+              <button 
+                onClick={() => setShowPWAModal(true)}
+                className="bg-white/5 hover:bg-white/10 text-white px-5 py-2.5 rounded-lg font-medium transition-all border border-white/10 hover:border-white/20 flex items-center gap-2"
                 data-testid="download-app-btn"
               >
                 <Download className="w-4 h-4" />
-                Get Started Free
-              </Link>
+                Download App
+              </button>
             </nav>
             <div className="md:hidden flex items-center gap-2">
               <Link to="/login" className="text-gray-400 hover:text-white px-3 py-2 text-sm">Login</Link>
@@ -196,9 +203,15 @@ const LandingPage = () => {
                 onClick={handleCTAClick}
                 className="bg-gradient-to-r from-emerald-600 to-emerald-500 text-white px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-1.5"
               >
-                <Download className="w-4 h-4" />
                 Get Started
               </Link>
+              <button 
+                onClick={() => setShowPWAModal(true)}
+                className="bg-white/5 text-white p-2 rounded-lg border border-white/10"
+                data-testid="download-app-mobile-btn"
+              >
+                <Download className="w-4 h-4" />
+              </button>
             </div>
           </div>
         </div>
@@ -256,16 +269,17 @@ const LandingPage = () => {
               className="group bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all hover:shadow-xl hover:shadow-emerald-500/30 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98]"
               data-testid="hero-cta-btn"
             >
-              <Download className="w-5 h-5" />
               Get Started Free
               <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
-            <a 
-              href="#features" 
-              className="bg-white/5 hover:bg-white/10 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all border border-white/10 hover:border-white/20"
+            <button 
+              onClick={() => setShowPWAModal(true)}
+              className="bg-white/5 hover:bg-white/10 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all border border-white/10 hover:border-white/20 flex items-center justify-center gap-2"
+              data-testid="hero-download-btn"
             >
-              See All Features
-            </a>
+              <Download className="w-5 h-5" />
+              Download App
+            </button>
           </div>
           
           <p className="text-gray-500 text-sm mt-6">

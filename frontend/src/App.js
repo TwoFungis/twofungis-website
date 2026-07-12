@@ -35,6 +35,7 @@ import TaxSummaryPage from './pages/app/TaxSummaryPage';
 import IntegrationsPage from './pages/app/IntegrationsPage';
 import ReceivablesPage from './pages/app/ReceivablesPage';
 import MainframePage from './pages/app/MainframePage';
+import CommandCenterPage from './pages/app/CommandCenterPage';
 
 // Opportunities (Vertical Slice 1)
 import OpportunitiesPage from './pages/app/opportunities/OpportunitiesPage';
@@ -146,6 +147,7 @@ function App() {
             <Route path="settings" element={<SettingsPage />} />
             <Route path="profile" element={<ProfilePage />} />
             <Route path="mainframe" element={<MainframePage />} />
+            <Route path="command-center" element={<CommandCenterPage />} />
           </Route>
 
           {/* Catch all - redirect to home */}
