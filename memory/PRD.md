@@ -84,6 +84,13 @@ The TradeOS V2 Foundation has been officially locked and stabilized.
 - Download App triggers PWA install modal (no account required)
 - Available in both header navigation and hero section
 
+**Phase 3.1: PWA Installation Experience Redesign** ✅ (July 12, 2026)
+- **One-click install**: Desktop/Android trigger native browser install prompt immediately
+- **iOS visual guide**: Clean 3-step visual flow (Share → Add to Home Screen → Tap Add)
+- **Installation detection**: App shows "Open App" instead of "Download App" when already installed
+- **Premium UX**: Minimal text, visual icons, no technical jargon
+- **Platform-aware**: Automatically detects iOS/Android/Desktop and shows appropriate flow
+
 **Key Files Created/Modified:**
 - `/app/backend/routes/workspace.py` - New workspace context API
 - `/app/frontend/src/pages/app/CommandCenterPage.jsx` - New Command Center
