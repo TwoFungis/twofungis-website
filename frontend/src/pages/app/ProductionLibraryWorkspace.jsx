@@ -17,7 +17,7 @@
  */
 
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Library,
   Layers,
@@ -58,10 +58,12 @@ import {
   Settings2,
   Eye,
   EyeOff,
-  RefreshCw
+  RefreshCw,
+  AlertTriangle
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
+import ImportWizard from '../../components/production/ImportWizard';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -1035,11 +1037,17 @@ const LoadingState = () => {
 // ============================================
 const ProductionLibraryWorkspace = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  // Check if showing import wizard
+  const showImportWizard = searchParams.get('tab') === 'import';
   
   // State
   const [activeView, setActiveView] = useState('items');
+  const [navCollapsed, setNavCollapsed] = useState(false);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [apiError, setApiError] = useState(null);
   const [viewMode, setViewMode] = useState('list');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedItems, setSelectedItems] = useState(new Set());
@@ -1052,7 +1060,14 @@ const ProductionLibraryWorkspace = () => {
   const [domains, setDomains] = useState([]);
   const [categories, setCategories] = useState([]);
   const [assemblies, setAssemblies] = useState([]);
-  const [counts, setCounts] = useState({});
+  
+  // Derived counts
+  const counts = useMemo(() => ({
+    items: items.length,
+    domains: domains.length,
+    categories: categories.length,
+    assemblies: assemblies.length
+  }), [items, domains, categories, assemblies]);
   
   // Keyboard shortcuts
   useEffect(() => {
@@ -1070,6 +1085,7 @@ const ProductionLibraryWorkspace = () => {
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
+      setApiError(null);
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
       
@@ -1082,6 +1098,23 @@ const ProductionLibraryWorkspace = () => {
         fetch(`${API_URL}/api/production-library/service-categories`, { headers }),
         fetch(`${API_URL}/api/production-library/assemblies`, { headers })
       ]);
+      
+      // Check for schema errors (404 means tables don't exist)
+      const anyFailed = [itemsRes, domainsRes, catsRes, assembliesRes].some(r => !r.ok);
+      
+      if (anyFailed) {
+        // Check if it's a schema issue
+        const firstFail = [itemsRes, domainsRes, catsRes, assembliesRes].find(r => !r.ok);
+        if (firstFail.status === 404 || firstFail.status === 500) {
+          const errorData = await firstFail.json().catch(() => ({}));
+          if (errorData.detail?.includes('migration') || errorData.detail?.includes('not exist') || errorData.detail?.includes('schema')) {
+            setApiError('schema');
+          } else {
+            setApiError('api');
+            toast.error('Failed to load Production Library data. Please try again.');
+          }
+        }
+      }
       
       if (itemsRes.ok) {
         const data = await itemsRes.json();
@@ -1099,14 +1132,6 @@ const ProductionLibraryWorkspace = () => {
         const data = await assembliesRes.json();
         setAssemblies(data.assemblies || []);
       }
-      
-      // Update counts
-      setCounts({
-        items: items.length,
-        domains: domains.length,
-        categories: categories.length,
-        assemblies: assemblies.length
-      });
       
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -1211,8 +1236,49 @@ const ProductionLibraryWorkspace = () => {
   };
   
   const handleImport = () => {
-    navigate('/app/production-library?tab=import');
+    setSearchParams({ tab: 'import' });
   };
+  
+  const handleCloseImport = () => {
+    setSearchParams({});
+    fetchData(); // Refresh data after import
+  };
+  
+  // If showing import wizard, render that instead
+  if (showImportWizard) {
+    return (
+      <div className="h-full flex flex-col bg-[#0A0A0A] overflow-hidden" data-testid="production-library-workspace">
+        {/* Top Bar */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-800 bg-[#0A0A0A]/95 backdrop-blur-sm flex-shrink-0">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={handleCloseImport}
+              className="p-2 text-neutral-400 hover:text-white hover:bg-neutral-800 rounded-lg transition-colors"
+            >
+              <ArrowRight className="w-5 h-5 rotate-180" strokeWidth={1.5} />
+            </button>
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 bg-emerald-500/10 rounded-lg flex items-center justify-center">
+                <Upload className="w-5 h-5 text-emerald-400" strokeWidth={1.5} />
+              </div>
+              <div>
+                <h1 className="text-lg font-medium text-white tracking-tight">Import Production Knowledge</h1>
+                <p className="text-xs text-neutral-500">Company Knowledge Engine</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Import Wizard */}
+        <div className="flex-1 overflow-auto p-6">
+          <ImportWizard 
+            onComplete={handleCloseImport}
+            onClose={handleCloseImport}
+          />
+        </div>
+      </div>
+    );
+  }
   
   return (
     <div className="h-full flex flex-col bg-[#0A0A0A] overflow-hidden" data-testid="production-library-workspace">
@@ -1284,8 +1350,43 @@ const ProductionLibraryWorkspace = () => {
       
       {/* Content */}
       <div className="flex-1 flex overflow-hidden">
+        {/* Left Navigation */}
+        <LeftNavigation
+          activeView={activeView}
+          onViewChange={setActiveView}
+          counts={counts}
+          collapsed={navCollapsed}
+          onToggleCollapse={() => setNavCollapsed(!navCollapsed)}
+        />
+        
+        {/* Main Content */}
         {loading ? (
           <LoadingState />
+        ) : apiError === 'schema' ? (
+          <div className="flex-1 flex items-center justify-center p-8">
+            <div className="text-center max-w-md">
+              <div className="w-20 h-20 bg-amber-500/10 border border-amber-500/30 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <AlertTriangle className="w-10 h-10 text-amber-400" strokeWidth={1.5} />
+              </div>
+              <h3 className="text-xl font-medium text-white mb-2">Database Setup Required</h3>
+              <p className="text-neutral-400 text-sm mb-6 leading-relaxed">
+                The Production Library tables have not been created in your database yet.
+                An administrator needs to run the migration.
+              </p>
+              <div className="bg-neutral-900 border border-neutral-800 rounded-lg p-4 mb-6">
+                <code className="text-xs text-neutral-300 font-mono">
+                  /app/migrations/015_production_library_foundation.sql
+                </code>
+              </div>
+              <button
+                onClick={handleImport}
+                className="flex items-center gap-2 mx-auto bg-emerald-500 hover:bg-emerald-400 text-black font-medium px-6 py-3 rounded-lg transition-all"
+              >
+                <Upload className="w-4 h-4" strokeWidth={2} />
+                Go to Import Wizard
+              </button>
+            </div>
+          </div>
         ) : items.length === 0 ? (
           <EmptyState onImport={handleImport} />
         ) : (
