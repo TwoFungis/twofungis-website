@@ -1,97 +1,91 @@
 {
   "theme": "dark",
-  "design_philosophy": "Mission Control. High-density, extreme clarity, and industrial premium feel. Not an accounting software. Every pixel must serve an operational purpose. Dark mode native.",
+  "archetype": "The Performance Pro mixed with SaaS Noir",
   "typography": {
-    "primary_font": "IBM Plex Sans",
-    "secondary_font": "JetBrains Mono",
-    "instructions": "Use IBM Plex Sans for all headings and body text. Use JetBrains Mono EXCLUSIVELY for numbers, data points, timestamps, and AI-generated outputs to enhance the 'Mainframe' aesthetic. BANNED FONTS: Inter, Space Grotesk, Roboto.",
+    "fonts_to_install": ["@fontsource/cabinet-grotesk", "@fontsource/manrope"],
+    "heading": "Cabinet Grotesk, sans-serif",
+    "body": "Manrope, sans-serif",
     "hierarchy": {
-      "h1": "text-2xl sm:text-3xl font-bold tracking-tight",
-      "h2": "text-xl sm:text-2xl font-semibold tracking-tight",
-      "h3": "text-lg font-medium tracking-tight",
-      "body": "text-sm sm:text-base leading-relaxed",
-      "data_labels": "text-xs font-mono tracking-[0.1em] uppercase",
-      "data_values": "text-lg sm:text-xl font-mono font-medium"
+      "h1": "text-5xl sm:text-6xl md:text-7xl tracking-tighter font-black uppercase",
+      "h2": "text-3xl sm:text-4xl lg:text-5xl tracking-tight font-bold uppercase",
+      "h3": "text-xl sm:text-2xl tracking-tight font-semibold",
+      "overline": "text-xs tracking-[0.2em] uppercase font-bold text-yellow-500",
+      "body": "text-base md:text-lg leading-relaxed text-neutral-400"
     }
   },
   "colors": {
     "background": "#050505",
     "surface": "#0F0F12",
     "surface_hover": "#1A1A1E",
-    "border": "#262626",
+    "surface_glass": "bg-black/60 backdrop-blur-2xl border border-white/10",
+    "primary_accent": "#FACC15",
+    "primary_accent_hover": "#FEF08A",
     "text_primary": "#FFFFFF",
     "text_secondary": "#A1A1AA",
-    "brand": {
-      "black_foundation": "#050505",
-      "tfcs_red": "#FF3B30",
-      "success_green": "#00FF66",
-      "premium_gold": "#D4AF37",
-      "tfcs_red_muted": "rgba(255, 59, 48, 0.15)",
-      "success_green_muted": "rgba(0, 255, 102, 0.15)",
-      "premium_gold_muted": "rgba(212, 175, 55, 0.15)"
-    },
-    "instructions": "Apply these exact hex codes in tailwind config. Do not use generic tailwind colors for status. The foundation must be pure/near black to reduce eye strain in a Mission Control setting. Never use pure white for large surfaces."
-  },
-  "visual_enhancers": {
-    "surfaces": "The 'Technical' Look. Expose the skeleton. Use flat backgrounds with crisp 1px borders (`border-border`). Avoid heavy shadows. For premium elements (like Today's Focus), use a subtle `border-l-4` or glowing border effect with Premium Gold.",
-    "effects": "No Glassmorphism. Mission control requires absolute clarity. Use solid colors. Subtle radial gradients behind key metrics (like Gold or Red glows at 5% opacity) can indicate priority.",
-    "animations": "Minimalist. Avoid bounces or large scale transforms. Use smooth micro-interactions: slight background lightening on row hover (`hover:bg-surface_hover`), opacity fades (`transition-opacity`), and crisp slide-downs for expandable panels."
+    "border": "#262626"
   },
   "layouts": {
-    "grid_strategy": "MODE B: High Density Grid. Utilize CSS Grid for the main dashboard. A 12-column or 4-column base where cards snap tightly together with minimal gaps (`gap-4` or `gap-6`). Every pixel must be utilized. No jagged bottoms.",
-    "alignment": "Strict left-alignment for text and data. Right-alignment for numbers in tables/lists. This creates a rigid, predictable reading line for fast triage.",
-    "spacing": "Dense but readable. Use `p-4` or `p-6` inside cards. Ensure tight spacing between related elements (`gap-2`) and wider spacing between distinct sections (`gap-6`)."
+    "hero": "Asymmetric layout with strong left-aligned typography. Text should sit on top of a dark overlay (bg-black/60 to bg-black/80 gradient) blending into a cinematic hero background image. Use 'The Swiss Grid' principles. Do not center-align the hero text.",
+    "features_bento": "MODE A: 'Tetris' Grid. Base grid-cols-1 md:grid-cols-12 gap-6 or gap-8. Mix tall (col-span-4 row-span-2), square (col-span-4 row-span-1), and wide (col-span-8 row-span-1) blocks. 1px technical border.",
+    "spacing": "Use p-8 to p-12 for bento containers. Use py-24 to py-32 for section vertical rhythm."
   },
-  "components": {
-    "header": {
-      "description": "Sticky top header. Minimalist. Must include TFCS Mainframe title, Notifications bell, Catch Me Up AI trigger, Owner Access crown, and Quick Add.",
-      "styling": "Solid background (`bg-background`) with a 1px bottom border (`border-b border-border`). Icons should use `lucide-react` with a default `text_secondary` color, highlighting on hover.",
-      "owner_access": "Style the Crown icon using Premium Gold. You may use the provided CEO portrait alongside the crown."
-    },
-    "todays_focus": {
-      "description": "The command center's highest priority module.",
-      "styling": "Single horizontal card spanning full width. Premium styling: 1px Gold border or a glowing gold left border. Inside, present 3 items in a flex row or grid, clearly badged with TFCS Red (Action), Success Green (Success), or Gold (Ownership)."
-    },
-    "data_cards": {
-      "description": "Projects and Opportunities cards.",
-      "styling": "Cardless or 'flat card' look. `bg-surface border border-border`. Rows should be `flex items-center justify-between py-3 border-b border-border last:border-0`. Rows must be interactive (`cursor-pointer hover:bg-surface_hover`). Use JetBrains Mono for counts."
-    },
-    "ai_catch_me_up": {
-      "description": "Operational summary.",
-      "styling": "Terminal aesthetic. `bg-black border border-border p-4`. Text must be JetBrains Mono, maybe slightly tinted green or gray, mimicking a console log."
-    },
-    "recent_activity": {
-      "description": "Company history feed.",
-      "styling": "Vertical timeline layout. Use small indicator dots (Red, Green, Gold, Gray) connected by a 1px vertical line. Timestamps in JetBrains Mono."
-    }
+  "visual_enhancers": {
+    "surfaces": "Use Glassmorphism for Sticky Header (bg-black/60 backdrop-blur-xl border-b border-white/10). Use Grid Borders for Feature Cards (flat dark background #0F0F12, 1px border-white/10, hover:border-yellow-500/50).",
+    "motion": "Use Framer Motion for staggered entrance animations. Consider a 'Tracing Beam' effect for high-tier Pricing Cards.",
+    "buttons": "Sharp edges or extremely minimal rounding (rounded-sm). Primary button must be Electric Yellow (bg-yellow-400) with solid black text. Hover state should lift (-translate-y-1) with a yellow drop shadow."
   },
-  "image_urls": {
-    "owner_avatar": {
-      "url": "https://images.unsplash.com/photo-1764545973653-94c40d993495?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxODh8MHwxfHNlYXJjaHwxfHxjZW8lMjBwb3J0cmFpdCUyMGRhcmslMjBiYWNrZ3JvdW5kfGVufDB8fHx8MTc4Mzc1ODkwNHww&ixlib=rb-4.1.0&q=85",
-      "description": "CEO portrait for Owner Access menu in the header."
-    }
+  "motion": {
+    "stagger_children": "Use Framer Motion to stagger bento grid items by 0.1s.",
+    "hover_states": "Hovering bento items should slightly brighten the border (border-white/20) and subtly scale an inner element/icon.",
+    "scroll": "Elements should gently fade in and translate-y-4 into place as they enter the viewport."
+  },
+  "components_to_use": {
+    "ui_library": "shadcn/ui",
+    "components": ["accordion", "button", "card", "badge", "dialog"],
+    "custom_instructions": "Strip the Vercel-look from Shadcn components. Override default radius to rounded-none or rounded-sm. Override default borders to border-white/10."
   },
   "accessibility": {
-    "contrast": "Ensure all text meets at least 4.5:1 ratio against the dark backgrounds. Muted colors should only be used for backgrounds, never for text.",
-    "testing": "All interactive elements MUST include `data-testid` (e.g., `data-testid=\"notifications-bell\"`, `data-testid=\"project-row-in-progress\"`)."
+    "contrast": "Ensure yellow text/buttons have dark text inside them (black). Do not use dark text on dark backgrounds.",
+    "testing": "All interactive elements MUST have data-testid attributes (e.g., data-testid='hero-cta-button', data-testid='pricing-card-pro')."
   },
-  "instructions_to_main_agent": [
-    "1. Do not use standard Shadcn card styles (with rounded-xl and shadows). Customize them to have sharp or slightly rounded corners (max 4px) and 1px hard borders.",
-    "2. Inject IBM Plex Sans and JetBrains Mono via Google Fonts in index.css.",
-    "3. Set Tailwind dark mode natively and apply the brand colors directly in tailwind.config.js.",
-    "4. Implement the UI using simple `div` and `flex`/`grid` utilities to maintain the brutalist/industrial structure rather than relying heavily on pre-styled components.",
-    "5. Use `lucide-react` for all icons (Crown, Bell, Bot/Sparkles, Plus/Quick Add).",
-    "6. Build a fully responsive layout. On mobile, the Today's Focus card should stack vertically.",
-    "7. Include `data-testid` on all buttons and clickable rows."
-  ],
+  "media": {
+    "images": [
+      {
+        "category": "hero_background",
+        "url": "https://images.pexels.com/photos/18162494/pexels-photo-18162494.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "description": "High-rise construction site, use with heavy bg-black/70 overlay to ensure text readability."
+      },
+      {
+        "category": "ai_section_background",
+        "url": "https://images.unsplash.com/photo-1768527858342-037cff722276?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA3MDB8MHwxfHNlYXJjaHwyfHxhYnN0cmFjdCUyMG5lb24lMjBnbG93aW5nJTIwZ3JpZCUyMDNkfGVufDB8fHx8MTc4MzgyMzYwOHww&ixlib=rb-4.1.0&q=85",
+        "description": "Abstract neon grid pattern, use for the 'Company Brain (AI)' and 'Future AI Automation' bento block background."
+      },
+      {
+        "category": "testimonial_portrait_1",
+        "url": "https://images.unsplash.com/photo-1672748341520-6a839e6c05bb?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1ODh8MHwxfHNlYXJjaHwxfHxjb250cmFjdG9yJTIwcG9ydHJhaXR8ZW58MHx8fHwxNzgzODIzNTkxfDA&ixlib=rb-4.1.0&q=85",
+        "description": "Contractor in red hard hat."
+      },
+      {
+        "category": "testimonial_portrait_2",
+        "url": "https://images.unsplash.com/photo-1679679811837-c28b2586f533?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1ODh8MHwxfHNlYXJjaHwzfHxjb250cmFjdG9yJTIwcG9ydHJhaXR8ZW58MHx8fHwxNzgzODIzNTkxfDA&ixlib=rb-4.1.0&q=85",
+        "description": "Smiling contractor."
+      },
+      {
+        "category": "sponsor_logo_1",
+        "url": "https://images.unsplash.com/photo-1772760110621-d7b6f54c1e42?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2MTJ8MHwxfHNlYXJjaHwyfHxtb2Rlcm4lMjBjb21wYW55JTIwYnJhbmQlMjBsb2dvfGVufDB8fHx8MTc4MzgyMzYwN3ww&ixlib=rb-4.1.0&q=85",
+        "description": "Sony logo illuminated"
+      }
+    ],
+    "icons": "Use @phosphor-icons/react for duotone/bold industrial feeling icons. Install with: yarn add @phosphor-icons/react. lucide-react is also acceptable."
+  },
   "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
-    "You tend to converge toward generic, 'on distribution' outputs. Avoid this: make creative, distinctive frontends that surprise and delight.",
-    "Dark colors look good when used independently without gradients. DO NOT use dark colors as gradients.",
-    "Don't make generic centered layouts. Use strictly aligned, asymmetric, or grid-based structural layouts.",
-    "You MUST NOT apply universal transition (e.g., `transition: all`). Always add transitions for specific properties.",
-    "You MUST NOT center align the app container. No `.App { text-align: center; }`.",
-    "NEVER use AI assistant Emoji characters like 🤖🧠💭💡🔮🎯 for icons.",
-    "Prioritize using pre-existing components from src/components/ui when applicable, but strip their default SaaS styling to match the Mission Control aesthetic.",
-    "Use `sonner` for any required toast notifications."
+    "NEVER use generic centered layouts or simplistic gradients.",
+    "NEVER use AI emojis (🤖🧠💭). Use proper SVG icons.",
+    "NEVER apply 'transition: all'. Explicitly state transition properties.",
+    "DO NOT center align the app container in CSS.",
+    "Use 2-3x more spacing (p-8 to p-16) for a premium feel.",
+    "Include data-testid on every interactive element.",
+    "Rely heavily on subtle border colors (border-white/10) to define dark mode sections, not massive background shifts.",
+    "Do not use complete transparent backgrounds for headers or dropdowns."
   ]
 }
