@@ -17,8 +17,8 @@ module.exports = {
         sm: 'calc(var(--radius) - 4px)'
       },
       colors: {
-        // TFCS Mainframe Brand Colors
-        'tfcs': {
+        // TradeOS Brand Colors
+        'tradeos': {
           'black': '#050505',
           'surface': '#0F0F12',
           'surface-hover': '#1A1A1E',

@@ -43,7 +43,7 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 // CONTEXT TYPES
 // ============================================
 const CONTEXT_TYPES = {
-  general: { label: 'General', icon: Brain, color: 'text-tfcs-gold' },
+  general: { label: 'General', icon: Brain, color: 'text-tradeos-gold' },
   project: { label: 'Project', icon: FileText, color: 'text-blue-400' },
   opportunity: { label: 'Opportunity', icon: Sparkles, color: 'text-purple-400' },
   estimate: { label: 'Estimate', icon: FileText, color: 'text-green-400' },
@@ -61,9 +61,9 @@ const CONTEXT_TYPES = {
 // ============================================
 const CompanyBrief = () => {
   return (
-    <div className="p-4 border-b border-tfcs-border">
+    <div className="p-4 border-b border-tradeos-border">
       <div className="flex items-center gap-2 mb-3">
-        <Sparkles className="w-4 h-4 text-tfcs-gold" />
+        <Sparkles className="w-4 h-4 text-tradeos-gold" />
         <h3 className="text-xs font-mono uppercase tracking-wider text-zinc-500">Company Brief</h3>
       </div>
       <div className="bg-black/50 rounded p-3 text-sm text-zinc-400 font-mono">
@@ -118,10 +118,10 @@ const ConversationSection = ({
   return (
     <div className="flex-1 flex flex-col min-h-0">
       {/* Context Header */}
-      <div className="p-3 border-b border-tfcs-border">
+      <div className="p-3 border-b border-tradeos-border">
         <button 
           onClick={() => setShowThreads(!showThreads)}
-          className="w-full flex items-center justify-between text-left hover:bg-tfcs-surface-hover rounded p-2 -m-2 transition-colors"
+          className="w-full flex items-center justify-between text-left hover:bg-tradeos-surface-hover rounded p-2 -m-2 transition-colors"
           data-testid="brain-context-selector"
         >
           <div className="flex items-center gap-2">
@@ -135,10 +135,10 @@ const ConversationSection = ({
         
         {/* Thread Selector Dropdown */}
         {showThreads && (
-          <div className="mt-2 bg-black/50 rounded border border-tfcs-border max-h-48 overflow-y-auto">
+          <div className="mt-2 bg-black/50 rounded border border-tradeos-border max-h-48 overflow-y-auto">
             <button
               onClick={() => { onSelectThread({ type: 'general', name: 'General' }); setShowThreads(false); }}
-              className="w-full flex items-center gap-2 p-2 text-left text-sm text-zinc-300 hover:bg-tfcs-surface-hover"
+              className="w-full flex items-center gap-2 p-2 text-left text-sm text-zinc-300 hover:bg-tradeos-surface-hover"
             >
               <Plus className="w-3 h-3" />
               New General Conversation
@@ -147,7 +147,7 @@ const ConversationSection = ({
               <button
                 key={thread.id || i}
                 onClick={() => { onSelectThread(thread); setShowThreads(false); }}
-                className="w-full flex items-center gap-2 p-2 text-left text-sm text-zinc-400 hover:bg-tfcs-surface-hover border-t border-tfcs-border/50"
+                className="w-full flex items-center gap-2 p-2 text-left text-sm text-zinc-400 hover:bg-tradeos-surface-hover border-t border-tradeos-border/50"
               >
                 <MessageSquare className="w-3 h-3" />
                 <span className="truncate">{thread.context_name || thread.context_type}</span>
@@ -162,7 +162,7 @@ const ConversationSection = ({
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.length === 0 ? (
           <div className="text-center py-8">
-            <Brain className="w-10 h-10 text-tfcs-gold/30 mx-auto mb-3" />
+            <Brain className="w-10 h-10 text-tradeos-gold/30 mx-auto mb-3" />
             <p className="text-zinc-500 text-sm">Start a conversation with Company Brain.</p>
             <p className="text-zinc-600 text-xs mt-1">AI capabilities coming in future specification.</p>
           </div>
@@ -175,9 +175,9 @@ const ConversationSection = ({
               <div 
                 className={`max-w-[85%] rounded-lg p-3 ${
                   msg.role === 'user' 
-                    ? 'bg-tfcs-gold/20 text-white' 
+                    ? 'bg-tradeos-gold/20 text-white' 
                     : msg.role === 'brain'
-                      ? 'bg-tfcs-surface border border-tfcs-border text-zinc-300'
+                      ? 'bg-tradeos-surface border border-tradeos-border text-zinc-300'
                       : 'bg-zinc-800/50 text-zinc-400 italic'
                 }`}
               >
@@ -193,8 +193,8 @@ const ConversationSection = ({
         )}
         {loading && (
           <div className="flex justify-start">
-            <div className="bg-tfcs-surface border border-tfcs-border rounded-lg p-3">
-              <Loader2 className="w-4 h-4 text-tfcs-gold animate-spin" />
+            <div className="bg-tradeos-surface border border-tradeos-border rounded-lg p-3">
+              <Loader2 className="w-4 h-4 text-tradeos-gold animate-spin" />
             </div>
           </div>
         )}
@@ -202,8 +202,8 @@ const ConversationSection = ({
       </div>
       
       {/* Input */}
-      <div className="p-3 border-t border-tfcs-border">
-        <div className="flex items-center gap-2 bg-tfcs-surface border border-tfcs-border rounded-lg">
+      <div className="p-3 border-t border-tradeos-border">
+        <div className="flex items-center gap-2 bg-tradeos-surface border border-tradeos-border rounded-lg">
           <input
             type="text"
             value={input}
@@ -224,7 +224,7 @@ const ConversationSection = ({
           <button
             onClick={handleSend}
             disabled={!input.trim() || loading}
-            className="p-2 text-tfcs-gold hover:text-tfcs-gold/80 disabled:text-zinc-600 disabled:cursor-not-allowed transition-colors"
+            className="p-2 text-tradeos-gold hover:text-tradeos-gold/80 disabled:text-zinc-600 disabled:cursor-not-allowed transition-colors"
             data-testid="brain-send"
           >
             <Send className="w-4 h-4" />
@@ -243,13 +243,13 @@ const SuggestedActions = ({ actions, onAction }) => {
   const [expanded, setExpanded] = useState(true);
   
   return (
-    <div className="border-t border-tfcs-border">
+    <div className="border-t border-tradeos-border">
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center justify-between p-3 hover:bg-tfcs-surface-hover transition-colors"
+        className="w-full flex items-center justify-between p-3 hover:bg-tradeos-surface-hover transition-colors"
       >
         <div className="flex items-center gap-2">
-          <Lightbulb className="w-4 h-4 text-tfcs-gold" />
+          <Lightbulb className="w-4 h-4 text-tradeos-gold" />
           <span className="text-xs font-mono uppercase tracking-wider text-zinc-500">Suggested Actions</span>
         </div>
         <ChevronRight className={`w-4 h-4 text-zinc-500 transition-transform ${expanded ? 'rotate-90' : ''}`} />
@@ -264,14 +264,14 @@ const SuggestedActions = ({ actions, onAction }) => {
               <button
                 key={action.id || i}
                 onClick={() => onAction(action)}
-                className="w-full text-left p-2 bg-tfcs-surface hover:bg-tfcs-surface-hover border border-tfcs-border rounded transition-colors group"
+                className="w-full text-left p-2 bg-tradeos-surface hover:bg-tradeos-surface-hover border border-tradeos-border rounded transition-colors group"
                 data-testid={`brain-action-${action.id}`}
               >
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-white">{action.title}</span>
                   <span className={`text-xs px-1.5 py-0.5 rounded ${
-                    action.priority === 'high' ? 'bg-tfcs-red-muted text-tfcs-red' :
-                    action.priority === 'medium' ? 'bg-tfcs-gold-muted text-tfcs-gold' :
+                    action.priority === 'high' ? 'bg-tradeos-red-muted text-tradeos-red' :
+                    action.priority === 'medium' ? 'bg-tradeos-gold-muted text-tradeos-gold' :
                     'bg-zinc-800 text-zinc-400'
                   }`}>
                     {action.priority}
@@ -298,10 +298,10 @@ const ActionHistory = ({ actions }) => {
   const [expanded, setExpanded] = useState(false);
   
   return (
-    <div className="border-t border-tfcs-border">
+    <div className="border-t border-tradeos-border">
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center justify-between p-3 hover:bg-tfcs-surface-hover transition-colors"
+        className="w-full flex items-center justify-between p-3 hover:bg-tradeos-surface-hover transition-colors"
       >
         <div className="flex items-center gap-2">
           <History className="w-4 h-4 text-zinc-500" />
@@ -325,8 +325,8 @@ const ActionHistory = ({ actions }) => {
                   <div className="flex items-center justify-between">
                     <span className="text-white">{action.module} → {action.action}</span>
                     <span className={`px-1.5 py-0.5 rounded ${
-                      action.state === 'completed' ? 'bg-tfcs-green-muted text-tfcs-green' :
-                      action.state === 'failed' ? 'bg-tfcs-red-muted text-tfcs-red' :
+                      action.state === 'completed' ? 'bg-tradeos-green-muted text-tradeos-green' :
+                      action.state === 'failed' ? 'bg-tradeos-red-muted text-tradeos-red' :
                       'bg-zinc-800 text-zinc-400'
                     }`}>
                       {action.state}
@@ -530,13 +530,13 @@ const CompanyBrainPanel = ({ isOpen, onClose, pageContext }) => {
       
       {/* Panel */}
       <div 
-        className="fixed right-0 top-0 h-full w-full max-w-md bg-tfcs-black border-l border-tfcs-gold/30 z-50 flex flex-col shadow-2xl"
+        className="fixed right-0 top-0 h-full w-full max-w-md bg-tradeos-black border-l border-tradeos-gold/30 z-50 flex flex-col shadow-2xl"
         data-testid="company-brain-panel"
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-tfcs-gold/30 bg-tfcs-gold-muted/30">
+        <div className="flex items-center justify-between p-4 border-b border-tradeos-gold/30 bg-tradeos-gold-muted/30">
           <div className="flex items-center gap-3">
-            <Brain className="w-6 h-6 text-tfcs-gold" />
+            <Brain className="w-6 h-6 text-tradeos-gold" />
             <div>
               <h2 className="text-lg font-semibold text-white">Company Brain</h2>
               <p className="text-xs text-zinc-500 font-mono">Operations Partner</p>

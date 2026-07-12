@@ -31,8 +31,8 @@ const NotificationsPanel = ({ isOpen, onClose, notifications, onMarkRead }) => {
   return (
     <div className="fixed inset-0 z-50 lg:relative lg:inset-auto">
       <div className="fixed inset-0 bg-black/50 lg:hidden" onClick={onClose} />
-      <div className="fixed right-0 top-0 h-full w-full max-w-md bg-tfcs-surface border-l border-tfcs-border lg:absolute lg:top-full lg:right-0 lg:h-auto lg:max-h-[70vh] lg:mt-2 lg:rounded lg:border overflow-hidden">
-        <div className="flex items-center justify-between p-4 border-b border-tfcs-border">
+      <div className="fixed right-0 top-0 h-full w-full max-w-md bg-tradeos-surface border-l border-tradeos-border lg:absolute lg:top-full lg:right-0 lg:h-auto lg:max-h-[70vh] lg:mt-2 lg:rounded lg:border overflow-hidden">
+        <div className="flex items-center justify-between p-4 border-b border-tradeos-border">
           <h3 className="font-semibold text-white">Notifications</h3>
           <button onClick={onClose} className="text-zinc-400 hover:text-white" data-testid="close-notifications">
             <X className="w-5 h-5" />
@@ -45,11 +45,11 @@ const NotificationsPanel = ({ isOpen, onClose, notifications, onMarkRead }) => {
               <p>No new notifications</p>
             </div>
           ) : (
-            <div className="divide-y divide-tfcs-border">
+            <div className="divide-y divide-tradeos-border">
               {notifications.map((notif, i) => (
                 <div 
                   key={i} 
-                  className="p-4 hover:bg-tfcs-surface-hover cursor-pointer transition-colors"
+                  className="p-4 hover:bg-tradeos-surface-hover cursor-pointer transition-colors"
                   onClick={() => onMarkRead(notif.id)}
                 >
                   <p className="text-white text-sm">{notif.title}</p>
@@ -70,10 +70,10 @@ const CatchMeUpPanel = ({ isOpen, onClose }) => {
   return (
     <div className="fixed inset-0 z-50 lg:relative lg:inset-auto">
       <div className="fixed inset-0 bg-black/50 lg:hidden" onClick={onClose} />
-      <div className="fixed right-0 top-0 h-full w-full max-w-lg bg-tfcs-black border-l border-tfcs-border lg:absolute lg:top-full lg:right-0 lg:h-auto lg:mt-2 lg:rounded lg:border overflow-hidden">
-        <div className="flex items-center justify-between p-4 border-b border-tfcs-border">
+      <div className="fixed right-0 top-0 h-full w-full max-w-lg bg-tradeos-black border-l border-tradeos-border lg:absolute lg:top-full lg:right-0 lg:h-auto lg:mt-2 lg:rounded lg:border overflow-hidden">
+        <div className="flex items-center justify-between p-4 border-b border-tradeos-border">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-tfcs-gold" />
+            <Sparkles className="w-5 h-5 text-tradeos-gold" />
             <h3 className="font-semibold text-white">Catch Me Up</h3>
           </div>
           <button onClick={onClose} className="text-zinc-400 hover:text-white" data-testid="close-catchmeup">
@@ -82,7 +82,7 @@ const CatchMeUpPanel = ({ isOpen, onClose }) => {
         </div>
         <div className="p-6 font-mono text-sm text-zinc-400 bg-black">
           <div className="flex flex-col items-center justify-center text-center py-8">
-            <Sparkles className="w-8 h-8 text-tfcs-gold/50 mb-4" />
+            <Sparkles className="w-8 h-8 text-tradeos-gold/50 mb-4" />
             <p className="text-zinc-500 leading-relaxed">
               Company Brain will summarize activity here in a future specification.
             </p>
@@ -120,11 +120,11 @@ const OwnerAccessPanel = ({ isOpen, onClose, roleData, owners, loadingOwners }) 
   return (
     <div className="fixed inset-0 z-50 lg:relative lg:inset-auto">
       <div className="fixed inset-0 bg-black/50 lg:hidden" onClick={onClose} />
-      <div className="fixed right-0 top-0 h-full w-full max-w-sm bg-tfcs-surface border-l border-tfcs-gold/30 lg:absolute lg:top-full lg:right-0 lg:h-auto lg:max-h-[80vh] lg:mt-2 lg:rounded lg:border overflow-hidden flex flex-col">
-        <div className="flex items-center justify-between p-4 border-b border-tfcs-gold/30 bg-tfcs-gold-muted">
+      <div className="fixed right-0 top-0 h-full w-full max-w-sm bg-tradeos-surface border-l border-tradeos-gold/30 lg:absolute lg:top-full lg:right-0 lg:h-auto lg:max-h-[80vh] lg:mt-2 lg:rounded lg:border overflow-hidden flex flex-col">
+        <div className="flex items-center justify-between p-4 border-b border-tradeos-gold/30 bg-tradeos-gold-muted">
           <div className="flex items-center gap-2">
-            <Crown className="w-5 h-5 text-tfcs-gold" />
-            <h3 className="font-semibold text-tfcs-gold">Owner Access</h3>
+            <Crown className="w-5 h-5 text-tradeos-gold" />
+            <h3 className="font-semibold text-tradeos-gold">Owner Access</h3>
           </div>
           <button onClick={onClose} className="text-zinc-400 hover:text-white" data-testid="close-owner">
             <X className="w-5 h-5" />
@@ -133,11 +133,11 @@ const OwnerAccessPanel = ({ isOpen, onClose, roleData, owners, loadingOwners }) 
         
         <div className="flex-1 overflow-y-auto">
           {/* Owner Management Section */}
-          <div className="p-4 border-b border-tfcs-border">
+          <div className="p-4 border-b border-tradeos-border">
             <p className="text-xs text-zinc-500 uppercase tracking-wider font-mono mb-3">Company Owners</p>
             {loadingOwners ? (
               <div className="flex items-center justify-center py-4">
-                <Loader2 className="w-5 h-5 text-tfcs-gold animate-spin" />
+                <Loader2 className="w-5 h-5 text-tradeos-gold animate-spin" />
               </div>
             ) : (
               <div className="space-y-3">
@@ -149,12 +149,12 @@ const OwnerAccessPanel = ({ isOpen, onClose, roleData, owners, loadingOwners }) 
                         <p className="text-xs text-zinc-500">{owner.email}</p>
                       </div>
                       <div className="flex items-center gap-1">
-                        <Crown className="w-3 h-3 text-tfcs-gold" />
-                        <span className="text-xs text-tfcs-gold font-medium">Owner</span>
+                        <Crown className="w-3 h-3 text-tradeos-gold" />
+                        <span className="text-xs text-tradeos-gold font-medium">Owner</span>
                       </div>
                     </div>
                     <div className="flex items-center justify-between mt-2 text-xs text-zinc-500">
-                      <span className={owner.status === 'active' ? 'text-tfcs-green' : 'text-zinc-500'}>
+                      <span className={owner.status === 'active' ? 'text-tradeos-green' : 'text-zinc-500'}>
                         {owner.status === 'active' ? '● Active' : '○ Inactive'}
                       </span>
                       <span>Last login: {formatLastLogin(owner.last_login)}</span>
@@ -166,7 +166,7 @@ const OwnerAccessPanel = ({ isOpen, onClose, roleData, owners, loadingOwners }) 
           </div>
           
           {/* Current User Info */}
-          <div className="p-4 border-b border-tfcs-border">
+          <div className="p-4 border-b border-tradeos-border">
             <p className="text-xs text-zinc-500 uppercase tracking-wider font-mono mb-2">Your Account</p>
             <div className="space-y-2">
               <div>
@@ -179,7 +179,7 @@ const OwnerAccessPanel = ({ isOpen, onClose, roleData, owners, loadingOwners }) 
               </div>
               <div>
                 <p className="text-xs text-zinc-600">Role</p>
-                <p className="text-tfcs-gold capitalize">{roleData?.role || 'Owner'}</p>
+                <p className="text-tradeos-gold capitalize">{roleData?.role || 'Owner'}</p>
               </div>
             </div>
           </div>
@@ -190,7 +190,7 @@ const OwnerAccessPanel = ({ isOpen, onClose, roleData, owners, loadingOwners }) 
             <div className="space-y-1">
               {permissions.map((perm, i) => (
                 <div key={i} className="flex items-center gap-2 text-sm">
-                  <CheckCircle2 className="w-4 h-4 text-tfcs-green" />
+                  <CheckCircle2 className="w-4 h-4 text-tradeos-green" />
                   <span className="text-white">{perm.label}</span>
                 </div>
               ))}
@@ -216,8 +216,8 @@ const QuickAddPanel = ({ isOpen, onClose, onNavigate }) => {
   return (
     <div className="fixed inset-0 z-50 lg:relative lg:inset-auto">
       <div className="fixed inset-0 bg-black/50 lg:hidden" onClick={onClose} />
-      <div className="fixed right-0 top-0 h-full w-full max-w-xs bg-tfcs-surface border-l border-tfcs-border lg:absolute lg:top-full lg:right-0 lg:h-auto lg:mt-2 lg:rounded lg:border overflow-hidden">
-        <div className="flex items-center justify-between p-4 border-b border-tfcs-border">
+      <div className="fixed right-0 top-0 h-full w-full max-w-xs bg-tradeos-surface border-l border-tradeos-border lg:absolute lg:top-full lg:right-0 lg:h-auto lg:mt-2 lg:rounded lg:border overflow-hidden">
+        <div className="flex items-center justify-between p-4 border-b border-tradeos-border">
           <h3 className="font-semibold text-white">Quick Add</h3>
           <button onClick={onClose} className="text-zinc-400 hover:text-white" data-testid="close-quickadd">
             <X className="w-5 h-5" />
@@ -228,7 +228,7 @@ const QuickAddPanel = ({ isOpen, onClose, onNavigate }) => {
             <button
               key={i}
               onClick={() => { onNavigate(item.href); onClose(); }}
-              className="w-full flex items-center gap-3 px-4 py-3 text-left text-white hover:bg-tfcs-surface-hover rounded transition-colors"
+              className="w-full flex items-center gap-3 px-4 py-3 text-left text-white hover:bg-tradeos-surface-hover rounded transition-colors"
               data-testid={`quickadd-${item.label.toLowerCase()}`}
             >
               <item.icon className="w-5 h-5 text-zinc-400" />
@@ -248,17 +248,17 @@ const QuickAddPanel = ({ isOpen, onClose, onNavigate }) => {
 const TodaysFocus = ({ items }) => {
   const getStatusColor = (priority) => {
     switch (priority) {
-      case 'urgent': return { bg: 'bg-tfcs-red-muted', border: 'border-tfcs-red', dot: 'bg-tfcs-red' };
-      case 'success': return { bg: 'bg-tfcs-green-muted', border: 'border-tfcs-green', dot: 'bg-tfcs-green' };
-      case 'info': return { bg: 'bg-tfcs-gold-muted', border: 'border-tfcs-gold', dot: 'bg-tfcs-gold' };
-      default: return { bg: 'bg-tfcs-surface', border: 'border-tfcs-border', dot: 'bg-zinc-500' };
+      case 'urgent': return { bg: 'bg-tradeos-red-muted', border: 'border-tradeos-red', dot: 'bg-tradeos-red' };
+      case 'success': return { bg: 'bg-tradeos-green-muted', border: 'border-tradeos-green', dot: 'bg-tradeos-green' };
+      case 'info': return { bg: 'bg-tradeos-gold-muted', border: 'border-tradeos-gold', dot: 'bg-tradeos-gold' };
+      default: return { bg: 'bg-tradeos-surface', border: 'border-tradeos-border', dot: 'bg-zinc-500' };
     }
   };
   
   // Empty state when no priority items exist
   if (!items || items.length === 0) {
     return (
-      <div className="bg-tfcs-surface border-l-4 border-l-tfcs-gold border border-tfcs-border p-6 rounded" data-testid="todays-focus">
+      <div className="bg-tradeos-surface border-l-4 border-l-tradeos-gold border border-tradeos-border p-6 rounded" data-testid="todays-focus">
         <h2 className="text-xs font-mono uppercase tracking-wider text-zinc-500 mb-4">Today&apos;s Focus</h2>
         <div className="flex items-center justify-center py-4">
           <p className="text-zinc-500 text-sm">No priority items require attention today.</p>
@@ -268,7 +268,7 @@ const TodaysFocus = ({ items }) => {
   }
   
   return (
-    <div className="bg-tfcs-surface border-l-4 border-l-tfcs-gold border border-tfcs-border p-4 rounded" data-testid="todays-focus">
+    <div className="bg-tradeos-surface border-l-4 border-l-tradeos-gold border border-tradeos-border p-4 rounded" data-testid="todays-focus">
       <h2 className="text-xs font-mono uppercase tracking-wider text-zinc-500 mb-4">Today&apos;s Focus</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {items.slice(0, 3).map((item, i) => {
@@ -303,16 +303,16 @@ const ProjectsCard = ({ data, onRowClick }) => {
   ];
   
   return (
-    <div className="bg-tfcs-surface border border-tfcs-border rounded" data-testid="projects-card">
-      <div className="px-4 py-3 border-b border-tfcs-border">
+    <div className="bg-tradeos-surface border border-tradeos-border rounded" data-testid="projects-card">
+      <div className="px-4 py-3 border-b border-tradeos-border">
         <h2 className="text-xs font-mono uppercase tracking-wider text-zinc-500">Projects</h2>
       </div>
-      <div className="divide-y divide-tfcs-border">
+      <div className="divide-y divide-tradeos-border">
         {rows.map((row) => (
           <button
             key={row.key}
             onClick={() => onRowClick('projects', row.key)}
-            className="w-full flex items-center justify-between px-4 py-3 hover:bg-tfcs-surface-hover transition-colors text-left"
+            className="w-full flex items-center justify-between px-4 py-3 hover:bg-tradeos-surface-hover transition-colors text-left"
             data-testid={`project-row-${row.key}`}
           >
             <span className="text-white">{row.label}</span>
@@ -338,16 +338,16 @@ const OpportunitiesCard = ({ data, onRowClick }) => {
   ];
   
   return (
-    <div className="bg-tfcs-surface border border-tfcs-border rounded" data-testid="opportunities-card">
-      <div className="px-4 py-3 border-b border-tfcs-border">
+    <div className="bg-tradeos-surface border border-tradeos-border rounded" data-testid="opportunities-card">
+      <div className="px-4 py-3 border-b border-tradeos-border">
         <h2 className="text-xs font-mono uppercase tracking-wider text-zinc-500">Opportunities</h2>
       </div>
-      <div className="divide-y divide-tfcs-border">
+      <div className="divide-y divide-tradeos-border">
         {rows.map((row) => (
           <button
             key={row.key}
             onClick={() => onRowClick('opportunities', row.key)}
-            className="w-full flex items-center justify-between px-4 py-3 hover:bg-tfcs-surface-hover transition-colors text-left"
+            className="w-full flex items-center justify-between px-4 py-3 hover:bg-tradeos-surface-hover transition-colors text-left"
             data-testid={`opportunity-row-${row.key}`}
           >
             <span className="text-white">{row.label}</span>
@@ -364,9 +364,9 @@ const OpportunitiesCard = ({ data, onRowClick }) => {
 
 const AICatchMeUp = () => {
   return (
-    <div className="bg-black border border-tfcs-border rounded" data-testid="ai-catchmeup">
-      <div className="px-4 py-3 border-b border-tfcs-border flex items-center gap-2">
-        <Sparkles className="w-4 h-4 text-tfcs-gold" />
+    <div className="bg-black border border-tradeos-border rounded" data-testid="ai-catchmeup">
+      <div className="px-4 py-3 border-b border-tradeos-border flex items-center gap-2">
+        <Sparkles className="w-4 h-4 text-tradeos-gold" />
         <h2 className="text-xs font-mono uppercase tracking-wider text-zinc-500">Company Brain</h2>
       </div>
       <div className="p-6 font-mono text-sm text-zinc-500 min-h-[100px] flex items-center justify-center">
@@ -381,16 +381,16 @@ const AICatchMeUp = () => {
 const RecentActivity = ({ activities }) => {
   const getActivityColor = (type) => {
     switch (type) {
-      case 'create': return 'bg-tfcs-green';
-      case 'update': return 'bg-tfcs-gold';
-      case 'urgent': return 'bg-tfcs-red';
+      case 'create': return 'bg-tradeos-green';
+      case 'update': return 'bg-tradeos-gold';
+      case 'urgent': return 'bg-tradeos-red';
       default: return 'bg-zinc-500';
     }
   };
   
   return (
-    <div className="bg-tfcs-surface border border-tfcs-border rounded" data-testid="recent-activity">
-      <div className="px-4 py-3 border-b border-tfcs-border">
+    <div className="bg-tradeos-surface border border-tradeos-border rounded" data-testid="recent-activity">
+      <div className="px-4 py-3 border-b border-tradeos-border">
         <h2 className="text-xs font-mono uppercase tracking-wider text-zinc-500">Recent Activity</h2>
       </div>
       <div className="p-4">
@@ -399,7 +399,7 @@ const RecentActivity = ({ activities }) => {
         ) : (
           <div className="relative">
             {/* Timeline line */}
-            <div className="absolute left-[5px] top-2 bottom-2 w-px bg-tfcs-border" />
+            <div className="absolute left-[5px] top-2 bottom-2 w-px bg-tradeos-border" />
             
             <div className="space-y-4">
               {activities.map((activity, i) => (
@@ -598,24 +598,24 @@ const MainframePage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-tfcs-black flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-tfcs-gold animate-spin" />
+      <div className="min-h-screen bg-tradeos-black flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-tradeos-gold animate-spin" />
       </div>
     );
   }
 
   if (!roleData?.has_role) {
     return (
-      <div className="min-h-screen bg-tfcs-black flex items-center justify-center p-4">
+      <div className="min-h-screen bg-tradeos-black flex items-center justify-center p-4">
         <div className="text-center max-w-md">
           <Shield className="w-16 h-16 text-zinc-700 mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-white mb-2">Access Restricted</h2>
           <p className="text-zinc-400 mb-6">
-            You do not have access to TFCS Mainframe. Contact your administrator.
+            You do not have access to TradeOS Command Center. Contact your administrator.
           </p>
           <button
             onClick={() => navigate('/app')}
-            className="px-4 py-2 bg-tfcs-surface border border-tfcs-border rounded text-white hover:bg-tfcs-surface-hover transition-colors"
+            className="px-4 py-2 bg-tradeos-surface border border-tradeos-border rounded text-white hover:bg-tradeos-surface-hover transition-colors"
           >
             Return to Dashboard
           </button>
@@ -625,14 +625,14 @@ const MainframePage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-tfcs-black font-sans" data-testid="tfcs-command-center">
+    <div className="min-h-screen bg-tradeos-black font-sans" data-testid="tradeos-command-center">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-tfcs-black border-b border-tfcs-border">
+      <header className="sticky top-0 z-40 bg-tradeos-black border-b border-tradeos-border">
         <div className="px-4 lg:px-6 py-4">
           <div className="flex items-center justify-between">
             {/* Left: Title */}
             <div>
-              <h1 className="text-xl lg:text-2xl font-bold text-white tracking-tight">TFCS Mainframe</h1>
+              <h1 className="text-xl lg:text-2xl font-bold text-white tracking-tight">TradeOS Command Center</h1>
               <p className="text-xs text-zinc-500 font-mono uppercase tracking-wider">Two Fungis Finishing</p>
             </div>
             
@@ -646,14 +646,14 @@ const MainframePage = () => {
               >
                 <Bell className="w-5 h-5" />
                 {unreadCount > 0 && (
-                  <span className="absolute top-1 right-1 w-2 h-2 bg-tfcs-red rounded-full" />
+                  <span className="absolute top-1 right-1 w-2 h-2 bg-tradeos-red rounded-full" />
                 )}
               </button>
               
               {/* Catch Me Up */}
               <button
                 onClick={() => { closeAllPanels(); setCatchMeUpOpen(true); }}
-                className="p-2 text-zinc-400 hover:text-tfcs-gold transition-colors"
+                className="p-2 text-zinc-400 hover:text-tradeos-gold transition-colors"
                 data-testid="catchmeup-btn"
               >
                 <Sparkles className="w-5 h-5" />
@@ -662,7 +662,7 @@ const MainframePage = () => {
               {/* Owner Access */}
               <button
                 onClick={() => { closeAllPanels(); setOwnerAccessOpen(true); }}
-                className="p-2 text-tfcs-gold hover:text-tfcs-gold/80 transition-colors"
+                className="p-2 text-tradeos-gold hover:text-tradeos-gold/80 transition-colors"
                 data-testid="owner-access-btn"
               >
                 <Crown className="w-5 h-5" />
@@ -671,7 +671,7 @@ const MainframePage = () => {
               {/* Quick Add */}
               <button
                 onClick={() => { closeAllPanels(); setQuickAddOpen(true); }}
-                className="p-2 bg-tfcs-surface border border-tfcs-border rounded text-white hover:bg-tfcs-surface-hover transition-colors"
+                className="p-2 bg-tradeos-surface border border-tradeos-border rounded text-white hover:bg-tradeos-surface-hover transition-colors"
                 data-testid="quickadd-btn"
               >
                 <Plus className="w-5 h-5" />

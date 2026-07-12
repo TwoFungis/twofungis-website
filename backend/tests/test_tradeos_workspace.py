@@ -1,5 +1,5 @@
 """
-TFCS Mainframe Dashboard Backend Tests
+TradeOS Workspace Dashboard Backend Tests
 Tests all endpoints used by /app/mainframe page:
 - /api/tfcs/health
 - /api/tfcs/role/me

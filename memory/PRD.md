@@ -23,6 +23,36 @@ Build "TradeOS," an end-to-end operating system for Canadian contractors. The ap
 
 ---
 
+## V2 FOUNDATION LOCK ✅ COMPLETE (July 12, 2026)
+
+### Architectural Freeze Status
+The TradeOS V2 Foundation has been officially locked and stabilized.
+
+| Component | Status | Description |
+|-----------|--------|-------------|
+| Workspace Shell | ✅ STABLE | Universal workspace container |
+| Command Center | ✅ STABLE | Priority-driven landing experience |
+| Organization Routing | ✅ STABLE | Organization-first authentication |
+| Sidebar Architecture | ✅ STABLE | Workflow-oriented navigation |
+| Universal Workspace Pattern | ✅ STABLE | Panel-first design |
+| Panel Dock System | ✅ STABLE | Contextual sliding panels |
+| Company Brain Integration | ✅ STABLE | AI integration points |
+| Core API Organization | ✅ STABLE | /api/workspace, /api/organizations |
+
+### Foundation Lock Deliverables
+- ✅ Legacy TFCS authorization removed
+- ✅ All "TFCS Mainframe" references updated to "TradeOS"
+- ✅ Brand consistency audit complete
+- ✅ Repository cleanup complete
+- ✅ `/app/VISION.md` created (architectural north star)
+- ✅ Design system documented
+- ✅ Deployment verification complete
+
+### Key Reference Document
+**See `/app/VISION.md` for the permanent architectural north star.**
+
+---
+
 ## PHASE 2 ARCHITECTURE (July 12, 2026)
 
 ### TradeOS Operating System Transition ✅ COMPLETE (July 12, 2026)
@@ -60,6 +90,22 @@ Build "TradeOS," an end-to-end operating system for Canadian contractors. The ap
 - `/app/frontend/src/components/routing/DashboardRedirect.jsx` - Updated routing
 - `/app/frontend/src/components/layout/AppLayout.jsx` - New navigation structure
 - `/app/frontend/src/pages/landing/LandingPage.jsx` - Download App CTAs
+
+---
+
+## NEXT MILESTONE: Phase 2 - Opportunity Intake Engine
+
+### Objective
+Establish AI-native workflow where TradeOS assembles opportunities from:
+- Emails (forwarded invitation parsing)
+- Drawings (OCR + AI analysis)
+- Tender packages (document extraction)
+- Builder portals (integration)
+- Historical company knowledge (Company Brain)
+
+**Goal**: Minimal manual input — intelligent opportunity construction.
+
+---
 
 ### Governing Documents
 | Document | Version | Purpose |

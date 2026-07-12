@@ -41,9 +41,9 @@
   "screenshots": [],
   "shortcuts": [
     {
-      "name": "Dashboard",
-      "url": "/app",
-      "description": "View your dashboard"
+      "name": "Command Center",
+      "url": "/app/command-center",
+      "description": "Open your workspace command center"
     },
     {
       "name": "New Project",
