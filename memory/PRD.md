@@ -21,6 +21,37 @@ Build "TradeOS," an end-to-end operating system for Canadian contractors. The ap
 - **Color Palette:** Black (#0a0a0a), Deep Charcoal (#111111), Emerald Green accents
 - **Target Market:** Canadian commercial and residential contractors
 
+---
+
+## PHASE 2 ARCHITECTURE (July 12, 2026)
+
+### Governing Documents
+| Document | Version | Purpose |
+|----------|---------|---------|
+| TradeOS Constitution v1.0 | RATIFIED | Permanent architectural philosophy |
+| Specification Governance | RATIFIED | Document standards and templates |
+| Specification 1.5 | v1.5.1 APPROVED | Multi-Tenant Platform Architecture |
+| Specification 2.0 | v2.0.1 APPROVED | Opportunity Lifecycle & Tender Workspace |
+
+### Key Architectural Decisions
+- **Work-Centric Design:** Everything revolves around Work moving through lifecycle states
+- **Universal Workspace Pattern:** Consistent UI across all entity types
+- **Multi-Tenant Isolation:** Complete data separation between organizations
+- **Company Brain:** Operations Manager, not chatbot — proactive intelligence
+- **Learning Company:** Every completed project improves future work
+- **No Orgs in URLs:** Context via JWT/Workspace Switcher
+- **First-Class External Users:** Clients, Builders, etc. are full authenticated users
+
+### Implementation Sequence
+1. Multi-Tenant Foundation (Spec 1.5)
+2. Opportunity Foundation (Spec 2.0 Phase 1)
+3. Tender Workspace (Spec 2.0 Phase 2-3)
+4. Project Conversion (Spec 2.0 Phase 4)
+5. Company Brain Integration (Spec 2.0 Phase 5)
+6. Production Library (Spec 2.1 - Future)
+
+---
+
 ## User Personas
 - **Primary:** Independent contractors and small trade businesses
 - **Secondary:** Founding/Elite lifetime members with premium access
@@ -313,28 +344,26 @@ Run `/app/migrations/012_company_brain_foundation.sql` in Supabase SQL Editor to
 
 ## Upcoming Tasks (Priority Order)
 
-### P0 - Specification 1.3: Production Library (NEXT)
-The Company's first structured knowledge base. AI integration is intentionally postponed until Company Brain has meaningful company knowledge to operate on.
+### P0 - Phase 2 Implementation
+Per Phase 2 Architecture Summary, implementation sequence is:
+1. Multi-Tenant Foundation (Spec 1.5)
+2. Opportunity Foundation (Spec 2.0)
+3. Tender Workspace (Spec 2.0)
+4. Project Conversion (Spec 2.0)
+5. Company Brain Integration (Spec 2.0)
 
-**Why Production Library First:**
-- Establishes real company knowledge for AI to reason over
-- Single source of truth for estimating
-- Foundation for intelligent cost analysis
-- Makes future AI significantly more valuable
+### P1 - Production Library (Spec 2.1)
+The Company's first structured knowledge base. Will be specified after Opportunity/Tender implementation.
 
-### P1 - AI Integration (DEFERRED)
+### P2 - AI Integration
 - GPT-5.2 integration for Company Brain conversations
 - "Catch Me Up" operational summaries
 - Context-aware responses based on Production Library data
 - **Prerequisite:** Production Library must be populated first
 
-### P2 - Additional Features
-- Estimate Templates + Production Rates
-- QuickBooks Sync (Sandbox-Ready)
-
 ### P3 - Future/Backlog
+- QuickBooks Sync
 - Trust Pack Settings Tab
-- `/api/opportunities` endpoint
 - Priority logic for Today's Focus
 - Company Brain Learning capabilities
 - Action execution engine

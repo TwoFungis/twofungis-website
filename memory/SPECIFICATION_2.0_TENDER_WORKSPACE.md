@@ -1,10 +1,47 @@
 # TRADEOS SPECIFICATION 2.0
 ## Opportunity Lifecycle & Tender Workspace
 
-**Version:** 2.0  
+**Version:** 2.0.1  
 **Date:** July 12, 2026  
 **Author:** Chief Software Architect  
-**Status:** DRAFT - AWAITING APPROVAL
+**Status:** APPROVED (Post-Constitution Compliance Review)
+
+---
+
+## DOCUMENT HIERARCHY
+
+**Parent Document(s):**
+- TradeOS Constitution v1.0
+- Specification 1.5: Multi-Tenant Platform Architecture
+
+**Related Specifications:**
+- Specification 1.2: Company Brain Foundation
+- Specification 2.1: Production Library Foundation (Planned)
+
+**Specification Type:** Product Specification
+
+---
+
+## 1. PURPOSE
+
+Define the lifecycle of contractor opportunities from initial lead through tender creation to project conversion, establishing the Tender Workspace as the focused environment for building estimates.
+
+## 2. PROBLEM STATEMENT
+
+Contractors manage opportunities across spreadsheets, emails, and disconnected tools. Estimating is time-consuming and error-prone. Knowledge from completed projects doesn't flow back to improve future estimates.
+
+## 3. BUSINESS OBJECTIVE
+
+Create a unified workflow where opportunities flow naturally through their lifecycle, tenders are built with AI assistance, and every completed project makes future estimating faster and more accurate.
+
+## 4. USER PERSONAS
+
+| Persona | Role | Primary Actions |
+|---------|------|-----------------|
+| **Estimator** | Creates tenders, manages opportunities | Build estimates, track submissions |
+| **Owner** | Reviews and approves | Approve tenders, monitor pipeline |
+| **Project Manager** | Converts to projects | Receive awarded work, begin execution |
+| **Client** (External) | Receives tenders | View proposals, approve/reject |
 
 ---
 
@@ -580,14 +617,70 @@ Response:
 
 ---
 
-## SUCCESS METRICS
+## ACCEPTANCE CRITERIA
 
-| Metric | Target | Measurement |
-|--------|--------|-------------|
-| Tender creation time | 50% reduction | Time from opportunity creation to submission |
-| Estimate accuracy | Within 10% of actual | Tender total vs. project final cost |
-| Win rate | Track and improve | Awarded / (Awarded + Lost) |
-| Learning adoption | 80% | Suggestions accepted vs. dismissed |
+| Criteria | Test |
+|----------|------|
+| Opportunity CRUD | Can create, view, edit, delete opportunities |
+| Status Workflow | Status transitions follow defined rules |
+| Tender Creation | Can create tender within opportunity |
+| Line Item Management | Can add, edit, delete, reorder line items |
+| Totals Calculation | Subtotal, markup, overhead, contingency calculate correctly |
+| PDF Generation | Can generate professional tender PDF |
+| Status Submission | Can submit tender, status changes correctly |
+| Project Conversion | Awarded opportunity converts to project with baseline |
+| Company Brain | Brain provides insights at each lifecycle stage |
+| Data Isolation | All data properly scoped to organization |
+
+---
+
+## SECURITY & PERMISSIONS
+
+Per Specification 1.5, access to Opportunity and Tender features is role-based:
+
+| Role | Opportunities | Tenders | Submit |
+|------|---------------|---------|--------|
+| Owner | Full | Full | Yes |
+| Admin | Full | Full | Yes |
+| Estimator | Full | Full | Yes |
+| Project Manager | View | View | No |
+| Office Admin | View | No | No |
+| Others | No | No | No |
+
+---
+
+## AUTOMATION OPPORTUNITIES
+
+| Automation | Trigger | Action |
+|------------|---------|--------|
+| Follow-up Reminder | Tender submitted 7 days ago | Notify to follow up |
+| Due Date Warning | Tender due in 48 hours | Notify estimator |
+| Auto-Archive | Opportunity lost 30 days ago | Move to archive |
+| Baseline Capture | Opportunity awarded | Auto-create project baseline |
+| Rate Suggestions | Line item added | Suggest from Production Library |
+
+---
+
+## COMPETITIVE CONTEXT
+
+| Competitor | Approach | TradeOS Differentiation |
+|------------|----------|------------------------|
+| **Buildxact** | Estimating-focused, separate from project management | Integrated lifecycle: Opportunity → Project |
+| **Procore** | Estimating as add-on module | Estimating is native, Company Brain assists |
+| **Clear Estimates** | Template-based estimating | Learning-based: improves from actuals |
+
+TradeOS advantage: **Estimates become project baselines, actuals feed back to improve future estimates.**
+
+---
+
+## FUTURE EXPANSION
+
+- Tender Templates (save and reuse)
+- Client Portal (external users view/approve tenders)
+- E-signature integration
+- Change Order management (post-award)
+- Multi-currency support
+- Subcontractor quote collection
 
 ---
 
@@ -614,6 +707,15 @@ Response:
 4. **Production Library Dependency:** Build Production Library first, or build Tender Workspace with manual rate entry and add Production Library integration later?
 
 5. **PDF Branding:** Should tender PDFs include company logo/branding, or start with a clean default template?
+
+---
+
+## VERSION HISTORY
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 2.0 | July 12, 2026 | Chief Architect | Initial specification |
+| 2.0.1 | July 12, 2026 | Chief Architect | Constitution compliance: added document hierarchy, personas, acceptance criteria, security, automation, competitive context |
 
 ---
 

@@ -1,11 +1,38 @@
 # TRADEOS SPECIFICATION 1.5
 ## Multi-Tenant Platform Architecture
 
-**Version:** 1.5  
+**Version:** 1.5.1  
 **Date:** July 12, 2026  
 **Author:** Chief Software Architect  
-**Status:** DRAFT - AWAITING APPROVAL  
-**Prerequisites:** None (Foundation Specification)
+**Status:** APPROVED (Post-Constitution Compliance Review)
+
+---
+
+## DOCUMENT HIERARCHY
+
+**Parent Document(s):**
+- TradeOS Constitution v1.0
+
+**Related Specifications:**
+- Specification 1.0: TFCS Mainframe Foundation
+- Specification 1.2: Company Brain Foundation
+- Specification 2.0: Opportunity Lifecycle & Tender Workspace
+
+**Specification Type:** Platform Specification (Foundation)
+
+---
+
+## 1. PURPOSE
+
+Define the multi-tenant architecture that enables TradeOS to serve multiple contractor businesses as completely isolated workspaces while maintaining a unified platform.
+
+## 2. PROBLEM STATEMENT
+
+Contractors need business software that is both powerful enough for enterprise use and simple enough for one-person operations. The architecture must ensure complete data isolation between companies while allowing platform-level management and continuous improvement.
+
+## 3. BUSINESS OBJECTIVE
+
+Create a scalable SaaS foundation that supports growth from early customers to thousands of organizations without architectural redesign.
 
 ---
 
@@ -1065,17 +1092,129 @@ WHERE user_id = 'scott-user-uuid'
 
 ---
 
-## OPEN QUESTIONS FOR APPROVAL
+## CONSTITUTIONAL DECISIONS (Resolved)
 
-1. **Organization Slug:** Should organizations have URL slugs (e.g., `app.tradeos.ca/two-fungis/projects`) or just use UUIDs?
+The following questions were resolved by TradeOS Constitution v1.0:
 
-2. **Primary Organization:** When a user belongs to multiple orgs, should we remember their last-used org, or always prompt?
+| Question | Constitutional Answer | Reference |
+|----------|----------------------|-----------|
+| Organization URL slugs? | **NO** — Organizations never appear in URLs | Article V |
+| Remember last org? | **YES** — System remembers previously active workspace | Article VI |
+| Lightweight portal users? | **NO** — External users are first-class authenticated users | Article VII |
+| Separate admin app? | **NO** — Platform Admin is hidden workspace in same app | Article IV |
 
-3. **Guest/External Roles:** Should Client/Builder/Subcontractor portal users be full `auth.users` or a separate lightweight user type?
+## OPEN QUESTIONS (Remaining)
 
-4. **Platform Admin UI:** Build as separate app/route (`admin.tradeos.ca`) or integrated into main app with context switch?
+1. **TFCS Role Migration:** The current `tfcs_user_roles` table has Owner/Manager/Employee. Migrate to new `organization_members` table, or keep both temporarily during transition?
 
-5. **Existing TFCS Roles:** The current `tfcs_user_roles` table has Owner/Manager/Employee. Migrate to new `organization_members` table, or keep both temporarily?
+---
+
+## URL PHILOSOPHY (Per Constitution Article V)
+
+Organizations shall **never** appear in URLs.
+
+```
+❌ FORBIDDEN:
+   tradeos.ca/app/two-fungis/projects
+   tradeos.ca/orgs/abc-contracting/dashboard
+
+✅ REQUIRED:
+   tradeos.ca/app
+   tradeos.ca/app/projects
+   tradeos.ca/app/opportunities/[uuid]
+```
+
+Organization context is determined by JWT claims and Workspace Switcher selection.
+
+---
+
+## WORKSPACE SWITCHER (Per Constitution Article VI)
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           WORKSPACE SWITCHER                                 │
+│                    (Accessible via header dropdown or Cmd+K)                 │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│   YOUR WORKSPACES                                                           │
+│                                                                              │
+│   ┌───────────────────────────────────────────────────────────────────┐     │
+│   │  🏢 Two Fungis Finishing                              Owner       │     │
+│   │     Last active: 2 minutes ago                        ● Current   │     │
+│   └───────────────────────────────────────────────────────────────────┘     │
+│                                                                              │
+│   ┌───────────────────────────────────────────────────────────────────┐     │
+│   │  🔧 TradeOS Platform                                  Admin       │     │
+│   │     Platform Administration                                       │     │
+│   └───────────────────────────────────────────────────────────────────┘     │
+│                                                                              │
+│   ─────────────────────────────────────────────────────────────────────     │
+│                                                                              │
+│   + Create New Organization                                                 │
+│   ─────────────────────────────────────────────────────────────────────     │
+│   ⚙ Workspace Settings                                                      │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Behavior:**
+- System remembers last active workspace
+- User returns to last workspace on login (no prompt)
+- Switch anytime via header or keyboard shortcut
+- Platform Workspace only visible to Platform role holders
+
+---
+
+## EXTERNAL USERS (Per Constitution Article VII)
+
+All external parties are **first-class authenticated TradeOS users**:
+
+| External Role | Description | Workspace Access |
+|---------------|-------------|------------------|
+| **Client** | Customer receiving services | Their Client Workspace + invited Projects |
+| **Builder** | General contractor | Their Builder Workspace + assigned Projects |
+| **Architect** | Design professional | Invited Projects (documents, RFIs) |
+| **Consultant** | External advisor | Invited Projects (read access) |
+| **Subcontractor** | Trade partner | Assigned work within Projects |
+| **Property Owner** | Building owner | Their properties, maintenance |
+| **Inspector** | Code/quality inspector | Inspection records, documents |
+
+External users:
+- Authenticate through same Supabase Auth
+- Have their own profile and settings
+- Receive appropriate permissions per relationship
+- Can belong to multiple organizations (e.g., a subcontractor working for multiple GCs)
+
+---
+
+## COMPANY BRAIN (Per Constitution Article VIII)
+
+> **Company Brain is the Operations Manager of the company, not a chatbot.**
+
+Each organization's Company Brain is completely isolated. See Specification 1.2 for detailed Company Brain architecture.
+
+**Platform-Level Learning:**
+Only anonymized, aggregate insights may improve platform defaults. No confidential data crosses organization boundaries.
+
+---
+
+## USER EXPERIENCE (Per Constitution Article X)
+
+All UI implementations must adhere to Constitutional UX principles:
+- Professional, Calm, Fast, Minimal, Modern
+- Context Aware, Predictive
+- Never overwhelming or cluttered
+
+Detailed design specifications follow the TradeOS Design System (separate document).
+
+---
+
+## VERSION HISTORY
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.5 | July 12, 2026 | Chief Architect | Initial specification |
+| 1.5.1 | July 12, 2026 | Chief Architect | Constitution compliance updates: resolved open questions, added Workspace Switcher, external users, URL philosophy |
 
 ---
 
