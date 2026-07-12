@@ -1040,7 +1040,7 @@ const CompanyStandardsView = ({
 // ============================================
 // KNOWLEDGE DOMAINS VIEW
 // ============================================
-const DomainsView = ({ domains, items, onSelectDomain }) => {
+const DomainsView = ({ domains, items, onSelectDomain, onImport }) => {
   // Calculate item counts per domain
   const domainStats = useMemo(() => {
     const stats = {};
@@ -1073,7 +1073,13 @@ const DomainsView = ({ domains, items, onSelectDomain }) => {
           <p className="text-neutral-400 text-sm mb-6 leading-relaxed">
             Domains organize your company standards into logical categories like Finish Carpentry, Doors &amp; Hardware, and more.
           </p>
-          <p className="text-sm text-neutral-500">Initialize your Production Library to create default domains.</p>
+          <button
+            onClick={onImport}
+            className="flex items-center gap-2 mx-auto bg-blue-500 hover:bg-blue-400 text-white font-medium px-6 py-3 rounded-lg transition-all"
+          >
+            <Upload className="w-4 h-4" strokeWidth={2} />
+            Initialize Production Library
+          </button>
         </div>
       </div>
     );
@@ -1839,10 +1845,12 @@ const ProductionLibraryWorkspace = () => {
         const firstFail = [itemsRes, domainsRes, catsRes, assembliesRes].find(r => !r.ok);
         if (firstFail.status === 404 || firstFail.status === 500) {
           const errorData = await firstFail.json().catch(() => ({}));
-          if (errorData.detail?.includes('migration') || errorData.detail?.includes('not exist') || errorData.detail?.includes('schema')) {
+          if (errorData.detail?.includes('migration') || errorData.detail?.includes('not exist') || errorData.detail?.includes('schema') || errorData.code === 'PGRST205') {
             setApiError('schema');
+            toast.error('Database setup required. Please run the migration.', { duration: 5000 });
           } else {
             setApiError('api');
+            toast.error('Failed to load Production Library. Please try again.', { duration: 4000 });
           }
         }
       }
@@ -1989,7 +1997,7 @@ const ProductionLibraryWorkspace = () => {
           />
         );
       case 'domains':
-        return <DomainsView domains={domains} items={items} onSelectDomain={(d) => { setFilters(f => ({ ...f, domain: d.id })); setActiveView('standards'); }} />;
+        return <DomainsView domains={domains} items={items} onSelectDomain={(d) => { setFilters(f => ({ ...f, domain: d.id })); setActiveView('standards'); }} onImport={handleImport} />;
       case 'assemblies':
         return <AssembliesView assemblies={assemblies} items={items} onSelectAssembly={() => {}} onCreateAssembly={handleCreateAssembly} />;
       case 'categories':

@@ -191,6 +191,57 @@ The TradeOS V2 Foundation has been officially locked and stabilized.
 - Subtle borders (border-neutral-800)
 - Hover states and transitions
 - Professional, minimal aesthetic
+
+### Phase 3.5: Company Knowledge Engine Experience ✅ COMPLETE (July 12, 2026)
+**Transform Production Library from data management to Company Intelligence Management**
+
+**Language Transition:**
+- External: "Company Standards" (not "Production Items")
+- External: "Company Knowledge Engine" (subtitle)
+- Internal database: Still uses `production_items` etc.
+
+**Complete Dedicated Workspaces:**
+1. **Company Standards View** - Main grid with search, filters, bulk actions, list/grid toggle
+2. **Knowledge Domains View** - Domain cards with item counts, stats, icons
+3. **Assemblies View** - Visual assembly cards with "Create First Assembly" empty state
+4. **Service Categories View** - Category cards with usage indicators
+5. **Templates View** - Placeholder with "Coming in Estimate Builder" message
+
+**Enhanced Detail Panel (Tabbed Interface):**
+- **Overview Tab**: Quick stats, general info, frequently used with, Company Brain insights, related standards
+- **Pricing Tab**: Rate comparison bars (Standard, Premium, Complex), pricing staleness alert
+- **Productivity Tab**: Output per day, crew size, labour hours, productivity trend insight
+- **Usage Tab**: Assemblies count, estimates count, average per project, used in assemblies list
+- **History Tab**: Revision timeline with version numbers
+
+**Visual Relationships:**
+- "X Assemblies" badge on list rows and cards
+- "Y Estimates" badge in detail panel header
+- "Last used Z days ago" indicator
+- "Frequently Used With" chips
+- "Related Standards" section
+
+**Company Brain (Mock Insights):**
+- Pricing staleness alerts ("Pricing has not been reviewed in 14 months")
+- Usage patterns ("This standard appears in 73% of Multifamily estimates")
+- Relationship suggestions ("Commonly used with MDF Baseboard")
+- Productivity insights ("Production rate is 11% higher than similar standards")
+- Assembly suggestions ("Consider converting this into an Assembly")
+
+**Command Palette Enhancements:**
+- Quick Actions: Create Company Standard, Create Assembly, Import Knowledge
+- Keyboard navigation (↑↓ arrows, Enter to select, Esc to close)
+- Recent Standards list
+- Grouped search results (Standards, Domains, Assemblies)
+- Keyboard hints footer
+
+**"Add to Estimate" Integration:**
+- Primary action button in Detail Panel footer
+- Bulk action option when multiple items selected
+- Toast message preparing for Estimate Builder
+
+**Component:** `/app/frontend/src/pages/app/ProductionLibraryWorkspace.jsx` (~2100 lines)
+
 **Premium onboarding experience for importing company knowledge into TradeOS**
 
 **Component:** `/app/frontend/src/components/production/ImportWizard.jsx`
