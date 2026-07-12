@@ -327,18 +327,8 @@ export const useAuthStore = create((set, get) => ({
   signInWithMagicLink: async (email) => {
     set({ loading: true });
     
-    // Use environment variable for redirect URL, fallback to window.location.origin
-    // In production, this should be the deployed app URL
-    const baseUrl = process.env.REACT_APP_BACKEND_URL 
-      ? process.env.REACT_APP_BACKEND_URL.replace('/api', '').replace(':8001', '')
-      : window.location.origin;
-    
-    // Use current origin for preview/development environments
-    const isPreviewEnv = window.location.hostname.includes('preview.') || 
-                         window.location.hostname === 'localhost';
-    const redirectUrl = isPreviewEnv
-      ? window.location.origin
-      : (baseUrl || window.location.origin);
+    // Always use current origin for auth redirects - works across all environments
+    const redirectUrl = window.location.origin;
     
     console.log('Magic link redirect URL:', `${redirectUrl}/app`);
     
