@@ -1,13 +1,11 @@
 from fastapi import FastAPI, APIRouter, Request, HTTPException
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
-from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 from pathlib import Path
-from pydantic import BaseModel, Field, ConfigDict
-from typing import List, Optional, Dict
-import uuid
+from pydantic import BaseModel
+from typing import Optional
 from datetime import datetime, timezone
 import httpx
 
@@ -65,11 +63,6 @@ from routes.company_brain import router as company_brain_router
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env', override=False)
 
-# MongoDB connection
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
-
 # Supabase configuration for direct DB access
 SUPABASE_URL = os.environ.get('SUPABASE_URL', '')
 SUPABASE_SERVICE_KEY = os.environ.get('SUPABASE_SERVICE_KEY', '')
@@ -80,17 +73,6 @@ app = FastAPI()
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
-
-# Define Models
-class StatusCheck(BaseModel):
-    model_config = ConfigDict(extra="ignore")
-    
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-
-class StatusCheckCreate(BaseModel):
-    client_name: str
 
 # Subscription Models (kept for backward compatibility)
 class SubscriptionCheckoutRequest(BaseModel):
@@ -126,26 +108,37 @@ async def root():
 async def health_check():
     return {"status": "healthy", "service": "tradeos-api"}
 
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.model_dump()
-    status_obj = StatusCheck(**status_dict)
+@api_router.get("/status")
+async def get_system_status():
+    """
+    System status endpoint - checks Supabase connectivity.
+    Returns health status of all external services.
+    """
+    status = {
+        "api": "healthy",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "services": {}
+    }
     
-    doc = status_obj.model_dump()
-    doc['timestamp'] = doc['timestamp'].isoformat()
+    # Check Supabase connectivity
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            response = await client.get(
+                f"{SUPABASE_URL}/rest/v1/",
+                headers={
+                    "apikey": SUPABASE_SERVICE_KEY,
+                    "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}"
+                }
+            )
+            status["services"]["supabase"] = "connected" if response.status_code == 200 else "error"
+    except Exception as e:
+        status["services"]["supabase"] = f"error: {str(e)[:50]}"
     
-    _ = await db.status_checks.insert_one(doc)
-    return status_obj
-
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    status_checks = await db.status_checks.find({}, {"_id": 0}).to_list(1000)
+    # Overall status
+    all_healthy = all(v == "connected" for v in status["services"].values())
+    status["status"] = "healthy" if all_healthy else "degraded"
     
-    for check in status_checks:
-        if isinstance(check['timestamp'], str):
-            check['timestamp'] = datetime.fromisoformat(check['timestamp'])
-    
-    return status_checks
+    return status
 
 
 # Legacy subscription endpoints (redirect to /api/stripe routes)
