@@ -55,6 +55,40 @@ The TradeOS V2 Foundation has been officially locked and stabilized.
 
 ## PHASE 2 ARCHITECTURE (July 12, 2026)
 
+### V2 Architecture Consolidation ✅ COMPLETE (July 12, 2026)
+**Eliminated dual application architecture — TradeOS is now ONE unified operating system**
+
+**Architectural Decision:**
+- ALL authenticated users enter the same V2 environment
+- Command Center is the universal entry point
+- No conditional UI based on workspace access
+- Onboarding happens INSIDE the application via progressive disclosure
+
+**Legacy Components Removed:**
+- ❌ `MainframePage.jsx` - Deleted (orphaned TFCS legacy)
+- ❌ `DashboardPage.jsx` - Deleted (legacy ERP dashboard)
+- ❌ `AICopilot.jsx` - Deleted (replaced by Company Brain)
+- ❌ `QuickAddFab.jsx` - Deleted (replaced by Quick Add panel)
+- ❌ `DashboardRedirect.jsx` - Deleted (routing now direct)
+
+**Routing Changes:**
+- `/app` → Redirects to `/app/command-center`
+- `/app/dashboard` → Redirects to `/app/command-center`
+- `/app/mainframe` → Redirects to `/app/command-center`
+- All authenticated users get same navigation and theme
+
+**AppLayout Consolidation:**
+- Removed all `hasWorkspaceAccess` conditional logic
+- Single dark theme with emerald accents for ALL users
+- Company Brain button visible for ALL authenticated users
+- V2 workflow navigation for ALL users
+
+**Test Results:**
+- Backend: 100% (13/13 tests)
+- Frontend: 100% (11/11 acceptance criteria)
+
+---
+
 ### Command Center Transition ✅ COMPLETE (July 12, 2026)
 **Retired legacy dashboard approach — Command Center is now the permanent operational headquarters**
 
@@ -74,10 +108,7 @@ The TradeOS V2 Foundation has been officially locked and stabilized.
 - ✅ Recent Activity timeline with action icons
 - ✅ Quick Add panel for rapid entity creation
 - ✅ 60-second auto-refresh polling
-
-**Legacy Dashboard Status:**
-- `DashboardPage.jsx` retained ONLY for users without organization membership (onboarding flow)
-- Organization members now exclusively use Command Center
+- ✅ Progressive onboarding WelcomeCard for users without organization
 - Routing via `DashboardRedirect.jsx` unchanged (already correct)
 
 **Test Results:**
@@ -636,10 +667,19 @@ Apply WorkspaceShell pattern to:
 
 ### Command Center (July 12, 2026)
 - `/app/backend/routes/command_center.py` - Dashboard aggregation API
-- `/app/frontend/src/pages/app/CommandCenterPage.jsx` - Operational headquarters UI
+- `/app/frontend/src/pages/app/CommandCenterPage.jsx` - Universal operational headquarters
 - `/app/backend/tests/test_command_center.py` - Backend tests
+- `/app/backend/tests/test_workspace_context.py` - Workspace context tests
 
-### TFCS Mainframe (Spec 1.0-1.1)
+### Deleted Legacy Files (July 12, 2026)
+The following files were permanently removed during V2 consolidation:
+- ❌ `/app/frontend/src/pages/app/MainframePage.jsx`
+- ❌ `/app/frontend/src/pages/app/DashboardPage.jsx`
+- ❌ `/app/frontend/src/components/ai/AICopilot.jsx`
+- ❌ `/app/frontend/src/components/app/QuickAddFab.jsx`
+- ❌ `/app/frontend/src/components/routing/DashboardRedirect.jsx`
+
+### TFCS Mainframe (Spec 1.0-1.1) - DEPRECATED
 - `/app/frontend/src/pages/app/MainframePage.jsx`
 - `/app/frontend/src/components/layout/AppLayout.jsx`
 - `/app/frontend/src/components/routing/DashboardRedirect.jsx` - Centralized post-login routing
