@@ -1264,14 +1264,16 @@ const TemplatesView = () => {
         <div className="w-20 h-20 bg-cyan-500/10 border border-cyan-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
           <FileText className="w-10 h-10 text-cyan-400" strokeWidth={1.5} />
         </div>
+        <span className="inline-block px-3 py-1 bg-cyan-500/20 text-cyan-400 text-xs font-medium uppercase tracking-wider rounded-full mb-4">
+          Coming Soon
+        </span>
         <h3 className="text-xl font-medium text-white mb-2">Estimate Templates</h3>
-        <p className="text-neutral-400 text-sm mb-6 leading-relaxed">
+        <p className="text-neutral-400 text-sm mb-4 leading-relaxed">
           Save time by creating templates for common project types. Templates pre-populate estimates with your most-used standards and assemblies.
         </p>
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-neutral-900 border border-neutral-800 rounded-lg text-sm text-neutral-500">
-          <Clock className="w-4 h-4" strokeWidth={1.5} />
-          Coming in Estimate Builder
-        </div>
+        <p className="text-neutral-500 text-xs">
+          This feature is part of Phase 3 - Company Standards expansion.
+        </p>
       </div>
     </div>
   );

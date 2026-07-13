@@ -23,6 +23,32 @@ Build "TradeOS," an end-to-end operating system for Canadian contractors. The ap
 
 ---
 
+## UI/UX Audit ✅ COMPLETE (July 13, 2026)
+
+### Production Library Actions Audit
+All visible buttons, actions, and menus now either work fully or show "Coming Soon" states.
+
+| Action | Status | Implementation |
+|--------|--------|----------------|
+| New Standard | ✅ WORKING | CreateStandardModal - creates items in DB |
+| Add Standard (to estimate) | ✅ WORKING | Opens Production Library panel |
+| Bulk Select | ✅ WORKING | Checkbox multi-select |
+| Bulk Archive | ✅ WORKING | Removes items from active view |
+| Bulk Duplicate | ✅ WORKING | Creates copies with -COPY suffix |
+| Bulk Add to Estimate | ✅ WORKING | Shows info toast (estimate context required) |
+| Item Click | ✅ WORKING | Navigates to detail page |
+| Search | ✅ WORKING | Filters items in real-time |
+| Filters | ✅ WORKING | Domain, Category, Status, Company Standard |
+| Assemblies | 🟡 COMING SOON | Shows proper empty state |
+| Templates | 🟡 COMING SOON | Shows proper empty state |
+| Production History | 🟡 COMING SOON | Shows proper empty state |
+| Archives | 🟡 COMING SOON | Shows proper empty state |
+
+### New Components Added
+- `/app/frontend/src/components/production/CreateStandardModal.jsx` - Full form with validation, 3-tier pricing, classification
+
+---
+
 ## V2 FOUNDATION LOCK ✅ COMPLETE (July 12, 2026)
 
 ### Architectural Freeze Status
