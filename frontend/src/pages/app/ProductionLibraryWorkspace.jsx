@@ -1911,7 +1911,10 @@ const ProductionLibraryWorkspace = () => {
     }
   };
   
-  const handleOpenItem = (item) => setSelectedItem(item);
+  const handleOpenItem = (item) => {
+    // Navigate to the detail page instead of opening a panel
+    navigate(`/app/production-library/items/${item.id}`);
+  };
   const handleImport = () => setSearchParams({ tab: 'import' });
   const handleCloseImport = () => { setSearchParams({}); fetchData(); };
   const handleNewStandard = () => toast.info('Create Standard - coming soon');

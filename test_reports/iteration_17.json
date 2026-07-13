@@ -1,0 +1,54 @@
+{
+  "summary": "Full-stack validation of Production Library v2 hierarchy + Finish Carpentry seed + Production Item Detail page + Estimate Builder integration. All 6 backend endpoints in scope PASS (6/6 pytest cases). Frontend flow verified end-to-end via Playwright: login -> Production Library (48 standards visible, matches expected) -> search 'Grab Bar' -> click FC-BA-001 -> Production Item Detail renders full metadata (desc, notes, crew=1, prod/day=12, output/hr=1.5, low=$45, standard=$58, premium=$78, trade=Finish Carpentry, cost_code=06-2000, tags=bathroom/grab-bar/accessibility, Active + Company Standard) -> Edit button enables 14 inline inputs with Save/Cancel. Sidebar counts confirmed: Company Standards=48, Knowledge Domains=19, Service Categories=11. One UI display bug found in Classification panel (raw UUIDs displayed instead of joined name/code).",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "ProductionItemDetail.jsx -> Classification panel",
+        "issue": "KNOWLEDGE DOMAIN and MEASUREMENT UNIT fields display raw UUIDs (e.g. 'fd541455-6af2-4fad-983d-6115987df9ef', 'ff282669-8116-4396-a8ba-3625d2511d87') instead of the human-readable name/code. The backend GET /api/production-library/items/{id} response already includes `knowledge_domains: {id, name, code}` and `measurement_units: {id, code, name}` joins - the frontend just needs to read `item.knowledge_domains.name` and `item.measurement_units.code` instead of the *_id fields.",
+        "selector": "Classification section (right column) on /app/production-library/items/:itemId",
+        "priority": "MEDIUM"
+      }
+    ],
+    "integration_issues": [
+      {
+        "flow": "AppLayout / useOrganization workspace-context",
+        "issue": "Two `TypeError: Failed to fetch` console errors observed immediately after login when navigating from /app/command-center to /app/production-library ('[useOrganization] Error: TypeError: Failed to fetch' and '[AppLayout] Workspace context error'). The page still recovers and renders correctly, but these are noise-level errors likely caused by a transient double-fire on route change. Non-blocking.",
+        "affected_selectors": ["console errors on /app/production-library first paint"]
+      }
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_production_library_hierarchy_v2.py",
+    "/app/test_reports/pytest/production_library_hierarchy_v2_results.xml"
+  ],
+  "action_items": [
+    "MEDIUM: In ProductionItemDetail.jsx Classification panel, replace `item.knowledge_domain_id` render with `item.knowledge_domains?.name` and `item.measurement_unit_id` with `item.measurement_units?.code` (or `.name`). The joined objects are already returned by the API."
+  ],
+  "critical_code_review_comments": [
+    "ProductionItemDetail.jsx renders raw UUID strings in the Classification section - should join through knowledge_domains.name / measurement_units.code (data is already in the payload).",
+    "routes/production_library.py is still 1918 lines and mixes domains / items / assemblies / import in one module - previously flagged, still worth splitting.",
+    "JWT is decoded with `options={'verify_signature': False}` across all production_library, production_library_hierarchy, production_library_seed routes. Security concern noted in earlier iterations, still not addressed.",
+    "verify_token_and_get_org() is duplicated verbatim across 3 route files (production_library.py, production_library_hierarchy.py, production_library_seed.py). Extract to a shared auth helper.",
+    "get_service_headers() is also duplicated across the same 3 files.",
+    "seed/finish-carpentry endpoint returns HTTP 200 even when items_created=0 (all skipped) - correct idempotent behavior; consider surfacing an explicit `already_seeded: true` flag for clarity.",
+    "seed/v2 hierarchy is idempotent by checking `if not divisions_check.json()` etc - won't top up if new items are added to the seed list later. Consider upsert-by-code."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_production_library_hierarchy_v2.py (new - 6 tests, all passing)"
+  ],
+  "success_rate": {
+    "backend": "100% (6/6 tests passed)",
+    "frontend": "~95% - all critical flows work; one UI display bug (Classification UUIDs)"
+  },
+  "test_credentials": "inbox@twofungis.ca / TradeOS2024! (Scott Marshall, Two Fungis Finishing owner) - working; post-login redirect goes to /app/command-center as expected",
+  "seed_data_creation": "Ran POST /api/production-library/seed/finish-carpentry (40 items) and POST /api/production-library/seed/v2 (12 divisions, 8 disciplines, 6 areas, 8 phases). Idempotent - re-running skips existing rows. Also updated FC-BA-003 (Towel Bar Install) notes for update-persistence test and restored original in teardown.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "The Production Library flow is fully working end-to-end. Backend regression suite: `REACT_APP_BACKEND_URL=https://profit-tracker-demo-1.preview.emergentagent.com python -m pytest backend/tests/test_production_library_hierarchy_v2.py -v` (6 tests). Test data: Grab Bar Install = FC-BA-001, all 40 FC-* codes seeded. Detail page route: /app/production-library/items/:itemId. Detail page container has data-testid='production-item-detail'; list rows have data-testid='standard-row-{item.id}'; grid search has data-testid='grid-search-input'. Sidebar shows Company Standards=48, Knowledge Domains=19. Only display bug: raw UUIDs in Classification panel.",
+  "rca of the issue": "Classification panel UUID bug: In /app/frontend/src/pages/app/ProductionItemDetail.jsx, the Classification section is reading `item.knowledge_domain_id` and `item.measurement_unit_id` (the raw FK columns). The backend GET /api/production-library/items/{id} response embeds the joined objects at `item.knowledge_domains.{id,name,code}` and `item.measurement_units.{id,code,name}` (verified in test_item_detail_full_metadata). Fix: replace the two `<div>{item.<field>_id}</div>` renders in the Classification card with `{item.knowledge_domains?.name ?? '—'}` and `{item.measurement_units?.code ?? '—'}`."
+}

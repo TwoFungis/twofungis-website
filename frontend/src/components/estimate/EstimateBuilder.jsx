@@ -661,9 +661,8 @@ export default function EstimateBuilder({ opportunity, session, onRefresh }) {
     if (!tender?.id || !session?.access_token) return;
 
     try {
-      // For Combined Unit Pricing (Vertical Slice #1):
-      // We use material_unit_cost as our "combined unit price"
-      // and set material_quantity = quantity for the calculation
+      // Production Library is the single source of truth
+      // Pull ALL available metadata from the standard
       const unitPrice = standard.standard_rate || 0;
       
       const response = await fetch(`${API_URL}/api/tenders/${tender.id}/items`, {
@@ -673,13 +672,33 @@ export default function EstimateBuilder({ opportunity, session, onRefresh }) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
+          // Core identification
           name: standard.production_name,
           description: standard.description || '',
           unit: standard.measurement_units?.code || 'EA',
           quantity: 1,
-          // Combined Unit Pricing: use material fields for simplicity
+          
+          // Pricing from Production Library
           material_quantity: 1,
           material_unit_cost: unitPrice,
+          
+          // Additional rates (when available)
+          low_rate: standard.low_labour_rate || null,
+          standard_rate: standard.standard_rate || null,
+          premium_rate: standard.premium_labour_rate || standard.premium_rate || null,
+          material_rate: standard.material_rate || null,
+          equipment_rate: standard.equipment_rate || null,
+          
+          // Production metrics
+          crew_size: standard.crew_size || 1,
+          production_per_day: standard.production_per_day || null,
+          production_output: standard.production_output || null,
+          
+          // Classification
+          trade_discipline: standard.trade_discipline || null,
+          cost_code: standard.cost_code || null,
+          
+          // Source tracking
           production_item_id: standard.id,
           production_source: 'library'
         })
@@ -689,8 +708,14 @@ export default function EstimateBuilder({ opportunity, session, onRefresh }) {
         const data = await response.json();
         setItems(prev => [...prev, {
           ...data.item,
+          // Preserve Production Library metadata for display
           production_code: standard.production_code,
-          standard_rate: unitPrice
+          standard_rate: unitPrice,
+          low_rate: standard.low_labour_rate,
+          premium_rate: standard.premium_labour_rate || standard.premium_rate,
+          crew_size: standard.crew_size,
+          trade_discipline: standard.trade_discipline,
+          cost_code: standard.cost_code
         }]);
       }
     } catch (err) {
