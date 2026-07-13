@@ -12,6 +12,8 @@ import uuid
 import os
 from emergentintegrations.llm.chat import LlmChat, UserMessage
 
+from config import config
+
 router = APIRouter(prefix="/api/ai", tags=["ai"])
 logger = logging.getLogger(__name__)
 

@@ -25,8 +25,6 @@ from routes.access_control import (
 router = APIRouter(prefix="/api/ai", tags=["ai-copilot"])
 logger = logging.getLogger(__name__)
 
-config.EMERGENT_LLM_KEY = "sk-emergent-0813c02F97f4c435dF"
-
 # Context models
 class CopilotContext(BaseModel):
     page: str
