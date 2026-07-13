@@ -268,7 +268,8 @@ function EstimateLineItem({ item, onUpdate, onDelete }) {
 
   // Get the unit price from the item (material_unit_cost for Combined Unit Pricing)
   const unitPrice = item.unit_price || item.material_unit_cost || item.standard_rate || 0;
-  const lineTotal = item.line_total || (unitPrice * quantity);
+  // Always calculate line total from current quantity state (not stale item.line_total)
+  const lineTotal = unitPrice * quantity;
 
   return (
     <div 
@@ -353,10 +354,11 @@ function EstimateLineItem({ item, onUpdate, onDelete }) {
 function AreaSection({ area, items, onUpdateItem, onDeleteItem, onDeleteArea }) {
   const [expanded, setExpanded] = useState(true);
   
+  // Calculate area total from current item quantities (not stale line_total)
   const areaTotal = items.reduce((sum, item) => {
     const unitPrice = item.unit_price || item.material_unit_cost || item.standard_rate || 0;
     const qty = item.quantity || 1;
-    return sum + (item.line_total || (unitPrice * qty));
+    return sum + (unitPrice * qty);
   }, 0);
 
   return (
@@ -440,7 +442,7 @@ function CompanyBrainReview({ estimate, items }) {
       const total = items.reduce((sum, item) => {
         const unitPrice = item.unit_price || item.material_unit_cost || item.standard_rate || 0;
         const qty = item.quantity || 1;
-        return sum + (item.line_total || (unitPrice * qty));
+        return sum + (unitPrice * qty);
       }, 0);
       
       if (total > 50000) {
@@ -510,10 +512,11 @@ function CompanyBrainReview({ estimate, items }) {
  */
 function EstimateSummary({ items, onSave, saving }) {
   const calculations = useMemo(() => {
+    // Calculate subtotal from current quantities (not stale line_total)
     const subtotal = items.reduce((sum, item) => {
       const unitPrice = item.unit_price || item.material_unit_cost || item.standard_rate || 0;
       const qty = item.quantity || 1;
-      return sum + (item.line_total || (unitPrice * qty));
+      return sum + (unitPrice * qty);
     }, 0);
     
     const markup = subtotal * 0.10; // 10% default markup
