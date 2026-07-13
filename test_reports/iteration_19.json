@@ -1,0 +1,90 @@
+{
+  "summary": "TradeOS v1.0 Alpha full audit. Backend audit (9/9 passed) via new pytest suite. Frontend audit covered: auth (login/logout/protected route), Command Center, Production Library, Opportunities (list + detail workspace + new modal), Projects (list + new modal), Invoices (list + New Invoice modal), Expenses (list + Add Expense modal), Documents, Settings (profile/subscription), full sidebar nav. All create modals open and render forms correctly. Sidebar nav is 100% clean (no dead links). CRITICAL: found 3 dead links in Command Center Quick Add panel that either show error states or eject the user from the app.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {
+        "endpoint": "GET /api/organizations/me and /api/invoices",
+        "issue": "Intermittent 500 responses observed in the browser on first paint after login (empty exception message in server logs: 'Error fetching user organizations: '). Direct pytest calls return 200 every time. Likely a race condition where the Supabase JWT is not yet valid/present in a subrequest, or is_platform_admin() httpx call transiently fails. Non-blocking (UI renders, just noisy console)."
+      },
+      {
+        "endpoint": "GET /api/opportunities/stats/pipeline",
+        "issue": "Occasional 401 on first paint after login (same race condition as above). Pytest with fresh Supabase token returns 200."
+      }
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "CommandCenterPage - Quick Add panel (+ New button in header)",
+        "issue": "HIGH: All three Quick Add items navigate to non-existent 'new' routes: (1) 'New Opportunity' -> /app/opportunities/new -> renders OpportunityWorkspaceV2 with id='new', which calls GET /api/opportunities/new, fails, and shows 'Failed to load opportunity' error page. (2) 'New Project' -> /app/projects/new -> renders ProjectDetailPage with id='new', fails, shows 'Error: Failed to load project'. (3) 'Quick Note' -> /app/notes/new -> route does not exist, catch-all Navigate to '/' EJECTS THE USER from the authenticated app back to the marketing landing page. Fix: Quick Add items should either open the existing Create modals (OpportunitiesPage and ProjectsPage already have working New Opportunity/New Project modals) or route to /app/opportunities?new=1 style URLs. Quick Note should show 'Coming Soon' or be removed.",
+        "selector": "[data-testid='quickadd-new-opportunity'], [data-testid='quickadd-new-project'], [data-testid='quickadd-quick-note']",
+        "priority": "HIGH"
+      },
+      {
+        "component": "DocumentsPage",
+        "issue": "HIGH: Frontend calls GET /api/documents?folder= (returns 404) - backend uses /api/storage prefix. Documents page silently shows 'No documents found' empty state. Upload button opens a browser alert() saying 'Upload functionality requires Supabase Storage bucket to be configured' (placeholder). Either wire to /api/storage or ship as a proper 'Coming Soon' page.",
+        "selector": "[data-testid='documents-page']",
+        "priority": "HIGH"
+      },
+      {
+        "component": "ProductionLibraryWorkspace - Assemblies handleCreateAssembly",
+        "issue": "toast.info('Assemblies coming soon...') fires from an in-app button while Assemblies view shows a full 'Coming Soon' state. Per audit spec ('Coming Soon toasts should be avoided'), replace with disabled button or wire to the existing Coming Soon empty-state.",
+        "selector": "N/A (handleCreateAssembly toast)",
+        "priority": "MEDIUM"
+      },
+      {
+        "component": "ProductionLibraryPage (legacy /production-library/import)",
+        "issue": "Contains 4 toast.info('...coming soon') placeholders (Assembly, Scope Item, Labour Rate, Template creation). If this page is still reachable, these violate the audit rule.",
+        "selector": "N/A",
+        "priority": "LOW"
+      }
+    ],
+    "integration_issues": [
+      {
+        "flow": "Post-login first paint",
+        "issue": "Recurring from iteration 17/18: '[useOrganization] Error: Failed to fetch organizations' console error on initial /app/* paint. Backend returns 500 with empty exception message. Direct API calls succeed. Retry logic (useOrganization already refetches) masks it, so UI works, but console is noisy.",
+        "affected_selectors": ["console errors on first paint"]
+      }
+    ],
+    "design_issues": [
+      {
+        "screen": "Command Center header",
+        "issues": ["'+ New' button in header has no visual disabled/loading state; on click it opens Quick Add panel which then leads to error pages (see Quick Add bug above)."]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_v1_alpha_audit.py",
+    "/app/test_reports/pytest/v1_alpha_audit.xml"
+  ],
+  "action_items": [
+    "HIGH: Fix Command Center Quick Add panel. Options: (a) change items[].href to trigger the existing Create modals on the target pages (e.g. navigate to /app/opportunities?new=1 and read query param to auto-open modal), (b) or convert each item to an onClick that opens a shared Create modal component. Quick Note should either be removed or show a Coming Soon empty state (never eject user to /).",
+    "HIGH: Fix Documents page - either implement /api/documents (list/read/delete) backed by the storage router, or replace DocumentsPage with a proper Coming Soon component and remove the browser alert() upload placeholder.",
+    "MEDIUM: Remove or rewire the 'Assemblies coming soon' toast in ProductionLibraryWorkspace.handleCreateAssembly (line ~1852) - the view already shows a proper Coming Soon empty state.",
+    "MEDIUM: Investigate transient 500 on /api/organizations/me and /api/invoices during first paint. The empty exception logs suggest an httpx timeout or the Supabase call throwing a swallowed error. Wrap is_platform_admin call with tighter timeout+retry, and log repr(e) so future debugging is possible.",
+    "LOW: Clean up legacy ProductionLibraryPage.jsx toasts (Assembly/Scope Item/Labour Rate/Template 'coming soon') if the route /app/production-library/import is still exposed.",
+    "LOW (recurring): Hide count badges for Coming Soon nav items (Assemblies) - reported in iteration_18, not addressed."
+  ],
+  "critical_code_review_comments": [
+    "App.js catch-all route Navigate to='/' silently ejects any authenticated user who lands on a bad in-app URL. Recommend a 404-not-found component inside AppLayout so users stay in the app.",
+    "OpportunityWorkspaceV2 and ProjectDetailPage should special-case id === 'new' to render a Create form instead of fetching. This is the actual pattern that would make /app/opportunities/new and /app/projects/new work as the Quick Add panel intends.",
+    "routes/organizations.py:283 does `logger.error(f'Error fetching user organizations: {e}')` — {e} is empty for httpx exceptions. Use `logger.exception(...)` or `repr(e)` to capture the actual failure.",
+    "DocumentsPage.jsx uploads use `alert()` in 2026. Replace with proper toast + modal or ship as Coming Soon.",
+    "ProductionLibraryWorkspace.jsx now 2157 lines (was 2156 last iteration) - still needs splitting per iteration_18 recommendation.",
+    "Frontend has two separate 'production library' pages: ProductionLibraryPage.jsx (1122 lines, legacy, still contains 'coming soon' toasts) and ProductionLibraryWorkspace.jsx (new). Legacy page routed at /app/production-library/import; verify if still needed."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_v1_alpha_audit.py (new)"
+  ],
+  "success_rate": {
+    "backend": "100% (9/9 pytest passed) - all list endpoints powering the audited pages return 200 with expected shape.",
+    "frontend": "~85% - authentication, sidebar nav, all create modals (Invoice/Opportunity/Project/Expense), opportunity workspace, list pages all work. Deducted for: Command Center Quick Add all-3-links broken (HIGH), Documents page endpoint mismatch (HIGH), 'Assemblies coming soon' toast (MEDIUM)."
+  },
+  "test_credentials": "inbox@twofungis.ca / TradeOS2024! - working. NOTE: LoginPage <input type='email'> occasionally rejects Playwright .fill(); reliable pattern is: click input -> page.keyboard.type(value, delay=30) -> wait 500ms -> then click password field. HTML5 required-field validation blocks submit if the field appears empty.",
+  "seed_data_creation": "No new seed data created in this run. Existing opportunity OPP-2026-001 'Vertical Slice Test - Office Renovation' ($125,000, ABC Construction Ltd, Vancouver, tendering, tender v2 = $3,194) is present and used for detail-page verification. QA-22422 standard from iteration_18 may still be present.",
+  "retest_needed": true,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Test creds: inbox@twofungis.ca / TradeOS2024!. Use Supabase auth playbook: POST {SUPABASE_URL}/auth/v1/token?grant_type=password with apikey header. Backend audit suite at /app/backend/tests/test_v1_alpha_audit.py covers /api/workspace/context, /api/organizations/me, /api/opportunities (+stats), /api/projects, /api/invoices, /api/expenses, and documents-endpoint-mismatch. Command Center Quick Add panel testids: quickadd-new-opportunity / quickadd-new-project / quickadd-quick-note. All three are broken - navigate to non-existent routes and end up on error pages (or eject to landing for /notes/new). NewOpp/NewProject/NewInvoice/AddExpense modals do NOT use role='dialog'; assert by presence of form fields (input[placeholder*='...']) or the modal title text.",
+  "rca of the issue": "Command Center Quick Add dead links RCA: CommandCenterPage.jsx defines items = [{href:'/app/opportunities/new'}, {href:'/app/projects/new'}, {href:'/app/notes/new'}] and calls onNavigate(item.href). App.js only defines routes for /app/opportunities/:id and /app/projects/:id (which then fetch by id, so id='new' returns 404 from the backend and the pages show error states) and has NO /app/notes route at all, so /app/notes/new falls through to the catch-all <Route path='*' element={<Navigate to='/' replace />}/> and redirects the user to the landing page. Reproduction: log in, click '+ New' in Command Center header, click any of the 3 items -> observe (a) Failed to load opportunity, (b) Error: Failed to load project, or (c) redirected to https://.../ landing page. Mitigation: either (1) intercept id='new' in OpportunityWorkspaceV2/ProjectDetailPage and render a Create form, or (2) change Quick Add items to onClick handlers that open the existing Create modals on the target pages (Opportunities/Projects already have working modals; Quick Note has no backing feature so should show Coming Soon)."
+}

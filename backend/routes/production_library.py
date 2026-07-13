@@ -669,6 +669,41 @@ async def get_production_item_revisions(
         logger.error(f"Error fetching revisions: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.delete("/items/{item_id}")
+async def delete_production_item(
+    item_id: str,
+    authorization: str = Header(...)
+):
+    """Archive (soft delete) a production item"""
+    context = await verify_token_and_get_org(authorization)
+    org_id = context['organization_id']
+    user_id = context['user_id']
+    
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            # Soft delete by setting is_active to false
+            response = await client.patch(
+                f"{config.SUPABASE_URL}/rest/v1/production_items?"
+                f"id=eq.{item_id}&organization_id=eq.{org_id}",
+                headers=await get_service_headers(),
+                json={
+                    "is_active": False,
+                    "archived_at": datetime.now(timezone.utc).isoformat(),
+                    "archived_by": user_id
+                }
+            )
+            
+            if response.status_code == 200:
+                return {"success": True, "message": "Item archived"}
+            else:
+                raise HTTPException(status_code=response.status_code, detail="Failed to archive item")
+                
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error archiving production item: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 # =====================================================
 # PRODUCTION ASSEMBLIES
 # =====================================================
