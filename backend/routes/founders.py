@@ -9,12 +9,11 @@ from typing import Optional, List
 import os
 import logging
 import httpx
+from config import config
 
 router = APIRouter(prefix="/api/founders", tags=["founders"])
 logger = logging.getLogger(__name__)
 
-SUPABASE_URL = os.environ.get('SUPABASE_URL', '')
-SUPABASE_SERVICE_KEY = os.environ.get('SUPABASE_SERVICE_KEY', '')
 
 # Pre-defined founder emails - these users get automatic lifetime access
 FOUNDER_EMAILS = [
@@ -37,8 +36,8 @@ class FoundersCountResponse(BaseModel):
 async def get_supabase_headers():
     """Get headers for Supabase service role requests"""
     return {
-        "apikey": SUPABASE_SERVICE_KEY,
-        "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+        "apikey": config.SUPABASE_SERVICE_KEY,
+        "Authorization": f"Bearer {config.SUPABASE_SERVICE_KEY}",
         "Content-Type": "application/json",
         "Prefer": "return=representation"
     }
@@ -78,7 +77,7 @@ async def activate_founder(user_id: str, request: Request):
         # First, get the user's email from their profile
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}&select=*",
+                f"{config.SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}&select=*",
                 headers=await get_supabase_headers()
             )
             
@@ -88,7 +87,7 @@ async def activate_founder(user_id: str, request: Request):
             
             # Profile exists, now get user email from Supabase auth
             auth_response = await client.get(
-                f"{SUPABASE_URL}/auth/v1/admin/users/{user_id}",
+                f"{config.SUPABASE_URL}/auth/v1/admin/users/{user_id}",
                 headers=await get_supabase_headers()
             )
             
@@ -104,7 +103,7 @@ async def activate_founder(user_id: str, request: Request):
             
             # Update the user's subscription to elite (full access)
             update_response = await client.patch(
-                f"{SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}",
+                f"{config.SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}",
                 headers=await get_supabase_headers(),
                 json={
                     "subscription_tier": "elite",
@@ -143,7 +142,7 @@ async def sync_all_founders():
             try:
                 # Find user by email via auth API
                 response = await client.get(
-                    f"{SUPABASE_URL}/auth/v1/admin/users",
+                    f"{config.SUPABASE_URL}/auth/v1/admin/users",
                     headers=await get_supabase_headers(),
                     params={"page": 1, "per_page": 1000}
                 )
@@ -163,7 +162,7 @@ async def sync_all_founders():
                 
                 # Update their subscription tier to elite (gives full access)
                 update_response = await client.patch(
-                    f"{SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}",
+                    f"{config.SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}",
                     headers=await get_supabase_headers(),
                     json={
                         "subscription_tier": "elite",

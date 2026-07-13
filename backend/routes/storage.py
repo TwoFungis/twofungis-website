@@ -31,6 +31,7 @@ import uuid
 import logging
 import requests
 import httpx
+from config import config
 from datetime import datetime, timezone
 
 router = APIRouter(prefix="/api/storage", tags=["storage"])
@@ -38,12 +39,9 @@ logger = logging.getLogger(__name__)
 
 # Emergent Object Storage configuration
 STORAGE_URL = "https://integrations.emergentagent.com/objstore/api/v1/storage"
-EMERGENT_KEY = os.environ.get("EMERGENT_LLM_KEY")
 APP_NAME = "tradeos"
 
 # Supabase configuration
-SUPABASE_URL = os.environ.get('SUPABASE_URL', '')
-SUPABASE_SERVICE_KEY = os.environ.get('SUPABASE_SERVICE_KEY', '')
 
 # Module-level storage key (initialized once at startup)
 storage_key = None
@@ -119,14 +117,14 @@ def init_storage():
     if storage_key:
         return storage_key
     
-    if not EMERGENT_KEY:
-        logger.error("EMERGENT_LLM_KEY not configured")
-        raise Exception("Storage not configured: Missing EMERGENT_LLM_KEY")
+    if not config.EMERGENT_LLM_KEY:
+        logger.error("config.EMERGENT_LLM_KEY not configured")
+        raise Exception("Storage not configured: Missing config.EMERGENT_LLM_KEY")
     
     try:
         resp = requests.post(
             f"{STORAGE_URL}/init",
-            json={"emergent_key": EMERGENT_KEY},
+            json={"emergent_key": config.EMERGENT_LLM_KEY},
             timeout=30
         )
         resp.raise_for_status()
@@ -187,8 +185,8 @@ def get_object(path: str) -> tuple:
 async def get_supabase_headers():
     """Get headers for Supabase service role requests."""
     return {
-        "apikey": SUPABASE_SERVICE_KEY,
-        "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+        "apikey": config.SUPABASE_SERVICE_KEY,
+        "Authorization": f"Bearer {config.SUPABASE_SERVICE_KEY}",
         "Content-Type": "application/json",
         "Prefer": "return=representation"
     }
@@ -297,7 +295,7 @@ async def upload_file(
         async with httpx.AsyncClient(timeout=10.0) as client:
             headers = await get_supabase_headers()
             response = await client.post(
-                f"{SUPABASE_URL}/rest/v1/files",
+                f"{config.SUPABASE_URL}/rest/v1/files",
                 headers=headers,
                 json=file_metadata
             )
@@ -341,7 +339,7 @@ async def download_file(
         async with httpx.AsyncClient(timeout=10.0) as client:
             headers = await get_supabase_headers()
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/files?id=eq.{file_id}&is_deleted=eq.false&select=*",
+                f"{config.SUPABASE_URL}/rest/v1/files?id=eq.{file_id}&is_deleted=eq.false&select=*",
                 headers=headers
             )
             
@@ -404,7 +402,7 @@ async def list_files(
             query_string = "&".join(query_parts)
             
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/files?{query_string}&order=created_at.desc&limit={limit}&offset={offset}&select=*",
+                f"{config.SUPABASE_URL}/rest/v1/files?{query_string}&order=created_at.desc&limit={limit}&offset={offset}&select=*",
                 headers=headers
             )
             
@@ -436,7 +434,7 @@ async def delete_file(
             
             # Soft delete by setting is_deleted = true
             response = await client.patch(
-                f"{SUPABASE_URL}/rest/v1/files?id=eq.{file_id}",
+                f"{config.SUPABASE_URL}/rest/v1/files?id=eq.{file_id}",
                 headers=headers,
                 json={
                     "is_deleted": True,

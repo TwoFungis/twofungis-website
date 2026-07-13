@@ -17,7 +17,6 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/bookkeeping", tags=["Bookkeeping"])
 
 # Get the Emergent LLM key
-EMERGENT_LLM_KEY = os.environ.get('EMERGENT_LLM_KEY', '')
 
 # Storage limits by subscription tier (in bytes)
 STORAGE_LIMITS = {
@@ -174,7 +173,7 @@ async def scan_receipt(
         raise HTTPException(status_code=400, detail="File too large. Maximum size is 10MB.")
     
     # Check if LLM key is available
-    if not EMERGENT_LLM_KEY:
+    if not config.EMERGENT_LLM_KEY:
         raise HTTPException(
             status_code=500, 
             detail="Receipt scanning is not configured. Please contact support."
@@ -186,7 +185,7 @@ async def scan_receipt(
         
         # Initialize chat with GPT-4 Vision
         chat = LlmChat(
-            api_key=EMERGENT_LLM_KEY,
+            api_key=config.EMERGENT_LLM_KEY,
             session_id=f"receipt_scan_{datetime.now(timezone.utc).timestamp()}",
             system_message="You are an expert at reading receipts and invoices. Extract information accurately and return valid JSON only."
         ).with_model("openai", "gpt-4o")
@@ -263,10 +262,10 @@ async def scan_receipt(
 @router.post("/test-scan")
 async def test_scan():
     """Test endpoint to verify receipt scanning is configured"""
-    if not EMERGENT_LLM_KEY:
+    if not config.EMERGENT_LLM_KEY:
         return {
             "configured": False,
-            "message": "EMERGENT_LLM_KEY not found in environment"
+            "message": "config.EMERGENT_LLM_KEY not found in environment"
         }
     
     return {

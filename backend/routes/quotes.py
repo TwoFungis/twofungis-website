@@ -7,6 +7,7 @@ from pydantic import BaseModel
 from typing import Optional, Dict, Any, List
 from datetime import datetime, timezone
 import httpx
+from config import config
 import os
 import logging
 import json
@@ -21,8 +22,6 @@ from routes.access_control import (
 router = APIRouter(prefix="/api/quotes", tags=["quotes"])
 logger = logging.getLogger(__name__)
 
-SUPABASE_URL = os.environ.get('SUPABASE_URL', '')
-SUPABASE_SERVICE_KEY = os.environ.get('SUPABASE_SERVICE_KEY', '')
 
 
 class QuoteLineItem(BaseModel):
@@ -68,8 +67,8 @@ def get_user_id_from_token(authorization: str) -> Optional[str]:
 
 async def get_service_headers():
     return {
-        "apikey": SUPABASE_SERVICE_KEY,
-        "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+        "apikey": config.SUPABASE_SERVICE_KEY,
+        "Authorization": f"Bearer {config.SUPABASE_SERVICE_KEY}",
         "Content-Type": "application/json",
         "Prefer": "return=representation"
     }
@@ -78,7 +77,7 @@ async def get_service_headers():
 async def supabase_request(method: str, table: str, data: Dict = None, params: Dict = None):
     """Make a request to Supabase REST API"""
     headers = await get_service_headers()
-    url = f"{SUPABASE_URL}/rest/v1/{table}"
+    url = f"{config.SUPABASE_URL}/rest/v1/{table}"
     
     if params:
         param_str = "&".join([f"{k}={v}" for k, v in params.items()])

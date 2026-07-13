@@ -14,6 +14,7 @@ import base64
 from datetime import datetime, timezone
 import os
 import httpx
+from config import config
 from emergentintegrations.llm.chat import LlmChat, UserMessage
 
 from routes.access_control import (
@@ -24,9 +25,7 @@ from routes.access_control import (
 router = APIRouter(prefix="/api/ai", tags=["ai-copilot"])
 logger = logging.getLogger(__name__)
 
-EMERGENT_LLM_KEY = "sk-emergent-0813c02F97f4c435dF"
-SUPABASE_URL = os.environ.get('SUPABASE_URL', '')
-SUPABASE_SERVICE_KEY = os.environ.get('SUPABASE_SERVICE_KEY', '')
+config.EMERGENT_LLM_KEY = "sk-emergent-0813c02F97f4c435dF"
 
 # Context models
 class CopilotContext(BaseModel):
@@ -148,14 +147,14 @@ async def get_user_profile_for_ai(user_id: str) -> Optional[Dict[str, Any]]:
     """Fetch user profile for AI access control"""
     try:
         headers = {
-            "apikey": SUPABASE_SERVICE_KEY,
-            "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+            "apikey": config.SUPABASE_SERVICE_KEY,
+            "Authorization": f"Bearer {config.SUPABASE_SERVICE_KEY}",
             "Content-Type": "application/json"
         }
         
         async with httpx.AsyncClient(timeout=5.0) as client:
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}&select=subscription_tier,grandfathered_active,trial_started_at,trial_ends_at,ai_daily_usage,ai_usage_reset_at",
+                f"{config.SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}&select=subscription_tier,grandfathered_active,trial_started_at,trial_ends_at,ai_daily_usage,ai_usage_reset_at",
                 headers=headers
             )
             
@@ -171,8 +170,8 @@ async def update_ai_usage(user_id: str, needs_reset: bool):
     """Update AI usage counter for locked users"""
     try:
         headers = {
-            "apikey": SUPABASE_SERVICE_KEY,
-            "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+            "apikey": config.SUPABASE_SERVICE_KEY,
+            "Authorization": f"Bearer {config.SUPABASE_SERVICE_KEY}",
             "Content-Type": "application/json",
             "Prefer": "return=minimal"
         }
@@ -190,7 +189,7 @@ async def update_ai_usage(user_id: str, needs_reset: bool):
             async with httpx.AsyncClient(timeout=5.0) as client:
                 # Simple approach: fetch, increment, update
                 response = await client.get(
-                    f"{SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}&select=ai_daily_usage",
+                    f"{config.SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}&select=ai_daily_usage",
                     headers=headers
                 )
                 if response.status_code == 200:
@@ -202,7 +201,7 @@ async def update_ai_usage(user_id: str, needs_reset: bool):
         
         async with httpx.AsyncClient(timeout=5.0) as client:
             await client.patch(
-                f"{SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}",
+                f"{config.SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}",
                 headers=headers,
                 json=update_data
             )
@@ -235,14 +234,14 @@ async def fetch_project_context_pack(project_id: str) -> Optional[Dict[str, Any]
     
     try:
         headers = {
-            "apikey": SUPABASE_SERVICE_KEY,
-            "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+            "apikey": config.SUPABASE_SERVICE_KEY,
+            "Authorization": f"Bearer {config.SUPABASE_SERVICE_KEY}",
             "Content-Type": "application/json"
         }
         
         async with httpx.AsyncClient(timeout=TIMEOUT_SECONDS) as client:
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/projects?id=eq.{project_id}&select=name,client_gc,status,notes,contract_value,region",
+                f"{config.SUPABASE_URL}/rest/v1/projects?id=eq.{project_id}&select=name,client_gc,status,notes,contract_value,region",
                 headers=headers
             )
             
@@ -447,7 +446,7 @@ async def copilot_chat(request: CopilotRequest, authorization: str = Header(None
         # Create LLM chat instance
         session_id = str(uuid.uuid4())
         llm = LlmChat(
-            api_key=EMERGENT_LLM_KEY,
+            api_key=config.EMERGENT_LLM_KEY,
             session_id=session_id,
             system_message=system_prompt
         ).with_model("openai", "gpt-5.2")
@@ -546,8 +545,8 @@ async def log_copilot_interaction(request: CopilotRequest, response: str, mode: 
         import httpx
         
         headers = {
-            "apikey": SUPABASE_SERVICE_KEY,
-            "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+            "apikey": config.SUPABASE_SERVICE_KEY,
+            "Authorization": f"Bearer {config.SUPABASE_SERVICE_KEY}",
             "Content-Type": "application/json",
             "Prefer": "return=minimal"
         }
@@ -563,7 +562,7 @@ async def log_copilot_interaction(request: CopilotRequest, response: str, mode: 
         
         async with httpx.AsyncClient() as client:
             await client.post(
-                f"{SUPABASE_URL}/rest/v1/ai_logs",
+                f"{config.SUPABASE_URL}/rest/v1/ai_logs",
                 headers=headers,
                 json=log_data,
                 timeout=5.0
@@ -580,15 +579,15 @@ async def get_project_context(project_id: str, request: Request):
         import httpx
         
         headers = {
-            "apikey": SUPABASE_SERVICE_KEY,
-            "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+            "apikey": config.SUPABASE_SERVICE_KEY,
+            "Authorization": f"Bearer {config.SUPABASE_SERVICE_KEY}",
             "Content-Type": "application/json"
         }
         
         async with httpx.AsyncClient() as client:
             # Fetch project
             proj_resp = await client.get(
-                f"{SUPABASE_URL}/rest/v1/projects?id=eq.{project_id}&select=*",
+                f"{config.SUPABASE_URL}/rest/v1/projects?id=eq.{project_id}&select=*",
                 headers=headers
             )
             
@@ -599,14 +598,14 @@ async def get_project_context(project_id: str, request: Request):
             
             # Fetch change orders
             co_resp = await client.get(
-                f"{SUPABASE_URL}/rest/v1/change_orders?project_id=eq.{project_id}&select=*",
+                f"{config.SUPABASE_URL}/rest/v1/change_orders?project_id=eq.{project_id}&select=*",
                 headers=headers
             )
             change_orders = co_resp.json() if co_resp.status_code == 200 else []
             
             # Fetch expenses
             exp_resp = await client.get(
-                f"{SUPABASE_URL}/rest/v1/expenses?project_name=eq.{project.get('name', '')}&select=*",
+                f"{config.SUPABASE_URL}/rest/v1/expenses?project_name=eq.{project.get('name', '')}&select=*",
                 headers=headers
             )
             expenses = exp_resp.json() if exp_resp.status_code == 200 else []

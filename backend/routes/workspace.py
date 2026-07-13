@@ -19,14 +19,13 @@ from typing import Optional
 import os
 import logging
 import httpx
+from config import config
 import jwt
 from datetime import datetime, timezone
 
 router = APIRouter(prefix="/api/workspace", tags=["workspace"])
 logger = logging.getLogger(__name__)
 
-SUPABASE_URL = os.environ.get('SUPABASE_URL', '')
-SUPABASE_SERVICE_KEY = os.environ.get('SUPABASE_SERVICE_KEY', '')
 
 # =====================================================
 # PYDANTIC MODELS
@@ -58,8 +57,8 @@ class WorkspaceContext(BaseModel):
 async def get_service_headers():
     """Get headers for Supabase service role requests"""
     return {
-        "apikey": SUPABASE_SERVICE_KEY,
-        "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+        "apikey": config.SUPABASE_SERVICE_KEY,
+        "Authorization": f"Bearer {config.SUPABASE_SERVICE_KEY}",
         "Content-Type": "application/json",
         "Prefer": "return=representation"
     }
@@ -85,10 +84,10 @@ async def get_user_email(user_id: str) -> Optional[str]:
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
             response = await client.get(
-                f"{SUPABASE_URL}/auth/v1/admin/users/{user_id}",
+                f"{config.SUPABASE_URL}/auth/v1/admin/users/{user_id}",
                 headers={
-                    "apikey": SUPABASE_SERVICE_KEY,
-                    "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}"
+                    "apikey": config.SUPABASE_SERVICE_KEY,
+                    "Authorization": f"Bearer {config.SUPABASE_SERVICE_KEY}"
                 }
             )
             if response.status_code == 200:
@@ -148,7 +147,7 @@ async def get_workspace_context(authorization: str = Header(...)):
             
             # Check platform admin status first
             platform_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/platform_admins?"
+                f"{config.SUPABASE_URL}/rest/v1/platform_admins?"
                 f"user_id=eq.{user_id}&"
                 f"is_active=eq.true&"
                 f"select=id,role",
@@ -164,7 +163,7 @@ async def get_workspace_context(authorization: str = Header(...)):
             
             # Check organization membership (primary org first)
             org_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/organization_members?"
+                f"{config.SUPABASE_URL}/rest/v1/organization_members?"
                 f"user_id=eq.{user_id}&"
                 f"is_active=eq.true&"
                 f"select=id,role,is_primary,user_name,organization_id,"
@@ -204,7 +203,7 @@ async def get_workspace_context(authorization: str = Header(...)):
             if not context["has_access"]:
                 try:
                     tfcs_response = await client.get(
-                        f"{SUPABASE_URL}/rest/v1/tfcs_user_roles?"
+                        f"{config.SUPABASE_URL}/rest/v1/tfcs_user_roles?"
                         f"user_id=eq.{user_id}&"
                         f"is_active=eq.true&"
                         f"select=role,user_email,user_name",

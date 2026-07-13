@@ -21,14 +21,13 @@ from typing import Optional, List
 import os
 import logging
 import httpx
+from config import config
 import jwt
 from datetime import datetime, timezone
 
 router = APIRouter(prefix="/api/organizations", tags=["organizations"])
 logger = logging.getLogger(__name__)
 
-SUPABASE_URL = os.environ.get('SUPABASE_URL', '')
-SUPABASE_SERVICE_KEY = os.environ.get('SUPABASE_SERVICE_KEY', '')
 
 # =====================================================
 # PYDANTIC MODELS
@@ -89,8 +88,8 @@ class OrganizationSettings(BaseModel):
 async def get_service_headers():
     """Get headers for Supabase service role requests"""
     return {
-        "apikey": SUPABASE_SERVICE_KEY,
-        "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+        "apikey": config.SUPABASE_SERVICE_KEY,
+        "Authorization": f"Bearer {config.SUPABASE_SERVICE_KEY}",
         "Content-Type": "application/json",
         "Prefer": "return=representation"
     }
@@ -116,7 +115,7 @@ async def is_platform_admin(user_id: str) -> bool:
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/platform_admins?"
+                f"{config.SUPABASE_URL}/rest/v1/platform_admins?"
                 f"user_id=eq.{user_id}&"
                 f"is_active=eq.true&"
                 f"select=id,role",
@@ -142,7 +141,7 @@ async def organizations_health():
     try:
         async with httpx.AsyncClient(timeout=5.0) as client:
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/organizations?limit=1",
+                f"{config.SUPABASE_URL}/rest/v1/organizations?limit=1",
                 headers=await get_service_headers()
             )
             
@@ -198,7 +197,7 @@ async def get_my_organizations(authorization: str = Header(...)):
             platform_role = None
             if platform_admin:
                 platform_response = await client.get(
-                    f"{SUPABASE_URL}/rest/v1/platform_admins?"
+                    f"{config.SUPABASE_URL}/rest/v1/platform_admins?"
                     f"user_id=eq.{user_id}&"
                     f"is_active=eq.true&"
                     f"select=role",
@@ -211,7 +210,7 @@ async def get_my_organizations(authorization: str = Header(...)):
             
             # Get all organization memberships
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/organization_members?"
+                f"{config.SUPABASE_URL}/rest/v1/organization_members?"
                 f"user_id=eq.{user_id}&"
                 f"is_active=eq.true&"
                 f"select=id,role,is_primary,organization_id,"
@@ -299,7 +298,7 @@ async def set_primary_organization(
         async with httpx.AsyncClient() as client:
             # Verify user is member of this organization
             verify_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/organization_members?"
+                f"{config.SUPABASE_URL}/rest/v1/organization_members?"
                 f"user_id=eq.{user_id}&"
                 f"organization_id=eq.{request.organization_id}&"
                 f"is_active=eq.true&"
@@ -312,7 +311,7 @@ async def set_primary_organization(
             
             # Clear existing primary flags
             await client.patch(
-                f"{SUPABASE_URL}/rest/v1/organization_members?"
+                f"{config.SUPABASE_URL}/rest/v1/organization_members?"
                 f"user_id=eq.{user_id}&"
                 f"is_primary=eq.true",
                 headers=await get_service_headers(),
@@ -321,7 +320,7 @@ async def set_primary_organization(
             
             # Set new primary
             response = await client.patch(
-                f"{SUPABASE_URL}/rest/v1/organization_members?"
+                f"{config.SUPABASE_URL}/rest/v1/organization_members?"
                 f"user_id=eq.{user_id}&"
                 f"organization_id=eq.{request.organization_id}",
                 headers=await get_service_headers(),
@@ -365,7 +364,7 @@ async def get_organization(
             
             if not is_admin:
                 verify_response = await client.get(
-                    f"{SUPABASE_URL}/rest/v1/organization_members?"
+                    f"{config.SUPABASE_URL}/rest/v1/organization_members?"
                     f"user_id=eq.{user_id}&"
                     f"organization_id=eq.{organization_id}&"
                     f"is_active=eq.true&"
@@ -378,7 +377,7 @@ async def get_organization(
             
             # Get organization details
             org_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/organizations?"
+                f"{config.SUPABASE_URL}/rest/v1/organizations?"
                 f"id=eq.{organization_id}&"
                 f"select=*",
                 headers=await get_service_headers()
@@ -395,7 +394,7 @@ async def get_organization(
             
             # Get settings
             settings_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/organization_settings?"
+                f"{config.SUPABASE_URL}/rest/v1/organization_settings?"
                 f"organization_id=eq.{organization_id}&"
                 f"select=*",
                 headers=await get_service_headers()
@@ -462,7 +461,7 @@ async def get_organization_members(
             
             if not is_admin:
                 verify_response = await client.get(
-                    f"{SUPABASE_URL}/rest/v1/organization_members?"
+                    f"{config.SUPABASE_URL}/rest/v1/organization_members?"
                     f"user_id=eq.{user_id}&"
                     f"organization_id=eq.{organization_id}&"
                     f"is_active=eq.true&"
@@ -475,7 +474,7 @@ async def get_organization_members(
             
             # Get all members
             members_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/organization_members?"
+                f"{config.SUPABASE_URL}/rest/v1/organization_members?"
                 f"organization_id=eq.{organization_id}&"
                 f"select=*&"
                 f"order=role.asc,user_name.asc",
@@ -548,7 +547,7 @@ async def get_my_organization_role(
             # If no org specified, get primary
             if not organization_id:
                 primary_response = await client.get(
-                    f"{SUPABASE_URL}/rest/v1/organization_members?"
+                    f"{config.SUPABASE_URL}/rest/v1/organization_members?"
                     f"user_id=eq.{user_id}&"
                     f"is_primary=eq.true&"
                     f"is_active=eq.true&"
@@ -572,7 +571,7 @@ async def get_my_organization_role(
                 
                 # No primary - try to find any membership
                 any_response = await client.get(
-                    f"{SUPABASE_URL}/rest/v1/organization_members?"
+                    f"{config.SUPABASE_URL}/rest/v1/organization_members?"
                     f"user_id=eq.{user_id}&"
                     f"is_active=eq.true&"
                     f"select=organization_id,role,organizations(name,is_platform)&"
@@ -604,7 +603,7 @@ async def get_my_organization_role(
             
             # Specific organization requested
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/organization_members?"
+                f"{config.SUPABASE_URL}/rest/v1/organization_members?"
                 f"user_id=eq.{user_id}&"
                 f"organization_id=eq.{organization_id}&"
                 f"is_active=eq.true&"

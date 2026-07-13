@@ -21,6 +21,7 @@ import logging
 import uuid
 import json
 import httpx
+from config import config
 from datetime import datetime, timezone
 from dotenv import load_dotenv
 
@@ -33,9 +34,6 @@ router = APIRouter(prefix="/api/ai/chat", tags=["ai-chat"])
 logger = logging.getLogger(__name__)
 
 # Configuration
-EMERGENT_LLM_KEY = os.environ.get("EMERGENT_LLM_KEY")
-SUPABASE_URL = os.environ.get('SUPABASE_URL', '')
-SUPABASE_SERVICE_KEY = os.environ.get('SUPABASE_SERVICE_KEY', '')
 
 # Default model configuration
 DEFAULT_PROVIDER = "openai"
@@ -99,8 +97,8 @@ class ChatHistoryResponse(BaseModel):
 async def get_supabase_headers():
     """Get headers for Supabase service role requests."""
     return {
-        "apikey": SUPABASE_SERVICE_KEY,
-        "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+        "apikey": config.SUPABASE_SERVICE_KEY,
+        "Authorization": f"Bearer {config.SUPABASE_SERVICE_KEY}",
         "Content-Type": "application/json",
         "Prefer": "return=representation"
     }
@@ -122,7 +120,7 @@ async def save_message_to_db(session_id: str, role: str, content: str, user_id: 
             }
             
             await client.post(
-                f"{SUPABASE_URL}/rest/v1/chat_messages",
+                f"{config.SUPABASE_URL}/rest/v1/chat_messages",
                 headers=headers,
                 json=message_data
             )
@@ -137,7 +135,7 @@ async def get_chat_history(session_id: str, limit: int = 20) -> List[dict]:
             headers = await get_supabase_headers()
             
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/chat_messages?"
+                f"{config.SUPABASE_URL}/rest/v1/chat_messages?"
                 f"session_id=eq.{session_id}&"
                 f"order=created_at.asc&"
                 f"limit={limit}&"
@@ -159,10 +157,10 @@ async def get_chat_history(session_id: str, limit: int = 20) -> List[dict]:
 async def chat_health():
     """Check AI chat service health."""
     return {
-        "status": "healthy" if EMERGENT_LLM_KEY else "unhealthy",
+        "status": "healthy" if config.EMERGENT_LLM_KEY else "unhealthy",
         "service": "ai-chat",
         "default_model": f"{DEFAULT_PROVIDER}/{DEFAULT_MODEL}",
-        "key_configured": bool(EMERGENT_LLM_KEY)
+        "key_configured": bool(config.EMERGENT_LLM_KEY)
     }
 
 
@@ -174,7 +172,7 @@ async def chat_completion(
     """
     Send a message and get an AI response.
     """
-    if not EMERGENT_LLM_KEY:
+    if not config.EMERGENT_LLM_KEY:
         raise HTTPException(status_code=500, detail="AI service not configured")
     
     # Generate or use provided session ID
@@ -191,7 +189,7 @@ async def chat_completion(
     try:
         # Initialize chat
         chat = LlmChat(
-            api_key=EMERGENT_LLM_KEY,
+            api_key=config.EMERGENT_LLM_KEY,
             session_id=session_id,
             system_message=system_prompt
         ).with_model(DEFAULT_PROVIDER, model)
@@ -256,7 +254,7 @@ async def clear_session_history(
             headers = await get_supabase_headers()
             
             response = await client.delete(
-                f"{SUPABASE_URL}/rest/v1/chat_messages?session_id=eq.{session_id}",
+                f"{config.SUPABASE_URL}/rest/v1/chat_messages?session_id=eq.{session_id}",
                 headers=headers
             )
             

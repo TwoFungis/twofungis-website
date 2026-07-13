@@ -7,6 +7,7 @@ from pydantic import BaseModel
 from typing import Optional, List
 from datetime import datetime, timezone
 import httpx
+from config import config
 import os
 import logging
 import json
@@ -14,8 +15,6 @@ import json
 router = APIRouter(prefix="/api/expenses", tags=["expenses"])
 logger = logging.getLogger(__name__)
 
-SUPABASE_URL = os.environ.get('SUPABASE_URL', '')
-SUPABASE_SERVICE_KEY = os.environ.get('SUPABASE_SERVICE_KEY', '')
 
 # Enhanced contractor expense categories with default deductibility
 CATEGORIES = {
@@ -90,17 +89,17 @@ def get_user_id_from_token(authorization: str) -> Optional[str]:
 
 
 async def supabase_request(method: str, endpoint: str, data=None, params=None):
-    if not SUPABASE_URL or not SUPABASE_SERVICE_KEY:
+    if not config.SUPABASE_URL or not config.SUPABASE_SERVICE_KEY:
         raise HTTPException(status_code=500, detail="Supabase not configured")
     
     headers = {
-        "apikey": SUPABASE_SERVICE_KEY,
-        "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+        "apikey": config.SUPABASE_SERVICE_KEY,
+        "Authorization": f"Bearer {config.SUPABASE_SERVICE_KEY}",
         "Content-Type": "application/json",
         "Prefer": "return=representation"
     }
     
-    url = f"{SUPABASE_URL}/rest/v1/{endpoint}"
+    url = f"{config.SUPABASE_URL}/rest/v1/{endpoint}"
     
     async with httpx.AsyncClient() as client:
         if method == "GET":

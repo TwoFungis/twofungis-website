@@ -9,14 +9,12 @@ from typing import Optional, List
 import os
 import logging
 import httpx
+from config import config
 from datetime import datetime, timezone
 
 router = APIRouter(prefix="/api/marketplace", tags=["marketplace"])
 logger = logging.getLogger(__name__)
 
-SUPABASE_URL = os.environ.get('SUPABASE_URL', '')
-SUPABASE_SERVICE_KEY = os.environ.get('SUPABASE_SERVICE_KEY', '')
-SUPABASE_ANON_KEY = os.environ.get('SUPABASE_ANON_KEY', '')
 
 # =============================================================================
 # MODELS
@@ -73,7 +71,7 @@ class VerificationBadge(BaseModel):
 # =============================================================================
 
 async def get_supabase_headers(use_service_key: bool = True):
-    key = SUPABASE_SERVICE_KEY if use_service_key else SUPABASE_ANON_KEY
+    key = config.SUPABASE_SERVICE_KEY if use_service_key else config.SUPABASE_ANON_KEY
     return {
         "apikey": key,
         "Authorization": f"Bearer {key}",
@@ -112,7 +110,7 @@ async def get_contractors(
         async with httpx.AsyncClient() as client:
             # Use the RPC function
             response = await client.post(
-                f"{SUPABASE_URL}/rest/v1/rpc/get_public_contractors",
+                f"{config.SUPABASE_URL}/rest/v1/rpc/get_public_contractors",
                 headers=await get_supabase_headers(use_service_key=False),
                 json={
                     "p_trade": trade,
@@ -130,7 +128,7 @@ async def get_contractors(
                 
                 # Get total count
                 count_response = await client.get(
-                    f"{SUPABASE_URL}/rest/v1/contractor_profiles_public?is_listed=eq.true&select=count",
+                    f"{config.SUPABASE_URL}/rest/v1/contractor_profiles_public?is_listed=eq.true&select=count",
                     headers={
                         **await get_supabase_headers(use_service_key=False),
                         "Prefer": "count=exact"
@@ -159,7 +157,7 @@ async def get_contractors(
             query_string = "&".join(query_params)
             
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/contractor_profiles_public?{query_string}&order=verification_level.desc,rating_average.desc&limit={limit}&offset={offset}",
+                f"{config.SUPABASE_URL}/rest/v1/contractor_profiles_public?{query_string}&order=verification_level.desc,rating_average.desc&limit={limit}&offset={offset}",
                 headers=await get_supabase_headers(use_service_key=False)
             )
             
@@ -186,7 +184,7 @@ async def get_contractor(user_id: str):
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/contractor_profiles_public?user_id=eq.{user_id}&is_listed=eq.true",
+                f"{config.SUPABASE_URL}/rest/v1/contractor_profiles_public?user_id=eq.{user_id}&is_listed=eq.true",
                 headers=await get_supabase_headers(use_service_key=False)
             )
             
@@ -215,7 +213,7 @@ async def get_available_trades():
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/contractor_profiles_public?is_listed=eq.true&select=trade",
+                f"{config.SUPABASE_URL}/rest/v1/contractor_profiles_public?is_listed=eq.true&select=trade",
                 headers=await get_supabase_headers(use_service_key=False)
             )
             
@@ -236,7 +234,7 @@ async def get_available_regions():
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/contractor_profiles_public?is_listed=eq.true&select=region",
+                f"{config.SUPABASE_URL}/rest/v1/contractor_profiles_public?is_listed=eq.true&select=region",
                 headers=await get_supabase_headers(use_service_key=False)
             )
             
@@ -263,13 +261,13 @@ async def get_own_marketplace_profile(user_id: str):
         async with httpx.AsyncClient() as client:
             # Get marketplace profile
             profile_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/contractor_profiles_public?user_id=eq.{user_id}",
+                f"{config.SUPABASE_URL}/rest/v1/contractor_profiles_public?user_id=eq.{user_id}",
                 headers=await get_supabase_headers()
             )
             
             # Get verification status
             verification_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/contractor_verification?user_id=eq.{user_id}",
+                f"{config.SUPABASE_URL}/rest/v1/contractor_verification?user_id=eq.{user_id}",
                 headers=await get_supabase_headers()
             )
             
@@ -306,7 +304,7 @@ async def create_marketplace_profile(user_id: str, profile: MarketplaceProfileUp
         async with httpx.AsyncClient() as client:
             # Check if profile exists
             check_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/contractor_profiles_public?user_id=eq.{user_id}",
+                f"{config.SUPABASE_URL}/rest/v1/contractor_profiles_public?user_id=eq.{user_id}",
                 headers=await get_supabase_headers()
             )
             
@@ -315,7 +313,7 @@ async def create_marketplace_profile(user_id: str, profile: MarketplaceProfileUp
             
             # Get user's main profile for defaults
             user_profile_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}",
+                f"{config.SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}",
                 headers=await get_supabase_headers()
             )
             
@@ -343,7 +341,7 @@ async def create_marketplace_profile(user_id: str, profile: MarketplaceProfileUp
             }
             
             response = await client.post(
-                f"{SUPABASE_URL}/rest/v1/contractor_profiles_public",
+                f"{config.SUPABASE_URL}/rest/v1/contractor_profiles_public",
                 headers=await get_supabase_headers(),
                 json=profile_data
             )
@@ -351,7 +349,7 @@ async def create_marketplace_profile(user_id: str, profile: MarketplaceProfileUp
             if response.status_code in [200, 201]:
                 # Also create verification record
                 await client.post(
-                    f"{SUPABASE_URL}/rest/v1/contractor_verification",
+                    f"{config.SUPABASE_URL}/rest/v1/contractor_verification",
                     headers=await get_supabase_headers(),
                     json={"user_id": user_id}
                 )
@@ -377,7 +375,7 @@ async def update_marketplace_profile(user_id: str, profile: MarketplaceProfileUp
         
         async with httpx.AsyncClient() as client:
             response = await client.patch(
-                f"{SUPABASE_URL}/rest/v1/contractor_profiles_public?user_id=eq.{user_id}",
+                f"{config.SUPABASE_URL}/rest/v1/contractor_profiles_public?user_id=eq.{user_id}",
                 headers=await get_supabase_headers(),
                 json=update_data
             )
@@ -406,7 +404,7 @@ async def toggle_marketplace_listing(user_id: str, is_listed: bool):
     try:
         async with httpx.AsyncClient() as client:
             response = await client.patch(
-                f"{SUPABASE_URL}/rest/v1/contractor_profiles_public?user_id=eq.{user_id}",
+                f"{config.SUPABASE_URL}/rest/v1/contractor_profiles_public?user_id=eq.{user_id}",
                 headers=await get_supabase_headers(),
                 json={
                     "is_listed": is_listed,

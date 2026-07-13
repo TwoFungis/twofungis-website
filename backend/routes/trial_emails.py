@@ -2,7 +2,6 @@
 TradeOS Trial Email API Routes
 Handles trial-related email triggers for the 30-day beta trial strategy
 """
-import os
 import asyncio
 import logging
 from fastapi import APIRouter, HTTPException, Header
@@ -11,6 +10,7 @@ from typing import Optional, List
 from datetime import datetime, timezone
 import json
 import httpx
+from config import config
 
 router = APIRouter(prefix="/api/trial", tags=["trial"])
 logger = logging.getLogger(__name__)
@@ -18,19 +18,13 @@ logger = logging.getLogger(__name__)
 # Check if resend is available
 try:
     import resend
-    RESEND_API_KEY = os.environ.get("RESEND_API_KEY")
-    if RESEND_API_KEY:
-        resend.api_key = RESEND_API_KEY
+    if config.RESEND_API_KEY:
+        resend.api_key = config.RESEND_API_KEY
         EMAIL_ENABLED = True
     else:
         EMAIL_ENABLED = False
 except ImportError:
     EMAIL_ENABLED = False
-
-SENDER_EMAIL = os.environ.get("SENDER_EMAIL", "onboarding@resend.dev")
-SUPABASE_URL = os.environ.get('SUPABASE_URL', '')
-SUPABASE_SERVICE_KEY = os.environ.get('SUPABASE_SERVICE_KEY', '')
-APP_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://tradeos.com')
 
 
 class TrialEmailRequest(BaseModel):
@@ -124,7 +118,7 @@ def generate_email_html(template_name: str, name: str, days_remaining: int = 0) 
             </div>
             
             <p>Ready to dive in?</p>
-            <a href="{APP_URL}/app/dashboard" class="cta-button">Go to Dashboard</a>
+            <a href="{config.APP_URL}/app/dashboard" class="cta-button">Go to Dashboard</a>
             
             <p style="margin-top: 30px;">Questions? Just reply to this email - we're here to help.</p>
         """,
@@ -139,7 +133,7 @@ def generate_email_html(template_name: str, name: str, days_remaining: int = 0) 
                 <p style="margin: 0; color: #e5e5e5;">1. Click "Quick Add" → "New Project"<br>2. Enter the project name and client<br>3. Add the contract value<br>4. That's it!</p>
             </div>
             
-            <a href="{APP_URL}/app/projects?new=true" class="cta-button">Create Your First Project</a>
+            <a href="{config.APP_URL}/app/projects?new=true" class="cta-button">Create Your First Project</a>
             
             <p>Once you have a project, you can track expenses, create milestones, and generate invoices - all in one place.</p>
         """,
@@ -156,7 +150,7 @@ def generate_email_html(template_name: str, name: str, days_remaining: int = 0) 
             
             <p><strong>Tip:</strong> Most contractors undercharge. If you're charging $50/hour but your fully loaded cost is $65, you're losing money on every job.</p>
             
-            <a href="{APP_URL}/app/settings" class="cta-button">Set Your Labor Rate</a>
+            <a href="{config.APP_URL}/app/settings" class="cta-button">Set Your Labor Rate</a>
         """,
         
         "day14_invoice_milestone": f"""
@@ -171,7 +165,7 @@ def generate_email_html(template_name: str, name: str, days_remaining: int = 0) 
             
             <p>TradeOS makes it easy to create milestones and automatically generate invoices when each one is complete.</p>
             
-            <a href="{APP_URL}/app/milestones" class="cta-button">Create Milestones</a>
+            <a href="{config.APP_URL}/app/milestones" class="cta-button">Create Milestones</a>
         """,
         
         "day21_tax_summary": f"""
@@ -186,7 +180,7 @@ def generate_email_html(template_name: str, name: str, days_remaining: int = 0) 
             
             <p>No more scrambling at tax time. TradeOS keeps you organized year-round.</p>
             
-            <a href="{APP_URL}/app/dashboard" class="cta-button">View Your Summary</a>
+            <a href="{config.APP_URL}/app/dashboard" class="cta-button">View Your Summary</a>
         """,
         
         "day25_conversion": f"""
@@ -201,7 +195,7 @@ def generate_email_html(template_name: str, name: str, days_remaining: int = 0) 
             
             <p>Upgrade today and never miss a beat.</p>
             
-            <a href="{APP_URL}/app/settings" class="cta-button">Upgrade to Pro</a>
+            <a href="{config.APP_URL}/app/settings" class="cta-button">Upgrade to Pro</a>
             
             <p style="font-size: 14px; color: #666;">Have questions? Reply to this email - we're happy to help.</p>
         """,
@@ -223,7 +217,7 @@ def generate_email_html(template_name: str, name: str, days_remaining: int = 0) 
             
             <p><strong>Good news:</strong> Your data will be preserved. Upgrade anytime to pick up right where you left off.</p>
             
-            <a href="{APP_URL}/app/settings" class="cta-button" style="background-color: #dc2626;">Upgrade Now</a>
+            <a href="{config.APP_URL}/app/settings" class="cta-button" style="background-color: #dc2626;">Upgrade Now</a>
             
             <p style="margin-top: 20px;">Questions? Just reply to this email.</p>
         """
@@ -283,7 +277,7 @@ async def send_trial_email(request: TrialEmailRequest):
     )
     
     params = {
-        "from": SENDER_EMAIL,
+        "from": config.SENDER_EMAIL,
         "to": [request.email],
         "subject": template_info["subject"],
         "html": html_content
@@ -312,17 +306,17 @@ async def send_trial_email(request: TrialEmailRequest):
 
 async def log_email_sent(user_id: str, trigger_day: int):
     """Log that an email was sent to prevent duplicates"""
-    if not SUPABASE_URL or not SUPABASE_SERVICE_KEY:
+    if not config.SUPABASE_URL or not config.SUPABASE_SERVICE_KEY:
         return
     
     try:
         async with httpx.AsyncClient() as client:
             # First, get current emails_sent array
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/users_profile",
+                f"{config.SUPABASE_URL}/rest/v1/users_profile",
                 headers={
-                    "apikey": SUPABASE_SERVICE_KEY,
-                    "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}"
+                    "apikey": config.SUPABASE_SERVICE_KEY,
+                    "Authorization": f"Bearer {config.SUPABASE_SERVICE_KEY}"
                 },
                 params={"user_id": f"eq.{user_id}", "select": "trial_emails_sent"}
             )
@@ -339,10 +333,10 @@ async def log_email_sent(user_id: str, trigger_day: int):
                 
                 # Update profile
                 await client.patch(
-                    f"{SUPABASE_URL}/rest/v1/users_profile",
+                    f"{config.SUPABASE_URL}/rest/v1/users_profile",
                     headers={
-                        "apikey": SUPABASE_SERVICE_KEY,
-                        "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+                        "apikey": config.SUPABASE_SERVICE_KEY,
+                        "Authorization": f"Bearer {config.SUPABASE_SERVICE_KEY}",
                         "Content-Type": "application/json"
                     },
                     params={"user_id": f"eq.{user_id}"},
@@ -359,16 +353,16 @@ async def check_pending_emails(authorization: str = Header(None)):
     if not user_id:
         raise HTTPException(status_code=401, detail="Unauthorized")
     
-    if not SUPABASE_URL or not SUPABASE_SERVICE_KEY:
+    if not config.SUPABASE_URL or not config.SUPABASE_SERVICE_KEY:
         return {"pending_emails": [], "trial_day": 0}
     
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/users_profile",
+                f"{config.SUPABASE_URL}/rest/v1/users_profile",
                 headers={
-                    "apikey": SUPABASE_SERVICE_KEY,
-                    "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}"
+                    "apikey": config.SUPABASE_SERVICE_KEY,
+                    "Authorization": f"Bearer {config.SUPABASE_SERVICE_KEY}"
                 },
                 params={
                     "user_id": f"eq.{user_id}",
@@ -427,17 +421,17 @@ async def process_pending_emails(authorization: str = Header(None)):
         raise HTTPException(status_code=401, detail="Unauthorized")
     
     # Get user email from Supabase auth
-    if not SUPABASE_URL or not SUPABASE_SERVICE_KEY:
+    if not config.SUPABASE_URL or not config.SUPABASE_SERVICE_KEY:
         return {"sent": [], "status": "skipped"}
     
     try:
         async with httpx.AsyncClient() as client:
             # Get user info
             response = await client.get(
-                f"{SUPABASE_URL}/auth/v1/admin/users/{user_id}",
+                f"{config.SUPABASE_URL}/auth/v1/admin/users/{user_id}",
                 headers={
-                    "apikey": SUPABASE_SERVICE_KEY,
-                    "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}"
+                    "apikey": config.SUPABASE_SERVICE_KEY,
+                    "Authorization": f"Bearer {config.SUPABASE_SERVICE_KEY}"
                 }
             )
             
@@ -475,5 +469,5 @@ async def trial_email_status():
     return {
         "email_enabled": EMAIL_ENABLED,
         "trigger_days": list(EMAIL_TEMPLATES.keys()),
-        "sender_email": SENDER_EMAIL if EMAIL_ENABLED else None
+        "sender_email": config.SENDER_EMAIL if EMAIL_ENABLED else None
     }

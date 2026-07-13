@@ -93,9 +93,8 @@ from routes.command_center import router as command_center_router
 # Import Production Library routes (Company Knowledge Engine)
 from routes.production_library import router as production_library_router
 
-# Supabase configuration for direct DB access (env already loaded at top)
-SUPABASE_URL = os.environ.get('SUPABASE_URL', '')
-SUPABASE_SERVICE_KEY = os.environ.get('SUPABASE_SERVICE_KEY', '')
+# Import centralized config (env already loaded at top, but config provides lazy access)
+from config import config
 
 # Create the main app without a prefix
 app = FastAPI()
@@ -154,10 +153,10 @@ async def get_system_status():
     try:
         async with httpx.AsyncClient(timeout=5.0) as client:
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/",
+                f"{config.SUPABASE_URL}/rest/v1/",
                 headers={
-                    "apikey": SUPABASE_SERVICE_KEY,
-                    "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}"
+                    "apikey": config.SUPABASE_SERVICE_KEY,
+                    "Authorization": f"Bearer {config.SUPABASE_SERVICE_KEY}"
                 }
             )
             status["services"]["supabase"] = "connected" if response.status_code == 200 else "error"

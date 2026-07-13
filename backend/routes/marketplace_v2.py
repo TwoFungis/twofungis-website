@@ -9,15 +9,13 @@ from typing import Optional, List
 import os
 import logging
 import httpx
+from config import config
 from datetime import datetime, timezone
 import uuid
 
 router = APIRouter(prefix="/api/marketplace", tags=["marketplace-v2"])
 logger = logging.getLogger(__name__)
 
-SUPABASE_URL = os.environ.get('SUPABASE_URL', '')
-SUPABASE_SERVICE_KEY = os.environ.get('SUPABASE_SERVICE_KEY', '')
-SUPABASE_ANON_KEY = os.environ.get('SUPABASE_ANON_KEY', '')
 
 # =============================================================================
 # MODELS
@@ -108,7 +106,7 @@ class ContractorFullProfile(BaseModel):
 # =============================================================================
 
 async def get_supabase_headers(use_service_key: bool = True):
-    key = SUPABASE_SERVICE_KEY if use_service_key else SUPABASE_ANON_KEY
+    key = config.SUPABASE_SERVICE_KEY if use_service_key else config.SUPABASE_ANON_KEY
     return {
         "apikey": key,
         "Authorization": f"Bearer {key}",
@@ -125,9 +123,9 @@ async def get_user_id_from_token(authorization: str = None):
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"{SUPABASE_URL}/auth/v1/user",
+                f"{config.SUPABASE_URL}/auth/v1/user",
                 headers={
-                    "apikey": SUPABASE_ANON_KEY,
+                    "apikey": config.SUPABASE_ANON_KEY,
                     "Authorization": f"Bearer {token}"
                 }
             )
@@ -149,7 +147,7 @@ async def get_contractor_full_profile(user_id: str):
         async with httpx.AsyncClient() as client:
             # Get basic profile
             profile_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/contractor_profiles_public?user_id=eq.{user_id}&is_listed=eq.true",
+                f"{config.SUPABASE_URL}/rest/v1/contractor_profiles_public?user_id=eq.{user_id}&is_listed=eq.true",
                 headers=await get_supabase_headers(use_service_key=False)
             )
             
@@ -160,14 +158,14 @@ async def get_contractor_full_profile(user_id: str):
             
             # Get services
             services_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/contractor_services?user_id=eq.{user_id}&is_active=eq.true",
+                f"{config.SUPABASE_URL}/rest/v1/contractor_services?user_id=eq.{user_id}&is_active=eq.true",
                 headers=await get_supabase_headers(use_service_key=False)
             )
             services = services_response.json() if services_response.status_code == 200 else []
             
             # Get job posts (only open ones for public view)
             jobs_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/marketplace_jobs?user_id=eq.{user_id}&status=eq.open&order=created_at.desc",
+                f"{config.SUPABASE_URL}/rest/v1/marketplace_jobs?user_id=eq.{user_id}&status=eq.open&order=created_at.desc",
                 headers=await get_supabase_headers(use_service_key=False)
             )
             jobs = jobs_response.json() if jobs_response.status_code == 200 else []
@@ -193,7 +191,7 @@ async def contact_contractor(contractor_id: str, request: ContactRequest):
         async with httpx.AsyncClient() as client:
             # Verify contractor exists and is listed
             check_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/contractor_profiles_public?user_id=eq.{contractor_id}&is_listed=eq.true",
+                f"{config.SUPABASE_URL}/rest/v1/contractor_profiles_public?user_id=eq.{contractor_id}&is_listed=eq.true",
                 headers=await get_supabase_headers(use_service_key=False)
             )
             
@@ -216,7 +214,7 @@ async def contact_contractor(contractor_id: str, request: ContactRequest):
             }
             
             response = await client.post(
-                f"{SUPABASE_URL}/rest/v1/contractor_inquiries",
+                f"{config.SUPABASE_URL}/rest/v1/contractor_inquiries",
                 headers=await get_supabase_headers(),
                 json=contact_data
             )
@@ -286,7 +284,7 @@ async def get_marketplace_jobs(
             query_string = "&".join(query_params)
             
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/marketplace_jobs?{query_string}&order=created_at.desc&limit={limit}&offset={offset}",
+                f"{config.SUPABASE_URL}/rest/v1/marketplace_jobs?{query_string}&order=created_at.desc&limit={limit}&offset={offset}",
                 headers=await get_supabase_headers(use_service_key=False)
             )
             
@@ -296,7 +294,7 @@ async def get_marketplace_jobs(
                 # Enrich with poster info
                 for job in jobs:
                     poster_response = await client.get(
-                        f"{SUPABASE_URL}/rest/v1/contractor_profiles_public?user_id=eq.{job['user_id']}&select=company_name,verification_level",
+                        f"{config.SUPABASE_URL}/rest/v1/contractor_profiles_public?user_id=eq.{job['user_id']}&select=company_name,verification_level",
                         headers=await get_supabase_headers(use_service_key=False)
                     )
                     if poster_response.status_code == 200 and poster_response.json():
@@ -341,7 +339,7 @@ async def create_job_post(
         
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                f"{SUPABASE_URL}/rest/v1/marketplace_jobs",
+                f"{config.SUPABASE_URL}/rest/v1/marketplace_jobs",
                 headers=await get_supabase_headers(),
                 json=job_data
             )
@@ -374,7 +372,7 @@ async def update_job_post(
         async with httpx.AsyncClient() as client:
             # Verify ownership
             check_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/marketplace_jobs?id=eq.{job_id}&user_id=eq.{user_id}",
+                f"{config.SUPABASE_URL}/rest/v1/marketplace_jobs?id=eq.{job_id}&user_id=eq.{user_id}",
                 headers=await get_supabase_headers()
             )
             
@@ -384,7 +382,7 @@ async def update_job_post(
             updates["updated_at"] = datetime.now(timezone.utc).isoformat()
             
             response = await client.patch(
-                f"{SUPABASE_URL}/rest/v1/marketplace_jobs?id=eq.{job_id}",
+                f"{config.SUPABASE_URL}/rest/v1/marketplace_jobs?id=eq.{job_id}",
                 headers=await get_supabase_headers(),
                 json=updates
             )
@@ -416,7 +414,7 @@ async def delete_job_post(
         async with httpx.AsyncClient() as client:
             # Verify ownership
             check_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/marketplace_jobs?id=eq.{job_id}&user_id=eq.{user_id}",
+                f"{config.SUPABASE_URL}/rest/v1/marketplace_jobs?id=eq.{job_id}&user_id=eq.{user_id}",
                 headers=await get_supabase_headers()
             )
             
@@ -424,7 +422,7 @@ async def delete_job_post(
                 raise HTTPException(status_code=403, detail="Not authorized to delete this job")
             
             response = await client.delete(
-                f"{SUPABASE_URL}/rest/v1/marketplace_jobs?id=eq.{job_id}",
+                f"{config.SUPABASE_URL}/rest/v1/marketplace_jobs?id=eq.{job_id}",
                 headers=await get_supabase_headers()
             )
             
@@ -464,7 +462,7 @@ async def get_marketplace_services(
             query_string = "&".join(query_params)
             
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/contractor_services?{query_string}&order=created_at.desc&limit={limit}&offset={offset}",
+                f"{config.SUPABASE_URL}/rest/v1/contractor_services?{query_string}&order=created_at.desc&limit={limit}&offset={offset}",
                 headers=await get_supabase_headers(use_service_key=False)
             )
             
@@ -474,7 +472,7 @@ async def get_marketplace_services(
                 # Enrich with provider info
                 for service in services:
                     provider_response = await client.get(
-                        f"{SUPABASE_URL}/rest/v1/contractor_profiles_public?user_id=eq.{service['user_id']}&select=company_name,verification_level,rating_average",
+                        f"{config.SUPABASE_URL}/rest/v1/contractor_profiles_public?user_id=eq.{service['user_id']}&select=company_name,verification_level,rating_average",
                         headers=await get_supabase_headers(use_service_key=False)
                     )
                     if provider_response.status_code == 200 and provider_response.json():
@@ -519,7 +517,7 @@ async def create_service_offering(
         
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                f"{SUPABASE_URL}/rest/v1/contractor_services",
+                f"{config.SUPABASE_URL}/rest/v1/contractor_services",
                 headers=await get_supabase_headers(),
                 json=service_data
             )
@@ -552,7 +550,7 @@ async def update_service_offering(
         async with httpx.AsyncClient() as client:
             # Verify ownership
             check_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/contractor_services?id=eq.{service_id}&user_id=eq.{user_id}",
+                f"{config.SUPABASE_URL}/rest/v1/contractor_services?id=eq.{service_id}&user_id=eq.{user_id}",
                 headers=await get_supabase_headers()
             )
             
@@ -562,7 +560,7 @@ async def update_service_offering(
             updates["updated_at"] = datetime.now(timezone.utc).isoformat()
             
             response = await client.patch(
-                f"{SUPABASE_URL}/rest/v1/contractor_services?id=eq.{service_id}",
+                f"{config.SUPABASE_URL}/rest/v1/contractor_services?id=eq.{service_id}",
                 headers=await get_supabase_headers(),
                 json=updates
             )
@@ -595,7 +593,7 @@ async def get_connections(authorization: str = Header(None)):
         async with httpx.AsyncClient() as client:
             # Get connections where user is either sender or receiver
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/contractor_connections?or=(from_user_id.eq.{user_id},to_user_id.eq.{user_id})&status=eq.accepted",
+                f"{config.SUPABASE_URL}/rest/v1/contractor_connections?or=(from_user_id.eq.{user_id},to_user_id.eq.{user_id})&status=eq.accepted",
                 headers=await get_supabase_headers()
             )
             
@@ -606,7 +604,7 @@ async def get_connections(authorization: str = Header(None)):
                 for conn in connections:
                     other_user_id = conn["to_user_id"] if conn["from_user_id"] == user_id else conn["from_user_id"]
                     profile_response = await client.get(
-                        f"{SUPABASE_URL}/rest/v1/contractor_profiles_public?user_id=eq.{other_user_id}",
+                        f"{config.SUPABASE_URL}/rest/v1/contractor_profiles_public?user_id=eq.{other_user_id}",
                         headers=await get_supabase_headers()
                     )
                     if profile_response.status_code == 200 and profile_response.json():
@@ -633,7 +631,7 @@ async def get_pending_connections(authorization: str = Header(None)):
         async with httpx.AsyncClient() as client:
             # Get pending requests sent TO this user
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/contractor_connections?to_user_id=eq.{user_id}&status=eq.pending",
+                f"{config.SUPABASE_URL}/rest/v1/contractor_connections?to_user_id=eq.{user_id}&status=eq.pending",
                 headers=await get_supabase_headers()
             )
             
@@ -643,7 +641,7 @@ async def get_pending_connections(authorization: str = Header(None)):
                 # Enrich with sender profiles
                 for req in requests:
                     profile_response = await client.get(
-                        f"{SUPABASE_URL}/rest/v1/contractor_profiles_public?user_id=eq.{req['from_user_id']}",
+                        f"{config.SUPABASE_URL}/rest/v1/contractor_profiles_public?user_id=eq.{req['from_user_id']}",
                         headers=await get_supabase_headers()
                     )
                     if profile_response.status_code == 200 and profile_response.json():
@@ -676,7 +674,7 @@ async def send_connection_request(
         async with httpx.AsyncClient() as client:
             # Check if connection already exists
             check_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/contractor_connections?or=(and(from_user_id.eq.{user_id},to_user_id.eq.{request.to_user_id}),and(from_user_id.eq.{request.to_user_id},to_user_id.eq.{user_id}))",
+                f"{config.SUPABASE_URL}/rest/v1/contractor_connections?or=(and(from_user_id.eq.{user_id},to_user_id.eq.{request.to_user_id}),and(from_user_id.eq.{request.to_user_id},to_user_id.eq.{user_id}))",
                 headers=await get_supabase_headers()
             )
             
@@ -693,7 +691,7 @@ async def send_connection_request(
             }
             
             response = await client.post(
-                f"{SUPABASE_URL}/rest/v1/contractor_connections",
+                f"{config.SUPABASE_URL}/rest/v1/contractor_connections",
                 headers=await get_supabase_headers(),
                 json=connection_data
             )
@@ -729,7 +727,7 @@ async def respond_to_connection(
         async with httpx.AsyncClient() as client:
             # Verify this request is TO the current user
             check_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/contractor_connections?id=eq.{connection_id}&to_user_id=eq.{user_id}&status=eq.pending",
+                f"{config.SUPABASE_URL}/rest/v1/contractor_connections?id=eq.{connection_id}&to_user_id=eq.{user_id}&status=eq.pending",
                 headers=await get_supabase_headers()
             )
             
@@ -739,7 +737,7 @@ async def respond_to_connection(
             new_status = "accepted" if action == "accept" else "rejected"
             
             response = await client.patch(
-                f"{SUPABASE_URL}/rest/v1/contractor_connections?id=eq.{connection_id}",
+                f"{config.SUPABASE_URL}/rest/v1/contractor_connections?id=eq.{connection_id}",
                 headers=await get_supabase_headers(),
                 json={
                     "status": new_status,
@@ -774,7 +772,7 @@ async def get_my_jobs(authorization: str = Header(None)):
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/marketplace_jobs?user_id=eq.{user_id}&order=created_at.desc",
+                f"{config.SUPABASE_URL}/rest/v1/marketplace_jobs?user_id=eq.{user_id}&order=created_at.desc",
                 headers=await get_supabase_headers()
             )
             
@@ -799,7 +797,7 @@ async def get_my_services(authorization: str = Header(None)):
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/contractor_services?user_id=eq.{user_id}&order=created_at.desc",
+                f"{config.SUPABASE_URL}/rest/v1/contractor_services?user_id=eq.{user_id}&order=created_at.desc",
                 headers=await get_supabase_headers()
             )
             
@@ -824,7 +822,7 @@ async def get_my_inquiries(authorization: str = Header(None)):
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/contractor_inquiries?contractor_id=eq.{user_id}&order=created_at.desc",
+                f"{config.SUPABASE_URL}/rest/v1/contractor_inquiries?contractor_id=eq.{user_id}&order=created_at.desc",
                 headers=await get_supabase_headers()
             )
             
@@ -871,7 +869,7 @@ async def submit_verification(
         
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                f"{SUPABASE_URL}/rest/v1/contractor_verification_submissions",
+                f"{config.SUPABASE_URL}/rest/v1/contractor_verification_submissions",
                 headers=await get_supabase_headers(),
                 json=verification_data
             )
@@ -900,7 +898,7 @@ async def get_verification_status(authorization: str = Header(None)):
         async with httpx.AsyncClient() as client:
             # Get verification record
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/contractor_verification?user_id=eq.{user_id}",
+                f"{config.SUPABASE_URL}/rest/v1/contractor_verification?user_id=eq.{user_id}",
                 headers=await get_supabase_headers()
             )
             
@@ -910,7 +908,7 @@ async def get_verification_status(authorization: str = Header(None)):
             
             # Get submitted documents
             docs_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/contractor_verification_submissions?user_id=eq.{user_id}",
+                f"{config.SUPABASE_URL}/rest/v1/contractor_verification_submissions?user_id=eq.{user_id}",
                 headers=await get_supabase_headers()
             )
             

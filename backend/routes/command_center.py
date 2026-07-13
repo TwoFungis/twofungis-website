@@ -20,13 +20,12 @@ from datetime import datetime, timezone, timedelta
 import os
 import logging
 import httpx
+from config import config
 import jwt
 
 router = APIRouter(prefix="/api/command-center", tags=["command-center"])
 logger = logging.getLogger(__name__)
 
-SUPABASE_URL = os.environ.get('SUPABASE_URL', '')
-SUPABASE_SERVICE_KEY = os.environ.get('SUPABASE_SERVICE_KEY', '')
 
 # =====================================================
 # UTILITY FUNCTIONS
@@ -34,8 +33,8 @@ SUPABASE_SERVICE_KEY = os.environ.get('SUPABASE_SERVICE_KEY', '')
 
 async def get_service_headers():
     return {
-        "apikey": SUPABASE_SERVICE_KEY,
-        "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+        "apikey": config.SUPABASE_SERVICE_KEY,
+        "Authorization": f"Bearer {config.SUPABASE_SERVICE_KEY}",
         "Content-Type": "application/json",
         "Prefer": "return=representation"
     }
@@ -52,7 +51,7 @@ async def verify_token_and_get_context(authorization: str) -> dict:
         async with httpx.AsyncClient(timeout=10.0) as client:
             # Get user's organization membership
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/organization_members?"
+                f"{config.SUPABASE_URL}/rest/v1/organization_members?"
                 f"user_id=eq.{user_id}&"
                 f"is_active=eq.true&"
                 f"select=organization_id,role,user_name,is_primary,"
@@ -79,10 +78,10 @@ async def verify_token_and_get_context(authorization: str) -> dict:
             # Get user email
             user_email = None
             email_response = await client.get(
-                f"{SUPABASE_URL}/auth/v1/admin/users/{user_id}",
+                f"{config.SUPABASE_URL}/auth/v1/admin/users/{user_id}",
                 headers={
-                    "apikey": SUPABASE_SERVICE_KEY,
-                    "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}"
+                    "apikey": config.SUPABASE_SERVICE_KEY,
+                    "Authorization": f"Bearer {config.SUPABASE_SERVICE_KEY}"
                 }
             )
             if email_response.status_code == 200:
@@ -156,7 +155,7 @@ async def get_command_center_dashboard(authorization: str = Header(...)):
                     projects_query = f"user_id=eq.{user_id}"
                 
                 projects_res = await client.get(
-                    f"{SUPABASE_URL}/rest/v1/projects?"
+                    f"{config.SUPABASE_URL}/rest/v1/projects?"
                     f"{projects_query}&select=id,status,start_date,created_at",
                     headers=headers
                 )
@@ -216,7 +215,7 @@ async def get_command_center_dashboard(authorization: str = Header(...)):
             try:
                 if org_id:
                     opps_res = await client.get(
-                        f"{SUPABASE_URL}/rest/v1/opportunities?"
+                        f"{config.SUPABASE_URL}/rest/v1/opportunities?"
                         f"organization_id=eq.{org_id}&"
                         f"select=id,status,estimated_value,tender_due_date,priority",
                         headers=headers
@@ -250,7 +249,7 @@ async def get_command_center_dashboard(authorization: str = Header(...)):
                     deadline_cutoff = (now + timedelta(days=7)).isoformat()
                     
                     deadline_res = await client.get(
-                        f"{SUPABASE_URL}/rest/v1/opportunities?"
+                        f"{config.SUPABASE_URL}/rest/v1/opportunities?"
                         f"organization_id=eq.{org_id}&"
                         f"status=in.(qualifying,tendering)&"
                         f"tender_due_date=lt.{deadline_cutoff}&"
@@ -283,7 +282,7 @@ async def get_command_center_dashboard(authorization: str = Header(...)):
                 # High priority opportunities
                 if org_id and len(today_focus) < 3:
                     priority_res = await client.get(
-                        f"{SUPABASE_URL}/rest/v1/opportunities?"
+                        f"{config.SUPABASE_URL}/rest/v1/opportunities?"
                         f"organization_id=eq.{org_id}&"
                         f"priority=in.(high,urgent)&"
                         f"status=in.(discovered,qualifying,tendering)&"
@@ -311,7 +310,7 @@ async def get_command_center_dashboard(authorization: str = Header(...)):
                     query = f"organization_id=eq.{org_id}" if org_id else f"user_id=eq.{user_id}"
                     
                     starting_res = await client.get(
-                        f"{SUPABASE_URL}/rest/v1/projects?"
+                        f"{config.SUPABASE_URL}/rest/v1/projects?"
                         f"{query}&"
                         f"status=in.(pending,planned,starting_soon)&"
                         f"start_date=lt.{start_cutoff}&"
@@ -346,7 +345,7 @@ async def get_command_center_dashboard(authorization: str = Header(...)):
                 if org_id:
                     # Get opportunity activity
                     activity_res = await client.get(
-                        f"{SUPABASE_URL}/rest/v1/opportunity_activity?"
+                        f"{config.SUPABASE_URL}/rest/v1/opportunity_activity?"
                         f"organization_id=eq.{org_id}&"
                         f"select=id,event_type,event_title,performed_by_name,created_at&"
                         f"order=created_at.desc&limit=10",
@@ -447,7 +446,7 @@ async def get_quick_stats(authorization: str = Header(...)):
             # Projects count
             query = f"organization_id=eq.{org_id}" if org_id else f"user_id=eq.{user_id}"
             proj_res = await client.get(
-                f"{SUPABASE_URL}/rest/v1/projects?"
+                f"{config.SUPABASE_URL}/rest/v1/projects?"
                 f"{query}&status=in.(active,in_progress,pending,starting_soon)&"
                 f"select=id",
                 headers={**headers, "Prefer": "count=exact"}
@@ -458,7 +457,7 @@ async def get_quick_stats(authorization: str = Header(...)):
             # Opportunities count and value
             if org_id:
                 opp_res = await client.get(
-                    f"{SUPABASE_URL}/rest/v1/opportunities?"
+                    f"{config.SUPABASE_URL}/rest/v1/opportunities?"
                     f"organization_id=eq.{org_id}&"
                     f"status=in.(discovered,qualifying,tendering,submitted,negotiation)&"
                     f"select=id,estimated_value",

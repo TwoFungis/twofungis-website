@@ -45,13 +45,12 @@ from datetime import datetime, timezone
 import os
 import logging
 import httpx
+from config import config
 import json
 
 router = APIRouter(prefix="/api/brain", tags=["company-brain"])
 logger = logging.getLogger(__name__)
 
-SUPABASE_URL = os.environ.get('SUPABASE_URL', '')
-SUPABASE_SERVICE_KEY = os.environ.get('SUPABASE_SERVICE_KEY', '')
 
 
 # =====================================================
@@ -337,8 +336,8 @@ class CompanyBrief(BaseModel):
 async def get_service_headers():
     """Get Supabase service headers."""
     return {
-        "apikey": SUPABASE_SERVICE_KEY,
-        "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+        "apikey": config.SUPABASE_SERVICE_KEY,
+        "Authorization": f"Bearer {config.SUPABASE_SERVICE_KEY}",
         "Content-Type": "application/json",
         "Prefer": "return=representation"
     }
@@ -376,7 +375,7 @@ async def get_user_tfcs_role(user_id: str) -> Optional[str]:
         headers = await get_service_headers()
         async with httpx.AsyncClient(timeout=10.0) as client:
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/tfcs_user_roles",
+                f"{config.SUPABASE_URL}/rest/v1/tfcs_user_roles",
                 headers=headers,
                 params={"user_id": f"eq.{user_id}", "select": "role"}
             )
@@ -442,7 +441,7 @@ async def get_conversation_threads(
         headers = await get_service_headers()
         async with httpx.AsyncClient(timeout=10.0) as client:
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/company_brain_threads",
+                f"{config.SUPABASE_URL}/rest/v1/company_brain_threads",
                 headers=headers,
                 params={
                     "user_id": f"eq.{user['user_id']}",
@@ -497,7 +496,7 @@ async def get_or_create_thread(
                 params["context_id"] = "is.null"
             
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/company_brain_threads",
+                f"{config.SUPABASE_URL}/rest/v1/company_brain_threads",
                 headers=headers,
                 params=params
             )
@@ -519,7 +518,7 @@ async def get_or_create_thread(
             }
             
             response = await client.post(
-                f"{SUPABASE_URL}/rest/v1/company_brain_threads",
+                f"{config.SUPABASE_URL}/rest/v1/company_brain_threads",
                 headers=headers,
                 json=new_thread
             )
@@ -563,7 +562,7 @@ async def get_thread_messages(
         headers = await get_service_headers()
         async with httpx.AsyncClient(timeout=10.0) as client:
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/company_brain_messages",
+                f"{config.SUPABASE_URL}/rest/v1/company_brain_messages",
                 headers=headers,
                 params={
                     "thread_id": f"eq.{thread_id}",
@@ -623,7 +622,7 @@ async def send_message(
             # Try to store in database
             try:
                 response = await client.post(
-                    f"{SUPABASE_URL}/rest/v1/company_brain_messages",
+                    f"{config.SUPABASE_URL}/rest/v1/company_brain_messages",
                     headers=headers,
                     json=user_message
                 )
@@ -802,7 +801,7 @@ async def get_action_history(
         headers = await get_service_headers()
         async with httpx.AsyncClient(timeout=10.0) as client:
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/company_brain_actions",
+                f"{config.SUPABASE_URL}/rest/v1/company_brain_actions",
                 headers=headers,
                 params={
                     "user_id": f"eq.{user['user_id']}",
@@ -875,7 +874,7 @@ async def queue_action(
         headers = await get_service_headers()
         async with httpx.AsyncClient(timeout=10.0) as client:
             response = await client.post(
-                f"{SUPABASE_URL}/rest/v1/company_brain_actions",
+                f"{config.SUPABASE_URL}/rest/v1/company_brain_actions",
                 headers=headers,
                 json=action_record
             )

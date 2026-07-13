@@ -10,13 +10,12 @@ from typing import Optional, List
 from datetime import date, datetime
 from decimal import Decimal
 import httpx
+from config import config
 import json
 
 router = APIRouter(prefix="/api/materials", tags=["materials"])
 logger = logging.getLogger(__name__)
 
-SUPABASE_URL = os.environ.get('SUPABASE_URL', '')
-SUPABASE_SERVICE_KEY = os.environ.get('SUPABASE_SERVICE_KEY', '')
 
 # Material categories
 MATERIAL_CATEGORIES = ['Materials', 'Consumables', 'Tools', 'Equipment', 'Rental', 'Delivery']
@@ -85,7 +84,7 @@ def get_headers(authorization: str):
     """Get headers for Supabase requests"""
     token = authorization.replace('Bearer ', '') if authorization else ''
     return {
-        "apikey": SUPABASE_SERVICE_KEY,
+        "apikey": config.SUPABASE_SERVICE_KEY,
         "Authorization": f"Bearer {token}",
         "Content-Type": "application/json",
         "Prefer": "return=representation"
@@ -116,7 +115,7 @@ async def list_materials(
         
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/materials",
+                f"{config.SUPABASE_URL}/rest/v1/materials",
                 headers=get_headers(authorization),
                 params=params
             )
@@ -199,7 +198,7 @@ async def create_material(
         
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                f"{SUPABASE_URL}/rest/v1/materials",
+                f"{config.SUPABASE_URL}/rest/v1/materials",
                 headers=get_headers(authorization),
                 json=data
             )
@@ -231,7 +230,7 @@ async def get_material(
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/materials",
+                f"{config.SUPABASE_URL}/rest/v1/materials",
                 headers=get_headers(authorization),
                 params={"id": f"eq.{material_id}", "user_id": f"eq.{user_id}"}
             )
@@ -284,7 +283,7 @@ async def update_material(
         
         async with httpx.AsyncClient() as client:
             response = await client.patch(
-                f"{SUPABASE_URL}/rest/v1/materials",
+                f"{config.SUPABASE_URL}/rest/v1/materials",
                 headers=get_headers(authorization),
                 params={"id": f"eq.{material_id}", "user_id": f"eq.{user_id}"},
                 json=update_data
@@ -320,7 +319,7 @@ async def delete_material(
     try:
         async with httpx.AsyncClient() as client:
             response = await client.delete(
-                f"{SUPABASE_URL}/rest/v1/materials",
+                f"{config.SUPABASE_URL}/rest/v1/materials",
                 headers=get_headers(authorization),
                 params={"id": f"eq.{material_id}", "user_id": f"eq.{user_id}"}
             )
@@ -350,7 +349,7 @@ async def get_project_materials_summary(
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/materials",
+                f"{config.SUPABASE_URL}/rest/v1/materials",
                 headers=get_headers(authorization),
                 params={
                     "project_id": f"eq.{project_id}",

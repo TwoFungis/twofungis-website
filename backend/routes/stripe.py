@@ -11,6 +11,7 @@ import os
 import logging
 import stripe
 import httpx
+from config import config
 from datetime import datetime, timezone
 
 router = APIRouter(prefix="/api/stripe", tags=["stripe"])
@@ -20,11 +21,6 @@ logger = logging.getLogger(__name__)
 # CONFIGURATION
 # =============================================================================
 
-STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY', '')
-STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET', '')
-FRONTEND_URL = os.environ.get('FRONTEND_URL', '')
-SUPABASE_URL = os.environ.get('SUPABASE_URL', '')
-SUPABASE_SERVICE_KEY = os.environ.get('SUPABASE_SERVICE_KEY', '')
 
 # Stripe Price IDs
 STRIPE_PRICE_IDS = {
@@ -34,7 +30,7 @@ STRIPE_PRICE_IDS = {
 }
 
 # Initialize Stripe
-stripe.api_key = STRIPE_SECRET_KEY
+stripe.api_key = config.STRIPE_SECRET_KEY
 
 # =============================================================================
 # MODELS
@@ -75,8 +71,8 @@ class PlansResponse(BaseModel):
 async def get_supabase_headers():
     """Get headers for Supabase service role requests"""
     return {
-        "apikey": SUPABASE_SERVICE_KEY,
-        "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+        "apikey": config.SUPABASE_SERVICE_KEY,
+        "Authorization": f"Bearer {config.SUPABASE_SERVICE_KEY}",
         "Content-Type": "application/json",
         "Prefer": "return=representation"
     }
@@ -86,7 +82,7 @@ async def get_lifetime_seats() -> LifetimeSeatsResponse:
     try:
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                f"{SUPABASE_URL}/rest/v1/rpc/get_lifetime_seats_status",
+                f"{config.SUPABASE_URL}/rest/v1/rpc/get_lifetime_seats_status",
                 headers=await get_supabase_headers(),
                 json={}
             )
@@ -105,7 +101,7 @@ async def get_lifetime_seats() -> LifetimeSeatsResponse:
             
             # Fallback: direct table query
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/founding_lifetime?id=eq.1",
+                f"{config.SUPABASE_URL}/rest/v1/founding_lifetime?id=eq.1",
                 headers=await get_supabase_headers()
             )
             
@@ -138,7 +134,7 @@ async def increment_lifetime_seat() -> dict:
     try:
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                f"{SUPABASE_URL}/rest/v1/rpc/increment_lifetime_seat",
+                f"{config.SUPABASE_URL}/rest/v1/rpc/increment_lifetime_seat",
                 headers=await get_supabase_headers(),
                 json={}
             )
@@ -160,7 +156,7 @@ async def check_existing_lifetime_purchase(user_id: str) -> bool:
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/lifetime_purchases?user_id=eq.{user_id}&select=id",
+                f"{config.SUPABASE_URL}/rest/v1/lifetime_purchases?user_id=eq.{user_id}&select=id",
                 headers=await get_supabase_headers()
             )
             
@@ -199,7 +195,7 @@ async def update_user_plan(
         
         async with httpx.AsyncClient() as client:
             response = await client.patch(
-                f"{SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}",
+                f"{config.SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}",
                 headers=await get_supabase_headers(),
                 json=update_data
             )
@@ -225,7 +221,7 @@ async def create_lifetime_purchase_record(
     try:
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                f"{SUPABASE_URL}/rest/v1/lifetime_purchases",
+                f"{config.SUPABASE_URL}/rest/v1/lifetime_purchases",
                 headers=await get_supabase_headers(),
                 json={
                     "user_id": user_id,
@@ -252,7 +248,7 @@ async def get_user_profile(user_id: str) -> dict:
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}&select=*",
+                f"{config.SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}&select=*",
                 headers=await get_supabase_headers()
             )
             
@@ -360,7 +356,7 @@ async def get_lifetime_seats_endpoint():
 async def create_checkout_session(request: CreateCheckoutRequest):
     """Create a Stripe checkout session for subscription or one-time payment"""
     
-    if not STRIPE_SECRET_KEY:
+    if not config.STRIPE_SECRET_KEY:
         raise HTTPException(status_code=500, detail="Stripe not configured")
     
     plan = request.plan
@@ -411,8 +407,8 @@ async def create_checkout_session(request: CreateCheckoutRequest):
                 detail="All Founding Lifetime memberships have been claimed."
             )
     
-    success_url = f"{FRONTEND_URL}/app/settings?session_id={{CHECKOUT_SESSION_ID}}&payment=success&plan={plan}"
-    cancel_url = f"{FRONTEND_URL}/app/settings?payment=cancelled"
+    success_url = f"{config.FRONTEND_URL}/app/settings?session_id={{CHECKOUT_SESSION_ID}}&payment=success&plan={plan}"
+    cancel_url = f"{config.FRONTEND_URL}/app/settings?payment=cancelled"
     
     try:
         session_params = {
@@ -469,7 +465,7 @@ async def create_checkout_session(request: CreateCheckoutRequest):
 async def create_portal_session(request: CreatePortalRequest):
     """Create a Stripe Customer Portal session for subscription management"""
     
-    if not STRIPE_SECRET_KEY:
+    if not config.STRIPE_SECRET_KEY:
         raise HTTPException(status_code=500, detail="Stripe not configured")
     
     profile = await get_user_profile(request.user_id)
@@ -493,7 +489,7 @@ async def create_portal_session(request: CreatePortalRequest):
     try:
         session = stripe.billing_portal.Session.create(
             customer=stripe_customer_id,
-            return_url=f"{FRONTEND_URL}/app/settings"
+            return_url=f"{config.FRONTEND_URL}/app/settings"
         )
         
         return CreatePortalResponse(portal_url=session.url)
@@ -511,13 +507,13 @@ async def stripe_webhook(request: Request):
     sig_header = request.headers.get("stripe-signature")
     
     # STRICT signature verification - no bypass
-    if not STRIPE_WEBHOOK_SECRET:
-        logger.error("STRIPE_WEBHOOK_SECRET not configured - rejecting webhook")
+    if not config.STRIPE_WEBHOOK_SECRET:
+        logger.error("config.STRIPE_WEBHOOK_SECRET not configured - rejecting webhook")
         raise HTTPException(status_code=500, detail="Webhook not configured")
     
     try:
         event = stripe.Webhook.construct_event(
-            payload, sig_header, STRIPE_WEBHOOK_SECRET
+            payload, sig_header, config.STRIPE_WEBHOOK_SECRET
         )
     except ValueError as e:
         logger.error(f"Invalid payload: {e}")
@@ -674,7 +670,7 @@ async def handle_payment_failed(invoice):
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/users_profile?stripe_subscription_id=eq.{subscription_id}&select=user_id,plan_type",
+                f"{config.SUPABASE_URL}/rest/v1/users_profile?stripe_subscription_id=eq.{subscription_id}&select=user_id,plan_type",
                 headers=await get_supabase_headers()
             )
             
@@ -708,7 +704,7 @@ async def handle_subscription_deleted(subscription):
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/users_profile?stripe_subscription_id=eq.{subscription_id}&select=user_id,plan_type",
+                f"{config.SUPABASE_URL}/rest/v1/users_profile?stripe_subscription_id=eq.{subscription_id}&select=user_id,plan_type",
                 headers=await get_supabase_headers()
             )
             
@@ -765,7 +761,7 @@ async def handle_subscription_updated(subscription):
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/users_profile?stripe_subscription_id=eq.{subscription_id}&select=user_id,plan_type",
+                f"{config.SUPABASE_URL}/rest/v1/users_profile?stripe_subscription_id=eq.{subscription_id}&select=user_id,plan_type",
                 headers=await get_supabase_headers()
             )
             
@@ -845,7 +841,7 @@ async def get_founders():
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/users_profile?plan_type=eq.LIFETIME_ELITE&select=id,full_name,company_name,created_at",
+                f"{config.SUPABASE_URL}/rest/v1/users_profile?plan_type=eq.LIFETIME_ELITE&select=id,full_name,company_name,created_at",
                 headers=await get_supabase_headers()
             )
             
@@ -887,7 +883,7 @@ async def check_if_founder(request: Request):
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/users_profile?email=eq.{email}&plan_type=eq.LIFETIME_ELITE&select=id",
+                f"{config.SUPABASE_URL}/rest/v1/users_profile?email=eq.{email}&plan_type=eq.LIFETIME_ELITE&select=id",
                 headers=await get_supabase_headers()
             )
             

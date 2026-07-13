@@ -26,14 +26,13 @@ from enum import Enum
 import os
 import logging
 import httpx
+from config import config
 import jwt
 import json
 
 router = APIRouter(prefix="/api/opportunities", tags=["opportunities"])
 logger = logging.getLogger(__name__)
 
-SUPABASE_URL = os.environ.get('SUPABASE_URL', '')
-SUPABASE_SERVICE_KEY = os.environ.get('SUPABASE_SERVICE_KEY', '')
 
 # =====================================================
 # ENUMS - WORKFLOW STAGES (Not CRM)
@@ -222,8 +221,8 @@ class ActivityCreate(BaseModel):
 
 async def get_service_headers():
     return {
-        "apikey": SUPABASE_SERVICE_KEY,
-        "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+        "apikey": config.SUPABASE_SERVICE_KEY,
+        "Authorization": f"Bearer {config.SUPABASE_SERVICE_KEY}",
         "Content-Type": "application/json",
         "Prefer": "return=representation"
     }
@@ -240,7 +239,7 @@ async def verify_token_and_get_org(authorization: str) -> tuple:
         # Get user's primary organization
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/organization_members?"
+                f"{config.SUPABASE_URL}/rest/v1/organization_members?"
                 f"user_id=eq.{user_id}&"
                 f"is_active=eq.true&"
                 f"is_primary=eq.true&"
@@ -255,7 +254,7 @@ async def verify_token_and_get_org(authorization: str) -> tuple:
             if not members:
                 # Try to get any organization
                 response = await client.get(
-                    f"{SUPABASE_URL}/rest/v1/organization_members?"
+                    f"{config.SUPABASE_URL}/rest/v1/organization_members?"
                     f"user_id=eq.{user_id}&"
                     f"is_active=eq.true&"
                     f"select=organization_id&"
@@ -297,7 +296,7 @@ async def log_activity(org_id: str, opp_id: str, event_type: str, title: str,
             }
             
             await client.post(
-                f"{SUPABASE_URL}/rest/v1/opportunity_activity",
+                f"{config.SUPABASE_URL}/rest/v1/opportunity_activity",
                 headers=await get_service_headers(),
                 json=activity
             )
@@ -336,7 +335,7 @@ async def opportunities_health():
     try:
         async with httpx.AsyncClient(timeout=5.0) as client:
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/opportunities?limit=1",
+                f"{config.SUPABASE_URL}/rest/v1/opportunities?limit=1",
                 headers=await get_service_headers()
             )
             
@@ -404,7 +403,7 @@ async def list_opportunities(
             # Build order
             order = f"{sort_by}.{sort_order}"
             
-            url = (f"{SUPABASE_URL}/rest/v1/opportunities?"
+            url = (f"{config.SUPABASE_URL}/rest/v1/opportunities?"
                    f"{query}&select=*&order={order}&limit={limit}&offset={offset}")
             
             response = await client.get(url, headers=await get_service_headers())
@@ -416,7 +415,7 @@ async def list_opportunities(
             
             # Get total count
             count_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/opportunities?{query}&select=id",
+                f"{config.SUPABASE_URL}/rest/v1/opportunities?{query}&select=id",
                 headers={**await get_service_headers(), "Prefer": "count=exact"}
             )
             total = int(count_response.headers.get('content-range', '0-0/0').split('/')[-1])
@@ -473,7 +472,7 @@ async def create_opportunity(
         async with httpx.AsyncClient() as client:
             # Generate reference number
             ref_response = await client.post(
-                f"{SUPABASE_URL}/rest/v1/rpc/generate_opportunity_reference",
+                f"{config.SUPABASE_URL}/rest/v1/rpc/generate_opportunity_reference",
                 headers=await get_service_headers(),
                 json={"org_id": org_id}
             )
@@ -500,7 +499,7 @@ async def create_opportunity(
             
             # Create opportunity
             response = await client.post(
-                f"{SUPABASE_URL}/rest/v1/opportunities",
+                f"{config.SUPABASE_URL}/rest/v1/opportunities",
                 headers=await get_service_headers(),
                 json=opp_data
             )
@@ -546,7 +545,7 @@ async def get_opportunity(
         async with httpx.AsyncClient() as client:
             # Get opportunity
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/opportunities?"
+                f"{config.SUPABASE_URL}/rest/v1/opportunities?"
                 f"id=eq.{opportunity_id}&"
                 f"organization_id=eq.{org_id}&"
                 f"select=*",
@@ -564,7 +563,7 @@ async def get_opportunity(
             
             # Get current tender (if any)
             tender_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/tenders?"
+                f"{config.SUPABASE_URL}/rest/v1/tenders?"
                 f"opportunity_id=eq.{opportunity_id}&"
                 f"is_current=eq.true&"
                 f"select=id,version_number,status,total,created_at,updated_at",
@@ -579,7 +578,7 @@ async def get_opportunity(
             
             # Get tender count
             tender_count_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/tenders?"
+                f"{config.SUPABASE_URL}/rest/v1/tenders?"
                 f"opportunity_id=eq.{opportunity_id}&"
                 f"select=id",
                 headers={**await get_service_headers(), "Prefer": "count=exact"}
@@ -588,7 +587,7 @@ async def get_opportunity(
             
             # Get document count
             doc_count_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/opportunity_documents?"
+                f"{config.SUPABASE_URL}/rest/v1/opportunity_documents?"
                 f"opportunity_id=eq.{opportunity_id}&"
                 f"select=id",
                 headers={**await get_service_headers(), "Prefer": "count=exact"}
@@ -597,7 +596,7 @@ async def get_opportunity(
             
             # Get RFI count
             rfi_count_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/opportunity_rfis?"
+                f"{config.SUPABASE_URL}/rest/v1/opportunity_rfis?"
                 f"opportunity_id=eq.{opportunity_id}&"
                 f"select=id",
                 headers={**await get_service_headers(), "Prefer": "count=exact"}
@@ -606,7 +605,7 @@ async def get_opportunity(
             
             # Get recent activity
             activity_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/opportunity_activity?"
+                f"{config.SUPABASE_URL}/rest/v1/opportunity_activity?"
                 f"opportunity_id=eq.{opportunity_id}&"
                 f"select=id,event_type,event_title,created_at&"
                 f"order=created_at.desc&limit=5",
@@ -645,7 +644,7 @@ async def update_opportunity(
         async with httpx.AsyncClient() as client:
             # Verify ownership
             check_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/opportunities?"
+                f"{config.SUPABASE_URL}/rest/v1/opportunities?"
                 f"id=eq.{opportunity_id}&"
                 f"organization_id=eq.{org_id}&"
                 f"select=id,name",
@@ -669,7 +668,7 @@ async def update_opportunity(
             
             # Update
             response = await client.patch(
-                f"{SUPABASE_URL}/rest/v1/opportunities?"
+                f"{config.SUPABASE_URL}/rest/v1/opportunities?"
                 f"id=eq.{opportunity_id}",
                 headers=await get_service_headers(),
                 json=update_data
@@ -690,7 +689,7 @@ async def update_opportunity(
             
             # Fetch updated record
             updated_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/opportunities?"
+                f"{config.SUPABASE_URL}/rest/v1/opportunities?"
                 f"id=eq.{opportunity_id}&select=*",
                 headers=await get_service_headers()
             )
@@ -724,7 +723,7 @@ async def change_opportunity_status(
         async with httpx.AsyncClient() as client:
             # Get current opportunity
             check_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/opportunities?"
+                f"{config.SUPABASE_URL}/rest/v1/opportunities?"
                 f"id=eq.{opportunity_id}&"
                 f"organization_id=eq.{org_id}&"
                 f"select=id,name,status",
@@ -769,7 +768,7 @@ async def change_opportunity_status(
             
             # Update
             response = await client.patch(
-                f"{SUPABASE_URL}/rest/v1/opportunities?"
+                f"{config.SUPABASE_URL}/rest/v1/opportunities?"
                 f"id=eq.{opportunity_id}",
                 headers=await get_service_headers(),
                 json=update_data
@@ -820,7 +819,7 @@ async def get_opportunity_activity(
         async with httpx.AsyncClient() as client:
             # Verify access
             check_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/opportunities?"
+                f"{config.SUPABASE_URL}/rest/v1/opportunities?"
                 f"id=eq.{opportunity_id}&"
                 f"organization_id=eq.{org_id}&"
                 f"select=id",
@@ -832,7 +831,7 @@ async def get_opportunity_activity(
             
             # Get activity
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/opportunity_activity?"
+                f"{config.SUPABASE_URL}/rest/v1/opportunity_activity?"
                 f"opportunity_id=eq.{opportunity_id}&"
                 f"select=*&"
                 f"order=created_at.desc&"
@@ -871,7 +870,7 @@ async def add_activity_note(
         async with httpx.AsyncClient() as client:
             # Verify access
             check_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/opportunities?"
+                f"{config.SUPABASE_URL}/rest/v1/opportunities?"
                 f"id=eq.{opportunity_id}&"
                 f"organization_id=eq.{org_id}&"
                 f"select=id",
@@ -918,7 +917,7 @@ async def delete_opportunity(
         async with httpx.AsyncClient() as client:
             # Get opportunity
             check_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/opportunities?"
+                f"{config.SUPABASE_URL}/rest/v1/opportunities?"
                 f"id=eq.{opportunity_id}&"
                 f"organization_id=eq.{org_id}&"
                 f"select=id,name,status",
@@ -939,7 +938,7 @@ async def delete_opportunity(
             
             # Delete
             response = await client.delete(
-                f"{SUPABASE_URL}/rest/v1/opportunities?"
+                f"{config.SUPABASE_URL}/rest/v1/opportunities?"
                 f"id=eq.{opportunity_id}",
                 headers=await get_service_headers()
             )
@@ -966,7 +965,7 @@ async def get_pipeline_stats(authorization: str = Header(...)):
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/opportunities?"
+                f"{config.SUPABASE_URL}/rest/v1/opportunities?"
                 f"organization_id=eq.{org_id}&"
                 f"select=status,estimated_value,priority,tender_due_date",
                 headers=await get_service_headers()

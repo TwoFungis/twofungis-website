@@ -7,6 +7,7 @@ from pydantic import BaseModel
 from typing import Optional, List, Literal
 from datetime import datetime, timezone, timedelta
 import httpx
+from config import config
 import os
 import logging
 import json
@@ -50,14 +51,10 @@ def parse_datetime_safe(date_str: Optional[str]) -> Optional[datetime]:
         logger.warning(f"Error parsing datetime '{date_str}': {e}")
         return None
 
-SUPABASE_URL = os.environ.get('SUPABASE_URL', '')
-SUPABASE_SERVICE_KEY = os.environ.get('SUPABASE_SERVICE_KEY', '')
-RESEND_API_KEY = os.environ.get('RESEND_API_KEY', '')
-SENDER_EMAIL = os.environ.get('SENDER_EMAIL', 'contact@tradeos.ca')
 
 # Initialize Resend
-if RESEND_API_KEY:
-    resend.api_key = RESEND_API_KEY
+if config.RESEND_API_KEY:
+    resend.api_key = config.RESEND_API_KEY
 
 # Email Templates
 EMAIL_TEMPLATES = {
@@ -165,13 +162,13 @@ def get_user_id_from_token(authorization: str) -> Optional[str]:
 
 async def supabase_request(method: str, endpoint: str, data=None, params=None):
     headers = {
-        "apikey": SUPABASE_SERVICE_KEY,
-        "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+        "apikey": config.SUPABASE_SERVICE_KEY,
+        "Authorization": f"Bearer {config.SUPABASE_SERVICE_KEY}",
         "Content-Type": "application/json",
         "Prefer": "return=representation"
     }
     
-    url = f"{SUPABASE_URL}/rest/v1/{endpoint}"
+    url = f"{config.SUPABASE_URL}/rest/v1/{endpoint}"
     
     async with httpx.AsyncClient() as client:
         if method == "GET":
@@ -278,7 +275,7 @@ async def send_payment_reminder(
     if not user_id:
         raise HTTPException(status_code=401, detail="Unauthorized")
     
-    if not RESEND_API_KEY:
+    if not config.RESEND_API_KEY:
         raise HTTPException(status_code=500, detail="Email service not configured")
     
     try:
@@ -338,7 +335,7 @@ async def send_payment_reminder(
         
         # Send email via Resend
         params = {
-            "from": f"{company_name} <{SENDER_EMAIL}>",
+            "from": f"{company_name} <{config.SENDER_EMAIL}>",
             "to": [invoice.get('client_email')],
             "subject": subject,
             "text": body

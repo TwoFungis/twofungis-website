@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field
 from typing import List, Optional, Dict
 from datetime import datetime, timezone, date
 import httpx
+from config import config
 import os
 import logging
 import json
@@ -15,8 +16,6 @@ router = APIRouter(prefix="/api/milestones", tags=["milestones"])
 logger = logging.getLogger(__name__)
 
 # Environment variables
-SUPABASE_URL = os.environ.get('SUPABASE_URL', '')
-SUPABASE_SERVICE_KEY = os.environ.get('SUPABASE_SERVICE_KEY', '')
 
 # Valid status transitions
 STATUS_TRANSITIONS = {
@@ -71,17 +70,17 @@ def get_user_id_from_token(authorization: str) -> Optional[str]:
 
 async def supabase_request(method: str, endpoint: str, data: Optional[Dict] = None, params: Optional[Dict] = None) -> Dict:
     """Make authenticated request to Supabase REST API"""
-    if not SUPABASE_URL or not SUPABASE_SERVICE_KEY:
+    if not config.SUPABASE_URL or not config.SUPABASE_SERVICE_KEY:
         raise HTTPException(status_code=500, detail="Supabase not configured")
     
     headers = {
-        "apikey": SUPABASE_SERVICE_KEY,
-        "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+        "apikey": config.SUPABASE_SERVICE_KEY,
+        "Authorization": f"Bearer {config.SUPABASE_SERVICE_KEY}",
         "Content-Type": "application/json",
         "Prefer": "return=representation"
     }
     
-    url = f"{SUPABASE_URL}/rest/v1/{endpoint}"
+    url = f"{config.SUPABASE_URL}/rest/v1/{endpoint}"
     
     async with httpx.AsyncClient() as client:
         if method == "GET":

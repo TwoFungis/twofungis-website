@@ -15,7 +15,6 @@ from emergentintegrations.llm.chat import LlmChat, UserMessage
 router = APIRouter(prefix="/api/ai", tags=["ai"])
 logger = logging.getLogger(__name__)
 
-EMERGENT_LLM_KEY = os.environ.get("EMERGENT_LLM_KEY", "")
 
 class EstimateRequest(BaseModel):
     project_type: str
@@ -79,7 +78,7 @@ Return ONLY valid JSON, no additional text."""
         # Create LlmChat instance
         session_id = str(uuid.uuid4())
         llm = LlmChat(
-            api_key=EMERGENT_LLM_KEY,
+            api_key=config.EMERGENT_LLM_KEY,
             session_id=session_id,
             system_message="You are a professional construction estimator. Always respond with valid JSON only."
         ).with_model("openai", "gpt-5.2")

@@ -19,6 +19,7 @@ from pydantic import BaseModel
 from typing import Optional
 import os
 import httpx
+from config import config
 import logging
 from datetime import datetime, timezone, timedelta
 import uuid
@@ -30,8 +31,6 @@ logger = logging.getLogger(__name__)
 EMERGENT_AUTH_URL = "https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data"
 
 # Supabase config
-SUPABASE_URL = os.environ.get('SUPABASE_URL', '')
-SUPABASE_SERVICE_KEY = os.environ.get('SUPABASE_SERVICE_KEY', '')
 
 # Session duration (7 days)
 SESSION_DURATION_DAYS = 7
@@ -52,8 +51,8 @@ class UserResponse(BaseModel):
 async def get_supabase_headers():
     """Get headers for Supabase service role requests"""
     return {
-        "apikey": SUPABASE_SERVICE_KEY,
-        "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+        "apikey": config.SUPABASE_SERVICE_KEY,
+        "Authorization": f"Bearer {config.SUPABASE_SERVICE_KEY}",
         "Content-Type": "application/json",
         "Prefer": "return=representation"
     }
@@ -107,7 +106,7 @@ async def google_oauth_callback(request: GoogleCallbackRequest, response: Respon
             
             # First, check if this Google user exists by email in profiles
             profile_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/profiles?email=eq.{email}&select=id,email,full_name,company_name,google_id",
+                f"{config.SUPABASE_URL}/rest/v1/profiles?email=eq.{email}&select=id,email,full_name,company_name,google_id",
                 headers=headers
             )
             
@@ -121,7 +120,7 @@ async def google_oauth_callback(request: GoogleCallbackRequest, response: Respon
                 # Update profile with Google data if not already set
                 if not profile.get('google_id'):
                     await client.patch(
-                        f"{SUPABASE_URL}/rest/v1/profiles?id=eq.{user_id}",
+                        f"{config.SUPABASE_URL}/rest/v1/profiles?id=eq.{user_id}",
                         headers=headers,
                         json={
                             "google_id": google_id,
@@ -133,10 +132,10 @@ async def google_oauth_callback(request: GoogleCallbackRequest, response: Respon
             else:
                 # Check if email exists in Supabase Auth
                 auth_users_response = await client.get(
-                    f"{SUPABASE_URL}/auth/v1/admin/users",
+                    f"{config.SUPABASE_URL}/auth/v1/admin/users",
                     headers={
-                        "apikey": SUPABASE_SERVICE_KEY,
-                        "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}"
+                        "apikey": config.SUPABASE_SERVICE_KEY,
+                        "Authorization": f"Bearer {config.SUPABASE_SERVICE_KEY}"
                     }
                 )
                 
@@ -153,7 +152,7 @@ async def google_oauth_callback(request: GoogleCallbackRequest, response: Respon
                     user_id = existing_auth_user['id']
                     # Create profile for existing auth user
                     await client.post(
-                        f"{SUPABASE_URL}/rest/v1/profiles",
+                        f"{config.SUPABASE_URL}/rest/v1/profiles",
                         headers=headers,
                         json={
                             "id": user_id,
@@ -171,10 +170,10 @@ async def google_oauth_callback(request: GoogleCallbackRequest, response: Respon
                     # Create new user in Supabase Auth
                     user_id = str(uuid.uuid4())
                     create_user_response = await client.post(
-                        f"{SUPABASE_URL}/auth/v1/admin/users",
+                        f"{config.SUPABASE_URL}/auth/v1/admin/users",
                         headers={
-                            "apikey": SUPABASE_SERVICE_KEY,
-                            "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+                            "apikey": config.SUPABASE_SERVICE_KEY,
+                            "Authorization": f"Bearer {config.SUPABASE_SERVICE_KEY}",
                             "Content-Type": "application/json"
                         },
                         json={
@@ -195,7 +194,7 @@ async def google_oauth_callback(request: GoogleCallbackRequest, response: Respon
                         
                         # Create profile
                         await client.post(
-                            f"{SUPABASE_URL}/rest/v1/profiles",
+                            f"{config.SUPABASE_URL}/rest/v1/profiles",
                             headers=headers,
                             json={
                                 "id": user_id,
@@ -219,7 +218,7 @@ async def google_oauth_callback(request: GoogleCallbackRequest, response: Respon
             # Check if google_sessions table exists, if not use a simpler approach
             try:
                 await client.post(
-                    f"{SUPABASE_URL}/rest/v1/google_sessions",
+                    f"{config.SUPABASE_URL}/rest/v1/google_sessions",
                     headers=headers,
                     json={
                         "user_id": user_id,

@@ -30,14 +30,13 @@ from decimal import Decimal
 import os
 import logging
 import httpx
+from config import config
 import jwt
 import json
 
 router = APIRouter(prefix="/api/tenders", tags=["tenders"])
 logger = logging.getLogger(__name__)
 
-SUPABASE_URL = os.environ.get('SUPABASE_URL', '')
-SUPABASE_SERVICE_KEY = os.environ.get('SUPABASE_SERVICE_KEY', '')
 
 # =====================================================
 # PYDANTIC MODELS
@@ -247,8 +246,8 @@ class SubmitTenderRequest(BaseModel):
 
 async def get_service_headers():
     return {
-        "apikey": SUPABASE_SERVICE_KEY,
-        "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+        "apikey": config.SUPABASE_SERVICE_KEY,
+        "Authorization": f"Bearer {config.SUPABASE_SERVICE_KEY}",
         "Content-Type": "application/json",
         "Prefer": "return=representation"
     }
@@ -264,7 +263,7 @@ async def verify_token_and_get_org(authorization: str) -> tuple:
         
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/organization_members?"
+                f"{config.SUPABASE_URL}/rest/v1/organization_members?"
                 f"user_id=eq.{user_id}&is_active=eq.true&is_primary=eq.true&select=organization_id",
                 headers=await get_service_headers()
             )
@@ -275,7 +274,7 @@ async def verify_token_and_get_org(authorization: str) -> tuple:
             members = response.json()
             if not members:
                 response = await client.get(
-                    f"{SUPABASE_URL}/rest/v1/organization_members?"
+                    f"{config.SUPABASE_URL}/rest/v1/organization_members?"
                     f"user_id=eq.{user_id}&is_active=eq.true&select=organization_id&limit=1",
                     headers=await get_service_headers()
                 )
@@ -298,7 +297,7 @@ async def verify_tender_access(tender_id: str, org_id: str) -> dict:
     """Verify user has access to tender and return tender data"""
     async with httpx.AsyncClient() as client:
         response = await client.get(
-            f"{SUPABASE_URL}/rest/v1/tenders?"
+            f"{config.SUPABASE_URL}/rest/v1/tenders?"
             f"id=eq.{tender_id}&organization_id=eq.{org_id}&select=*",
             headers=await get_service_headers()
         )
@@ -384,7 +383,7 @@ async def recalculate_tender_totals(tender_id: str):
     async with httpx.AsyncClient() as client:
         # Get tender
         tender_response = await client.get(
-            f"{SUPABASE_URL}/rest/v1/tenders?id=eq.{tender_id}&select=*",
+            f"{config.SUPABASE_URL}/rest/v1/tenders?id=eq.{tender_id}&select=*",
             headers=await get_service_headers()
         )
         
@@ -395,7 +394,7 @@ async def recalculate_tender_totals(tender_id: str):
         
         # Get included line items
         items_response = await client.get(
-            f"{SUPABASE_URL}/rest/v1/tender_line_items?"
+            f"{config.SUPABASE_URL}/rest/v1/tender_line_items?"
             f"tender_id=eq.{tender_id}&is_included=eq.true&select=line_total",
             headers=await get_service_headers()
         )
@@ -447,7 +446,7 @@ async def recalculate_tender_totals(tender_id: str):
         
         # Update tender
         await client.patch(
-            f"{SUPABASE_URL}/rest/v1/tenders?id=eq.{tender_id}",
+            f"{config.SUPABASE_URL}/rest/v1/tenders?id=eq.{tender_id}",
             headers=await get_service_headers(),
             json={
                 "subtotal": round(subtotal, 2),
@@ -464,14 +463,14 @@ async def recalculate_tender_totals(tender_id: str):
         
         # Update section totals
         sections_response = await client.get(
-            f"{SUPABASE_URL}/rest/v1/tender_sections?tender_id=eq.{tender_id}&select=id",
+            f"{config.SUPABASE_URL}/rest/v1/tender_sections?tender_id=eq.{tender_id}&select=id",
             headers=await get_service_headers()
         )
         
         if sections_response.status_code == 200:
             for section in sections_response.json():
                 section_items_response = await client.get(
-                    f"{SUPABASE_URL}/rest/v1/tender_line_items?"
+                    f"{config.SUPABASE_URL}/rest/v1/tender_line_items?"
                     f"section_id=eq.{section['id']}&is_included=eq.true&"
                     f"select=labor_total,material_total,equipment_cost,subcontractor_cost,line_total",
                     headers=await get_service_headers()
@@ -486,7 +485,7 @@ async def recalculate_tender_totals(tender_id: str):
                 section_subtotal = sum(float(item.get('line_total', 0) or 0) for item in section_items)
                 
                 await client.patch(
-                    f"{SUPABASE_URL}/rest/v1/tender_sections?id=eq.{section['id']}",
+                    f"{config.SUPABASE_URL}/rest/v1/tender_sections?id=eq.{section['id']}",
                     headers=await get_service_headers(),
                     json={
                         "labor_total": round(labor_total, 2),
@@ -505,7 +504,7 @@ async def log_opportunity_activity(org_id: str, opp_id: str, event_type: str, ti
     try:
         async with httpx.AsyncClient() as client:
             await client.post(
-                f"{SUPABASE_URL}/rest/v1/opportunity_activity",
+                f"{config.SUPABASE_URL}/rest/v1/opportunity_activity",
                 headers=await get_service_headers(),
                 json={
                     "opportunity_id": opp_id,
@@ -531,7 +530,7 @@ async def tenders_health():
     try:
         async with httpx.AsyncClient(timeout=5.0) as client:
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/tenders?limit=1",
+                f"{config.SUPABASE_URL}/rest/v1/tenders?limit=1",
                 headers=await get_service_headers()
             )
             if response.status_code == 200:
@@ -551,7 +550,7 @@ async def create_tender(tender: TenderCreate, authorization: str = Header(...)):
         async with httpx.AsyncClient() as client:
             # Verify opportunity exists and belongs to org
             opp_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/opportunities?"
+                f"{config.SUPABASE_URL}/rest/v1/opportunities?"
                 f"id=eq.{tender.opportunity_id}&organization_id=eq.{org_id}&select=id,name,status",
                 headers=await get_service_headers()
             )
@@ -563,7 +562,7 @@ async def create_tender(tender: TenderCreate, authorization: str = Header(...)):
             
             # Mark any existing current tenders as not current
             await client.patch(
-                f"{SUPABASE_URL}/rest/v1/tenders?"
+                f"{config.SUPABASE_URL}/rest/v1/tenders?"
                 f"opportunity_id=eq.{tender.opportunity_id}&is_current=eq.true",
                 headers=await get_service_headers(),
                 json={"is_current": False}
@@ -571,7 +570,7 @@ async def create_tender(tender: TenderCreate, authorization: str = Header(...)):
             
             # Get next version number
             version_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/tenders?"
+                f"{config.SUPABASE_URL}/rest/v1/tenders?"
                 f"opportunity_id=eq.{tender.opportunity_id}&select=version_number&order=version_number.desc&limit=1",
                 headers=await get_service_headers()
             )
@@ -610,7 +609,7 @@ async def create_tender(tender: TenderCreate, authorization: str = Header(...)):
             }
             
             response = await client.post(
-                f"{SUPABASE_URL}/rest/v1/tenders",
+                f"{config.SUPABASE_URL}/rest/v1/tenders",
                 headers=await get_service_headers(),
                 json=tender_data
             )
@@ -625,7 +624,7 @@ async def create_tender(tender: TenderCreate, authorization: str = Header(...)):
             # Update opportunity status if it's in discovered/qualifying
             if opportunity['status'] in ['discovered', 'qualifying']:
                 await client.patch(
-                    f"{SUPABASE_URL}/rest/v1/opportunities?id=eq.{tender.opportunity_id}",
+                    f"{config.SUPABASE_URL}/rest/v1/opportunities?id=eq.{tender.opportunity_id}",
                     headers=await get_service_headers(),
                     json={"status": "tendering", "updated_at": datetime.now(timezone.utc).isoformat()}
                 )
@@ -659,7 +658,7 @@ async def get_tender(tender_id: str, authorization: str = Header(...)):
         async with httpx.AsyncClient() as client:
             # Get sections
             sections_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/tender_sections?"
+                f"{config.SUPABASE_URL}/rest/v1/tender_sections?"
                 f"tender_id=eq.{tender_id}&select=*&order=sort_order.asc",
                 headers=await get_service_headers()
             )
@@ -667,7 +666,7 @@ async def get_tender(tender_id: str, authorization: str = Header(...)):
             
             # Get all line items
             items_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/tender_line_items?"
+                f"{config.SUPABASE_URL}/rest/v1/tender_line_items?"
                 f"tender_id=eq.{tender_id}&select=*&order=sort_order.asc",
                 headers=await get_service_headers()
             )
@@ -692,7 +691,7 @@ async def get_tender(tender_id: str, authorization: str = Header(...)):
             
             # Get version history
             versions_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/tender_versions?"
+                f"{config.SUPABASE_URL}/rest/v1/tender_versions?"
                 f"tender_id=eq.{tender_id}&select=id,version_number,version_label,total,submitted_at,outcome&"
                 f"order=version_number.desc",
                 headers=await get_service_headers()
@@ -744,7 +743,7 @@ async def update_tender(tender_id: str, updates: TenderUpdate, authorization: st
         
         async with httpx.AsyncClient() as client:
             response = await client.patch(
-                f"{SUPABASE_URL}/rest/v1/tenders?id=eq.{tender_id}",
+                f"{config.SUPABASE_URL}/rest/v1/tenders?id=eq.{tender_id}",
                 headers=await get_service_headers(),
                 json=update_data
             )
@@ -788,7 +787,7 @@ async def create_section(tender_id: str, section: SectionCreate, authorization: 
         async with httpx.AsyncClient() as client:
             # Get max sort order
             order_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/tender_sections?"
+                f"{config.SUPABASE_URL}/rest/v1/tender_sections?"
                 f"tender_id=eq.{tender_id}&select=sort_order&order=sort_order.desc&limit=1",
                 headers=await get_service_headers()
             )
@@ -807,7 +806,7 @@ async def create_section(tender_id: str, section: SectionCreate, authorization: 
             }
             
             response = await client.post(
-                f"{SUPABASE_URL}/rest/v1/tender_sections",
+                f"{config.SUPABASE_URL}/rest/v1/tender_sections",
                 headers=await get_service_headers(),
                 json=section_data
             )
@@ -844,7 +843,7 @@ async def update_section(tender_id: str, section_id: str, updates: SectionUpdate
         
         async with httpx.AsyncClient() as client:
             response = await client.patch(
-                f"{SUPABASE_URL}/rest/v1/tender_sections?id=eq.{section_id}&tender_id=eq.{tender_id}",
+                f"{config.SUPABASE_URL}/rest/v1/tender_sections?id=eq.{section_id}&tender_id=eq.{tender_id}",
                 headers=await get_service_headers(),
                 json=update_data
             )
@@ -874,14 +873,14 @@ async def delete_section(tender_id: str, section_id: str, authorization: str = H
         async with httpx.AsyncClient() as client:
             # Move items to unsectioned
             await client.patch(
-                f"{SUPABASE_URL}/rest/v1/tender_line_items?section_id=eq.{section_id}",
+                f"{config.SUPABASE_URL}/rest/v1/tender_line_items?section_id=eq.{section_id}",
                 headers=await get_service_headers(),
                 json={"section_id": None}
             )
             
             # Delete section
             response = await client.delete(
-                f"{SUPABASE_URL}/rest/v1/tender_sections?id=eq.{section_id}&tender_id=eq.{tender_id}",
+                f"{config.SUPABASE_URL}/rest/v1/tender_sections?id=eq.{section_id}&tender_id=eq.{tender_id}",
                 headers=await get_service_headers()
             )
             
@@ -918,7 +917,7 @@ async def create_line_item(tender_id: str, item: LineItemCreate, authorization: 
         async with httpx.AsyncClient() as client:
             # Get max sort order
             order_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/tender_line_items?"
+                f"{config.SUPABASE_URL}/rest/v1/tender_line_items?"
                 f"tender_id=eq.{tender_id}&select=sort_order&order=sort_order.desc&limit=1",
                 headers=await get_service_headers()
             )
@@ -935,7 +934,7 @@ async def create_line_item(tender_id: str, item: LineItemCreate, authorization: 
             }
             
             response = await client.post(
-                f"{SUPABASE_URL}/rest/v1/tender_line_items",
+                f"{config.SUPABASE_URL}/rest/v1/tender_line_items",
                 headers=await get_service_headers(),
                 json=item_data
             )
@@ -973,7 +972,7 @@ async def update_line_item(tender_id: str, item_id: str, updates: LineItemUpdate
         async with httpx.AsyncClient() as client:
             # Get current item
             item_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/tender_line_items?"
+                f"{config.SUPABASE_URL}/rest/v1/tender_line_items?"
                 f"id=eq.{item_id}&tender_id=eq.{tender_id}&select=*",
                 headers=await get_service_headers()
             )
@@ -993,7 +992,7 @@ async def update_line_item(tender_id: str, item_id: str, updates: LineItemUpdate
             update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
             
             response = await client.patch(
-                f"{SUPABASE_URL}/rest/v1/tender_line_items?id=eq.{item_id}&tender_id=eq.{tender_id}",
+                f"{config.SUPABASE_URL}/rest/v1/tender_line_items?id=eq.{item_id}&tender_id=eq.{tender_id}",
                 headers=await get_service_headers(),
                 json=update_data
             )
@@ -1025,7 +1024,7 @@ async def delete_line_item(tender_id: str, item_id: str, authorization: str = He
         
         async with httpx.AsyncClient() as client:
             response = await client.delete(
-                f"{SUPABASE_URL}/rest/v1/tender_line_items?id=eq.{item_id}&tender_id=eq.{tender_id}",
+                f"{config.SUPABASE_URL}/rest/v1/tender_line_items?id=eq.{item_id}&tender_id=eq.{tender_id}",
                 headers=await get_service_headers()
             )
             
@@ -1057,7 +1056,7 @@ async def reorder_items(tender_id: str, request: ReorderRequest, authorization: 
         async with httpx.AsyncClient() as client:
             for index, item_id in enumerate(request.item_ids):
                 await client.patch(
-                    f"{SUPABASE_URL}/rest/v1/tender_line_items?id=eq.{item_id}&tender_id=eq.{tender_id}",
+                    f"{config.SUPABASE_URL}/rest/v1/tender_line_items?id=eq.{item_id}&tender_id=eq.{tender_id}",
                     headers=await get_service_headers(),
                     json={"sort_order": index}
                 )
@@ -1088,13 +1087,13 @@ async def submit_tender(tender_id: str, request: SubmitTenderRequest, authorizat
         async with httpx.AsyncClient() as client:
             # Get all sections and items for snapshot
             sections_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/tender_sections?tender_id=eq.{tender_id}&select=*",
+                f"{config.SUPABASE_URL}/rest/v1/tender_sections?tender_id=eq.{tender_id}&select=*",
                 headers=await get_service_headers()
             )
             sections = sections_response.json() if sections_response.status_code == 200 else []
             
             items_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/tender_line_items?tender_id=eq.{tender_id}&select=*",
+                f"{config.SUPABASE_URL}/rest/v1/tender_line_items?tender_id=eq.{tender_id}&select=*",
                 headers=await get_service_headers()
             )
             items = items_response.json() if items_response.status_code == 200 else []
@@ -1126,7 +1125,7 @@ async def submit_tender(tender_id: str, request: SubmitTenderRequest, authorizat
             }
             
             version_response = await client.post(
-                f"{SUPABASE_URL}/rest/v1/tender_versions",
+                f"{config.SUPABASE_URL}/rest/v1/tender_versions",
                 headers=await get_service_headers(),
                 json=version_data
             )
@@ -1136,7 +1135,7 @@ async def submit_tender(tender_id: str, request: SubmitTenderRequest, authorizat
             
             # Update tender status
             await client.patch(
-                f"{SUPABASE_URL}/rest/v1/tenders?id=eq.{tender_id}",
+                f"{config.SUPABASE_URL}/rest/v1/tenders?id=eq.{tender_id}",
                 headers=await get_service_headers(),
                 json={
                     "status": "submitted",
@@ -1150,7 +1149,7 @@ async def submit_tender(tender_id: str, request: SubmitTenderRequest, authorizat
             
             # Update opportunity status
             await client.patch(
-                f"{SUPABASE_URL}/rest/v1/opportunities?id=eq.{tender.get('opportunity_id')}",
+                f"{config.SUPABASE_URL}/rest/v1/opportunities?id=eq.{tender.get('opportunity_id')}",
                 headers=await get_service_headers(),
                 json={
                     "status": "submitted",
@@ -1193,20 +1192,20 @@ async def create_revision(tender_id: str, authorization: str = Header(...)):
         async with httpx.AsyncClient() as client:
             # Mark current as not current
             await client.patch(
-                f"{SUPABASE_URL}/rest/v1/tenders?id=eq.{tender_id}",
+                f"{config.SUPABASE_URL}/rest/v1/tenders?id=eq.{tender_id}",
                 headers=await get_service_headers(),
                 json={"is_current": False}
             )
             
             # Get sections and items to copy
             sections_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/tender_sections?tender_id=eq.{tender_id}&select=*",
+                f"{config.SUPABASE_URL}/rest/v1/tender_sections?tender_id=eq.{tender_id}&select=*",
                 headers=await get_service_headers()
             )
             sections = sections_response.json() if sections_response.status_code == 200 else []
             
             items_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/tender_line_items?tender_id=eq.{tender_id}&select=*",
+                f"{config.SUPABASE_URL}/rest/v1/tender_line_items?tender_id=eq.{tender_id}&select=*",
                 headers=await get_service_headers()
             )
             items = items_response.json() if items_response.status_code == 200 else []
@@ -1252,7 +1251,7 @@ async def create_revision(tender_id: str, authorization: str = Header(...)):
                     new_tender_data[field] = tender.get(field)
             
             new_tender_response = await client.post(
-                f"{SUPABASE_URL}/rest/v1/tenders",
+                f"{config.SUPABASE_URL}/rest/v1/tenders",
                 headers=await get_service_headers(),
                 json=new_tender_data
             )
@@ -1274,7 +1273,7 @@ async def create_revision(tender_id: str, authorization: str = Header(...)):
                 new_section_data['tender_id'] = new_tender_id
                 
                 section_response = await client.post(
-                    f"{SUPABASE_URL}/rest/v1/tender_sections",
+                    f"{config.SUPABASE_URL}/rest/v1/tender_sections",
                     headers=await get_service_headers(),
                     json=new_section_data
                 )
@@ -1297,14 +1296,14 @@ async def create_revision(tender_id: str, authorization: str = Header(...)):
                     new_item_data['section_id'] = None
                 
                 await client.post(
-                    f"{SUPABASE_URL}/rest/v1/tender_line_items",
+                    f"{config.SUPABASE_URL}/rest/v1/tender_line_items",
                     headers=await get_service_headers(),
                     json=new_item_data
                 )
             
             # Update opportunity status back to tendering
             await client.patch(
-                f"{SUPABASE_URL}/rest/v1/opportunities?id=eq.{tender.get('opportunity_id')}",
+                f"{config.SUPABASE_URL}/rest/v1/opportunities?id=eq.{tender.get('opportunity_id')}",
                 headers=await get_service_headers(),
                 json={"status": "tendering", "updated_at": datetime.now(timezone.utc).isoformat()}
             )

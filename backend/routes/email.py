@@ -1,12 +1,10 @@
-import os
 import asyncio
 import logging
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, EmailStr
 from typing import Optional
-from dotenv import load_dotenv
 
-load_dotenv()
+from config import config
 
 router = APIRouter(prefix="/api/email", tags=["email"])
 logger = logging.getLogger(__name__)
@@ -14,9 +12,8 @@ logger = logging.getLogger(__name__)
 # Check if resend is available
 try:
     import resend
-    RESEND_API_KEY = os.environ.get("RESEND_API_KEY")
-    if RESEND_API_KEY:
-        resend.api_key = RESEND_API_KEY
+    if config.RESEND_API_KEY:
+        resend.api_key = config.RESEND_API_KEY
         EMAIL_ENABLED = True
     else:
         EMAIL_ENABLED = False
@@ -24,8 +21,6 @@ try:
 except ImportError:
     EMAIL_ENABLED = False
     logger.warning("resend package not installed - email sending disabled")
-
-SENDER_EMAIL = os.environ.get("SENDER_EMAIL", "onboarding@resend.dev")
 
 
 class InvoiceEmailRequest(BaseModel):
@@ -155,14 +150,14 @@ async def send_invoice_email(request: InvoiceEmailRequest):
     if not EMAIL_ENABLED:
         return {
             "status": "skipped",
-            "message": "Email sending not configured. Set RESEND_API_KEY to enable.",
+            "message": "Email sending not configured. Set config.RESEND_API_KEY to enable.",
             "email_id": None
         }
     
     html_content = generate_invoice_email_html(request)
     
     params = {
-        "from": SENDER_EMAIL,
+        "from": config.SENDER_EMAIL,
         "to": [request.recipient_email],
         "subject": f"Invoice {request.invoice_number} - {request.project_name}",
         "html": html_content
@@ -192,5 +187,5 @@ async def email_status():
     """Check if email sending is configured"""
     return {
         "email_enabled": EMAIL_ENABLED,
-        "sender_email": SENDER_EMAIL if EMAIL_ENABLED else None
+        "sender_email": config.SENDER_EMAIL if EMAIL_ENABLED else None
     }

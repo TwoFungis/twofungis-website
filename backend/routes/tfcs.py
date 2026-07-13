@@ -21,6 +21,7 @@ from typing import Optional, List, Literal
 import os
 import logging
 import httpx
+from config import config
 import jwt
 from datetime import datetime, timezone, timedelta
 from enum import Enum
@@ -28,8 +29,6 @@ from enum import Enum
 router = APIRouter(prefix="/api/tfcs", tags=["tfcs"])
 logger = logging.getLogger(__name__)
 
-SUPABASE_URL = os.environ.get('SUPABASE_URL', '')
-SUPABASE_SERVICE_KEY = os.environ.get('SUPABASE_SERVICE_KEY', '')
 
 # =====================================================
 # ENUMS & CONSTANTS
@@ -196,8 +195,8 @@ class RoleAssignment(BaseModel):
 async def get_service_headers():
     """Get headers for Supabase service role requests"""
     return {
-        "apikey": SUPABASE_SERVICE_KEY,
-        "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+        "apikey": config.SUPABASE_SERVICE_KEY,
+        "Authorization": f"Bearer {config.SUPABASE_SERVICE_KEY}",
         "Content-Type": "application/json",
         "Prefer": "return=representation"
     }
@@ -223,7 +222,7 @@ async def get_user_role(user_id: str) -> Optional[UserRoleInfo]:
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/tfcs_user_roles?user_id=eq.{user_id}&is_active=eq.true&select=*",
+                f"{config.SUPABASE_URL}/rest/v1/tfcs_user_roles?user_id=eq.{user_id}&is_active=eq.true&select=*",
                 headers=await get_service_headers()
             )
             
@@ -252,7 +251,7 @@ async def get_user_profile(user_id: str) -> Optional[dict]:
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}&select=email,full_name",
+                f"{config.SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}&select=email,full_name",
                 headers=await get_service_headers()
             )
             if response.status_code == 200:
@@ -356,7 +355,7 @@ async def log_activity(
         
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                f"{SUPABASE_URL}/rest/v1/tfcs_activity_events",
+                f"{config.SUPABASE_URL}/rest/v1/tfcs_activity_events",
                 headers=await get_service_headers(),
                 json=payload
             )
@@ -406,7 +405,7 @@ async def create_notification(notification: NotificationCreate) -> Optional[str]
         
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                f"{SUPABASE_URL}/rest/v1/tfcs_notifications",
+                f"{config.SUPABASE_URL}/rest/v1/tfcs_notifications",
                 headers=await get_service_headers(),
                 json=payload
             )
@@ -440,7 +439,7 @@ async def notify_role(
         # Get all users with the specified role
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/tfcs_user_roles?role=eq.{role.value}&is_active=eq.true&select=user_id",
+                f"{config.SUPABASE_URL}/rest/v1/tfcs_user_roles?role=eq.{role.value}&is_active=eq.true&select=user_id",
                 headers=await get_service_headers()
             )
             
@@ -497,10 +496,10 @@ async def get_my_role(authorization: str = Header(...)):
         async with httpx.AsyncClient() as client:
             # Get user's email from Supabase auth
             user_response = await client.get(
-                f"{SUPABASE_URL}/auth/v1/admin/users",
+                f"{config.SUPABASE_URL}/auth/v1/admin/users",
                 headers={
-                    "apikey": SUPABASE_SERVICE_KEY,
-                    "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}"
+                    "apikey": config.SUPABASE_SERVICE_KEY,
+                    "Authorization": f"Bearer {config.SUPABASE_SERVICE_KEY}"
                 }
             )
             
@@ -512,14 +511,14 @@ async def get_my_role(authorization: str = Header(...)):
                     # This is the designated owner - auto-assign if tables exist
                     # Check if tables exist first
                     table_check = await client.get(
-                        f"{SUPABASE_URL}/rest/v1/tfcs_user_roles?limit=1",
+                        f"{config.SUPABASE_URL}/rest/v1/tfcs_user_roles?limit=1",
                         headers=await get_service_headers()
                     )
                     
                     if table_check.status_code == 200:
                         # Tables exist - check if any owner already exists
                         owners_check = await client.get(
-                            f"{SUPABASE_URL}/rest/v1/tfcs_user_roles?role=eq.owner&is_active=eq.true&select=id",
+                            f"{config.SUPABASE_URL}/rest/v1/tfcs_user_roles?role=eq.owner&is_active=eq.true&select=id",
                             headers=await get_service_headers()
                         )
                         
@@ -539,7 +538,7 @@ async def get_my_role(authorization: str = Header(...)):
                             }
                             
                             assign_response = await client.post(
-                                f"{SUPABASE_URL}/rest/v1/tfcs_user_roles",
+                                f"{config.SUPABASE_URL}/rest/v1/tfcs_user_roles",
                                 headers=await get_service_headers(),
                                 json=role_payload
                             )
@@ -579,7 +578,7 @@ async def list_all_roles(auth_data: tuple = Depends(require_employee)):
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/tfcs_user_roles?is_active=eq.true&select=*&order=role.asc",
+                f"{config.SUPABASE_URL}/rest/v1/tfcs_user_roles?is_active=eq.true&select=*&order=role.asc",
                 headers=await get_service_headers()
             )
             
@@ -611,10 +610,10 @@ async def assign_role(
         async with httpx.AsyncClient() as client:
             # Find target user by email
             user_response = await client.get(
-                f"{SUPABASE_URL}/auth/v1/admin/users",
+                f"{config.SUPABASE_URL}/auth/v1/admin/users",
                 headers={
-                    "apikey": SUPABASE_SERVICE_KEY,
-                    "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}"
+                    "apikey": config.SUPABASE_SERVICE_KEY,
+                    "Authorization": f"Bearer {config.SUPABASE_SERVICE_KEY}"
                 }
             )
             
@@ -647,14 +646,14 @@ async def assign_role(
             if existing:
                 # Update existing role
                 response = await client.patch(
-                    f"{SUPABASE_URL}/rest/v1/tfcs_user_roles?user_id=eq.{target_user_id}",
+                    f"{config.SUPABASE_URL}/rest/v1/tfcs_user_roles?user_id=eq.{target_user_id}",
                     headers=await get_service_headers(),
                     json=role_payload
                 )
             else:
                 # Insert new role
                 response = await client.post(
-                    f"{SUPABASE_URL}/rest/v1/tfcs_user_roles",
+                    f"{config.SUPABASE_URL}/rest/v1/tfcs_user_roles",
                     headers=await get_service_headers(),
                     json=role_payload
                 )
@@ -726,7 +725,7 @@ async def remove_role(
         async with httpx.AsyncClient() as client:
             # Soft delete by setting is_active = false
             response = await client.patch(
-                f"{SUPABASE_URL}/rest/v1/tfcs_user_roles?user_id=eq.{target_user_id}",
+                f"{config.SUPABASE_URL}/rest/v1/tfcs_user_roles?user_id=eq.{target_user_id}",
                 headers=await get_service_headers(),
                 json={
                     "is_active": False,
@@ -797,10 +796,10 @@ async def create_owner_account(
         async with httpx.AsyncClient(timeout=30.0) as client:
             # Check if user already exists
             user_response = await client.get(
-                f"{SUPABASE_URL}/auth/v1/admin/users",
+                f"{config.SUPABASE_URL}/auth/v1/admin/users",
                 headers={
-                    "apikey": SUPABASE_SERVICE_KEY,
-                    "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}"
+                    "apikey": config.SUPABASE_SERVICE_KEY,
+                    "Authorization": f"Bearer {config.SUPABASE_SERVICE_KEY}"
                 }
             )
             
@@ -825,10 +824,10 @@ async def create_owner_account(
             else:
                 # Create new user via Supabase Admin API
                 create_response = await client.post(
-                    f"{SUPABASE_URL}/auth/v1/admin/users",
+                    f"{config.SUPABASE_URL}/auth/v1/admin/users",
                     headers={
-                        "apikey": SUPABASE_SERVICE_KEY,
-                        "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+                        "apikey": config.SUPABASE_SERVICE_KEY,
+                        "Authorization": f"Bearer {config.SUPABASE_SERVICE_KEY}",
                         "Content-Type": "application/json"
                     },
                     json={
@@ -866,7 +865,7 @@ async def create_owner_account(
             
             # Upsert role
             role_response = await client.post(
-                f"{SUPABASE_URL}/rest/v1/tfcs_user_roles",
+                f"{config.SUPABASE_URL}/rest/v1/tfcs_user_roles",
                 headers={
                     **await get_service_headers(),
                     "Prefer": "resolution=merge-duplicates"
@@ -878,7 +877,7 @@ async def create_owner_account(
                 logger.error(f"Failed to assign role: {role_response.text}")
                 # Try upsert via on_conflict
                 role_response = await client.post(
-                    f"{SUPABASE_URL}/rest/v1/tfcs_user_roles?on_conflict=user_id",
+                    f"{config.SUPABASE_URL}/rest/v1/tfcs_user_roles?on_conflict=user_id",
                     headers=await get_service_headers(),
                     json=role_payload
                 )
@@ -930,7 +929,7 @@ async def list_owners(
         async with httpx.AsyncClient(timeout=15.0) as client:
             # Get all active owners from tfcs_user_roles
             roles_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/tfcs_user_roles?role=eq.owner&is_active=eq.true&select=*&order=assigned_at.asc",
+                f"{config.SUPABASE_URL}/rest/v1/tfcs_user_roles?role=eq.owner&is_active=eq.true&select=*&order=assigned_at.asc",
                 headers=await get_service_headers()
             )
             
@@ -941,10 +940,10 @@ async def list_owners(
             
             # Get user details from Supabase auth for last_sign_in_at
             users_response = await client.get(
-                f"{SUPABASE_URL}/auth/v1/admin/users",
+                f"{config.SUPABASE_URL}/auth/v1/admin/users",
                 headers={
-                    "apikey": SUPABASE_SERVICE_KEY,
-                    "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}"
+                    "apikey": config.SUPABASE_SERVICE_KEY,
+                    "Authorization": f"Bearer {config.SUPABASE_SERVICE_KEY}"
                 }
             )
             
@@ -999,7 +998,7 @@ async def list_team_members(
         async with httpx.AsyncClient(timeout=15.0) as client:
             # Get all active roles
             roles_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/tfcs_user_roles?is_active=eq.true&select=*",
+                f"{config.SUPABASE_URL}/rest/v1/tfcs_user_roles?is_active=eq.true&select=*",
                 headers=await get_service_headers()
             )
             
@@ -1010,10 +1009,10 @@ async def list_team_members(
             
             # Get user details from Supabase auth
             users_response = await client.get(
-                f"{SUPABASE_URL}/auth/v1/admin/users",
+                f"{config.SUPABASE_URL}/auth/v1/admin/users",
                 headers={
-                    "apikey": SUPABASE_SERVICE_KEY,
-                    "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}"
+                    "apikey": config.SUPABASE_SERVICE_KEY,
+                    "Authorization": f"Bearer {config.SUPABASE_SERVICE_KEY}"
                 }
             )
             
@@ -1109,7 +1108,7 @@ async def get_activity_feed(
         filter_string = "&".join(filters) if filters else ""
         
         async with httpx.AsyncClient() as client:
-            url = f"{SUPABASE_URL}/rest/v1/tfcs_activity_events?{filter_string}&select=*&order=created_at.desc&limit={limit}&offset={offset}"
+            url = f"{config.SUPABASE_URL}/rest/v1/tfcs_activity_events?{filter_string}&select=*&order=created_at.desc&limit={limit}&offset={offset}"
             response = await client.get(url, headers=await get_service_headers())
             
             if response.status_code != 200:
@@ -1148,7 +1147,7 @@ async def get_object_activity(
             if role_info.role != TFCSRole.OWNER:
                 visibility = "&is_private=eq.false"
             
-            url = f"{SUPABASE_URL}/rest/v1/tfcs_activity_events?object_type=eq.{object_type}&object_id=eq.{object_id}{visibility}&select=*&order=created_at.desc&limit={limit}"
+            url = f"{config.SUPABASE_URL}/rest/v1/tfcs_activity_events?object_type=eq.{object_type}&object_id=eq.{object_id}{visibility}&select=*&order=created_at.desc&limit={limit}"
             response = await client.get(url, headers=await get_service_headers())
             
             if response.status_code != 200:
@@ -1230,7 +1229,7 @@ async def get_my_notifications(
         
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/tfcs_notifications?{filter_string}&select=*&order=created_at.desc&limit={limit}",
+                f"{config.SUPABASE_URL}/rest/v1/tfcs_notifications?{filter_string}&select=*&order=created_at.desc&limit={limit}",
                 headers=await get_service_headers()
             )
             
@@ -1277,7 +1276,7 @@ async def mark_notification_read(
     try:
         async with httpx.AsyncClient() as client:
             response = await client.patch(
-                f"{SUPABASE_URL}/rest/v1/tfcs_notifications?id=eq.{notification_id}&recipient_user_id=eq.{user_id}",
+                f"{config.SUPABASE_URL}/rest/v1/tfcs_notifications?id=eq.{notification_id}&recipient_user_id=eq.{user_id}",
                 headers=await get_service_headers(),
                 json={
                     "is_read": True,
@@ -1304,7 +1303,7 @@ async def mark_all_notifications_read(authorization: str = Header(...)):
     try:
         async with httpx.AsyncClient() as client:
             response = await client.patch(
-                f"{SUPABASE_URL}/rest/v1/tfcs_notifications?recipient_user_id=eq.{user_id}&is_read=eq.false",
+                f"{config.SUPABASE_URL}/rest/v1/tfcs_notifications?recipient_user_id=eq.{user_id}&is_read=eq.false",
                 headers=await get_service_headers(),
                 json={
                     "is_read": True,
@@ -1329,7 +1328,7 @@ async def dismiss_notification(
     try:
         async with httpx.AsyncClient() as client:
             response = await client.patch(
-                f"{SUPABASE_URL}/rest/v1/tfcs_notifications?id=eq.{notification_id}&recipient_user_id=eq.{user_id}",
+                f"{config.SUPABASE_URL}/rest/v1/tfcs_notifications?id=eq.{notification_id}&recipient_user_id=eq.{user_id}",
                 headers=await get_service_headers(),
                 json={
                     "is_dismissed": True,
@@ -1365,7 +1364,7 @@ async def tfcs_diagnostics(auth_data: tuple = Depends(require_owner)):
         async with httpx.AsyncClient() as client:
             # Count roles
             roles_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/tfcs_user_roles?is_active=eq.true&select=role",
+                f"{config.SUPABASE_URL}/rest/v1/tfcs_user_roles?is_active=eq.true&select=role",
                 headers=await get_service_headers()
             )
             roles = roles_response.json() if roles_response.status_code == 200 else []
@@ -1373,14 +1372,14 @@ async def tfcs_diagnostics(auth_data: tuple = Depends(require_owner)):
             # Count events (last 24h)
             yesterday = (datetime.now(timezone.utc) - timedelta(days=1)).isoformat()
             events_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/tfcs_activity_events?created_at=gte.{yesterday}&select=id",
+                f"{config.SUPABASE_URL}/rest/v1/tfcs_activity_events?created_at=gte.{yesterday}&select=id",
                 headers=await get_service_headers()
             )
             recent_events = events_response.json() if events_response.status_code == 200 else []
             
             # Count pending notifications
             notif_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/tfcs_notifications?is_read=eq.false&is_dismissed=eq.false&select=id",
+                f"{config.SUPABASE_URL}/rest/v1/tfcs_notifications?is_read=eq.false&is_dismissed=eq.false&select=id",
                 headers=await get_service_headers()
             )
             unread_notifs = notif_response.json() if notif_response.status_code == 200 else []
@@ -1416,10 +1415,10 @@ async def initialize_owner(authorization: str = Header(...)):
         async with httpx.AsyncClient() as client:
             # Get user email FIRST - this is the email guard
             user_response = await client.get(
-                f"{SUPABASE_URL}/auth/v1/admin/users",
+                f"{config.SUPABASE_URL}/auth/v1/admin/users",
                 headers={
-                    "apikey": SUPABASE_SERVICE_KEY,
-                    "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}"
+                    "apikey": config.SUPABASE_SERVICE_KEY,
+                    "Authorization": f"Bearer {config.SUPABASE_SERVICE_KEY}"
                 }
             )
             
@@ -1444,7 +1443,7 @@ async def initialize_owner(authorization: str = Header(...)):
             
             # Check if any owners already exist (handle pre-migration state gracefully)
             owners_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/tfcs_user_roles?role=eq.owner&is_active=eq.true&select=id",
+                f"{config.SUPABASE_URL}/rest/v1/tfcs_user_roles?role=eq.owner&is_active=eq.true&select=id",
                 headers=await get_service_headers()
             )
             
@@ -1469,7 +1468,7 @@ async def initialize_owner(authorization: str = Header(...)):
             }
             
             response = await client.post(
-                f"{SUPABASE_URL}/rest/v1/tfcs_user_roles",
+                f"{config.SUPABASE_URL}/rest/v1/tfcs_user_roles",
                 headers=await get_service_headers(),
                 json=role_payload
             )
@@ -1483,7 +1482,7 @@ async def initialize_owner(authorization: str = Header(...)):
                     )
                 # Try upsert if insert fails
                 response = await client.patch(
-                    f"{SUPABASE_URL}/rest/v1/tfcs_user_roles?user_id=eq.{user_id}",
+                    f"{config.SUPABASE_URL}/rest/v1/tfcs_user_roles?user_id=eq.{user_id}",
                     headers=await get_service_headers(),
                     json=role_payload
                 )

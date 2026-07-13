@@ -1,0 +1,43 @@
+{
+  "summary": "Config hardening refactor verified. All 6 endpoints in scope return HTTP 200 with expected payloads. 9/9 pytest cases pass on the public URL. Login (Supabase password grant) returns a valid 3-segment JWT. GET /api/organizations/me returns 'Two Fungis Finishing' with primary_organization_id set. GET /api/command-center/dashboard returns organization_name containing 'Two Fungis' with all required keys (today_focus, projects, opportunities, recent_activity, brain_insights, quick_stats, generated_at). GET /api/production-library/seed/status returns is_seeded=true with 8+ production_items. GET /api/production-library/items returns all 8 seeded codes (DW-001..TP-002). GET /api/opportunities returns 200 with 'opportunities' list. No DNS 'Name or service not known' / 'errno -2' errors in any response body, confirming config.SUPABASE_URL is properly loaded via the new lazy Config module. Also identified and fixed one leftover from the refactor in /app/backend/server.py (see rca).",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {
+        "endpoint": "/api/status",
+        "issue": "Fixed inline: /api/status was still using bare module-level SUPABASE_URL / SUPABASE_SERVICE_KEY names that were removed during the config refactor. Endpoint returned 200 but with services.supabase = \"error: name 'SUPABASE_URL' is not defined\" and status='degraded'. Replaced with config.SUPABASE_URL / config.SUPABASE_SERVICE_KEY. Now returns supabase='connected', status='healthy'."
+      }
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_config_refactor.py",
+    "/app/test_reports/pytest/config_refactor_results.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "server.py already fixed inline: /api/status was the only remaining site using bare SUPABASE_URL/SUPABASE_SERVICE_KEY. Consider grepping the whole backend for other bare env-var names (`grep -rn 'SUPABASE_URL\\|SUPABASE_SERVICE_KEY' backend/ | grep -v config\\.` returns clean now).",
+    "config.py uses @cached_property so values are memoised on first access. This means changing env vars at runtime will NOT propagate. Acceptable for prod but worth documenting.",
+    "config.APP_URL default 'https://tradeos.com' silently masks a missing REACT_APP_BACKEND_URL. Consider raising if empty in prod paths.",
+    "routes/production_library.py is 1918 lines - still worth splitting into domain/items/assemblies/seed modules (>700 line threshold, previously flagged).",
+    "JWT is still decoded with verify_signature=False across multiple routes (organizations, production_library). Security concern noted in prior iterations, not blocking."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_config_refactor.py (new)",
+    "/app/backend/server.py (fixed /api/status to use config.SUPABASE_URL / config.SUPABASE_SERVICE_KEY)"
+  ],
+  "success_rate": {
+    "backend": "100% (9/9 tests passed)",
+    "frontend": "not tested (backend only per request)"
+  },
+  "test_credentials": "inbox@twofungis.ca / TradeOS2024! (Scott Marshall, Two Fungis Finishing owner) - working",
+  "seed_data_creation": "None; used existing Supabase-seeded data (8 standards: DW-001..TP-002).",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Config refactor is fully validated. All routes now use `from config import config` + `config.SUPABASE_URL` / `config.SUPABASE_SERVICE_KEY` (lazy cached_property). No route reads env vars at import time. Regression suite: pytest /app/backend/tests/test_config_refactor.py -v (9 tests). Also existing suites still relevant: test_organizations_me.py, test_command_center.py, test_production_library_seed.py.",
+  "rca of the issue": "Not a bug in the requested scope - all 6 endpoints in the review returned 200 successfully out of the box. The refactor is working. During review I found a leftover /api/status endpoint in server.py (lines 155-160) still referencing module-level SUPABASE_URL/SUPABASE_SERVICE_KEY which were removed during the refactor. This raised NameError caught by a broad except, so /api/status returned 200 but with services.supabase='error: name SUPABASE_URL is not defined' and status='degraded'. Fixed by replacing with config.SUPABASE_URL / config.SUPABASE_SERVICE_KEY. Verified: /api/status now returns {\"services\":{\"supabase\":\"connected\"},\"status\":\"healthy\"}."
+}

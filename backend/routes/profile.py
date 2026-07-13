@@ -10,6 +10,7 @@ from typing import Optional
 import os
 import logging
 import httpx
+from config import config
 import jwt
 from datetime import datetime, timezone, timedelta
 
@@ -22,9 +23,6 @@ from routes.access_control import (
 router = APIRouter(prefix="/api/profile", tags=["profile"])
 logger = logging.getLogger(__name__)
 
-SUPABASE_URL = os.environ.get('SUPABASE_URL', '')
-SUPABASE_SERVICE_KEY = os.environ.get('SUPABASE_SERVICE_KEY', '')
-SUPABASE_ANON_KEY = os.environ.get('SUPABASE_ANON_KEY', '')
 
 class ProfileUpdateRequest(BaseModel):
     full_name: Optional[str] = None
@@ -50,8 +48,8 @@ class ProfileResponse(BaseModel):
 async def get_service_headers():
     """Get headers for Supabase service role requests"""
     return {
-        "apikey": SUPABASE_SERVICE_KEY,
-        "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+        "apikey": config.SUPABASE_SERVICE_KEY,
+        "Authorization": f"Bearer {config.SUPABASE_SERVICE_KEY}",
         "Content-Type": "application/json",
         "Prefer": "return=representation"
     }
@@ -85,7 +83,7 @@ async def get_my_profile(authorization: str = Header(...)):
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}&select=*",
+                f"{config.SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}&select=*",
                 headers=await get_service_headers()
             )
             
@@ -152,7 +150,7 @@ async def update_profile(
         async with httpx.AsyncClient(timeout=30.0) as client:
             # First check if profile exists
             check_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}&select=id",
+                f"{config.SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}&select=id",
                 headers=await get_service_headers()
             )
             
@@ -171,7 +169,7 @@ async def update_profile(
                 logger.info(f"Creating new profile with 30-day trial for user {user_id}")
                 
                 response = await client.post(
-                    f"{SUPABASE_URL}/rest/v1/users_profile",
+                    f"{config.SUPABASE_URL}/rest/v1/users_profile",
                     headers=await get_service_headers(),
                     json=create_data
                 )
@@ -196,7 +194,7 @@ async def update_profile(
             else:
                 # Update existing profile
                 response = await client.patch(
-                    f"{SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}",
+                    f"{config.SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}",
                     headers=await get_service_headers(),
                     json=update_data
                 )
@@ -217,7 +215,7 @@ async def update_profile(
                 
                 # Fetch updated profile
                 fetch_response = await client.get(
-                    f"{SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}&select=*",
+                    f"{config.SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}&select=*",
                     headers=await get_service_headers()
                 )
                 
@@ -267,7 +265,7 @@ async def update_activation_status(
     try:
         async with httpx.AsyncClient(timeout=30.0) as client:
             response = await client.patch(
-                f"{SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}",
+                f"{config.SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}",
                 headers=await get_service_headers(),
                 json=update_data
             )
@@ -317,7 +315,7 @@ async def get_access_state(authorization: str = Header(...)):
         async with httpx.AsyncClient() as client:
             # First try fetching with new columns, fall back to basic query if columns don't exist
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}&select=subscription_tier,grandfathered_active,trial_started_at,trial_ends_at,locked_project_created,locked_quote_created,locked_invoice_created,ai_daily_usage,ai_usage_reset_at",
+                f"{config.SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}&select=subscription_tier,grandfathered_active,trial_started_at,trial_ends_at,locked_project_created,locked_quote_created,locked_invoice_created,ai_daily_usage,ai_usage_reset_at",
                 headers=await get_service_headers()
             )
             
@@ -325,7 +323,7 @@ async def get_access_state(authorization: str = Header(...)):
             if response.status_code == 400 and 'does not exist' in response.text:
                 logger.info("Trial columns not found, falling back to basic query")
                 response = await client.get(
-                    f"{SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}&select=subscription_tier",
+                    f"{config.SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}&select=subscription_tier",
                     headers=await get_service_headers()
                 )
             

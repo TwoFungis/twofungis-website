@@ -24,13 +24,12 @@ Usage:
 import os
 import logging
 import httpx
+from config import config
 from typing import Optional, Literal
 from datetime import datetime, timezone
 
 logger = logging.getLogger(__name__)
 
-SUPABASE_URL = os.environ.get('SUPABASE_URL', '')
-SUPABASE_SERVICE_KEY = os.environ.get('SUPABASE_SERVICE_KEY', '')
 
 # Valid values for enums
 ACTION_TYPES = [
@@ -56,8 +55,8 @@ CATEGORIES = [
 async def get_service_headers():
     """Get headers for Supabase service role requests"""
     return {
-        "apikey": SUPABASE_SERVICE_KEY,
-        "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+        "apikey": config.SUPABASE_SERVICE_KEY,
+        "Authorization": f"Bearer {config.SUPABASE_SERVICE_KEY}",
         "Content-Type": "application/json",
         "Prefer": "return=representation"
     }
@@ -71,7 +70,7 @@ async def get_user_tfcs_role(user_id: str) -> Optional[str]:
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/tfcs_user_roles?user_id=eq.{user_id}&is_active=eq.true&select=role",
+                f"{config.SUPABASE_URL}/rest/v1/tfcs_user_roles?user_id=eq.{user_id}&is_active=eq.true&select=role",
                 headers=await get_service_headers()
             )
             
@@ -93,7 +92,7 @@ async def get_user_info(user_id: str) -> tuple[Optional[str], Optional[str]]:
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}&select=full_name,email",
+                f"{config.SUPABASE_URL}/rest/v1/users_profile?user_id=eq.{user_id}&select=full_name,email",
                 headers=await get_service_headers()
             )
             
@@ -203,7 +202,7 @@ async def log_tradeos_activity(
         
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                f"{SUPABASE_URL}/rest/v1/tfcs_activity_events",
+                f"{config.SUPABASE_URL}/rest/v1/tfcs_activity_events",
                 headers=await get_service_headers(),
                 json=payload
             )
@@ -274,7 +273,7 @@ async def create_tradeos_notification(
         
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                f"{SUPABASE_URL}/rest/v1/tfcs_notifications",
+                f"{config.SUPABASE_URL}/rest/v1/tfcs_notifications",
                 headers=await get_service_headers(),
                 json=payload
             )

@@ -18,18 +18,17 @@ from fastapi import APIRouter, HTTPException, Header, Query, UploadFile, File
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
 from datetime import datetime, timezone
-import os
 import logging
 import httpx
 import jwt
 import csv
 import io
 
+# Use centralized config for lazy environment variable access
+from config import config
+
 router = APIRouter(prefix="/api/production-library", tags=["production-library"])
 logger = logging.getLogger(__name__)
-
-SUPABASE_URL = os.environ.get('SUPABASE_URL', '')
-SUPABASE_SERVICE_KEY = os.environ.get('SUPABASE_SERVICE_KEY', '')
 
 # =====================================================
 # PYDANTIC MODELS
@@ -119,8 +118,8 @@ class AssemblyItemCreate(BaseModel):
 
 async def get_service_headers():
     return {
-        "apikey": SUPABASE_SERVICE_KEY,
-        "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+        "apikey": config.SUPABASE_SERVICE_KEY,
+        "Authorization": f"Bearer {config.SUPABASE_SERVICE_KEY}",
         "Content-Type": "application/json",
         "Prefer": "return=representation"
     }
@@ -137,7 +136,7 @@ async def verify_token_and_get_org(authorization: str) -> dict:
         async with httpx.AsyncClient(timeout=10.0) as client:
             # Get user's organization
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/organization_members?"
+                f"{config.SUPABASE_URL}/rest/v1/organization_members?"
                 f"user_id=eq.{user_id}&"
                 f"is_active=eq.true&"
                 f"select=organization_id,role,organizations(id,name)",
@@ -178,7 +177,7 @@ async def get_measurement_units(authorization: str = Header(...)):
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/measurement_units?"
+                f"{config.SUPABASE_URL}/rest/v1/measurement_units?"
                 f"is_active=eq.true&"
                 f"order=sort_order.asc",
                 headers=await get_service_headers()
@@ -216,7 +215,7 @@ async def get_knowledge_domains(
                 query += "&is_active=eq.true"
             
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/knowledge_domains?"
+                f"{config.SUPABASE_URL}/rest/v1/knowledge_domains?"
                 f"{query}&order=sort_order.asc,name.asc",
                 headers=await get_service_headers()
             )
@@ -246,7 +245,7 @@ async def create_knowledge_domain(
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
             response = await client.post(
-                f"{SUPABASE_URL}/rest/v1/knowledge_domains",
+                f"{config.SUPABASE_URL}/rest/v1/knowledge_domains",
                 headers=await get_service_headers(),
                 json={
                     "organization_id": org_id,
@@ -289,7 +288,7 @@ async def get_service_categories(
                 query += "&is_active=eq.true"
             
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/service_categories?"
+                f"{config.SUPABASE_URL}/rest/v1/service_categories?"
                 f"{query}&order=sort_order.asc,name.asc",
                 headers=await get_service_headers()
             )
@@ -319,7 +318,7 @@ async def create_service_category(
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
             response = await client.post(
-                f"{SUPABASE_URL}/rest/v1/service_categories",
+                f"{config.SUPABASE_URL}/rest/v1/service_categories",
                 headers=await get_service_headers(),
                 json={
                     "organization_id": org_id,
@@ -375,7 +374,7 @@ async def get_production_items(
             
             # Get count first
             count_response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/production_items?{query}&select=id",
+                f"{config.SUPABASE_URL}/rest/v1/production_items?{query}&select=id",
                 headers={**headers, "Prefer": "count=exact"}
             )
             total = int(count_response.headers.get('content-range', '0-0/0').split('/')[-1])
@@ -383,7 +382,7 @@ async def get_production_items(
             # Get paginated items with relationships
             offset = (page - 1) * per_page
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/production_items?"
+                f"{config.SUPABASE_URL}/rest/v1/production_items?"
                 f"{query}&"
                 f"select=*,knowledge_domains(id,name,code),measurement_units(id,code,name)&"
                 f"order=production_code.asc&"
@@ -398,7 +397,7 @@ async def get_production_items(
                 if service_category_id:
                     # Get item IDs for this service category
                     sc_response = await client.get(
-                        f"{SUPABASE_URL}/rest/v1/production_item_service_categories?"
+                        f"{config.SUPABASE_URL}/rest/v1/production_item_service_categories?"
                         f"service_category_id=eq.{service_category_id}&select=production_item_id",
                         headers=headers
                     )
@@ -440,7 +439,7 @@ async def get_production_item(
             
             # Get item with relationships
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/production_items?"
+                f"{config.SUPABASE_URL}/rest/v1/production_items?"
                 f"id=eq.{item_id}&"
                 f"organization_id=eq.{org_id}&"
                 f"select=*,knowledge_domains(id,name,code),measurement_units(id,code,name)",
@@ -456,7 +455,7 @@ async def get_production_item(
                 
                 # Get service categories
                 sc_response = await client.get(
-                    f"{SUPABASE_URL}/rest/v1/production_item_service_categories?"
+                    f"{config.SUPABASE_URL}/rest/v1/production_item_service_categories?"
                     f"production_item_id=eq.{item_id}&"
                     f"select=*,service_categories(id,name,code)",
                     headers=headers
@@ -469,7 +468,7 @@ async def get_production_item(
                 
                 # Get attachments
                 att_response = await client.get(
-                    f"{SUPABASE_URL}/rest/v1/production_item_attachments?"
+                    f"{config.SUPABASE_URL}/rest/v1/production_item_attachments?"
                     f"production_item_id=eq.{item_id}&order=sort_order.asc",
                     headers=headers
                 )
@@ -503,7 +502,7 @@ async def create_production_item(
             # Create the production item
             item_data = item.model_dump(exclude={'service_category_ids'})
             response = await client.post(
-                f"{SUPABASE_URL}/rest/v1/production_items",
+                f"{config.SUPABASE_URL}/rest/v1/production_items",
                 headers=headers,
                 json={
                     "organization_id": org_id,
@@ -519,7 +518,7 @@ async def create_production_item(
                 if item.service_category_ids:
                     for sc_id in item.service_category_ids:
                         await client.post(
-                            f"{SUPABASE_URL}/rest/v1/production_item_service_categories",
+                            f"{config.SUPABASE_URL}/rest/v1/production_item_service_categories",
                             headers=headers,
                             json={
                                 "production_item_id": created['id'],
@@ -529,7 +528,7 @@ async def create_production_item(
                 
                 # Create initial revision
                 await client.post(
-                    f"{SUPABASE_URL}/rest/v1/production_item_revisions",
+                    f"{config.SUPABASE_URL}/rest/v1/production_item_revisions",
                     headers=headers,
                     json={
                         "production_item_id": created['id'],
@@ -574,7 +573,7 @@ async def update_production_item(
             update_data['updated_at'] = datetime.now(timezone.utc).isoformat()
             
             response = await client.patch(
-                f"{SUPABASE_URL}/rest/v1/production_items?"
+                f"{config.SUPABASE_URL}/rest/v1/production_items?"
                 f"id=eq.{item_id}&organization_id=eq.{org_id}",
                 headers=headers,
                 json=update_data
@@ -589,14 +588,14 @@ async def update_production_item(
                 if item.service_category_ids is not None:
                     # Delete existing
                     await client.delete(
-                        f"{SUPABASE_URL}/rest/v1/production_item_service_categories?"
+                        f"{config.SUPABASE_URL}/rest/v1/production_item_service_categories?"
                         f"production_item_id=eq.{item_id}",
                         headers=headers
                     )
                     # Create new
                     for sc_id in item.service_category_ids:
                         await client.post(
-                            f"{SUPABASE_URL}/rest/v1/production_item_service_categories",
+                            f"{config.SUPABASE_URL}/rest/v1/production_item_service_categories",
                             headers=headers,
                             json={
                                 "production_item_id": item_id,
@@ -625,7 +624,7 @@ async def get_production_item_revisions(
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/production_item_revisions?"
+                f"{config.SUPABASE_URL}/rest/v1/production_item_revisions?"
                 f"production_item_id=eq.{item_id}&order=version.desc",
                 headers=await get_service_headers()
             )
@@ -673,7 +672,7 @@ async def get_assemblies(
             
             offset = (page - 1) * per_page
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/production_assemblies?"
+                f"{config.SUPABASE_URL}/rest/v1/production_assemblies?"
                 f"{query}&"
                 f"select=*,knowledge_domains(id,name,code)&"
                 f"order=assembly_name.asc&"
@@ -708,7 +707,7 @@ async def get_assembly(
             
             # Get assembly
             response = await client.get(
-                f"{SUPABASE_URL}/rest/v1/production_assemblies?"
+                f"{config.SUPABASE_URL}/rest/v1/production_assemblies?"
                 f"id=eq.{assembly_id}&organization_id=eq.{org_id}&"
                 f"select=*,knowledge_domains(id,name,code)",
                 headers=headers
@@ -723,7 +722,7 @@ async def get_assembly(
                 
                 # Get assembly items
                 items_response = await client.get(
-                    f"{SUPABASE_URL}/rest/v1/assembly_items?"
+                    f"{config.SUPABASE_URL}/rest/v1/assembly_items?"
                     f"assembly_id=eq.{assembly_id}&"
                     f"select=*,production_items(id,production_code,production_name,standard_rate,premium_rate,complex_rate,labour_hours,measurement_units(code,name))&"
                     f"order=sort_order.asc",
@@ -756,7 +755,7 @@ async def create_assembly(
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
             response = await client.post(
-                f"{SUPABASE_URL}/rest/v1/production_assemblies",
+                f"{config.SUPABASE_URL}/rest/v1/production_assemblies",
                 headers=await get_service_headers(),
                 json={
                     "organization_id": org_id,
@@ -789,7 +788,7 @@ async def add_assembly_item(
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
             response = await client.post(
-                f"{SUPABASE_URL}/rest/v1/assembly_items",
+                f"{config.SUPABASE_URL}/rest/v1/assembly_items",
                 headers=await get_service_headers(),
                 json={
                     "assembly_id": assembly_id,
@@ -823,7 +822,7 @@ async def remove_assembly_item(
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
             response = await client.delete(
-                f"{SUPABASE_URL}/rest/v1/assembly_items?"
+                f"{config.SUPABASE_URL}/rest/v1/assembly_items?"
                 f"id=eq.{item_id}&assembly_id=eq.{assembly_id}",
                 headers=await get_service_headers()
             )
@@ -1049,7 +1048,7 @@ async def validate_import(
             
             # Get lookup tables
             domains_resp = await client.get(
-                f"{SUPABASE_URL}/rest/v1/knowledge_domains?organization_id=eq.{org_id}",
+                f"{config.SUPABASE_URL}/rest/v1/knowledge_domains?organization_id=eq.{org_id}",
                 headers=headers
             )
             domains = {}
@@ -1062,7 +1061,7 @@ async def validate_import(
                         domains[d['code'].lower()] = d
             
             cats_resp = await client.get(
-                f"{SUPABASE_URL}/rest/v1/service_categories?organization_id=eq.{org_id}",
+                f"{config.SUPABASE_URL}/rest/v1/service_categories?organization_id=eq.{org_id}",
                 headers=headers
             )
             categories = {}
@@ -1075,7 +1074,7 @@ async def validate_import(
                         categories[c['code'].lower()] = c
             
             units_resp = await client.get(
-                f"{SUPABASE_URL}/rest/v1/measurement_units?is_active=eq.true",
+                f"{config.SUPABASE_URL}/rest/v1/measurement_units?is_active=eq.true",
                 headers=headers
             )
             units = {}
@@ -1274,7 +1273,7 @@ async def validate_import(
             # Check for duplicates against existing database items
             if results['summary']['production_codes']:
                 existing_check = await client.get(
-                    f"{SUPABASE_URL}/rest/v1/production_items?"
+                    f"{config.SUPABASE_URL}/rest/v1/production_items?"
                     f"organization_id=eq.{org_id}&"
                     f"select=production_code",
                     headers=headers
@@ -1370,7 +1369,7 @@ async def commit_import(
             
             # Get lookup tables
             domains_resp = await client.get(
-                f"{SUPABASE_URL}/rest/v1/knowledge_domains?organization_id=eq.{org_id}",
+                f"{config.SUPABASE_URL}/rest/v1/knowledge_domains?organization_id=eq.{org_id}",
                 headers=headers
             )
             domains = {}
@@ -1381,7 +1380,7 @@ async def commit_import(
                         domains[d['code'].lower()] = d['id']
             
             cats_resp = await client.get(
-                f"{SUPABASE_URL}/rest/v1/service_categories?organization_id=eq.{org_id}",
+                f"{config.SUPABASE_URL}/rest/v1/service_categories?organization_id=eq.{org_id}",
                 headers=headers
             )
             categories = {}
@@ -1392,7 +1391,7 @@ async def commit_import(
                         categories[c['code'].lower()] = c['id']
             
             units_resp = await client.get(
-                f"{SUPABASE_URL}/rest/v1/measurement_units?is_active=eq.true",
+                f"{config.SUPABASE_URL}/rest/v1/measurement_units?is_active=eq.true",
                 headers=headers
             )
             units = {}
@@ -1462,7 +1461,7 @@ async def commit_import(
                 try:
                     # Check if exists
                     existing_resp = await client.get(
-                        f"{SUPABASE_URL}/rest/v1/production_items?"
+                        f"{config.SUPABASE_URL}/rest/v1/production_items?"
                         f"organization_id=eq.{org_id}&"
                         f"production_code=eq.{production_code}",
                         headers=headers
@@ -1477,7 +1476,7 @@ async def commit_import(
                             update_data['updated_at'] = datetime.now(timezone.utc).isoformat()
                             
                             await client.patch(
-                                f"{SUPABASE_URL}/rest/v1/production_items?id=eq.{existing_item['id']}",
+                                f"{config.SUPABASE_URL}/rest/v1/production_items?id=eq.{existing_item['id']}",
                                 headers=headers,
                                 json=update_data
                             )
@@ -1485,13 +1484,13 @@ async def commit_import(
                             # Update service categories
                             if service_category_ids:
                                 await client.delete(
-                                    f"{SUPABASE_URL}/rest/v1/production_item_service_categories?"
+                                    f"{config.SUPABASE_URL}/rest/v1/production_item_service_categories?"
                                     f"production_item_id=eq.{existing_item['id']}",
                                     headers=headers
                                 )
                                 for sc_id in service_category_ids:
                                     await client.post(
-                                        f"{SUPABASE_URL}/rest/v1/production_item_service_categories",
+                                        f"{config.SUPABASE_URL}/rest/v1/production_item_service_categories",
                                         headers=headers,
                                         json={"production_item_id": existing_item['id'], "service_category_id": sc_id}
                                     )
@@ -1502,7 +1501,7 @@ async def commit_import(
                     else:
                         # Create new
                         create_resp = await client.post(
-                            f"{SUPABASE_URL}/rest/v1/production_items",
+                            f"{config.SUPABASE_URL}/rest/v1/production_items",
                             headers=headers,
                             json=item_data
                         )
@@ -1513,14 +1512,14 @@ async def commit_import(
                             # Create service category links
                             for sc_id in service_category_ids:
                                 await client.post(
-                                    f"{SUPABASE_URL}/rest/v1/production_item_service_categories",
+                                    f"{config.SUPABASE_URL}/rest/v1/production_item_service_categories",
                                     headers=headers,
                                     json={"production_item_id": created_item['id'], "service_category_id": sc_id}
                                 )
                             
                             # Create initial revision
                             await client.post(
-                                f"{SUPABASE_URL}/rest/v1/production_item_revisions",
+                                f"{config.SUPABASE_URL}/rest/v1/production_item_revisions",
                                 headers=headers,
                                 json={
                                     "production_item_id": created_item['id'],
@@ -1577,21 +1576,21 @@ async def get_production_library_stats(authorization: str = Header(...)):
             
             # Get counts
             items_resp = await client.get(
-                f"{SUPABASE_URL}/rest/v1/production_items?"
+                f"{config.SUPABASE_URL}/rest/v1/production_items?"
                 f"organization_id=eq.{org_id}&is_active=eq.true&select=id",
                 headers={**headers, "Prefer": "count=exact"}
             )
             items_count = int(items_resp.headers.get('content-range', '0-0/0').split('/')[-1])
             
             assemblies_resp = await client.get(
-                f"{SUPABASE_URL}/rest/v1/production_assemblies?"
+                f"{config.SUPABASE_URL}/rest/v1/production_assemblies?"
                 f"organization_id=eq.{org_id}&is_active=eq.true&select=id",
                 headers={**headers, "Prefer": "count=exact"}
             )
             assemblies_count = int(assemblies_resp.headers.get('content-range', '0-0/0').split('/')[-1])
             
             domains_resp = await client.get(
-                f"{SUPABASE_URL}/rest/v1/knowledge_domains?"
+                f"{config.SUPABASE_URL}/rest/v1/knowledge_domains?"
                 f"organization_id=eq.{org_id}&is_active=eq.true&select=id",
                 headers={**headers, "Prefer": "count=exact"}
             )
@@ -1599,7 +1598,7 @@ async def get_production_library_stats(authorization: str = Header(...)):
             
             # Get items with high AI confidence
             ai_resp = await client.get(
-                f"{SUPABASE_URL}/rest/v1/production_items?"
+                f"{config.SUPABASE_URL}/rest/v1/production_items?"
                 f"organization_id=eq.{org_id}&is_active=eq.true&"
                 f"ai_confidence_score=gte.0.7&select=id",
                 headers={**headers, "Prefer": "count=exact"}
@@ -1689,7 +1688,7 @@ async def seed_production_library(
             
             # Check existing domains
             existing_domains_resp = await client.get(
-                f"{SUPABASE_URL}/rest/v1/knowledge_domains?"
+                f"{config.SUPABASE_URL}/rest/v1/knowledge_domains?"
                 f"organization_id=eq.{org_id}&select=code",
                 headers=headers
             )
@@ -1713,7 +1712,7 @@ async def seed_production_library(
                     
                 try:
                     resp = await client.post(
-                        f"{SUPABASE_URL}/rest/v1/knowledge_domains",
+                        f"{config.SUPABASE_URL}/rest/v1/knowledge_domains",
                         headers=headers,
                         json={
                             "organization_id": org_id,
@@ -1743,7 +1742,7 @@ async def seed_production_library(
             
             # Check existing service categories
             existing_cats_resp = await client.get(
-                f"{SUPABASE_URL}/rest/v1/service_categories?"
+                f"{config.SUPABASE_URL}/rest/v1/service_categories?"
                 f"organization_id=eq.{org_id}&select=code",
                 headers=headers
             )
@@ -1759,7 +1758,7 @@ async def seed_production_library(
                     
                 try:
                     resp = await client.post(
-                        f"{SUPABASE_URL}/rest/v1/service_categories",
+                        f"{config.SUPABASE_URL}/rest/v1/service_categories",
                         headers=headers,
                         json={
                             "organization_id": org_id,
@@ -1823,7 +1822,7 @@ async def get_seed_status(authorization: str = Header(...)):
             
             # Check domains
             domains_resp = await client.get(
-                f"{SUPABASE_URL}/rest/v1/knowledge_domains?"
+                f"{config.SUPABASE_URL}/rest/v1/knowledge_domains?"
                 f"organization_id=eq.{org_id}&select=id",
                 headers={**headers, "Prefer": "count=exact"}
             )
@@ -1849,7 +1848,7 @@ async def get_seed_status(authorization: str = Header(...)):
             
             # Check service categories
             cats_resp = await client.get(
-                f"{SUPABASE_URL}/rest/v1/service_categories?"
+                f"{config.SUPABASE_URL}/rest/v1/service_categories?"
                 f"organization_id=eq.{org_id}&select=id",
                 headers={**headers, "Prefer": "count=exact"}
             )
@@ -1874,7 +1873,7 @@ async def get_seed_status(authorization: str = Header(...)):
             
             # Check production items
             items_resp = await client.get(
-                f"{SUPABASE_URL}/rest/v1/production_items?"
+                f"{config.SUPABASE_URL}/rest/v1/production_items?"
                 f"organization_id=eq.{org_id}&select=id",
                 headers={**headers, "Prefer": "count=exact"}
             )
