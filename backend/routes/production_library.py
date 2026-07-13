@@ -70,12 +70,26 @@ class ProductionItemCreate(BaseModel):
     description: Optional[str] = None
     knowledge_domain_id: str
     measurement_unit_id: str
+    # Production metrics
     production_per_day: Optional[float] = None
+    production_output: Optional[float] = None  # Units per hour
     crew_size: Optional[float] = 1
     labour_hours: Optional[float] = None
-    standard_rate: Optional[float] = None
-    premium_rate: Optional[float] = None
+    # Labour rates (Low/Standard/Premium)
+    low_labour_rate: Optional[float] = None
+    standard_rate: Optional[float] = None  # Standard labour rate
+    premium_labour_rate: Optional[float] = None
+    premium_rate: Optional[float] = None  # Legacy, same as premium_labour_rate
     complex_rate: Optional[float] = None
+    # Material & Equipment rates
+    material_rate: Optional[float] = None
+    equipment_rate: Optional[float] = None
+    # Organization & Classification
+    division_id: Optional[str] = None
+    trade_discipline: Optional[str] = None
+    cost_code: Optional[str] = None
+    tags: Optional[List[str]] = None
+    # Status
     is_company_standard: Optional[bool] = False
     notes: Optional[str] = None
     service_category_ids: Optional[List[str]] = []
@@ -85,12 +99,26 @@ class ProductionItemUpdate(BaseModel):
     description: Optional[str] = None
     knowledge_domain_id: Optional[str] = None
     measurement_unit_id: Optional[str] = None
+    # Production metrics
     production_per_day: Optional[float] = None
+    production_output: Optional[float] = None
     crew_size: Optional[float] = None
     labour_hours: Optional[float] = None
+    # Labour rates
+    low_labour_rate: Optional[float] = None
     standard_rate: Optional[float] = None
+    premium_labour_rate: Optional[float] = None
     premium_rate: Optional[float] = None
     complex_rate: Optional[float] = None
+    # Material & Equipment rates
+    material_rate: Optional[float] = None
+    equipment_rate: Optional[float] = None
+    # Organization & Classification
+    division_id: Optional[str] = None
+    trade_discipline: Optional[str] = None
+    cost_code: Optional[str] = None
+    tags: Optional[List[str]] = None
+    # Status
     is_company_standard: Optional[bool] = None
     is_active: Optional[bool] = None
     notes: Optional[str] = None

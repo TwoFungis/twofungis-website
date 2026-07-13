@@ -92,6 +92,7 @@ from routes.command_center import router as command_center_router
 
 # Import Production Library routes (Company Knowledge Engine)
 from routes.production_library import router as production_library_router
+from routes.production_library_hierarchy import router as production_library_hierarchy_router
 
 # Import centralized config (env already loaded at top, but config provides lazy access)
 from config import config
@@ -264,6 +265,7 @@ app.include_router(command_center_router)
 
 # Include Production Library routes (Company Knowledge Engine)
 app.include_router(production_library_router)
+app.include_router(production_library_hierarchy_router)
 
 app.add_middleware(
     CORSMiddleware,

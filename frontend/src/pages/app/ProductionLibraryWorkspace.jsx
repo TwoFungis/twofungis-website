@@ -94,6 +94,7 @@ import {
 import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
 import ImportWizard from '../../components/production/ImportWizard';
+import ProductionHierarchyManager from '../../components/production/ProductionHierarchyManager';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -115,6 +116,7 @@ const NAV_SECTIONS = [
     label: 'Organization',
     items: [
       { id: 'categories', label: 'Service Categories', icon: Tags, count: null },
+      { id: 'hierarchy', label: 'Hierarchy Settings', icon: Settings2, count: null },
       { id: 'templates', label: 'Templates', icon: FileText, count: null },
     ]
   },
@@ -1796,6 +1798,7 @@ const ProductionLibraryWorkspace = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [sortConfig, setSortConfig] = useState({ field: 'production_code', direction: 'asc' });
   const [filters, setFilters] = useState({ domain: 'all', category: 'all', status: 'active', companyStandard: false });
+  const [session, setSession] = useState(null);
   
   // Data
   const [items, setItems] = useState([]);
@@ -2002,6 +2005,8 @@ const ProductionLibraryWorkspace = () => {
         return <AssembliesView assemblies={assemblies} items={items} onSelectAssembly={() => {}} onCreateAssembly={handleCreateAssembly} />;
       case 'categories':
         return <CategoriesView categories={categories} items={items} onSelectCategory={(c) => { setFilters(f => ({ ...f, category: c.id })); setActiveView('standards'); }} />;
+      case 'hierarchy':
+        return <ProductionHierarchyManager session={session} />;
       case 'templates':
         return <TemplatesView />;
       default:
