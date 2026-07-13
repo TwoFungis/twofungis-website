@@ -1,0 +1,36 @@
+{
+  "summary": "Backend-only regression test for bug fix on GET /api/organizations/me (load_dotenv moved to top of server.py so SUPABASE_URL is set before route modules import, plus organization_settings join fix). All 8 pytest cases PASS on the public URL. The previous DNS resolution error '[Errno -2] Name or service not known' is fully resolved. Login via Supabase returns a valid JWT; /api/organizations/me returns HTTP 200 with the expected payload for inbox@twofungis.ca: organization 'Two Fungis Finishing' (id a0000000-0000-0000-0000-000000000002, role=owner, is_primary=true, subscription_tier=founding_lifetime), primary_organization_id set correctly, is_platform_admin=true, platform_role=platform_admin. Unauthorized and bad-token cases return the proper 401/422 codes rather than 500. /api/health and /api/organizations/health also return healthy, confirming Supabase env vars loaded correctly at startup.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_organizations_me.py",
+    "/app/test_reports/pytest/organizations_me_results.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "server.py: load_dotenv(override=False) is called before route imports which is correct. Good.",
+    "routes/organizations.py get_my_organizations(): the join `organizations(id,name,slug,subscription_tier)` returns the joined data correctly. No further changes needed.",
+    "routes/organizations.py verify_jwt_token(): uses jwt.decode(..., options={'verify_signature': False}) which does NOT validate the JWT signature. This is a security concern (any well-formed JWT with a `sub` claim passes). Consider validating against Supabase JWT secret. Not blocking for this bug fix but should be tracked.",
+    "Response includes internal fields like 'success' and 'count' that are undocumented in the Pydantic models (OrganizationSummary/OrganizationDetail) - the endpoint returns raw dicts, not typed models. Consider using response_model= for schema stability."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_organizations_me.py (new)"
+  ],
+  "success_rate": {
+    "backend": "100% (8/8 tests passed)",
+    "frontend": "not tested (backend-only request)"
+  },
+  "test_credentials": "inbox@twofungis.ca / TradeOS2024! (Scott Marshall, Two Fungis Finishing owner) - working",
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Bug fix verified. New regression file at /app/backend/tests/test_organizations_me.py covers: (1) /api/health, (2) /api/organizations/health, (3) Supabase login returns JWT, (4) /api/organizations/me returns 200 (no DNS error), (5) payload includes organizations/primary_organization_id/is_platform_admin, (6) 'Two Fungis Finishing' present and matches primary_organization_id, (7) missing auth returns 401/422, (8) bad token returns 401. Live sample payload: organizations=[{id:a0000000-0000-0000-0000-000000000002, name:'Two Fungis Finishing', role:'owner', is_primary:true, subscription_tier:'founding_lifetime'}], primary_organization_id=a0000000-0000-0000-0000-000000000002, is_platform_admin=true, platform_role='platform_admin'. Run: pytest /app/backend/tests/test_organizations_me.py -v",
+  "rca of the issue": "Original bug: FastAPI route modules were imported at server.py load time, and each module read os.environ.get('SUPABASE_URL','') into a module-level constant. Since load_dotenv() was called AFTER those imports, SUPABASE_URL was an empty string in those modules, so httpx calls hit 'https:///rest/v1/...' which threw '[Errno -2] Name or service not known'. Fix: moved load_dotenv to the very top of server.py (lines 1-8) before any route imports. Verified by observing SUPABASE_URL is populated at import time and /api/organizations/me now returns 200 with real data. The secondary organization_settings join issue is also non-reproducible now (endpoint returns clean payload)."
+}

@@ -1,9 +1,15 @@
-from fastapi import FastAPI, APIRouter, Request, HTTPException
 from dotenv import load_dotenv
-from starlette.middleware.cors import CORSMiddleware
-import os
-import logging
 from pathlib import Path
+import os
+
+# Load environment variables FIRST, before any other imports
+# This ensures all route modules have access to env vars when they load
+ROOT_DIR = Path(__file__).parent
+load_dotenv(ROOT_DIR / '.env', override=False)
+
+from fastapi import FastAPI, APIRouter, Request, HTTPException
+from starlette.middleware.cors import CORSMiddleware
+import logging
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime, timezone
@@ -87,10 +93,7 @@ from routes.command_center import router as command_center_router
 # Import Production Library routes (Company Knowledge Engine)
 from routes.production_library import router as production_library_router
 
-ROOT_DIR = Path(__file__).parent
-load_dotenv(ROOT_DIR / '.env', override=False)
-
-# Supabase configuration for direct DB access
+# Supabase configuration for direct DB access (env already loaded at top)
 SUPABASE_URL = os.environ.get('SUPABASE_URL', '')
 SUPABASE_SERVICE_KEY = os.environ.get('SUPABASE_SERVICE_KEY', '')
 

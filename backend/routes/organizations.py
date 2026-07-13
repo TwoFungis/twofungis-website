@@ -215,8 +215,7 @@ async def get_my_organizations(authorization: str = Header(...)):
                 f"user_id=eq.{user_id}&"
                 f"is_active=eq.true&"
                 f"select=id,role,is_primary,organization_id,"
-                f"organizations(id,name,slug,subscription_tier),"
-                f"organization_settings:organization_id(logo_url)",
+                f"organizations(id,name,slug,subscription_tier)",
                 headers=await get_service_headers()
             )
             
@@ -241,7 +240,6 @@ async def get_my_organizations(authorization: str = Header(...)):
             
             for membership in memberships:
                 org = membership.get('organizations', {})
-                settings = membership.get('organization_settings') or {}
                 
                 if not org:
                     continue
@@ -253,7 +251,7 @@ async def get_my_organizations(authorization: str = Header(...)):
                     "role": membership.get('role'),
                     "is_primary": membership.get('is_primary', False),
                     "subscription_tier": org.get('subscription_tier'),
-                    "logo_url": settings.get('logo_url') if isinstance(settings, dict) else None
+                    "logo_url": None  # Settings table not yet implemented
                 }
                 
                 organizations.append(org_summary)
