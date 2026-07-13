@@ -95,6 +95,7 @@ import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
 import ImportWizard from '../../components/production/ImportWizard';
 import ProductionHierarchyManager from '../../components/production/ProductionHierarchyManager';
+import CreateStandardModal from '../../components/production/CreateStandardModal';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -1150,89 +1151,23 @@ const DomainsView = ({ domains, items, onSelectDomain, onImport }) => {
 // ASSEMBLIES VIEW
 // ============================================
 const AssembliesView = ({ assemblies, items, onSelectAssembly, onCreateAssembly }) => {
-  if (assemblies.length === 0) {
-    return (
-      <div className="flex-1 flex items-center justify-center p-8">
-        <div className="text-center max-w-md">
-          <div className="w-20 h-20 bg-purple-500/10 border border-purple-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <Layers className="w-10 h-10 text-purple-400" strokeWidth={1.5} />
-          </div>
-          <h3 className="text-xl font-medium text-white mb-2">Production Assemblies</h3>
-          <p className="text-neutral-400 text-sm mb-8 leading-relaxed">
-            Assemblies group related standards together. Build a door installation assembly with all hardware, trim, and finishing components.
-          </p>
-          <button
-            onClick={onCreateAssembly}
-            className="flex items-center gap-2 mx-auto bg-purple-500 hover:bg-purple-400 text-white font-medium px-6 py-3 rounded-lg transition-all"
-          >
-            <Plus className="w-4 h-4" strokeWidth={2} />
-            Create First Assembly
-          </button>
-        </div>
-      </div>
-    );
-  }
-  
+  // Show coming soon state regardless of assemblies count
   return (
-    <div className="flex-1 p-6 overflow-auto">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h2 className="text-xl font-medium text-white mb-1">Production Assemblies</h2>
-          <p className="text-sm text-neutral-500">Group related standards for faster estimating</p>
+    <div className="flex-1 flex items-center justify-center p-8">
+      <div className="text-center max-w-md">
+        <div className="w-20 h-20 bg-purple-500/10 border border-purple-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
+          <Layers className="w-10 h-10 text-purple-400" strokeWidth={1.5} />
         </div>
-        <button
-          onClick={onCreateAssembly}
-          className="flex items-center gap-2 bg-purple-500 hover:bg-purple-400 text-white font-medium px-4 py-2.5 rounded-lg transition-all"
-        >
-          <Plus className="w-4 h-4" strokeWidth={2} />
-          New Assembly
-        </button>
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {assemblies.map((assembly) => (
-          <div
-            key={assembly.id}
-            onClick={() => onSelectAssembly(assembly)}
-            className="bg-[#111111] border border-neutral-800 rounded-xl p-5 hover:border-purple-500/50 transition-all cursor-pointer"
-            data-testid={`assembly-card-${assembly.id}`}
-          >
-            <div className="flex items-start gap-4 mb-4">
-              <div className="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center">
-                <Layers className="w-6 h-6 text-purple-400" strokeWidth={1.5} />
-              </div>
-              <div className="flex-1">
-                <h3 className="text-base font-medium text-white mb-1">{assembly.name}</h3>
-                <span className="text-xs text-neutral-500">{assembly.item_count || 0} standards included</span>
-              </div>
-            </div>
-            
-            {assembly.description && (
-              <p className="text-sm text-neutral-400 mb-4 line-clamp-2">{assembly.description}</p>
-            )}
-            
-            <div className="grid grid-cols-3 gap-3 pt-4 border-t border-neutral-800">
-              <div className="text-center">
-                <div className="text-lg font-semibold text-white">
-                  {assembly.total_labour_hours?.toFixed(1) || '-'}
-                </div>
-                <div className="text-[10px] uppercase tracking-wider text-neutral-500">Hours</div>
-              </div>
-              <div className="text-center">
-                <div className="text-lg font-semibold text-emerald-400">
-                  ${assembly.total_cost?.toFixed(0) || '0'}
-                </div>
-                <div className="text-[10px] uppercase tracking-wider text-neutral-500">Total Cost</div>
-              </div>
-              <div className="text-center">
-                <div className="text-lg font-semibold text-blue-400">
-                  {assembly.usage_count || 0}
-                </div>
-                <div className="text-[10px] uppercase tracking-wider text-neutral-500">Used</div>
-              </div>
-            </div>
-          </div>
-        ))}
+        <span className="inline-block px-3 py-1 bg-purple-500/20 text-purple-400 text-xs font-medium uppercase tracking-wider rounded-full mb-4">
+          Coming Soon
+        </span>
+        <h3 className="text-xl font-medium text-white mb-2">Production Assemblies</h3>
+        <p className="text-neutral-400 text-sm mb-4 leading-relaxed">
+          Assemblies group related standards together. Build a door installation assembly with all hardware, trim, and finishing components.
+        </p>
+        <p className="text-neutral-500 text-xs">
+          This feature is part of Phase 3 - Company Standards expansion.
+        </p>
       </div>
     </div>
   );
@@ -1799,6 +1734,8 @@ const ProductionLibraryWorkspace = () => {
   const [sortConfig, setSortConfig] = useState({ field: 'production_code', direction: 'asc' });
   const [filters, setFilters] = useState({ domain: 'all', category: 'all', status: 'active', companyStandard: false });
   const [session, setSession] = useState(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [units, setUnits] = useState([]);
   
   // Data
   const [items, setItems] = useState([]);
@@ -1836,11 +1773,12 @@ const ProductionLibraryWorkspace = () => {
       
       const headers = { 'Authorization': `Bearer ${currentSession.access_token}` };
       
-      const [itemsRes, domainsRes, catsRes, assembliesRes] = await Promise.all([
+      const [itemsRes, domainsRes, catsRes, assembliesRes, unitsRes] = await Promise.all([
         fetch(`${API_URL}/api/production-library/items?limit=500`, { headers }),
         fetch(`${API_URL}/api/production-library/domains`, { headers }),
         fetch(`${API_URL}/api/production-library/service-categories`, { headers }),
-        fetch(`${API_URL}/api/production-library/assemblies`, { headers })
+        fetch(`${API_URL}/api/production-library/assemblies`, { headers }),
+        fetch(`${API_URL}/api/production-library/units`, { headers })
       ]);
       
       const anyFailed = [itemsRes, domainsRes, catsRes, assembliesRes].some(r => !r.ok);
@@ -1863,6 +1801,7 @@ const ProductionLibraryWorkspace = () => {
       if (domainsRes.ok) setDomains((await domainsRes.json()).domains || []);
       if (catsRes.ok) setCategories((await catsRes.json()).categories || []);
       if (assembliesRes.ok) setAssemblies((await assembliesRes.json()).assemblies || []);
+      if (unitsRes.ok) setUnits((await unitsRes.json()).units || []);
       
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -1893,16 +1832,6 @@ const ProductionLibraryWorkspace = () => {
     }
   };
   
-  const handleBulkAction = (action) => {
-    if (action === 'clear') {
-      setSelectedItems(new Set());
-    } else if (action === 'addToEstimate') {
-      toast.info('Estimate Builder coming soon - standards will be available there');
-    } else {
-      toast.info(`${action} ${selectedItems.size} standards - coming soon`);
-    }
-  };
-  
   const handleFilterChange = (key, value) => {
     if (key === 'clear') {
       setFilters({ domain: 'all', category: 'all', status: 'active', companyStandard: false });
@@ -1917,10 +1846,107 @@ const ProductionLibraryWorkspace = () => {
   };
   const handleImport = () => setSearchParams({ tab: 'import' });
   const handleCloseImport = () => { setSearchParams({}); fetchData(); };
-  const handleNewStandard = () => toast.info('Create Standard - coming soon');
-  const handleCreateAssembly = () => toast.info('Create Assembly - coming soon');
+  const handleNewStandard = () => setShowCreateModal(true);
+  const handleCreateAssembly = () => toast.info('Assemblies coming soon - group related standards together');
   const handleAddToEstimate = (item) => toast.info(`"${item.production_name}" ready for Estimate Builder`);
   
+  // Handle standard created
+  const handleStandardCreated = (newItem) => {
+    setItems(prev => [newItem, ...prev]);
+    setShowCreateModal(false);
+  };
+
+  // Bulk actions
+  const handleBulkAction = async (action) => {
+    if (selectedItems.size === 0) return;
+    
+    const selectedIds = Array.from(selectedItems);
+    const selectedItemsList = items.filter(i => selectedIds.includes(i.id));
+    
+    switch (action) {
+      case 'clear':
+        setSelectedItems(new Set());
+        break;
+        
+      case 'archive':
+        if (!session?.access_token) return;
+        try {
+          // Archive all selected items
+          const results = await Promise.all(
+            selectedIds.map(id => 
+              fetch(`${API_URL}/api/production-library/items/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${session.access_token}` }
+              })
+            )
+          );
+          const successCount = results.filter(r => r.ok).length;
+          if (successCount > 0) {
+            toast.success(`Archived ${successCount} item${successCount > 1 ? 's' : ''}`);
+            setItems(prev => prev.filter(i => !selectedIds.includes(i.id)));
+            setSelectedItems(new Set());
+          }
+        } catch (error) {
+          console.error('Archive error:', error);
+          toast.error('Failed to archive items');
+        }
+        break;
+        
+      case 'duplicate':
+        if (!session?.access_token) return;
+        try {
+          let duplicatedCount = 0;
+          for (const item of selectedItemsList) {
+            const newCode = `${item.production_code}-COPY`;
+            const response = await fetch(`${API_URL}/api/production-library/items`, {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${session.access_token}`,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                ...item,
+                id: undefined,
+                production_code: newCode,
+                production_name: `${item.production_name} (Copy)`,
+                created_at: undefined,
+                updated_at: undefined
+              })
+            });
+            if (response.ok) {
+              const data = await response.json();
+              setItems(prev => [data.item, ...prev]);
+              duplicatedCount++;
+            }
+          }
+          if (duplicatedCount > 0) {
+            toast.success(`Duplicated ${duplicatedCount} item${duplicatedCount > 1 ? 's' : ''}`);
+            setSelectedItems(new Set());
+          }
+        } catch (error) {
+          console.error('Duplicate error:', error);
+          toast.error('Failed to duplicate items');
+        }
+        break;
+        
+      case 'edit':
+        if (selectedItems.size === 1) {
+          const item = items.find(i => i.id === selectedIds[0]);
+          if (item) handleOpenItem(item);
+        } else {
+          toast.info('Select a single item to edit');
+        }
+        break;
+        
+      case 'addToEstimate':
+        toast.info(`${selectedItems.size} item${selectedItems.size > 1 ? 's' : ''} ready for Estimate Builder`);
+        break;
+        
+      default:
+        break;
+    }
+  };
+
   const handleCommandAction = (actionId) => {
     if (actionId === 'create-standard') handleNewStandard();
     else if (actionId === 'create-assembly') handleCreateAssembly();
@@ -2013,6 +2039,28 @@ const ProductionLibraryWorkspace = () => {
         return <ProductionHierarchyManager session={session} />;
       case 'templates':
         return <TemplatesView />;
+      case 'historical':
+      case 'archives':
+        return (
+          <div className="flex-1 flex items-center justify-center p-8">
+            <div className="text-center max-w-md">
+              <div className="w-20 h-20 bg-neutral-800/50 border border-neutral-700/50 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <Archive className="w-10 h-10 text-neutral-500" strokeWidth={1.5} />
+              </div>
+              <span className="inline-block px-3 py-1 bg-neutral-800/50 text-neutral-500 text-xs font-medium uppercase tracking-wider rounded-full mb-4">
+                Coming Soon
+              </span>
+              <h3 className="text-xl font-medium text-white mb-2">
+                {activeView === 'historical' ? 'Production History' : 'Archives'}
+              </h3>
+              <p className="text-neutral-400 text-sm leading-relaxed">
+                {activeView === 'historical' 
+                  ? 'Track production performance over time. Compare estimated vs actual productivity across projects.'
+                  : 'View archived standards and restore them when needed.'}
+              </p>
+            </div>
+          </div>
+        );
       default:
         return null;
     }
@@ -2090,6 +2138,15 @@ const ProductionLibraryWorkspace = () => {
         assemblies={assemblies}
         onSelectItem={handleOpenItem}
         onAction={handleCommandAction}
+      />
+      
+      <CreateStandardModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        session={session}
+        domains={domains}
+        units={units}
+        onCreated={handleStandardCreated}
       />
     </div>
   );
