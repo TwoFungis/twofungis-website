@@ -14,15 +14,23 @@ import { supabase } from '../../lib/supabase';
 import { useAuthStore } from '../../store/authStore';
 
 const ProjectsPage = () => {
-  const [searchParams] = useSearchParams();
-  const showNewModal = searchParams.get('new') === 'true';
-  const [isModalOpen, setIsModalOpen] = useState(showNewModal);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const showNewModal = searchParams.get('new') === '1' || searchParams.get('new') === 'true';
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [error, setError] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const { user, markSetupComplete } = useAuthStore();
+
+  // Handle ?new=1 query param
+  useEffect(() => {
+    if (showNewModal) {
+      setIsModalOpen(true);
+      setSearchParams({});
+    }
+  }, [showNewModal, setSearchParams]);
 
   const [formData, setFormData] = useState({
     name: '',

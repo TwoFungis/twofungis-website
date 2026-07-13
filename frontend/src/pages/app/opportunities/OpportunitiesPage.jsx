@@ -7,7 +7,7 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Plus,
   Search,
@@ -394,6 +394,15 @@ export default function OpportunitiesPage() {
   const [search, setSearch] = useState('');
   const [viewMode, setViewMode] = useState('grid');
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Check for ?new=1 query param to auto-open create modal
+  useEffect(() => {
+    if (searchParams.get('new') === '1') {
+      setShowCreateModal(true);
+      setSearchParams({});
+    }
+  }, [searchParams, setSearchParams]);
 
   // Fetch opportunities
   const fetchOpportunities = useCallback(async () => {

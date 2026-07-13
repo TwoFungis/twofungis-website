@@ -95,13 +95,13 @@ const NotificationsPanel = ({ isOpen, onClose, notifications, onMarkRead }) => {
   );
 };
 
-const QuickAddPanel = ({ isOpen, onClose, onNavigate }) => {
+const QuickAddPanel = ({ isOpen, onClose, onAction }) => {
   if (!isOpen) return null;
   
   const items = [
-    { label: 'New Opportunity', icon: Target, href: '/app/opportunities/new', description: 'Start tracking a new opportunity' },
-    { label: 'New Project', icon: FolderKanban, href: '/app/projects/new', description: 'Create a new project workspace' },
-    { label: 'Quick Note', icon: FileText, href: '/app/notes/new', description: 'Capture a quick note' },
+    { label: 'New Opportunity', icon: Target, action: 'opportunity', description: 'Start tracking a new opportunity' },
+    { label: 'New Project', icon: FolderKanban, action: 'project', description: 'Create a new project workspace' },
+    { label: 'Quick Note', icon: FileText, action: 'note', description: 'Coming soon', disabled: true },
   ];
   
   return (
@@ -118,18 +118,29 @@ const QuickAddPanel = ({ isOpen, onClose, onNavigate }) => {
           {items.map((item, i) => (
             <button
               key={i}
-              onClick={() => { onNavigate(item.href); onClose(); }}
-              className="w-full flex items-center gap-4 px-4 py-4 text-left bg-zinc-800/50 hover:bg-zinc-800 rounded-lg transition-colors group"
+              onClick={() => { if (!item.disabled) { onAction(item.action); onClose(); } }}
+              disabled={item.disabled}
+              className={`w-full flex items-center gap-4 px-4 py-4 text-left rounded-lg transition-colors group ${
+                item.disabled 
+                  ? 'bg-zinc-800/30 cursor-not-allowed opacity-60' 
+                  : 'bg-zinc-800/50 hover:bg-zinc-800'
+              }`}
               data-testid={`quickadd-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
             >
-              <div className="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center group-hover:bg-emerald-500/30 transition-colors">
-                <item.icon className="w-5 h-5 text-emerald-400" />
+              <div className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors ${
+                item.disabled 
+                  ? 'bg-zinc-700/30' 
+                  : 'bg-emerald-500/20 group-hover:bg-emerald-500/30'
+              }`}>
+                <item.icon className={`w-5 h-5 ${item.disabled ? 'text-zinc-500' : 'text-emerald-400'}`} />
               </div>
               <div className="flex-1">
                 <span className="text-white font-medium block">{item.label}</span>
-                <span className="text-zinc-500 text-xs">{item.description}</span>
+                <span className={`text-xs ${item.disabled ? 'text-amber-500/80' : 'text-zinc-500'}`}>
+                  {item.description}
+                </span>
               </div>
-              <ChevronRight className="w-4 h-4 text-zinc-600 group-hover:text-zinc-400" />
+              {!item.disabled && <ChevronRight className="w-4 h-4 text-zinc-600 group-hover:text-zinc-400" />}
             </button>
           ))}
         </div>
@@ -753,7 +764,13 @@ const CommandCenterPage = () => {
       <QuickAddPanel 
         isOpen={quickAddOpen} 
         onClose={() => setQuickAddOpen(false)}
-        onNavigate={navigate}
+        onAction={(action) => {
+          if (action === 'opportunity') {
+            navigate('/app/opportunities?new=1');
+          } else if (action === 'project') {
+            navigate('/app/projects?new=1');
+          }
+        }}
       />
 
       {/* Main Content */}

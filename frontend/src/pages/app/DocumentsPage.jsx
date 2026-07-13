@@ -29,46 +29,27 @@ const DocumentsPage = () => {
   const { user } = useAuthStore();
   const [documents, setDocuments] = useState([]);
   const [folders, setFolders] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentFolder, setCurrentFolder] = useState(null);
   const [viewMode, setViewMode] = useState('grid');
   const [showUploadModal, setShowUploadModal] = useState(false);
 
-  const fetchDocuments = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const response = await fetch(`${API_URL}/api/documents?folder=${currentFolder || ''}`, {
-        headers: { 'Authorization': `Bearer ${user?.access_token}` }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setDocuments(data.documents || []);
-        setFolders(data.folders || []);
-      }
-    } catch (error) {
-      console.error('Error fetching documents:', error);
-      // Demo data
-      setFolders([
-        { id: 'contracts', name: 'Contracts', document_count: 12 },
-        { id: 'permits', name: 'Permits & Licenses', document_count: 8 },
-        { id: 'insurance', name: 'Insurance', document_count: 4 },
-        { id: 'receipts', name: 'Receipts', document_count: 45 },
-      ]);
-      setDocuments([
-        { id: '1', name: 'Smith Residence Contract.pdf', type: 'contract', size: 245000, uploaded_at: '2026-02-15', project_name: 'Smith Residence' },
-        { id: '2', name: 'Building Permit BC-2026-001.pdf', type: 'permit', size: 125000, uploaded_at: '2026-02-10', project_name: 'Smith Residence' },
-        { id: '3', name: 'Liability Insurance Certificate.pdf', type: 'insurance', size: 180000, uploaded_at: '2026-01-15' },
-        { id: '4', name: 'Materials Receipt Feb 15.jpg', type: 'receipt', size: 890000, uploaded_at: '2026-02-15', project_name: 'Johnson Reno' },
-      ]);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [currentFolder, user?.access_token]);
-
+  // Documents feature coming soon - show placeholder data
   useEffect(() => {
-    fetchDocuments();
-  }, [fetchDocuments]);
+    // No API call - just set demo data
+    setFolders([
+      { id: 'contracts', name: 'Contracts', document_count: 12 },
+      { id: 'permits', name: 'Permits & Licenses', document_count: 8 },
+      { id: 'insurance', name: 'Insurance', document_count: 4 },
+      { id: 'receipts', name: 'Receipts', document_count: 45 },
+    ]);
+    setDocuments([
+      { id: '1', name: 'Smith Residence Contract.pdf', type: 'contract', size: 245000, uploaded_at: '2026-02-15', project_name: 'Smith Residence' },
+      { id: '2', name: 'Building Permit BC-2026-001.pdf', type: 'permit', size: 125000, uploaded_at: '2026-02-10', project_name: 'Smith Residence' },
+      { id: '3', name: 'Liability Insurance 2026.pdf', type: 'insurance', size: 890000, uploaded_at: '2026-01-05', project_name: null },
+    ]);
+  }, [currentFolder]);
 
   const filteredDocuments = documents.filter(doc =>
     doc.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -87,6 +68,20 @@ const DocumentsPage = () => {
 
   return (
     <div className="space-y-6" data-testid="documents-page">
+      {/* Coming Soon Banner */}
+      <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 flex items-center gap-3">
+        <div className="w-10 h-10 bg-amber-500/20 rounded-lg flex items-center justify-center">
+          <FolderOpen className="w-5 h-5 text-amber-400" />
+        </div>
+        <div className="flex-1">
+          <p className="text-amber-400 text-sm font-medium">Document Management Coming Soon</p>
+          <p className="text-amber-400/70 text-xs">Secure file storage and project document organization will be available in a future update.</p>
+        </div>
+        <span className="px-3 py-1 bg-amber-500/20 text-amber-400 text-xs font-medium uppercase tracking-wider rounded-full">
+          Preview
+        </span>
+      </div>
+
       {/* Header with Shield */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -99,7 +94,8 @@ const DocumentsPage = () => {
         <div className="flex items-center gap-3">
           <button
             onClick={() => setShowUploadModal(true)}
-            className="bg-steel-500 hover:bg-steel-600 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+            disabled
+            className="bg-steel-500/50 text-white/50 cursor-not-allowed px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
             data-testid="upload-document-btn"
           >
             <Upload className="w-4 h-4" />
@@ -273,7 +269,7 @@ const DocumentsPage = () => {
       {showUploadModal && (
         <UploadDocumentModal
           onClose={() => setShowUploadModal(false)}
-          onSuccess={() => { setShowUploadModal(false); fetchDocuments(); }}
+          onSuccess={() => setShowUploadModal(false)}
           user={user}
         />
       )}
