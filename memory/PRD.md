@@ -91,6 +91,43 @@ The TradeOS V2 Foundation has been officially locked and stabilized.
 - Level 3: Production Item (the knowledge records)
 - Level 4: Measurement Unit (EA, LF, SF, LS, DAY, HR, SET, KIT, PAIR, COST)
 
+### Phase 2.1: Expanded Production Library Hierarchy 🚧 IN PROGRESS (July 13, 2026)
+**Expand the Production Library to support a 6-level hierarchy for enterprise-scale estimating.**
+
+**Six-Level Hierarchy:**
+```
+Knowledge Domain → Service Category → Area → Phase → Division → Production Item
+```
+
+**New Tables (Migration 016):**
+- `production_areas` - Physical/logical project sections (Lobby, Corridors, Suites, Parking)
+- `production_phases` - Construction stages (Framing, Rough-In, Finishing, Punchlist)
+- `production_divisions` - CSI MasterFormat divisions (06-Wood & Plastics, 09-Finishes)
+- `trade_disciplines` - Trade classifications (Carpentry, Millwork, Painting)
+- `cost_codes` - Job costing integration
+
+**Expanded Production Item Fields:**
+- Production metrics: `production_output` (per hour), `production_per_day`, `crew_size`, `labour_hours`
+- Labour rates: `low_labour_rate`, `standard_rate`, `premium_labour_rate`
+- Material & Equipment: `material_rate`, `equipment_rate`
+- Classification: `division_id`, `trade_discipline`, `cost_code`, `tags`
+- Archival: `archived_at`, `archived_by`, `archive_reason`
+
+**New API Endpoints:**
+- `/api/production-library/areas` - CRUD for production areas
+- `/api/production-library/phases` - CRUD for production phases
+- `/api/production-library/divisions` - CRUD for divisions (CSI MasterFormat)
+- `/api/production-library/trade-disciplines` - CRUD for trade disciplines
+- `/api/production-library/cost-codes` - CRUD for cost codes
+- `/api/production-library/hierarchy` - Full hierarchy stats and navigation tree
+- `/api/production-library/seed/v2` - Seed default CSI divisions, trades, areas, phases
+
+**Frontend Components:**
+- `ProductionHierarchyManager.jsx` - Management UI for all hierarchy levels
+- Integrated into Production Library Workspace under "Hierarchy Settings" nav item
+
+**⚠️ MIGRATION REQUIRED:** User must run `/app/migrations/016_expanded_production_library.sql` in Supabase to enable the expanded hierarchy.
+
 **API Endpoints Created:**
 - `/api/production-library/units` - Controlled measurement unit lookup
 - `/api/production-library/domains` - Knowledge domains CRUD

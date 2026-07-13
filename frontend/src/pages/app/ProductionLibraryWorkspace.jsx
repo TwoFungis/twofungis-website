@@ -1830,10 +1830,11 @@ const ProductionLibraryWorkspace = () => {
     try {
       setLoading(true);
       setApiError(null);
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return;
+      const { data: { session: currentSession } } = await supabase.auth.getSession();
+      if (!currentSession) return;
+      setSession(currentSession);
       
-      const headers = { 'Authorization': `Bearer ${session.access_token}` };
+      const headers = { 'Authorization': `Bearer ${currentSession.access_token}` };
       
       const [itemsRes, domainsRes, catsRes, assembliesRes] = await Promise.all([
         fetch(`${API_URL}/api/production-library/items?limit=500`, { headers }),
