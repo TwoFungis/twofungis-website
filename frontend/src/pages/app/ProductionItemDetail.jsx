@@ -644,42 +644,72 @@ export default function ProductionItemDetail() {
             {/* Classification */}
             <DetailSection title="Classification" icon={FolderTree}>
               <div className="space-y-4">
-                <Field
-                  label="Knowledge Domain"
-                  value={currentItem.knowledge_domain_id}
-                  editable
-                  editing={editing}
-                  onChange={(v) => updateField('knowledge_domain_id', v)}
-                  type="select"
-                  options={domains.map(d => ({ value: d.id, label: d.name }))}
-                />
-                <Field
-                  label="Measurement Unit"
-                  value={currentItem.measurement_unit_id}
-                  editable
-                  editing={editing}
-                  onChange={(v) => updateField('measurement_unit_id', v)}
-                  type="select"
-                  options={units.map(u => ({ value: u.id, label: `${u.code} - ${u.name}` }))}
-                />
-                <Field
-                  label="Trade Discipline"
-                  value={currentItem.trade_discipline}
-                  editable
-                  editing={editing}
-                  onChange={(v) => updateField('trade_discipline', v)}
-                  type="select"
-                  options={disciplines.map(d => ({ value: d.name, label: d.name }))}
-                />
-                <Field
-                  label="CSI Division"
-                  value={currentItem.division_id}
-                  editable
-                  editing={editing}
-                  onChange={(v) => updateField('division_id', v)}
-                  type="select"
-                  options={divisions.map(d => ({ value: d.id, label: `${d.code} - ${d.name}` }))}
-                />
+                {editing ? (
+                  <Field
+                    label="Knowledge Domain"
+                    value={currentItem.knowledge_domain_id}
+                    editable
+                    editing={editing}
+                    onChange={(v) => updateField('knowledge_domain_id', v)}
+                    type="select"
+                    options={domains.map(d => ({ value: d.id, label: d.name }))}
+                  />
+                ) : (
+                  <Field
+                    label="Knowledge Domain"
+                    value={currentItem.knowledge_domains?.name || domainName}
+                  />
+                )}
+                {editing ? (
+                  <Field
+                    label="Measurement Unit"
+                    value={currentItem.measurement_unit_id}
+                    editable
+                    editing={editing}
+                    onChange={(v) => updateField('measurement_unit_id', v)}
+                    type="select"
+                    options={units.map(u => ({ value: u.id, label: `${u.code} - ${u.name}` }))}
+                  />
+                ) : (
+                  <Field
+                    label="Measurement Unit"
+                    value={currentItem.measurement_units?.code ? `${currentItem.measurement_units.code} - ${currentItem.measurement_units.name}` : unitCode}
+                  />
+                )}
+                {editing ? (
+                  <Field
+                    label="Trade Discipline"
+                    value={currentItem.trade_discipline}
+                    editable
+                    editing={editing}
+                    onChange={(v) => updateField('trade_discipline', v)}
+                    type="select"
+                    options={disciplines.map(d => ({ value: d.name, label: d.name }))}
+                  />
+                ) : (
+                  <Field
+                    label="Trade Discipline"
+                    value={currentItem.trade_discipline}
+                  />
+                )}
+                {editing ? (
+                  <Field
+                    label="CSI Division"
+                    value={currentItem.division_id}
+                    editable
+                    editing={editing}
+                    onChange={(v) => updateField('division_id', v)}
+                    type="select"
+                    options={divisions.map(d => ({ value: d.id, label: `${d.code} - ${d.name}` }))}
+                  />
+                ) : (
+                  <Field
+                    label="CSI Division"
+                    value={divisions.find(d => d.id === currentItem.division_id)?.name ? 
+                      `${divisions.find(d => d.id === currentItem.division_id).code} - ${divisions.find(d => d.id === currentItem.division_id).name}` : 
+                      '—'}
+                  />
+                )}
                 <Field
                   label="Cost Code"
                   value={currentItem.cost_code}
