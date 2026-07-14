@@ -96,6 +96,9 @@ import { toast } from 'sonner';
 import ImportWizard from '../../components/production/ImportWizard';
 import ProductionHierarchyManager from '../../components/production/ProductionHierarchyManager';
 import CreateStandardModal from '../../components/production/CreateStandardModal';
+import { useProductionLibraryRealtime, useDomainsRealtime, useCategoriesRealtime } from '../../hooks/useProductionLibraryRealtime';
+import { useOrganization } from '../../hooks/useOrganization';
+import { useAuthStore } from '../../store/authStore';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -1776,6 +1779,107 @@ const ProductionLibraryWorkspace = () => {
   const [categories, setCategories] = useState([]);
   const [assemblies, setAssemblies] = useState([]);
   
+  // Get organization and user for realtime filtering
+  const { currentOrg } = useOrganization();
+  const { user } = useAuthStore();
+  
+  // ===========================================
+  // REALTIME SUBSCRIPTIONS
+  // ===========================================
+  
+  // Handle remote INSERT - add new item to state
+  const handleRealtimeInsert = useCallback((newItem) => {
+    setItems(prev => {
+      // Check if item already exists (avoid duplicates from optimistic updates)
+      if (prev.some(item => item.id === newItem.id)) {
+        return prev;
+      }
+      // Add new item at the beginning
+      return [newItem, ...prev];
+    });
+  }, []);
+  
+  // Handle remote UPDATE - update existing item in state
+  const handleRealtimeUpdate = useCallback((updatedItem) => {
+    setItems(prev => prev.map(item => 
+      item.id === updatedItem.id ? { ...item, ...updatedItem } : item
+    ));
+    // Also update selected item if it's the one being viewed
+    setSelectedItem(prev => 
+      prev?.id === updatedItem.id ? { ...prev, ...updatedItem } : prev
+    );
+  }, []);
+  
+  // Handle remote DELETE - remove item from state
+  const handleRealtimeDelete = useCallback((deletedItem) => {
+    setItems(prev => prev.filter(item => item.id !== deletedItem.id));
+    // Clear selection if deleted item was selected
+    setSelectedItem(prev => prev?.id === deletedItem.id ? null : prev);
+    setSelectedItems(prev => {
+      const newSet = new Set(prev);
+      newSet.delete(deletedItem.id);
+      return newSet;
+    });
+  }, []);
+  
+  // Handle domain changes
+  const handleDomainInsert = useCallback((newDomain) => {
+    setDomains(prev => prev.some(d => d.id === newDomain.id) ? prev : [...prev, newDomain]);
+  }, []);
+  
+  const handleDomainUpdate = useCallback((updatedDomain) => {
+    setDomains(prev => prev.map(d => d.id === updatedDomain.id ? { ...d, ...updatedDomain } : d));
+  }, []);
+  
+  const handleDomainDelete = useCallback((deletedDomain) => {
+    setDomains(prev => prev.filter(d => d.id !== deletedDomain.id));
+  }, []);
+  
+  // Handle category changes
+  const handleCategoryInsert = useCallback((newCategory) => {
+    setCategories(prev => prev.some(c => c.id === newCategory.id) ? prev : [...prev, newCategory]);
+  }, []);
+  
+  const handleCategoryUpdate = useCallback((updatedCategory) => {
+    setCategories(prev => prev.map(c => c.id === updatedCategory.id ? { ...c, ...updatedCategory } : c));
+  }, []);
+  
+  const handleCategoryDelete = useCallback((deletedCategory) => {
+    setCategories(prev => prev.filter(c => c.id !== deletedCategory.id));
+  }, []);
+  
+  // Subscribe to Production Items realtime changes
+  useProductionLibraryRealtime({
+    organizationId: currentOrg?.id,
+    currentUserId: user?.id,
+    onInsert: handleRealtimeInsert,
+    onUpdate: handleRealtimeUpdate,
+    onDelete: handleRealtimeDelete,
+    enabled: !!currentOrg?.id
+  });
+  
+  // Subscribe to Domains realtime changes
+  useDomainsRealtime({
+    organizationId: currentOrg?.id,
+    onInsert: handleDomainInsert,
+    onUpdate: handleDomainUpdate,
+    onDelete: handleDomainDelete,
+    enabled: !!currentOrg?.id
+  });
+  
+  // Subscribe to Categories realtime changes
+  useCategoriesRealtime({
+    organizationId: currentOrg?.id,
+    onInsert: handleCategoryInsert,
+    onUpdate: handleCategoryUpdate,
+    onDelete: handleCategoryDelete,
+    enabled: !!currentOrg?.id
+  });
+  
+  // ===========================================
+  // END REALTIME SUBSCRIPTIONS
+  // ===========================================
+
   const counts = useMemo(() => ({
     standards: items.length,
     domains: domains.length,

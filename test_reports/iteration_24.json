@@ -1,0 +1,49 @@
+{
+  "summary": "Frontend-only verification of Supabase Realtime + PWA Update Banner. All 7 requested checks PASS. Production Library loads clean, realtime subscription reaches SUBSCRIBED status on mount, PWA banner renders with correct test IDs when SW_UPDATE_WAITING is received (organically observed AND manually simulated), refresh/dismiss buttons work, service worker is registered and controlling the page, Team page and Import Wizard remain functional.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {
+        "flow": "First paint of /app/production-library (and other /app/* routes) after login",
+        "issue": "Carry-over from iterations 19-23: transient 'TypeError: Failed to fetch' from [AppLayout] Workspace context and [useOrganization] on initial navigation. Data loads correctly on subsequent renders. Not blocking the new realtime/PWA features.",
+        "affected_selectors": ["N/A"]
+      }
+    ],
+    "design_issues": []
+  },
+  "verification_results": {
+    "production_library_loads": "PASS - /app/production-library renders empty state 'Build Your Company Standards', shows 0 Standards / 19 Domains / 11 Categories in left nav counts, no error toasts",
+    "realtime_hook_imported_and_active": "PASS - Console shows '[Realtime] Production Library subscription status: SUBSCRIBED' followed by '[Realtime] Successfully subscribed to Production Library changes'. Hook is called at line 1852 of ProductionLibraryWorkspace.jsx with correct org/user context, and useDomainsRealtime + useCategoriesRealtime are also wired.",
+    "pwa_banner_component_in_App_js": "PASS - PWAUpdateBanner imported (line 7) and rendered inside BrowserRouter (line 197) of App.js so it is available on every route.",
+    "pwa_banner_test_ids": "PASS - data-testid='pwa-update-banner', 'pwa-refresh-btn', 'pwa-dismiss-btn' all present and interactive when banner is shown",
+    "pwa_banner_shows_on_update_event": "PASS - Dispatching a synthetic MessageEvent { type: 'SW_UPDATE_WAITING' } on navigator.serviceWorker made the banner appear with copy 'A new version of TradeOS is available.' + Refresh button. Dismiss button hides it.",
+    "pwa_banner_hidden_when_no_update": "PASS - On fresh load with active/controlled SW and no waiting worker, banner is not visible",
+    "service_worker_registered": "PASS - navigator.serviceWorker.getRegistrations() returns 1 active registration at scope https://profit-tracker-demo-1.preview.emergentagent.com/ with active/controller scriptURL /sw.js. Update detection wired in /app/frontend/src/index.js and PWAUpdateBanner listens to 'message', 'updatefound', 'controllerchange'.",
+    "service_worker_lifecycle_observed": "PASS - Console logs show install -> activate -> controllerchange -> [PWA] New version activated: v2.0.0 during first visit (SW was updated on the fly).",
+    "team_page_still_works": "PASS - /app/settings/team renders H1 'Team' and invite-member-btn is present for Scott (owner)",
+    "production_library_import_route": "PASS - /app/production-library/import renders 'Import Production Knowledge' wizard (5-step: Initialize -> Template -> Upload -> Validate -> Import) with 21 Domains, 13 Categories, 60 base Items shown in the initialize state",
+    "manual_refresh_button": "PASS - Top-right refresh icon in Production Library workspace header renders (RefreshCw button)"
+  },
+  "test_report_links": [],
+  "action_items": [
+    "OPTIONAL/carry-over: the transient '[AppLayout] Workspace context error: TypeError: Failed to fetch' and '[useOrganization] Error: TypeError: Failed to fetch' on first navigation after login is unrelated to this task but worth fixing (tracked since iteration_19).",
+    "OPTIONAL: 'Multiple GoTrueClient instances detected in the same browser context' warning. Two Supabase clients now exist: /app/frontend/src/lib/supabase.js (used app-wide) and the new one created in /app/frontend/src/hooks/useProductionLibraryRealtime.js (getSupabaseClient). Both use the same auth storage key, hence the warning. Recommend refactoring the realtime hook to reuse the existing shared client (import { supabase } from '../lib/supabase') and configure it once with realtime params, instead of instantiating a second createClient."
+  ],
+  "critical_code_review_comments": [
+    "hooks/useProductionLibraryRealtime.js creates a SECOND Supabase client (createClient) even though /app/frontend/src/lib/supabase.js already exports one. This produces the GoTrueClient duplicate-instance warning and doubles auth storage listeners. Use the shared client instance; realtime params can be set on it or Supabase's default realtime is sufficient.",
+    "hooks/useProductionLibraryRealtime.js skips events where record.updated_by === currentUserId to avoid echoing local writes, but production_items may not always populate updated_by (depends on insert path). If updated_by is null on remote inserts from another tab that also lacks the field, it will pass the check correctly, but if the local user's own updates don't set updated_by, they will loop back and re-render (harmless but redundant). Worth documenting that the DB layer must set updated_by consistently for the dedupe to work.",
+    "components/pwa/PWAUpdateBanner.jsx: the two paths that set showBanner (the postMessage listener and the registration.waiting/updatefound listener) can both fire, but only the second path stores waitingWorker. If SW posts SW_UPDATE_WAITING before/without a waiting registration being present, clicking Refresh falls back to a plain window.location.reload() which will NOT actually swap the SW. Consider always resolving registration.waiting inside handleUpdate rather than relying on the state variable.",
+    "public/sw.js: BUILD_TIMESTAMP is captured as `new Date().toISOString()` at script-parse time, so every restart of the SW (including on activate) recomputes it. This is fine for logging but means it is not a stable build identifier and cannot be relied on to determine 'is this a new deployment?'. The version string 'v2.0.0' is hardcoded, so bumping the version on new deploys must be done manually or via a build step - otherwise the SW hash will change (triggering an update) but CACHE_VERSION won't, and the old cache won't be evicted. Recommend replacing 'v2.0.0' with a build-time env or content hash.",
+    "public/sw.js sends SW_UPDATE_WAITING from inside the install handler to all matched clients. However, the very first-ever install (no previous SW controlling the page) should NOT show an update banner - it's the initial install, not an update. Currently it will only briefly matter because activate() also runs and clients.claim() takes control immediately, but the message posting inside install still runs. Consider guarding with `self.registration.active` before sending SW_UPDATE_WAITING.",
+    "pages/app/ProductionLibraryWorkspace.jsx is now 2305 lines - well over the 700-line guideline. The three realtime handler groups (items/domains/categories) could be extracted into a small useRealtimeSync hook."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (not requested)", "frontend": "100% (7/7 requested checks pass)"},
+  "test_credentials": "inbox@twofungis.ca / TradeOS2024! - working",
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Realtime + PWA Update Banner are wired end-to-end. Production Library subscribes on mount when currentOrg?.id is available. PWA banner shows when a SW_UPDATE_WAITING message is received OR when registration.waiting exists on mount. To manually test the banner in a browser session, evaluate: navigator.serviceWorker.dispatchEvent(new MessageEvent('message', { data: { type: 'SW_UPDATE_WAITING', version: 'test' } })). To simulate a real deploy, bump CACHE_VERSION in /app/frontend/public/sw.js and reload - the browser will fetch the new SW, install it, and post the message. The Production Library is intentionally empty (0 items) after cleanup - this is expected. Two Fungis Finishing org id is a0000000-0000-0000-0000-000000000002.",
+  "rca of the issue": "No issues to root-cause. The two dev-hygiene items worth main-agent attention are: (1) the duplicate Supabase client causing a GoTrueClient warning, and (2) the hardcoded CACHE_VERSION in sw.js which will not auto-bump on deploy."
+}

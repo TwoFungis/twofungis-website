@@ -3,6 +3,9 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './store/authStore';
 import { OrganizationProvider } from './hooks/useOrganization';
 
+// PWA Components
+import PWAUpdateBanner from './components/pwa/PWAUpdateBanner';
+
 // Landing Pages
 import LandingPage from './pages/landing/LandingPage';
 import PrivacyPage from './pages/landing/PrivacyPage';
@@ -189,6 +192,9 @@ function App() {
           {/* Catch all - redirect to home */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        
+        {/* PWA Update Banner - shown when new version available */}
+        <PWAUpdateBanner />
       </BrowserRouter>
     </OrganizationProvider>
   );
