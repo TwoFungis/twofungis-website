@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../lib/supabase';
 
 /**
  * Supabase Realtime Hook for Production Library
@@ -13,25 +13,6 @@ import { createClient } from '@supabase/supabase-js';
  * - Proper cleanup on unmount
  * - Ignores changes from the current user (optimistic updates handle those)
  */
-
-const SUPABASE_URL = process.env.REACT_APP_SUPABASE_URL;
-const SUPABASE_ANON_KEY = process.env.REACT_APP_SUPABASE_ANON_KEY;
-
-// Create a single Supabase client for realtime
-let supabaseClient = null;
-
-const getSupabaseClient = () => {
-  if (!supabaseClient && SUPABASE_URL && SUPABASE_ANON_KEY) {
-    supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      realtime: {
-        params: {
-          eventsPerSecond: 10
-        }
-      }
-    });
-  }
-  return supabaseClient;
-};
 
 export const useProductionLibraryRealtime = ({
   organizationId,
@@ -55,8 +36,7 @@ export const useProductionLibraryRealtime = ({
     }
 
     // Skip events triggered by the current user (optimistic updates handle those)
-    // Note: Supabase doesn't provide user_id in realtime by default,
-    // so we rely on the updated_by field if available
+    // Note: This relies on updated_by being set consistently in the database
     if (record && record.updated_by === currentUserId) {
       return;
     }
@@ -87,7 +67,6 @@ export const useProductionLibraryRealtime = ({
 
   // Subscribe to realtime changes
   const subscribe = useCallback(() => {
-    const supabase = getSupabaseClient();
     if (!supabase || !organizationId || !enabled) {
       return;
     }
@@ -140,11 +119,8 @@ export const useProductionLibraryRealtime = ({
       }
       
       if (channelRef.current) {
-        const supabase = getSupabaseClient();
-        if (supabase) {
-          console.log('[Realtime] Cleaning up Production Library subscription');
-          supabase.removeChannel(channelRef.current);
-        }
+        console.log('[Realtime] Cleaning up Production Library subscription');
+        supabase.removeChannel(channelRef.current);
         channelRef.current = null;
       }
     };
@@ -194,7 +170,6 @@ export const useDomainsRealtime = ({
   }, [organizationId, onInsert, onUpdate, onDelete]);
 
   useEffect(() => {
-    const supabase = getSupabaseClient();
     if (!supabase || !organizationId || !enabled) return;
 
     const channel = supabase
@@ -214,7 +189,7 @@ export const useDomainsRealtime = ({
     channelRef.current = channel;
 
     return () => {
-      if (channelRef.current && supabase) {
+      if (channelRef.current) {
         supabase.removeChannel(channelRef.current);
         channelRef.current = null;
       }
@@ -258,7 +233,6 @@ export const useCategoriesRealtime = ({
   }, [organizationId, onInsert, onUpdate, onDelete]);
 
   useEffect(() => {
-    const supabase = getSupabaseClient();
     if (!supabase || !organizationId || !enabled) return;
 
     const channel = supabase
@@ -278,7 +252,7 @@ export const useCategoriesRealtime = ({
     channelRef.current = channel;
 
     return () => {
-      if (channelRef.current && supabase) {
+      if (channelRef.current) {
         supabase.removeChannel(channelRef.current);
         channelRef.current = null;
       }

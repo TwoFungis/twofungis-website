@@ -23,6 +23,88 @@ Build "TradeOS," an end-to-end operating system for Canadian contractors. The ap
 
 ---
 
+## Team Management ✅ COMPLETE (July 14, 2026)
+
+### Features Implemented
+| Feature | Status |
+|---------|--------|
+| Team Page (`/app/settings/team`) | ✅ Working |
+| Invite Member by Email | ✅ Working |
+| Owner/Employee Roles | ✅ Working |
+| Role Change (Owner only) | ✅ Working |
+| Remove Member (Owner only) | ✅ Working |
+| Only-owner Protection | ✅ Prevents self-demotion/removal |
+
+### API Endpoints
+- `GET /api/organizations/{org_id}/members` - List team members
+- `POST /api/organizations/{org_id}/invite` - Invite user by email
+- `PUT /api/organizations/{org_id}/members/{user_id}/role` - Update role
+- `DELETE /api/organizations/{org_id}/members/{user_id}` - Remove member
+
+### Role Permissions
+| Permission | Owner | Employee |
+|------------|-------|----------|
+| Access company data | ✅ | ✅ |
+| Create/edit records | ✅ | ✅ |
+| Invite team members | ✅ | ❌ |
+| Manage billing | ✅ | ❌ |
+| Change settings | ✅ | ❌ |
+| Delete organization | ✅ | ❌ |
+
+---
+
+## Supabase Realtime ✅ COMPLETE (July 14, 2026)
+
+### Features
+- Production Library items sync in real-time between users
+- Knowledge Domains and Service Categories also sync
+- Incremental state updates (no full page refresh)
+- Automatic WebSocket reconnection
+- Proper cleanup on component unmount
+
+### How It Works
+When Beau edits a Production Library item:
+1. Change is immediately committed to Supabase
+2. Supabase broadcasts the change via WebSocket
+3. Your browser receives the event within 1-2 seconds
+4. React state is updated incrementally
+5. You see the change without refreshing
+
+### Scope
+- ✅ Production Library (production_items table)
+- ✅ Knowledge Domains (knowledge_domains table)
+- ✅ Service Categories (service_categories table)
+- ❌ Opportunities (future milestone)
+- ❌ Projects (future milestone)
+- ❌ Estimates (future milestone)
+
+---
+
+## PWA Update Flow ✅ COMPLETE (July 14, 2026)
+
+### Features
+- Automatic detection of new deployments
+- Non-intrusive banner: "A new version of TradeOS is available. Refresh to update."
+- Single-click refresh to update
+- No cache clearing, uninstall, or reinstall required
+- User data in Supabase is never affected
+
+### How It Works
+1. Deploy new version to production
+2. User's browser detects new service worker
+3. Banner appears at bottom of screen
+4. User clicks "Refresh"
+5. App updates to new version instantly
+
+### Technical Implementation
+- `/app/frontend/public/sw.js` - Service worker with update detection
+- `/app/frontend/src/components/pwa/PWAUpdateBanner.jsx` - Update banner component
+- Service worker posts `SW_UPDATE_WAITING` message when new version available
+- `skipWaiting()` activates new version on user action
+
+---
+
+
 ## Import Library Wizard ✅ RESTORED (July 14, 2026)
 
 ### Summary
