@@ -156,6 +156,91 @@ Estimating (expandable)
 
 ---
 
+## Estimate Workbench v1.1 - Professional Estimate Refinement 🔄 IN PROGRESS
+
+### Summary
+Elevating the functional Estimate Workbench into a professional commercial estimating system suitable for direct submission to clients. This refines the existing architecture without redesigning the UI.
+
+### Phase 1: Company Profile & Estimate Header ✅ COMPLETE (July 14, 2026)
+| Feature | Status |
+|---------|--------|
+| Company Profile settings page | ✅ New tab under Settings |
+| Company Info fields (Name, Legal Name, Address, City, Province, Postal Code, Country, Phone, Email, Website) | ✅ All 10 fields |
+| Business Info fields (GST Number, WCB Number, GL Insurance, Business License) | ✅ All 4 fields |
+| Estimating Defaults (Estimator, Pricing Profile, Quote Validity, Markup %, GST %, Contingency %, Terms) | ✅ All 7 fields |
+| Company Logo upload/change/remove | ✅ Base64 storage |
+| localStorage persistence for Company Profile | ✅ `tradeos_company_profile` key |
+| Client Information section in workbench header | ✅ Client Company, Contact, Address, City, Province, Postal, Phone, Email |
+| Project Information section in workbench header | ✅ Name, Address, Project ID, Estimate Number (editable), Revision, Date, Valid Until, Tender Date, Estimator |
+| Pricing & Notes section in workbench header | ✅ Profile dropdown, Markup, Contingency, GST inputs |
+| Notes, Clarifications, Internal Notes textareas | ✅ Internal notes styled amber for visibility |
+| Expandable header editor (Details button) | ✅ Toggle visibility |
+| New estimate loads company defaults | ✅ Auto-populates GST, Markup, Contingency, Estimator, Terms, Valid Until |
+| Editable Estimate Number preserved on save | ✅ User input not overwritten |
+| Save persists all new metadata | ✅ Company snapshot, client, project, notes, pricing |
+| Load restores all metadata exactly | ✅ Full round-trip verified |
+| Contingency calculation in LiveSummary | ✅ Shows Markup + Contingency + Tax |
+| Build passes CI (no ESLint warnings) | ✅ `craco build` clean |
+
+### Phase 2: Pricing Profile Integration 🔜 PENDING
+| Feature | Status |
+|---------|--------|
+| Auto-populate Low/Standard/Premium rates from Production Library | ⏳ |
+| Markup, GST, Contingency calculations | ⏳ |
+| Default values (GST 5%, Contingency 10%, Markup user-defined) | ⏳ |
+
+### Phase 3: Production Library Scrolling & Usability 🔜 PENDING
+| Feature | Status |
+|---------|--------|
+| Independent scrolling for each panel | ⏳ |
+| Preserve scroll position on navigation | ⏳ |
+| Usability polish | ⏳ |
+
+### Phase 4: Professional PDF Generation 🔜 PENDING
+| Feature | Status |
+|---------|--------|
+| Company branding (logo, name, address) | ⏳ |
+| Client/Project info on PDF | ⏳ |
+| Pricing Summary (Subtotal, Markup, Contingency, Tax, Total) | ⏳ |
+| Clarifications section | ⏳ |
+| Signature line | ⏳ |
+| Page numbers | ⏳ |
+
+### Phase 5: Final Polish & Regression 🔜 PENDING
+| Feature | Status |
+|---------|--------|
+| Full regression testing | ⏳ |
+| Edge case handling | ⏳ |
+| Performance optimization | ⏳ |
+
+### Testing Results (Iteration 32)
+| Test | Result |
+|------|--------|
+| Settings tabs with URL params | ✅ PASS |
+| Company Profile all 21 fields present | ✅ PASS |
+| Company Profile save to localStorage | ✅ PASS |
+| Estimate number input visible | ✅ PASS |
+| Details button expands editor | ✅ PASS |
+| Client Information section | ✅ PASS |
+| Project Information section | ✅ PASS |
+| Pricing & Notes section | ✅ PASS |
+| Notes/Clarifications/Internal Notes | ✅ PASS |
+| LiveSummary shows Markup+Contingency+Tax | ✅ PASS |
+| New estimate loads company defaults | ✅ PASS |
+| Save persists all metadata | ✅ PASS |
+| Reopen restores all fields | ✅ PASS |
+| User-edited estimate number persistence | ✅ PASS (bug fixed) |
+
+### Component Files Modified
+| File | Changes |
+|------|---------|
+| `/app/frontend/src/components/settings/CompanyProfile.jsx` | Complete Company Profile form with all fields per spec |
+| `/app/frontend/src/pages/app/SettingsPage.jsx` | Added Company Profile tab with URL param switching |
+| `/app/frontend/src/components/EstimateWorkbench/EstimateWorkbench.jsx` | Expandable header editor, client/project info, notes, enhanced save/load |
+| `/app/frontend/src/components/EstimateWorkbench/LiveSummary.jsx` | Added contingency calculation |
+
+---
+
 ### Mobile Acceptance Criteria ✅
 | Criteria | Status |
 |----------|--------|

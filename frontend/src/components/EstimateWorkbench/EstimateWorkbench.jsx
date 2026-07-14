@@ -311,9 +311,9 @@ const EstimateWorkbench = () => {
       let estNumber = estimateNumber;
       
       if (!estimateId) {
-        // Create new estimate
+        // Create new estimate - preserve user-edited estimate number if provided
         estimateId = uuidv4();
-        estNumber = generateEstimateNumber();
+        estNumber = (estimateNumber && estimateNumber.trim()) ? estimateNumber : generateEstimateNumber();
         setCurrentEstimateId(estimateId);
         setEstimateNumber(estNumber);
       }
