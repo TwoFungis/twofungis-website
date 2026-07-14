@@ -45,6 +45,14 @@ import ReceivablesPage from './pages/app/ReceivablesPage';
 import OpportunitiesPage from './pages/app/opportunities/OpportunitiesPage';
 import OpportunityWorkspace from './pages/app/opportunities/OpportunityWorkspaceV2';
 
+// Estimating (V2 Architecture)
+import {
+  EstimateWorkbenchPage,
+  ProductionLibraryPage as EstimatingLibraryPage,
+  AssembliesPage,
+  TemplatesPage
+} from './pages/app/estimating';
+
 // Layout
 import AppLayout from './components/layout/AppLayout';
 
@@ -156,8 +164,14 @@ function App() {
             <Route path="projects/:id" element={<ProjectDetailPage />} />
             
             {/* Production Library - Company Knowledge Engine */}
-            <Route path="estimating" element={<ProductionLibraryWorkspace />} />
-            <Route path="estimating/:id" element={<ProductionLibraryWorkspace />} />
+            {/* Estimating Section - V2 Architecture */}
+            <Route path="estimating" element={<EstimateWorkbenchPage />} />
+            <Route path="estimating/workbench" element={<EstimateWorkbenchPage />} />
+            <Route path="estimating/library" element={<EstimatingLibraryPage />} />
+            <Route path="estimating/assemblies" element={<AssembliesPage />} />
+            <Route path="estimating/templates" element={<TemplatesPage />} />
+            
+            {/* Legacy Production Library Routes (backwards compatibility) */}
             <Route path="production-library" element={<ProductionLibraryWorkspace />} />
             <Route path="production-library/items/:itemId" element={<ProductionItemDetail />} />
             <Route path="production-library/import" element={<ProductionLibraryPage />} />

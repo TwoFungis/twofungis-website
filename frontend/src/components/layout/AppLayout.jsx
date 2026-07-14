@@ -29,7 +29,11 @@ import {
   Link2,
   Brain,
   Target,
-  Home
+  Home,
+  ChevronDown,
+  Library,
+  Layers,
+  FileText
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { supabase } from '../../lib/supabase';
@@ -99,12 +103,51 @@ const AppLayout = () => {
     { path: '/app/command-center', icon: Home, label: 'Home' },
     { path: '/app/opportunities', icon: Target, label: 'Opportunities' },
     { path: '/app/projects', icon: FolderKanban, label: 'Projects' },
-    { path: '/app/estimating', icon: Calculator, label: 'Estimating' },
+    { 
+      path: '/app/estimating', 
+      icon: Calculator, 
+      label: 'Estimating',
+      hasSubMenu: true,
+      subItems: [
+        { path: '/app/estimating', label: 'Estimate Workbench', icon: Calculator },
+        { path: '/app/estimating/library', label: 'Production Library', icon: Library },
+        { path: '/app/estimating/assemblies', label: 'Assemblies', icon: Layers },
+        { path: '/app/estimating/templates', label: 'Templates', icon: FileText },
+      ]
+    },
     { path: '/app/invoices', icon: Receipt, label: 'Financial' },
     { path: '/app/expenses', icon: Wallet, label: 'Expenses' },
     { path: '/app/documents', icon: FolderOpen, label: 'Documents' },
     { path: '/app/reports', icon: BarChart3, label: 'Reports' },
   ];
+  
+  // Track expanded menu sections
+  const [expandedMenus, setExpandedMenus] = useState(() => {
+    // Auto-expand if we're on an estimating page
+    if (location.pathname.startsWith('/app/estimating')) {
+      return new Set(['Estimating']);
+    }
+    return new Set();
+  });
+  
+  // Update expanded state when location changes
+  useEffect(() => {
+    if (location.pathname.startsWith('/app/estimating')) {
+      setExpandedMenus(prev => new Set([...prev, 'Estimating']));
+    }
+  }, [location.pathname]);
+  
+  const toggleMenuExpand = (label) => {
+    setExpandedMenus(prev => {
+      const next = new Set(prev);
+      if (next.has(label)) {
+        next.delete(label);
+      } else {
+        next.add(label);
+      }
+      return next;
+    });
+  };
   
   const bottomNavItems = [
     { path: '/app/integrations', icon: Link2, label: 'Integrations' },
@@ -129,23 +172,83 @@ const AppLayout = () => {
         </div>
 
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                  isActive
-                    ? 'bg-emerald-500/10 text-emerald-400 border-l-2 border-emerald-500'
-                    : 'text-zinc-400 hover:text-white hover:bg-zinc-800'
-                }`
-              }
-              data-testid={`nav-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
-            >
-              <item.icon className="w-5 h-5" />
-              <span className="font-medium">{item.label}</span>
-            </NavLink>
-          ))}
+          {navItems.map((item) => {
+            const isEstimatingSection = location.pathname.startsWith('/app/estimating');
+            const isExpanded = item.hasSubMenu && expandedMenus.has(item.label);
+            const isParentActive = item.hasSubMenu 
+              ? location.pathname.startsWith(item.path)
+              : location.pathname === item.path;
+            
+            if (item.hasSubMenu) {
+              return (
+                <div key={item.path}>
+                  {/* Parent Item with Toggle */}
+                  <button
+                    onClick={() => toggleMenuExpand(item.label)}
+                    className={`w-full flex items-center justify-between gap-3 px-4 py-3 rounded-lg transition-colors ${
+                      isParentActive
+                        ? 'bg-emerald-500/10 text-emerald-400'
+                        : 'text-zinc-400 hover:text-white hover:bg-zinc-800'
+                    }`}
+                    data-testid={`nav-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <item.icon className="w-5 h-5" />
+                      <span className="font-medium">{item.label}</span>
+                    </div>
+                    <ChevronDown 
+                      className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} 
+                    />
+                  </button>
+                  
+                  {/* Sub Items */}
+                  {isExpanded && (
+                    <div className="ml-4 mt-1 space-y-1 border-l border-zinc-800 pl-3">
+                      {item.subItems.map((subItem) => {
+                        const SubIcon = subItem.icon;
+                        const isSubActive = location.pathname === subItem.path;
+                        
+                        return (
+                          <NavLink
+                            key={subItem.path}
+                            to={subItem.path}
+                            end={subItem.path === '/app/estimating'}
+                            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm ${
+                              isSubActive
+                                ? 'bg-emerald-500/10 text-emerald-400'
+                                : 'text-zinc-500 hover:text-white hover:bg-zinc-800'
+                            }`}
+                            data-testid={`nav-${subItem.label.toLowerCase().replace(/\s+/g, '-')}`}
+                          >
+                            <SubIcon className="w-4 h-4" />
+                            <span>{subItem.label}</span>
+                          </NavLink>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            }
+            
+            return (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                    isActive
+                      ? 'bg-emerald-500/10 text-emerald-400 border-l-2 border-emerald-500'
+                      : 'text-zinc-400 hover:text-white hover:bg-zinc-800'
+                  }`
+                }
+                data-testid={`nav-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
+              >
+                <item.icon className="w-5 h-5" />
+                <span className="font-medium">{item.label}</span>
+              </NavLink>
+            );
+          })}
           
           {/* Separator */}
           <div className="border-t border-zinc-800 my-2"></div>
@@ -289,23 +392,81 @@ const AppLayout = () => {
 
             {/* Navigation Items */}
             <nav className="flex-1 p-3 space-y-1 overflow-y-auto overscroll-contain">
-              {navItems.map((item) => (
-                <NavLink
-                  key={item.path}
-                  to={item.path}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={({ isActive }) =>
-                    `flex items-center gap-4 px-4 py-3.5 rounded-xl transition-colors min-h-[48px] ${
-                      isActive
-                        ? 'bg-emerald-500/15 text-emerald-400 border-l-4 border-emerald-500'
-                        : 'text-zinc-300 hover:text-white hover:bg-zinc-800 active:bg-zinc-700'
-                    }`
-                  }
-                >
-                  <item.icon className="w-5 h-5 flex-shrink-0" />
-                  <span className="font-medium text-[15px]">{item.label}</span>
-                </NavLink>
-              ))}
+              {navItems.map((item) => {
+                const isExpanded = item.hasSubMenu && expandedMenus.has(item.label);
+                const isParentActive = item.hasSubMenu 
+                  ? location.pathname.startsWith(item.path)
+                  : location.pathname === item.path;
+                
+                if (item.hasSubMenu) {
+                  return (
+                    <div key={item.path}>
+                      {/* Parent Item with Toggle */}
+                      <button
+                        onClick={() => toggleMenuExpand(item.label)}
+                        className={`w-full flex items-center justify-between gap-4 px-4 py-3.5 rounded-xl transition-colors min-h-[48px] ${
+                          isParentActive
+                            ? 'bg-emerald-500/15 text-emerald-400'
+                            : 'text-zinc-300 hover:text-white hover:bg-zinc-800 active:bg-zinc-700'
+                        }`}
+                      >
+                        <div className="flex items-center gap-4">
+                          <item.icon className="w-5 h-5 flex-shrink-0" />
+                          <span className="font-medium text-[15px]">{item.label}</span>
+                        </div>
+                        <ChevronDown 
+                          className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} 
+                        />
+                      </button>
+                      
+                      {/* Sub Items */}
+                      {isExpanded && (
+                        <div className="ml-5 mt-1 space-y-1 border-l border-zinc-800 pl-4">
+                          {item.subItems.map((subItem) => {
+                            const SubIcon = subItem.icon;
+                            const isSubActive = location.pathname === subItem.path;
+                            
+                            return (
+                              <NavLink
+                                key={subItem.path}
+                                to={subItem.path}
+                                end={subItem.path === '/app/estimating'}
+                                onClick={() => setMobileMenuOpen(false)}
+                                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors min-h-[44px] ${
+                                  isSubActive
+                                    ? 'bg-emerald-500/15 text-emerald-400'
+                                    : 'text-zinc-400 hover:text-white hover:bg-zinc-800 active:bg-zinc-700'
+                                }`}
+                              >
+                                <SubIcon className="w-4 h-4 flex-shrink-0" />
+                                <span className="text-[14px]">{subItem.label}</span>
+                              </NavLink>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                }
+                
+                return (
+                  <NavLink
+                    key={item.path}
+                    to={item.path}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={({ isActive }) =>
+                      `flex items-center gap-4 px-4 py-3.5 rounded-xl transition-colors min-h-[48px] ${
+                        isActive
+                          ? 'bg-emerald-500/15 text-emerald-400 border-l-4 border-emerald-500'
+                          : 'text-zinc-300 hover:text-white hover:bg-zinc-800 active:bg-zinc-700'
+                      }`
+                    }
+                  >
+                    <item.icon className="w-5 h-5 flex-shrink-0" />
+                    <span className="font-medium text-[15px]">{item.label}</span>
+                  </NavLink>
+                );
+              })}
               
               {/* Separator */}
               <div className="border-t border-zinc-800 my-3"></div>
