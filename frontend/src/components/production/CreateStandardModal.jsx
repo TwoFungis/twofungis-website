@@ -1,7 +1,7 @@
 /**
  * CreateStandardModal.jsx
  * =======================
- * Modal for creating new Production Items (Company Standards).
+ * Modal for creating new Production Items (Production Standards).
  * Provides a clean form interface with validation and persistence.
  */
 

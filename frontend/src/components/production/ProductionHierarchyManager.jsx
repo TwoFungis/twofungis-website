@@ -618,7 +618,7 @@ export default function ProductionHierarchyManager({ session }) {
               <strong>Six-Level Hierarchy:</strong> Knowledge Domain → Service Category → Area → Phase → Division → Production Item
             </p>
             <p className="text-xs text-white/50 mt-1">
-              This structure organizes all Company Standards and enables precise filtering in estimates and reports.
+              This structure organizes all Production Standards and enables precise filtering in estimates and reports.
             </p>
           </div>
         </div>

@@ -303,7 +303,7 @@ export default function ProductionItemDetail() {
         const data = await response.json();
         setItem(data.item);
         setEditedItem(data.item);
-        toast.success(newValue ? 'Added to Company Standards' : 'Removed from Company Standards');
+        toast.success(newValue ? 'Added to Production Standards' : 'Removed from Production Standards');
       }
     } catch (error) {
       console.error('Toggle error:', error);
@@ -328,6 +328,81 @@ export default function ProductionItemDetail() {
     } catch (error) {
       console.error('Archive error:', error);
       toast.error('Failed to archive');
+    }
+  };
+
+  // Restore archived item
+  const handleRestore = async () => {
+    if (!session || !item) return;
+
+    try {
+      const response = await fetch(`${API_URL}/api/production-library/items/${itemId}/restore`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${session.access_token}` }
+      });
+
+      if (response.ok) {
+        toast.success('Production item restored');
+        fetchData(); // Refresh the item
+      } else {
+        const error = await response.json();
+        toast.error(error.detail || 'Failed to restore');
+      }
+    } catch (error) {
+      console.error('Restore error:', error);
+      toast.error('Failed to restore');
+    }
+  };
+
+  // Duplicate item
+  const handleDuplicate = async () => {
+    if (!session || !item) return;
+
+    try {
+      const response = await fetch(`${API_URL}/api/production-library/items/${itemId}/duplicate`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${session.access_token}` }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        toast.success(data.message || 'Item duplicated');
+        // Navigate to the new item
+        navigate(`/app/production-library/items/${data.item.id}`);
+      } else {
+        const error = await response.json();
+        toast.error(error.detail || 'Failed to duplicate');
+      }
+    } catch (error) {
+      console.error('Duplicate error:', error);
+      toast.error('Failed to duplicate');
+    }
+  };
+
+  // Permanent delete (with confirmation)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  
+  const handlePermanentDelete = async () => {
+    if (!session || !item) return;
+
+    try {
+      const response = await fetch(`${API_URL}/api/production-library/items/${itemId}/permanent`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${session.access_token}` }
+      });
+
+      if (response.ok) {
+        toast.success('Production item permanently deleted');
+        navigate('/app/production-library');
+      } else {
+        const error = await response.json();
+        toast.error(error.detail || 'Cannot delete this item');
+        setShowDeleteConfirm(false);
+      }
+    } catch (error) {
+      console.error('Delete error:', error);
+      toast.error('Failed to delete');
+      setShowDeleteConfirm(false);
     }
   };
 
@@ -432,7 +507,26 @@ export default function ProductionItemDetail() {
                     Save
                   </button>
                 </>
+              ) : item?.is_active === false ? (
+                // Archived item actions
+                <>
+                  <button
+                    onClick={handleRestore}
+                    className="flex items-center gap-2 px-4 py-2 bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 rounded-lg transition-colors text-sm"
+                  >
+                    <RotateCcw className="w-4 h-4" />
+                    Restore
+                  </button>
+                  <button
+                    onClick={() => setShowDeleteConfirm(true)}
+                    className="flex items-center gap-2 px-4 py-2 bg-red-500/20 text-red-400 hover:bg-red-500/30 rounded-lg transition-colors text-sm"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    Delete Permanently
+                  </button>
+                </>
               ) : (
+                // Active item actions
                 <>
                   <button
                     onClick={toggleCompanyStandard}
@@ -444,6 +538,14 @@ export default function ProductionItemDetail() {
                   >
                     {item.is_company_standard ? <StarOff className="w-4 h-4" /> : <Star className="w-4 h-4" />}
                     {item.is_company_standard ? 'Remove Standard' : 'Make Standard'}
+                  </button>
+                  <button
+                    onClick={handleDuplicate}
+                    className="flex items-center gap-2 px-3 py-2 text-white/50 hover:text-white hover:bg-white/10 rounded-lg transition-colors text-sm"
+                    title="Duplicate"
+                  >
+                    <Copy className="w-4 h-4" />
+                    Duplicate
                   </button>
                   <button
                     onClick={() => setEditing(true)}
@@ -789,6 +891,41 @@ export default function ProductionItemDetail() {
           </div>
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+          <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-6 max-w-md mx-4">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-red-500/20 rounded-lg flex items-center justify-center">
+                <Trash2 className="w-5 h-5 text-red-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-white">Permanently Delete Item</h3>
+            </div>
+            <p className="text-neutral-400 mb-4">
+              Are you sure you want to permanently delete <span className="text-white font-medium">{item?.production_name}</span>?
+              This action cannot be undone.
+            </p>
+            <p className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg p-3 mb-6">
+              Note: Items that have been used in estimates, projects, or assemblies cannot be permanently deleted. They must remain archived for historical reference.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="px-4 py-2 text-white/60 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handlePermanentDelete}
+                className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg transition-colors"
+              >
+                Delete Permanently
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

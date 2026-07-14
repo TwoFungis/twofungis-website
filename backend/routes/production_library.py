@@ -452,7 +452,8 @@ async def delete_service_category(
 async def get_production_items(
     authorization: str = Header(...),
     page: int = Query(1, ge=1),
-    per_page: int = Query(50, ge=1, le=100),
+    per_page: int = Query(50, ge=1, le=1000),
+    limit: Optional[int] = Query(None, ge=1, le=1000),
     domain_id: Optional[str] = Query(None),
     service_category_id: Optional[str] = Query(None),
     search: Optional[str] = Query(None),
@@ -461,6 +462,9 @@ async def get_production_items(
     """Get production items with pagination and filtering"""
     context = await verify_token_and_get_org(authorization)
     org_id = context['organization_id']
+    
+    # Support both 'limit' and 'per_page' for compatibility
+    actual_per_page = limit if limit else per_page
     
     try:
         async with httpx.AsyncClient(timeout=15.0) as client:
@@ -483,13 +487,13 @@ async def get_production_items(
             total = int(count_response.headers.get('content-range', '0-0/0').split('/')[-1])
             
             # Get paginated items with relationships
-            offset = (page - 1) * per_page
+            offset = (page - 1) * actual_per_page
             response = await client.get(
                 f"{config.SUPABASE_URL}/rest/v1/production_items?"
                 f"{query}&"
                 f"select=*,knowledge_domains(id,name,code),measurement_units(id,code,name)&"
                 f"order=production_code.asc&"
-                f"offset={offset}&limit={per_page}",
+                f"offset={offset}&limit={actual_per_page}",
                 headers=headers
             )
             
@@ -514,8 +518,8 @@ async def get_production_items(
                     "meta": {
                         "total": total,
                         "page": page,
-                        "per_page": per_page,
-                        "total_pages": (total + per_page - 1) // per_page
+                        "per_page": actual_per_page,
+                        "total_pages": (total + actual_per_page - 1) // actual_per_page
                     }
                 }
             else:
@@ -777,6 +781,239 @@ async def delete_production_item(
         raise
     except Exception as e:
         logger.error(f"Error archiving production item: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/items/{item_id}/restore")
+async def restore_production_item(
+    item_id: str,
+    authorization: str = Header(...)
+):
+    """Restore an archived production item"""
+    context = await verify_token_and_get_org(authorization)
+    org_id = context['organization_id']
+    user_id = context['user_id']
+    
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            headers = await get_service_headers()
+            
+            # Restore by setting is_active to true
+            response = await client.patch(
+                f"{config.SUPABASE_URL}/rest/v1/production_items?"
+                f"id=eq.{item_id}&organization_id=eq.{org_id}",
+                headers=headers,
+                json={
+                    "is_active": True,
+                    "archived_at": None,
+                    "archived_by": None,
+                    "updated_at": datetime.now(timezone.utc).isoformat(),
+                    "updated_by": user_id
+                }
+            )
+            
+            if response.status_code == 200:
+                return {"success": True, "message": "Item restored"}
+            else:
+                raise HTTPException(status_code=response.status_code, detail="Failed to restore item")
+                
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error restoring production item: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/items/{item_id}/duplicate")
+async def duplicate_production_item(
+    item_id: str,
+    authorization: str = Header(...)
+):
+    """Duplicate a production item with a new code"""
+    context = await verify_token_and_get_org(authorization)
+    org_id = context['organization_id']
+    user_id = context['user_id']
+    
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            headers = await get_service_headers()
+            
+            # Get the original item
+            response = await client.get(
+                f"{config.SUPABASE_URL}/rest/v1/production_items?"
+                f"id=eq.{item_id}&organization_id=eq.{org_id}",
+                headers=headers
+            )
+            
+            if response.status_code != 200 or not response.json():
+                raise HTTPException(status_code=404, detail="Item not found")
+            
+            original = response.json()[0]
+            
+            # Generate new code
+            base_code = original['production_code']
+            suffix = 1
+            new_code = f"{base_code}-COPY"
+            
+            # Check for existing codes
+            while True:
+                check_resp = await client.get(
+                    f"{config.SUPABASE_URL}/rest/v1/production_items?"
+                    f"organization_id=eq.{org_id}&production_code=eq.{new_code}",
+                    headers=headers
+                )
+                if check_resp.status_code == 200 and not check_resp.json():
+                    break
+                suffix += 1
+                new_code = f"{base_code}-COPY{suffix}"
+                if suffix > 99:
+                    new_code = f"{base_code}-{datetime.now().strftime('%H%M%S')}"
+                    break
+            
+            # Create the duplicate
+            new_item = {
+                "organization_id": org_id,
+                "production_code": new_code,
+                "production_name": f"{original['production_name']} (Copy)",
+                "knowledge_domain_id": original.get('knowledge_domain_id'),
+                "measurement_unit_id": original.get('measurement_unit_id'),
+                "description": original.get('description'),
+                "notes": original.get('notes'),
+                "production_per_day": original.get('production_per_day'),
+                "crew_size": original.get('crew_size'),
+                "labour_hours": original.get('labour_hours'),
+                "production_output": original.get('production_output'),
+                "standard_rate": original.get('standard_rate'),
+                "premium_rate": original.get('premium_rate'),
+                "complex_rate": original.get('complex_rate'),
+                "is_company_standard": False,  # Start as non-standard
+                "created_by": user_id
+            }
+            
+            create_resp = await client.post(
+                f"{config.SUPABASE_URL}/rest/v1/production_items",
+                headers=headers,
+                json=new_item
+            )
+            
+            if create_resp.status_code == 201:
+                created = create_resp.json()[0]
+                
+                # Copy service category links
+                sc_resp = await client.get(
+                    f"{config.SUPABASE_URL}/rest/v1/production_item_service_categories?"
+                    f"production_item_id=eq.{item_id}",
+                    headers=headers
+                )
+                if sc_resp.status_code == 200:
+                    for link in sc_resp.json():
+                        await client.post(
+                            f"{config.SUPABASE_URL}/rest/v1/production_item_service_categories",
+                            headers=headers,
+                            json={
+                                "production_item_id": created['id'],
+                                "service_category_id": link['service_category_id']
+                            }
+                        )
+                
+                return {
+                    "success": True,
+                    "message": f"Item duplicated as {new_code}",
+                    "item": created
+                }
+            else:
+                raise HTTPException(status_code=create_resp.status_code, detail="Failed to create duplicate")
+                
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error duplicating production item: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.delete("/items/{item_id}/permanent")
+async def permanently_delete_production_item(
+    item_id: str,
+    authorization: str = Header(...)
+):
+    """
+    Permanently delete a production item.
+    Only allowed if the item has never been referenced in:
+    - Estimates
+    - Projects
+    - Assemblies
+    """
+    context = await verify_token_and_get_org(authorization)
+    org_id = context['organization_id']
+    
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            headers = await get_service_headers()
+            
+            # Check if item exists and belongs to this org
+            item_resp = await client.get(
+                f"{config.SUPABASE_URL}/rest/v1/production_items?"
+                f"id=eq.{item_id}&organization_id=eq.{org_id}",
+                headers=headers
+            )
+            
+            if item_resp.status_code != 200 or not item_resp.json():
+                raise HTTPException(status_code=404, detail="Item not found")
+            
+            # Check if item is used in any assemblies
+            assembly_check = await client.get(
+                f"{config.SUPABASE_URL}/rest/v1/assembly_items?"
+                f"production_item_id=eq.{item_id}&select=id",
+                headers=headers
+            )
+            if assembly_check.status_code == 200 and assembly_check.json():
+                raise HTTPException(
+                    status_code=400,
+                    detail="Cannot permanently delete - item is used in assemblies. Archive it instead."
+                )
+            
+            # Check if item is used in any estimates (estimate_line_items)
+            estimate_check = await client.get(
+                f"{config.SUPABASE_URL}/rest/v1/estimate_line_items?"
+                f"production_item_id=eq.{item_id}&select=id",
+                headers=headers
+            )
+            if estimate_check.status_code == 200 and estimate_check.json():
+                raise HTTPException(
+                    status_code=400,
+                    detail="Cannot permanently delete - item is used in estimates. Archive it instead."
+                )
+            
+            # Delete service category links first
+            await client.delete(
+                f"{config.SUPABASE_URL}/rest/v1/production_item_service_categories?"
+                f"production_item_id=eq.{item_id}",
+                headers=headers
+            )
+            
+            # Delete revisions
+            await client.delete(
+                f"{config.SUPABASE_URL}/rest/v1/production_item_revisions?"
+                f"production_item_id=eq.{item_id}",
+                headers=headers
+            )
+            
+            # Permanently delete the item
+            delete_resp = await client.delete(
+                f"{config.SUPABASE_URL}/rest/v1/production_items?"
+                f"id=eq.{item_id}&organization_id=eq.{org_id}",
+                headers=headers
+            )
+            
+            if delete_resp.status_code in [200, 204]:
+                return {"success": True, "message": "Item permanently deleted"}
+            else:
+                raise HTTPException(status_code=delete_resp.status_code, detail="Failed to delete item")
+                
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error permanently deleting production item: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 # =====================================================

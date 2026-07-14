@@ -110,7 +110,7 @@ const NAV_SECTIONS = [
     id: 'knowledge',
     label: 'Knowledge',
     items: [
-      { id: 'standards', label: 'Company Standards', icon: Library, count: null, primary: true },
+      { id: 'standards', label: 'Production Standards', icon: Library, count: null, primary: true },
       { id: 'domains', label: 'Knowledge Domains', icon: FolderTree, count: null },
       { id: 'assemblies', label: 'Assemblies', icon: Layers, count: null },
     ]
@@ -549,7 +549,7 @@ const CommandPalette = ({ isOpen, onClose, items, domains, categories, assemblie
               {filteredResults.items.length > 0 && (
                 <div className="px-3 py-2">
                   <div className="px-2 py-1.5 text-[11px] uppercase tracking-widest font-medium text-neutral-500">
-                    Company Standards
+                    Production Standards
                   </div>
                   {filteredResults.items.map((item, i) => {
                     const isSelected = selectedIndex === i;
@@ -686,10 +686,11 @@ const CompanyStandardsView = ({
     if (filters.companyStandard) {
       result = result.filter(item => item.is_company_standard);
     }
+    // Filter by active/archived status (using is_active field)
     if (filters.status === 'active') {
-      result = result.filter(item => !item.is_archived);
+      result = result.filter(item => item.is_active !== false);
     } else if (filters.status === 'archived') {
-      result = result.filter(item => item.is_archived);
+      result = result.filter(item => item.is_active === false);
     }
     
     result.sort((a, b) => {
@@ -721,7 +722,7 @@ const CompanyStandardsView = ({
           <div className="w-20 h-20 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
             <Library className="w-10 h-10 text-emerald-400" strokeWidth={1.5} />
           </div>
-          <h3 className="text-xl font-medium text-white mb-2">Build Your Company Standards</h3>
+          <h3 className="text-xl font-medium text-white mb-2">Build Your Production Standards</h3>
           <p className="text-neutral-400 text-sm mb-8 leading-relaxed">
             Import your company&apos;s production knowledge to get started. Every standard you add becomes part of your operational intelligence.
           </p>
@@ -863,7 +864,7 @@ const CompanyStandardsView = ({
                 onChange={(e) => onFilterChange('companyStandard', e.target.checked)}
                 className="w-4 h-4 rounded border-neutral-700 bg-neutral-900 text-emerald-500 focus:ring-emerald-500/20"
               />
-              <span className="text-sm text-neutral-300">Company Standards Only</span>
+              <span className="text-sm text-neutral-300">Production Standards Only</span>
             </label>
             
             <button
@@ -1108,7 +1109,7 @@ const DomainsView = ({ domains, items, onSelectDomain, onImport }) => {
           </div>
           <h3 className="text-xl font-medium text-white mb-2">Knowledge Domains</h3>
           <p className="text-neutral-400 text-sm mb-6 leading-relaxed">
-            Domains organize your company standards into logical categories like Finish Carpentry, Doors &amp; Hardware, and more.
+            Domains organize your production standards into logical categories like Finish Carpentry, Doors &amp; Hardware, and more.
           </p>
           <button
             onClick={onImport}
@@ -1126,7 +1127,7 @@ const DomainsView = ({ domains, items, onSelectDomain, onImport }) => {
     <div className="flex-1 p-6 overflow-auto">
       <div className="mb-6">
         <h2 className="text-xl font-medium text-white mb-1">Knowledge Domains</h2>
-        <p className="text-sm text-neutral-500">Organize your company standards by trade specialty</p>
+        <p className="text-sm text-neutral-500">Organize your production standards by trade specialty</p>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1200,7 +1201,7 @@ const AssembliesView = ({ assemblies, items, onSelectAssembly, onCreateAssembly 
           Assemblies group related standards together. Build a door installation assembly with all hardware, trim, and finishing components.
         </p>
         <p className="text-neutral-500 text-xs">
-          This feature is part of Phase 3 - Company Standards expansion.
+          This feature is part of Phase 3 - Production Standards expansion.
         </p>
       </div>
     </div>
@@ -1306,7 +1307,7 @@ const TemplatesView = () => {
           Save time by creating templates for common project types. Templates pre-populate estimates with your most-used standards and assemblies.
         </p>
         <p className="text-neutral-500 text-xs">
-          This feature is part of Phase 3 - Company Standards expansion.
+          This feature is part of Phase 3 - Production Standards expansion.
         </p>
       </div>
     </div>
@@ -1910,10 +1911,11 @@ const ProductionLibraryWorkspace = () => {
       
       const headers = { 'Authorization': `Bearer ${currentSession.access_token}` };
       
+      // Fetch all items (including inactive) so we can filter on frontend
       const [itemsRes, domainsRes, catsRes, assembliesRes, unitsRes] = await Promise.all([
-        fetch(`${API_URL}/api/production-library/items?limit=500`, { headers }),
-        fetch(`${API_URL}/api/production-library/domains`, { headers }),
-        fetch(`${API_URL}/api/production-library/service-categories`, { headers }),
+        fetch(`${API_URL}/api/production-library/items?limit=1000&include_inactive=true`, { headers }),
+        fetch(`${API_URL}/api/production-library/domains?include_inactive=true`, { headers }),
+        fetch(`${API_URL}/api/production-library/service-categories?include_inactive=true`, { headers }),
         fetch(`${API_URL}/api/production-library/assemblies`, { headers }),
         fetch(`${API_URL}/api/production-library/units`, { headers })
       ]);

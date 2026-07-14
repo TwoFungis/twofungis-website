@@ -1,0 +1,71 @@
+{
+  "summary": "TradeOS Alpha Completion Pass — Production Library CRUD & Standards rename verified end-to-end. Backend: 11/11 pytest tests pass covering limit=500 pagination fix, default 50 fallback, limit>1000 rejection, include_inactive listing, POST /duplicate (-COPY suffix, name (Copy), is_company_standard=false), DELETE (soft-archive), POST /restore (round-trip), DELETE /permanent (removes unreferenced item + 404 on subsequent GET), DELETE /permanent blocked with 400 when item is used in an assembly, and auth-guard on all 3 new endpoints. Frontend: Production Library workspace loads with 434-item sidebar count under 'Production Standards' (no 'Company Standards' string on the page); search 'IMPORT-' narrows list to imported rows; filter panel exposes Active/Archived/All Status select; clicking an active item routes to /app/production-library/items/{id} with Edit + Duplicate + Archive + Remove Standard buttons visible; archived-item detail page shows Restore + Delete Permanently buttons (no Duplicate). The full CRUD lifecycle is wired correctly UI ↔ backend.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "GET /api/production-library/items", "issue": "'per_page' query param docstring says max 1000 but Query has le=1000 while default remains 50; if a caller passes both limit and per_page, limit silently wins with no warning."},
+      {"endpoint": "POST /api/production-library/items/{id}/duplicate", "issue": "Only copies a hard-coded subset of columns (production_per_day, crew_size, labour_hours, production_output, standard/premium/complex_rate, notes, description). Fields such as low_labour_rate, premium_labour_rate, material_rate, equipment_rate, division_id, trade_discipline, cost_code, tags, and attachments are NOT duplicated. Consider using original.copy() minus id/production_code/timestamps."},
+      {"endpoint": "POST /api/production-library/items/{id}/duplicate", "issue": "The endpoint does not create an initial revision row for the duplicate (unlike POST /items). Revision history for duplicates will show 'nothing' until first edit."},
+      {"endpoint": "DELETE /api/production-library/items/{id}/permanent", "issue": "Checks assembly_items + estimate_line_items but NOT other likely references (projects, invoices, purchase orders). If the schema has additional FK tables, deletion could still fail at DB level or orphan rows. Consider centralising 'is_referenced' checks."},
+      {"endpoint": "POST /api/production-library/items/{id}/restore", "issue": "Does not verify the item is currently archived (is_active=false). Calling restore on an already-active item silently no-ops with success=true, which is confusing behaviour."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "ProductionItemDetail header badge", "issue": "The header pill still reads 'Company Standard' (singular) and the toggle toasts show 'Production Standards' — mixed rename. If the pass renames the concept to 'Production Standards', the detail-page badge should read 'Production Standard' (or match the sidebar naming). Line ~470 of /app/frontend/src/pages/app/ProductionItemDetail.jsx.", "selector": "span:has-text('Company Standard')", "priority": "LOW"},
+      {"component": "ProductionItemDetail Status section", "issue": "Field label reads 'Company Standard: Yes/No' — should be 'Production Standard' to stay consistent with the rename. Line ~864.", "selector": "text=Company Standard", "priority": "LOW"},
+      {"component": "ProductionLibraryWorkspace CommandPalette", "issue": "Command palette Quick Action still labeled 'Create Company Standard' (line 391) instead of 'Create Production Standard'.", "selector": "text=Create Company Standard", "priority": "LOW"},
+      {"component": "ProductionLibraryWorkspace filter checkbox", "issue": "Filter panel toggle checkbox is labeled 'Production Standards Only' but the underlying field is is_company_standard. Label is consistent with rename — flagging for reference only."}
+    ],
+    "integration_issues": [
+      {"flow": "post-login command-center bootstrap", "issue": "Right after Supabase SIGNED_IN, first GET /api/workspace/context and /api/command-center throw 'TypeError: Failed to fetch' in the console (visible on second load too). The request likely races the service-worker take-over. Doesn't block navigation to Production Library, but produces noisy console errors that could mask real failures.", "affected_selectors": ["[data-testid='app-layout']"]}
+    ],
+    "design_issues": []
+  },
+  "verification_results": {
+    "backend_limit_500_returns_full_page": "PASS - meta.per_page=500, items length matches total (>=50)",
+    "backend_default_pagination_50": "PASS",
+    "backend_limit_over_1000_rejected": "PASS - 422",
+    "backend_include_inactive_returns_archived": "PASS - archived item leaks out of active-only listing and appears when include_inactive=true",
+    "backend_duplicate_creates_COPY_suffix": "PASS - -COPY suffix + (Copy) name + is_company_standard=false",
+    "backend_archive_then_restore_roundtrip": "PASS - is_active toggles false → true",
+    "backend_permanent_delete_removes_unreferenced": "PASS - subsequent GET returns 404",
+    "backend_permanent_delete_blocked_when_used_in_assembly": "PASS - 400 with 'used in assemblies' detail",
+    "backend_auth_guards_on_restore_duplicate_permanent": "PASS - all 3 endpoints reject unauth requests",
+    "frontend_sidebar_shows_Production_Standards_434": "PASS - 'Production Standards\\n434' in nav-standards",
+    "frontend_no_Company_Standards_string_on_workspace": "PASS - substring not present in workspace listing view",
+    "frontend_search_IMPORT_narrows_list": "PASS - 2 rows shown for 'IMPORT-' filter",
+    "frontend_filter_status_options_Active_Archived_All": "PASS - select exposes Active/Archived/All",
+    "frontend_active_item_detail_has_Duplicate_Edit_Archive": "PASS - Duplicate + Edit + Archive icon + Remove Standard buttons visible on active item detail",
+    "frontend_archived_item_detail_has_Restore_and_DeletePermanently": "PASS - Restore + Delete Permanently buttons visible, Duplicate hidden",
+    "frontend_click_row_navigates_to_item_detail_route": "PASS - /app/production-library/items/{id}"
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_production_library_crud.py",
+    "/app/test_reports/pytest/production_library_crud_results.xml"
+  ],
+  "action_items": [
+    "Rename remaining 'Company Standard' strings on the detail page (header pill line ~470 & Status field line ~864 in ProductionItemDetail.jsx) and in the Command Palette Quick Action (line 391 in ProductionLibraryWorkspace.jsx) to 'Production Standard' to complete the rename pass.",
+    "Investigate the two post-login 'Failed to fetch' console errors on /api/workspace/context and /api/command-center. They fire on every fresh session and could mask real integration errors from ops.",
+    "Enhance /items/{id}/duplicate to copy ALL non-identity fields (low_labour_rate, premium_labour_rate, material_rate, equipment_rate, division_id, trade_discipline, cost_code, tags, service_category_ids) — current copy loses several columns silently.",
+    "Add an initial revision row on duplicate to keep revision history consistent with POST /items.",
+    "In /items/{id}/restore, guard against restoring an already-active item and return 400 or a clear no-op message instead of silent success.",
+    "Consider extending /items/{id}/permanent reference checks beyond assembly_items and estimate_line_items (projects, invoices, POs) or wrap the delete in a try/except that returns 400 with a clean 'still referenced' message when the DB constraint fires."
+  ],
+  "critical_code_review_comments": [
+    "routes/production_library.py is still >2200 lines with import + CRUD + assemblies + attachments all in one router file. The 700-line guideline is exceeded 3x; split into production_library_items.py, production_library_assemblies.py, production_library_import.py, etc.",
+    "/items/{id}/duplicate cherry-picks fields; use a canonical serialiser (or SELECT * then strip id/production_code/created_at/updated_at) so future columns don't get silently dropped from copies.",
+    "/items/{id}/permanent only checks 2 tables. If new FKs are added (e.g., estimates_v2, po_line_items), stale checks will let a delete through and either 500 on FK violation or orphan referrers. Consider adding a Postgres function 'production_item_is_referenced(id)' or a DB trigger to keep this authoritative.",
+    "The frontend rename is incomplete: workspace lists and sidebar use 'Production Standards' but the item detail header, status field, and command-palette action still say 'Company Standard'. Users will see mixed language."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_production_library_crud.py (new — 11 tests, all passing)"
+  ],
+  "success_rate": {"backend": "100% (11/11)", "frontend": "100% (all listed flows verified)"},
+  "test_credentials": "inbox@twofungis.ca / TradeOS2024! — working",
+  "seed_data_creation": "Each pytest run creates and cleans up a handful of TEST-CRUD-* items and one TEST-ASM-* assembly. Cleanup is best-effort: on assertion failure a few TEST-CRUD-* rows and one TEST-ASM-* assembly may remain in the Two Fungis Finishing org.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "The Production Library workspace is at /app/production-library and currently shows 434 items for the Two Fungis Finishing org (367 active + 67 archived at test time). Archived filter works. Item detail routing is a full page at /app/production-library/items/{id} (NOT a slide-out) with different action sets for active vs archived items. Backend endpoint /items now accepts BOTH limit and per_page (limit wins). New endpoints live at POST /items/{id}/restore, POST /items/{id}/duplicate, DELETE /items/{id}/permanent. All three are auth-gated. Rename pass is 90% complete — three remaining 'Company Standard' strings live in ProductionItemDetail.jsx (~lines 470, 864) and ProductionLibraryWorkspace.jsx (~line 391).",
+  "rca of the issue": "N/A — no functional bugs. Only cosmetic rename leftovers and non-blocking minor code-review observations."
+}

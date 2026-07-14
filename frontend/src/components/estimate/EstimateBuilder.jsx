@@ -5,7 +5,7 @@
  * 
  * Workflow:
  * 1. Create/Open Estimate (from Opportunity)
- * 2. Browse Company Standards (Production Library)
+ * 2. Browse Production Standards (Production Library)
  * 3. Select Standards → Add to Estimate
  * 4. Adjust Quantities
  * 5. Automatic Totals
@@ -67,7 +67,7 @@ function formatNumber(value, decimals = 2) {
 }
 
 /**
- * Company Standards Browser
+ * Production Standards Browser
  * Browse and select from Production Library
  */
 function StandardsBrowser({ session, onAddToEstimate, addedItemIds }) {
@@ -152,7 +152,7 @@ function StandardsBrowser({ session, onAddToEstimate, addedItemIds }) {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search Company Standards..."
+            placeholder="Search Production Standards..."
             className="w-full pl-10 pr-4 py-2 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm placeholder-white/40 focus:outline-none focus:border-emerald-500/50"
             data-testid="standards-search"
           />
@@ -426,7 +426,7 @@ function CompanyBrainReview({ estimate, items }) {
       newInsights.push({
         type: 'warning',
         title: 'Empty Estimate',
-        message: 'Add items from your Company Standards to begin building your estimate.'
+        message: 'Add items from your Production Standards to begin building your estimate.'
       });
     } else {
       // Check for completeness
@@ -859,7 +859,7 @@ export default function EstimateBuilder({ opportunity, session, onRefresh }) {
           <div className="p-4 border-b border-neutral-800">
             <div className="flex items-center gap-2">
               <Package className="w-4 h-4 text-emerald-400" />
-              <h3 className="text-sm font-medium text-white">Company Standards</h3>
+              <h3 className="text-sm font-medium text-white">Production Standards</h3>
             </div>
             <p className="text-xs text-white/50 mt-1">Select items to add to estimate</p>
           </div>
@@ -900,7 +900,7 @@ export default function EstimateBuilder({ opportunity, session, onRefresh }) {
                   </div>
                   <h3 className="text-lg font-medium text-white mb-2">Start Building Your Estimate</h3>
                   <p className="text-white/50 text-sm leading-relaxed">
-                    Browse your Company Standards on the left and click the + button to add items to your estimate. Quantities can be adjusted after adding.
+                    Browse your Production Standards on the left and click the + button to add items to your estimate. Quantities can be adjusted after adding.
                   </p>
                 </div>
               </div>
