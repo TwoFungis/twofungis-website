@@ -309,7 +309,7 @@ const EstimateWorkbench = () => {
     if (estimateIdFromUrl) {
       loadEstimate(estimateIdFromUrl);
     }
-  }, []);
+  }, [fetchLibraryData, fetchEstimates, searchParams, loadEstimate]);
   
   // Track unsaved changes - use a ref to track initial load state
   const isInitialLoad = React.useRef(true);

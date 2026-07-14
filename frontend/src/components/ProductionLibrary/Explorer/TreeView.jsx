@@ -160,7 +160,7 @@ const TreeView = ({
         }
       });
     }
-  }, [searchQuery, filteredTree]);
+  }, [searchQuery, filteredTree, expandedNodes, onToggleExpand]);
   
   // Render a standard node
   const renderStandard = useCallback((standard, level) => {
