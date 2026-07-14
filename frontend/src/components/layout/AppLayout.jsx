@@ -202,41 +202,48 @@ const AppLayout = () => {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-h-screen">
-        {/* Top Bar */}
-        <header className="bg-zinc-900 border-b border-zinc-800 px-4 lg:px-8 py-4 flex items-center justify-between">
+        {/* Top Bar - Mobile Optimized */}
+        <header className="bg-zinc-900 border-b border-zinc-800 px-4 lg:px-8 py-3 lg:py-4 flex items-center justify-between min-h-[56px] lg:min-h-[64px] safe-area-inset-top">
+          {/* Hamburger Menu Button - 48px touch target */}
           <button
             onClick={() => setMobileMenuOpen(true)}
-            className="lg:hidden text-zinc-400 hover:text-white"
+            className="lg:hidden w-12 h-12 -ml-2 flex items-center justify-center text-zinc-400 hover:text-white active:bg-zinc-800 rounded-xl transition-colors"
             data-testid="mobile-menu-btn"
+            aria-label="Open navigation menu"
           >
             <Menu className="w-6 h-6" />
           </button>
 
+          {/* Logo for mobile - centered */}
           <div className="lg:hidden">
-            <LogoIcon size="md" />
+            <Link to="/app/command-center">
+              <LogoIcon size="md" />
+            </Link>
           </div>
 
+          {/* Spacer for desktop */}
           <div className="hidden lg:block" />
 
-          <div className="flex items-center gap-3">
+          {/* Right side actions */}
+          <div className="flex items-center gap-2 lg:gap-3">
             {/* Sync Indicator */}
             <SyncIndicator />
             
-            {/* Company Brain Button - Universal AI Interface */}
+            {/* Company Brain Button - Touch friendly */}
             <button
               onClick={() => setBrainOpen(true)}
-              className="bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 border border-emerald-500/30"
+              className="bg-emerald-500/20 hover:bg-emerald-500/30 active:bg-emerald-500/40 text-emerald-400 px-3 lg:px-4 py-2.5 rounded-xl font-medium transition-colors flex items-center gap-2 border border-emerald-500/30 min-h-[44px]"
               data-testid="company-brain-btn"
               title="Company Brain - Your Operations Partner"
             >
               <Brain className="w-5 h-5" />
-              <span className="hidden sm:inline">Brain</span>
+              <span className="hidden sm:inline text-sm">Brain</span>
             </button>
           </div>
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 p-4 lg:p-8 pb-20 lg:pb-8 overflow-auto relative bg-black">
+        <main className="flex-1 p-4 lg:p-8 overflow-auto relative bg-black">
           {/* Large Shield Watermark - Centered Background */}
           <div 
             className="fixed inset-0 pointer-events-none z-0 flex items-center justify-center"
@@ -256,68 +263,101 @@ const AppLayout = () => {
             <Outlet />
           </div>
         </main>
-
-        {/* Mobile Bottom Nav */}
-        <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-zinc-900 border-t border-zinc-800 flex justify-around py-2 z-30">
-          {navItems.slice(0, 5).map((item) => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              className={({ isActive }) =>
-                `flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-colors ${
-                  isActive ? 'text-emerald-400' : 'text-zinc-500'
-                }`
-              }
-            >
-              <item.icon className="w-5 h-5" />
-              <span className="text-xs">{item.label.split(' ')[0]}</span>
-            </NavLink>
-          ))}
-        </nav>
       </div>
 
-      {/* Mobile Sidebar */}
+      {/* Mobile Sidebar / Navigation Drawer */}
       {mobileMenuOpen && (
         <>
           <div 
-            className="fixed inset-0 bg-black/50 z-40 lg:hidden" 
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden" 
             onClick={() => setMobileMenuOpen(false)} 
           />
-          <aside className="fixed inset-y-0 left-0 w-72 bg-zinc-900 z-50 lg:hidden flex flex-col">
-            <div className="p-4 border-b border-zinc-800 flex items-center justify-between">
-              <Logo size="sm" showText={false} />
-              <button onClick={() => setMobileMenuOpen(false)} className="text-zinc-400">
+          <aside className="fixed inset-y-0 left-0 w-[85%] max-w-[320px] bg-zinc-900 z-50 lg:hidden flex flex-col safe-area-inset-left">
+            {/* Header */}
+            <div className="p-4 border-b border-zinc-800 flex items-center justify-between min-h-[64px]">
+              <Link to="/app/command-center" onClick={() => setMobileMenuOpen(false)}>
+                <img src="/logo.png" alt="TradeOS" className="h-10 w-auto" />
+              </Link>
+              <button 
+                onClick={() => setMobileMenuOpen(false)} 
+                className="w-10 h-10 flex items-center justify-center rounded-lg text-zinc-400 hover:bg-zinc-800 active:bg-zinc-700 transition-colors"
+                aria-label="Close menu"
+              >
                 <X className="w-6 h-6" />
               </button>
             </div>
 
-            <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+            {/* Navigation Items */}
+            <nav className="flex-1 p-3 space-y-1 overflow-y-auto overscroll-contain">
               {navItems.map((item) => (
                 <NavLink
                   key={item.path}
                   to={item.path}
                   onClick={() => setMobileMenuOpen(false)}
                   className={({ isActive }) =>
-                    `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                    `flex items-center gap-4 px-4 py-3.5 rounded-xl transition-colors min-h-[48px] ${
                       isActive
-                        ? 'bg-emerald-500/10 text-emerald-400'
-                        : 'text-zinc-400 hover:text-white hover:bg-zinc-800'
+                        ? 'bg-emerald-500/15 text-emerald-400 border-l-4 border-emerald-500'
+                        : 'text-zinc-300 hover:text-white hover:bg-zinc-800 active:bg-zinc-700'
                     }`
                   }
                 >
-                  <item.icon className="w-5 h-5" />
-                  <span className="font-medium">{item.label}</span>
+                  <item.icon className="w-5 h-5 flex-shrink-0" />
+                  <span className="font-medium text-[15px]">{item.label}</span>
                 </NavLink>
               ))}
+              
+              {/* Separator */}
+              <div className="border-t border-zinc-800 my-3"></div>
+              
+              {/* Bottom nav items */}
+              {bottomNavItems.map((item) => (
+                <NavLink
+                  key={item.path}
+                  to={item.path}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={({ isActive }) =>
+                    `flex items-center gap-4 px-4 py-3.5 rounded-xl transition-colors min-h-[48px] ${
+                      isActive
+                        ? 'bg-emerald-500/15 text-emerald-400'
+                        : 'text-zinc-300 hover:text-white hover:bg-zinc-800 active:bg-zinc-700'
+                    }`
+                  }
+                >
+                  <item.icon className="w-5 h-5 flex-shrink-0" />
+                  <span className="font-medium text-[15px]">{item.label}</span>
+                </NavLink>
+              ))}
+              
+              {/* Profile Link */}
+              <NavLink
+                to="/app/profile"
+                onClick={() => setMobileMenuOpen(false)}
+                className={({ isActive }) =>
+                  `flex items-center gap-4 px-4 py-3.5 rounded-xl transition-colors min-h-[48px] ${
+                    isActive
+                      ? 'bg-emerald-500/15 text-emerald-400'
+                      : 'text-zinc-300 hover:text-white hover:bg-zinc-800 active:bg-zinc-700'
+                  }`
+                }
+              >
+                <User className="w-5 h-5 flex-shrink-0" />
+                <span className="font-medium text-[15px]">My Profile</span>
+              </NavLink>
             </nav>
 
-            <div className="p-4 border-t border-zinc-800">
+            {/* Footer */}
+            <div className="p-4 border-t border-zinc-800 space-y-3 safe-area-inset-bottom">
+              <div className="bg-zinc-800/50 rounded-xl p-4">
+                <p className="text-sm text-zinc-200 truncate font-medium">{organizationName}</p>
+                <p className="text-xs text-zinc-500 capitalize mt-0.5">{displayPlan} Plan</p>
+              </div>
               <button
                 onClick={handleSignOut}
-                className="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
+                className="flex items-center gap-4 w-full px-4 py-3.5 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-800 active:bg-zinc-700 transition-colors min-h-[48px]"
               >
-                <LogOut className="w-5 h-5" />
-                <span className="font-medium">Sign Out</span>
+                <LogOut className="w-5 h-5 flex-shrink-0" />
+                <span className="font-medium text-[15px]">Sign Out</span>
               </button>
             </div>
           </aside>

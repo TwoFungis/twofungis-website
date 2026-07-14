@@ -77,7 +77,7 @@ function getDaysUntil(dateString) {
   return Math.ceil((target - today) / (1000 * 60 * 60 * 24));
 }
 
-// Opportunity Card Component
+// Opportunity Card Component - Mobile Optimized
 function OpportunityCard({ opportunity, onClick }) {
   const stage = STAGE_CONFIG[opportunity.status] || STAGE_CONFIG.discovered;
   const daysUntil = getDaysUntil(opportunity.tender_due_date);
@@ -87,50 +87,50 @@ function OpportunityCard({ opportunity, onClick }) {
   return (
     <div
       onClick={onClick}
-      className="bg-[#111111] border border-[#262626] rounded-xl p-5 cursor-pointer transition-all duration-200 hover:border-white/20 hover:-translate-y-[2px] group"
+      className="bg-[#111111] border border-[#262626] rounded-xl p-4 sm:p-5 cursor-pointer transition-all duration-200 hover:border-white/20 active:bg-[#1a1a1a] group min-h-[120px]"
       data-testid={`opportunity-card-${opportunity.id}`}
     >
       <div className="flex items-start justify-between mb-3">
-        <span className={`px-2.5 py-1 text-xs font-medium rounded-full border ${stage.color}`}>
+        <span className={`px-2.5 py-1.5 text-xs font-medium rounded-full border ${stage.color}`}>
           {stage.label}
         </span>
-        <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-white/50 transition-colors" />
+        <ChevronRight className="w-5 h-5 text-white/20 group-hover:text-white/50 transition-colors" />
       </div>
 
-      <h3 className="text-base font-medium text-white mb-1 truncate group-hover:text-emerald-400 transition-colors">
+      <h3 className="text-base sm:text-lg font-medium text-white mb-1 line-clamp-2 group-hover:text-emerald-400 transition-colors">
         {opportunity.name}
       </h3>
       
-      <p className="text-xs font-mono text-white/40 mb-4">
+      <p className="text-xs font-mono text-white/40 mb-3">
         {opportunity.reference_number || 'No reference'}
       </p>
 
       <div className="space-y-2 text-sm">
         {(opportunity.client_company || opportunity.client_name) && (
           <div className="flex items-center gap-2 text-white/60">
-            <Building2 className="w-3.5 h-3.5 text-white/40" />
+            <Building2 className="w-4 h-4 text-white/40 flex-shrink-0" />
             <span className="truncate">{opportunity.client_company || opportunity.client_name}</span>
           </div>
         )}
         
         {opportunity.site_city && (
           <div className="flex items-center gap-2 text-white/60">
-            <MapPin className="w-3.5 h-3.5 text-white/40" />
+            <MapPin className="w-4 h-4 text-white/40 flex-shrink-0" />
             <span>{opportunity.site_city}</span>
           </div>
         )}
       </div>
 
       <div className="flex items-center justify-between mt-4 pt-4 border-t border-[#262626]">
-        <span className="font-mono text-lg text-white">
+        <span className="font-mono text-lg sm:text-xl text-white font-semibold">
           {formatCurrency(opportunity.estimated_value)}
         </span>
         
         {opportunity.tender_due_date && (
-          <span className={`text-xs font-mono ${
-            isOverdue ? 'text-red-400' : isUrgent ? 'text-amber-400' : 'text-white/50'
+          <span className={`text-xs sm:text-sm font-mono px-2 py-1 rounded-lg ${
+            isOverdue ? 'text-red-400 bg-red-500/10' : isUrgent ? 'text-amber-400 bg-amber-500/10' : 'text-white/50'
           }`}>
-            {isOverdue ? `${Math.abs(daysUntil)}d overdue` : daysUntil !== null ? `${daysUntil}d` : formatDate(opportunity.tender_due_date)}
+            {isOverdue ? `${Math.abs(daysUntil)}d overdue` : daysUntil !== null ? `${daysUntil}d left` : formatDate(opportunity.tender_due_date)}
           </span>
         )}
       </div>
@@ -502,86 +502,88 @@ export default function OpportunitiesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a]" data-testid="opportunities-page">
-      {/* Header */}
+    <div className="min-h-screen bg-[#0a0a0a] workspace-container" data-testid="opportunities-page">
+      {/* Header - Mobile Optimized */}
       <header className="sticky top-0 z-40 bg-[#0a0a0a] border-b border-[#262626]">
-        <div className="max-w-[1600px] mx-auto px-6 lg:px-8 py-6">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-semibold text-white">Opportunities</h1>
-              <p className="text-white/50 text-sm mt-1">Manage your pipeline from discovery to project</p>
+              <h1 className="text-xl sm:text-2xl font-semibold text-white">Opportunities</h1>
+              <p className="text-white/50 text-sm mt-0.5 sm:mt-1">Manage your pipeline</p>
             </div>
             
             <button
               onClick={handleCreate}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-xl transition-colors"
+              className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-medium rounded-xl transition-colors min-h-[48px]"
               data-testid="create-opportunity-btn"
             >
-              <Plus className="w-4 h-4" />
-              New Opportunity
+              <Plus className="w-5 h-5" />
+              <span>New Opportunity</span>
             </button>
           </div>
 
-          {/* Filters */}
-          <div className="flex flex-wrap items-center gap-4 mt-6">
+          {/* Filters - Responsive */}
+          <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-3 mt-4 sm:mt-6">
             {/* Search */}
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+            <div className="relative flex-1 sm:max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
               <input
                 type="text"
                 placeholder="Search opportunities..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-[#111111] border border-[#262626] rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-emerald-500/50"
+                className="w-full pl-11 pr-4 py-3 bg-[#111111] border border-[#262626] rounded-xl text-white text-base placeholder-white/40 focus:outline-none focus:border-emerald-500/50 min-h-[48px]"
                 data-testid="search-input"
               />
             </div>
 
-            {/* Status filter */}
-            <div className="flex items-center gap-1 bg-[#111111] border border-[#262626] rounded-lg p-1">
-              {['active', 'all', 'awarded', 'lost'].map((f) => (
-                <button
-                  key={f}
-                  onClick={() => setFilter(f)}
-                  className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
-                    filter === f
-                      ? 'bg-white/10 text-white'
-                      : 'text-white/50 hover:text-white'
-                  }`}
-                  data-testid={`filter-${f}`}
-                >
-                  {f.charAt(0).toUpperCase() + f.slice(1)}
-                </button>
-              ))}
-            </div>
+            <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
+              {/* Status filter - Horizontal scroll on mobile */}
+              <div className="flex items-center gap-1 bg-[#111111] border border-[#262626] rounded-xl p-1 flex-shrink-0">
+                {['active', 'all', 'awarded', 'lost'].map((f) => (
+                  <button
+                    key={f}
+                    onClick={() => setFilter(f)}
+                    className={`px-4 py-2 text-sm rounded-lg transition-colors min-h-[40px] whitespace-nowrap ${
+                      filter === f
+                        ? 'bg-white/10 text-white'
+                        : 'text-white/50 hover:text-white active:bg-white/5'
+                    }`}
+                    data-testid={`filter-${f}`}
+                  >
+                    {f.charAt(0).toUpperCase() + f.slice(1)}
+                  </button>
+                ))}
+              </div>
 
-            {/* View toggle */}
-            <div className="flex items-center gap-1 bg-[#111111] border border-[#262626] rounded-lg p-1">
-              <button
-                onClick={() => setViewMode('grid')}
-                className={`p-2 rounded-md transition-colors ${
-                  viewMode === 'grid' ? 'bg-white/10 text-white' : 'text-white/50 hover:text-white'
-                }`}
-                data-testid="view-grid"
-              >
-                <LayoutGrid className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => setViewMode('list')}
-                className={`p-2 rounded-md transition-colors ${
-                  viewMode === 'list' ? 'bg-white/10 text-white' : 'text-white/50 hover:text-white'
-                }`}
-                data-testid="view-list"
-              >
-                <List className="w-4 h-4" />
-              </button>
+              {/* View toggle - Hide on mobile (auto card view) */}
+              <div className="hidden sm:flex items-center gap-1 bg-[#111111] border border-[#262626] rounded-xl p-1 flex-shrink-0">
+                <button
+                  onClick={() => setViewMode('grid')}
+                  className={`p-2.5 rounded-lg transition-colors min-h-[40px] min-w-[40px] ${
+                    viewMode === 'grid' ? 'bg-white/10 text-white' : 'text-white/50 hover:text-white'
+                  }`}
+                  data-testid="view-grid"
+                >
+                  <LayoutGrid className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`p-2.5 rounded-lg transition-colors min-h-[40px] min-w-[40px] ${
+                    viewMode === 'list' ? 'bg-white/10 text-white' : 'text-white/50 hover:text-white'
+                  }`}
+                  data-testid="view-list"
+                >
+                  <List className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </header>
 
       {/* Content */}
-      <main className="max-w-[1600px] mx-auto px-6 lg:px-8 py-8">
+      <main className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Stats */}
         <PipelineStats stats={stats} />
 
@@ -657,11 +659,11 @@ export default function OpportunitiesPage() {
           </div>
         )}
 
-        {/* Grid */}
+        {/* Grid - Responsive */}
         {!loading && !error && filteredOpportunities.length > 0 && (
           <div className={
             viewMode === 'grid'
-              ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'
+              ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4'
               : 'space-y-3'
           }>
             {filteredOpportunities.map((opp) => (

@@ -1,0 +1,241 @@
+/**
+ * TradeOS Responsive Framework v1.0
+ * =================================
+ * Mobile-first responsive utilities and safe-area support
+ * All modules should inherit these styles
+ */
+
+/* Safe Area Support for iOS PWA */
+.safe-area-inset-top {
+  padding-top: max(env(safe-area-inset-top, 0px), 0px);
+}
+
+.safe-area-inset-bottom {
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 0px);
+}
+
+.safe-area-inset-left {
+  padding-left: env(safe-area-inset-left, 0px);
+}
+
+.safe-area-inset-right {
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+/* Touch-friendly minimum sizes */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+.touch-target-lg {
+  min-height: 48px;
+  min-width: 48px;
+}
+
+/* Prevent text selection on interactive elements (mobile) */
+.no-select {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Smooth scrolling containers */
+.scroll-container {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* Hide scrollbar but keep functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Mobile card styles */
+.mobile-card {
+  @apply bg-[#111111] border border-[#262626] rounded-xl p-4 active:bg-[#1a1a1a] transition-colors;
+}
+
+/* Responsive text utilities */
+.text-mobile-heading {
+  @apply text-xl font-semibold leading-tight;
+}
+
+.text-mobile-subheading {
+  @apply text-base font-medium;
+}
+
+.text-mobile-body {
+  @apply text-sm leading-relaxed;
+}
+
+.text-mobile-caption {
+  @apply text-xs text-zinc-400;
+}
+
+/* Mobile-first grid system */
+.grid-mobile-1 {
+  @apply grid grid-cols-1 gap-3;
+}
+
+.grid-mobile-2 {
+  @apply grid grid-cols-2 gap-3;
+}
+
+/* Responsive workspace container */
+.workspace-container {
+  @apply w-full max-w-full overflow-x-hidden;
+}
+
+/* Mobile-friendly button base */
+.btn-mobile {
+  @apply px-4 py-3 rounded-xl font-medium text-sm min-h-[44px] flex items-center justify-center gap-2 transition-colors active:scale-[0.98];
+}
+
+.btn-mobile-primary {
+  @apply btn-mobile bg-emerald-500 text-white hover:bg-emerald-600 active:bg-emerald-700;
+}
+
+.btn-mobile-secondary {
+  @apply btn-mobile bg-zinc-800 text-white hover:bg-zinc-700 active:bg-zinc-600;
+}
+
+.btn-mobile-ghost {
+  @apply btn-mobile text-zinc-400 hover:text-white hover:bg-zinc-800 active:bg-zinc-700;
+}
+
+/* Mobile input styling */
+.input-mobile {
+  @apply w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white placeholder-zinc-500 text-base min-h-[48px] focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500;
+}
+
+/* Mobile-friendly tabs */
+.tabs-mobile {
+  @apply flex gap-1 p-1 bg-zinc-900 rounded-xl overflow-x-auto scrollbar-hide;
+}
+
+.tab-mobile {
+  @apply px-4 py-2.5 rounded-lg text-sm font-medium whitespace-nowrap min-h-[40px] transition-colors;
+}
+
+.tab-mobile-active {
+  @apply bg-zinc-800 text-white;
+}
+
+.tab-mobile-inactive {
+  @apply text-zinc-400 hover:text-white active:bg-zinc-800;
+}
+
+/* Responsive drawer/panel */
+.drawer-mobile {
+  @apply fixed inset-0 z-50 flex flex-col bg-zinc-900;
+}
+
+.drawer-header {
+  @apply flex items-center justify-between px-4 py-3 border-b border-zinc-800 min-h-[56px];
+}
+
+.drawer-content {
+  @apply flex-1 overflow-y-auto overscroll-contain;
+}
+
+.drawer-footer {
+  @apply p-4 border-t border-zinc-800 safe-area-inset-bottom;
+}
+
+/* Stats/metric cards for mobile */
+.stat-card-mobile {
+  @apply bg-zinc-800/50 rounded-xl p-4;
+}
+
+.stat-value-mobile {
+  @apply text-2xl font-bold text-white;
+}
+
+.stat-label-mobile {
+  @apply text-xs text-zinc-400 mt-1;
+}
+
+/* Action sheet style */
+.action-sheet {
+  @apply fixed inset-x-0 bottom-0 z-50 bg-zinc-900 rounded-t-2xl safe-area-inset-bottom;
+  max-height: 80vh;
+}
+
+.action-sheet-handle {
+  @apply w-10 h-1 bg-zinc-700 rounded-full mx-auto my-3;
+}
+
+/* Pipeline/Kanban responsive */
+@media (max-width: 1023px) {
+  .kanban-container {
+    @apply flex flex-col gap-4;
+  }
+  
+  .kanban-column {
+    @apply w-full min-h-0;
+  }
+}
+
+/* Prevent body scroll when modal is open */
+body.modal-open {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+}
+
+/* Responsive table alternative - Card list */
+.table-to-cards {
+  @apply hidden;
+}
+
+@media (max-width: 767px) {
+  .table-responsive {
+    @apply hidden;
+  }
+  
+  .table-to-cards {
+    @apply block;
+  }
+}
+
+/* Responsive form layout */
+.form-mobile {
+  @apply space-y-4;
+}
+
+.form-row-mobile {
+  @apply flex flex-col gap-4;
+}
+
+@media (min-width: 640px) {
+  .form-row-mobile {
+    @apply flex-row;
+  }
+}
+
+/* Loading states */
+.skeleton-mobile {
+  @apply bg-zinc-800 rounded-lg animate-pulse;
+}
+
+/* Empty states */
+.empty-state-mobile {
+  @apply flex flex-col items-center justify-center py-12 px-6 text-center;
+}
+
+.empty-state-icon {
+  @apply w-16 h-16 text-zinc-600 mb-4;
+}
+
+.empty-state-title {
+  @apply text-lg font-medium text-white mb-2;
+}
+
+.empty-state-description {
+  @apply text-sm text-zinc-400 mb-6 max-w-xs;
+}

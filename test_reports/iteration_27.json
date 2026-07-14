@@ -1,0 +1,81 @@
+{
+  "summary": "TradeOS Mobile Experience v1.0 — frontend-only smoke on iPhone 14 Pro viewport (390x844) after login as inbox@twofungis.ca. Verified: (1) bottom nav bar is fully removed on mobile (no fixed bottom nav element found), (2) hamburger button in AppLayout header opens a full-height slide-out drawer with backdrop and 48x48 touch target, (3) all drawer nav items (Home, Opportunities, Projects, Estimating, Financial, Expenses, Documents, Reports, Integrations, Settings, My Profile, Sign Out) use min-h-[48px] and render inside a 320px drawer, (4) Opportunities page renders as mobile-optimised cards + search, no horizontal overflow (doc scrollWidth=clientWidth=390), New Opportunity CTA is 326x48, (5) Projects page 'Create Project'/'New Project' button opens the New Project modal correctly on mobile, (6) Production Library (Estimating) mobile navigation drawer opens correctly showing Production Standards / Knowledge Domains / Assemblies / Service Categories / Import Library. FAIL: Production Library CONTENT overflows horizontally on mobile — document scrollWidth=1184 vs clientWidth=390, forcing the entire app shell (AppLayout main wrapper) to be 1184px wide. Root cause is a missing min-w-0 on the AppLayout flex child, combined with the list-view rows using fixed pixel column widths that require ~900px. Additionally two touch targets slightly under-spec (40px vs 44px).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "AppLayout main content wrapper",
+        "issue": "Missing min-w-0 on the flex child. On mobile, when a nested page has wide fixed-width content (Production Library list rows), the flex-1 wrapper grows to fit content, forcing the entire viewport to scroll horizontally (documentElement.scrollWidth=1184 vs clientWidth=390). This defeats the workspace's own overflow-auto container.",
+        "selector": "div.flex-1.flex.flex-col.min-h-screen (child of the root <div class='min-h-screen bg-black flex'> in AppLayout.jsx line ~204)",
+        "priority": "HIGH"
+      },
+      {
+        "component": "ProductionLibraryWorkspace list view (Estimating)",
+        "issue": "List rows use fixed pixel widths (w-28 code + w-36 domain + w-16 unit + w-24 rate + w-20 output + w-24 usage + w-8 + flex-1 name) totaling ~900px. On a 390px viewport the row cannot shrink and no horizontal scroll is offered inside the workspace pane — instead the entire page scrolls horizontally. Requirement 'Production Library content is scrollable without horizontal overflow' is NOT met. Consider (a) switching to a card/stacked layout on mobile like Opportunities, or (b) forcing the items container to overflow-x-auto with a min-width table so scroll is trapped inside the pane.",
+        "selector": "[data-testid='production-library-workspace'] .flex-1.overflow-auto > div (list header/rows around line 907-1000 of ProductionLibraryWorkspace.jsx)",
+        "priority": "HIGH"
+      },
+      {
+        "component": "ProductionLibraryWorkspace top-bar mobile menu button",
+        "issue": "The workspace's own hamburger button is 40x40px which is below the 44-48px min touch target requirement stated in the spec ('all touch targets should be minimum 44px height'). AppLayout's hamburger is correctly 48x48. Recommend bumping to w-11 h-11 (44px) or w-12 h-12 (48px).",
+        "selector": "[data-testid='production-library-workspace'] button.lg\\:hidden (line ~2298 of ProductionLibraryWorkspace.jsx)",
+        "priority": "MEDIUM"
+      },
+      {
+        "component": "ProjectsPage New Project button",
+        "issue": "The 'New Project' CTA in the Projects page header is 151x40 on mobile — 40px height is below the 44px min touch target. In-modal 'Create Project' submit is fine (larger). Bump button to min-h-[44px].",
+        "selector": "[data-testid='new-project-btn']",
+        "priority": "MEDIUM"
+      }
+    ],
+    "integration_issues": [
+      {
+        "flow": "Post-login command-center bootstrap",
+        "issue": "First fetch after SIGNED_IN throws 'TypeError: Failed to fetch' at /api/command-center (also reported in iteration_26). Still present. Console noise, doesn't block UI.",
+        "affected_selectors": ["[data-testid='command-center']"]
+      }
+    ],
+    "design_issues": [
+      {
+        "screen": "Estimating (Production Library) mobile",
+        "issues": [
+          "Table columns extend well past viewport (C001, C002 rows show Standard Name + STAND(ARD) badge clipped mid-word).",
+          "Header 'Production Library' title is hidden below sm breakpoint (hidden sm:block), leaving only the library icon — the mobile header feels bare. Consider showing the title on mobile too."
+        ]
+      }
+    ]
+  },
+  "verification_results": {
+    "bottom_nav_removed_on_mobile": "PASS - no fixed bottom navigation element present in DOM at 390x844",
+    "hamburger_opens_drawer": "PASS - [data-testid='mobile-menu-btn'] click opens 320px-wide slide-out drawer with backdrop; hamburger is 48x48",
+    "drawer_touch_targets_min_44_48": "PASS - drawer nav items and CTAs use min-h-[48px]",
+    "opportunities_mobile_responsive": "PASS - no horizontal overflow (scrollWidth 390 = clientWidth 390), search input rendered, New Opportunity 326x48 touch target, cards render at 326px width",
+    "estimating_mobile_drawer": "PASS - workspace hamburger opens Production Library drawer with Production Standards / Knowledge Domains / Assemblies / Service Categories / Import Library",
+    "estimating_no_horizontal_overflow": "FAIL - document scrollWidth=1184, clientWidth=390. AppLayout root flex-1 wrapper grows to 1184px because list rows have ~900px of fixed-width columns and no min-w-0 on the wrapper",
+    "projects_create_project_modal": "PASS - [data-testid='new-project-btn'] click opens [data-testid='new-project-modal'] with Project Name / Client / Region / Contract Value / Notes / Create Project fields",
+    "header_hamburger_and_brain_touch_targets": "PARTIAL PASS - AppLayout hamburger 48x48 PASS, Brain button 46x44 PASS. Workspace's own hamburger inside Estimating is 40x40 FAIL"
+  },
+  "test_report_links": [],
+  "action_items": [
+    "PRIMARY FIX: In /app/frontend/src/components/layout/AppLayout.jsx line ~204, add 'min-w-0' to the main content flex wrapper: change <div className=\"flex-1 flex flex-col min-h-screen\"> to <div className=\"flex-1 flex flex-col min-h-screen min-w-0\">. This will let child pages honour their own overflow-x-auto and stop the whole app shell from being pushed wider than the viewport on mobile.",
+    "SECONDARY FIX: In /app/frontend/src/pages/app/ProductionLibraryWorkspace.jsx (around line 907-1000), give the list-view container a mobile-friendly layout — either wrap the rows in a div with overflow-x-auto + a min-width on the header/rows so scroll is trapped inside the pane, OR switch to a stacked card layout at <lg (mirroring the Opportunities pattern).",
+    "TERTIARY: bump the workspace hamburger (line ~2298 of ProductionLibraryWorkspace.jsx) from w-10 h-10 to w-11 h-11 or w-12 h-12 to hit the 44px min touch target.",
+    "TERTIARY: bump [data-testid='new-project-btn'] in ProjectsPage.jsx line ~185 to include min-h-[44px] — currently 40px on mobile.",
+    "OPTIONAL: unhide the 'Production Library' title on <sm (currently 'hidden sm:block' on line 2309) so mobile users see a title in the workspace header.",
+    "OPTIONAL: investigate the /api/command-center 'Failed to fetch' error still surfacing post-login (carried over from iteration_26)."
+  ],
+  "critical_code_review_comments": [
+    "AppLayout.jsx: The main content wrapper is missing 'min-w-0' — a very common Tailwind flexbox trap. Every page inside <Outlet /> is at the mercy of a single misbehaving fixed-width child. Add min-w-0 defensively.",
+    "ProductionLibraryWorkspace.jsx is 2381 lines and still houses navigation, list, grid, domains, categories, assemblies, detail panel, command palette and modal in one file — >3x the 700-line guideline. This makes the mobile pass painful because responsive fixes ripple through many concerns. Recommend splitting into LeftNavigation.jsx, ProductionStandardsList.jsx, DomainsView.jsx, AssembliesView.jsx, CommandPalette.jsx, DetailPanel.jsx.",
+    "Touch target spec is stated as 'minimum 44-48px height' but two obvious controls (workspace hamburger 40px, ProjectsPage new-project 40px) miss it. A quick eslint rule / audit hook enforcing min-h-[44px] on button/link elements in the workspace routes would prevent regression.",
+    "The AppLayout desktop-sidebar-only aside uses 'hidden lg:flex' which is fine, but the mobile drawer duplicates the entire navItems / bottomNavItems render logic. Extract into a shared <NavigationList /> component to avoid drift when adding new sections."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (frontend-only per request)", "frontend": "6/8 core features fully PASS, 1 FAIL (Estimating horizontal overflow), 1 PARTIAL (workspace hamburger touch target)"},
+  "test_credentials": "inbox@twofungis.ca / TradeOS2024! — working (logged in successfully, redirected to /app/command-center)",
+  "seed_data_creation": "None. No data created during this run.",
+  "retest_needed": true,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Test at 390x844 viewport. All mobile assertions above ran against the deployed URL https://profit-tracker-demo-1.preview.emergentagent.com. The single blocking issue is horizontal overflow on /app/estimating — DO NOT retest it until AppLayout gets min-w-0 AND ProductionLibraryWorkspace list-view is made responsive (either card-stack or trapped horizontal scroll). Everything else (bottom-nav removal, drawer, opportunities responsive, projects modal) is passing. To reproduce the overflow: login → navigate to /app/estimating → run `document.documentElement.scrollWidth` in DevTools console → expect 1184.",
+  "rca of the issue": "Horizontal overflow on Estimating (Production Library) at mobile viewport: (a) AppLayout's flex row does NOT set min-w-0 on the '<div class=flex-1 flex flex-col min-h-screen>' child, so flex default min-width:auto lets the child grow to its content's intrinsic width. (b) ProductionLibraryWorkspace list-view rows sum fixed-width columns (w-28 + w-36 + w-16 + w-24 + w-20 + w-24 + w-8 + gap-4 + flex-1) to ~900px. (c) The workspace's own overflow-auto on the items pane can't rescue the layout because the parent chain already grew past viewport. Fix requires BOTH min-w-0 at AppLayout (structural) AND a responsive list layout inside the workspace (list should either become card-stack on <lg or force min-w on the inner scroll container so overflow-x-auto actually kicks in). Reproduction: /app/estimating at 390x844 → document.documentElement.scrollWidth === 1184."
+}

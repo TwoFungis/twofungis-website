@@ -68,6 +68,7 @@ import {
   RefreshCw,
   AlertTriangle,
   Zap,
+  Menu,
   Target,
   BarChart3,
   PieChart,
@@ -87,6 +88,8 @@ import {
   Wrench,
   Hammer,
   Building2,
+  Folders,
+  Tag,
   Home,
   Factory,
   ShoppingCart
@@ -1773,6 +1776,7 @@ const ProductionLibraryWorkspace = () => {
   const [session, setSession] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [units, setUnits] = useState([]);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   
   // Data
   const [items, setItems] = useState([]);
@@ -2209,57 +2213,128 @@ const ProductionLibraryWorkspace = () => {
   };
   
   return (
-    <div className="h-full flex bg-[#0A0A0A] overflow-hidden" data-testid="production-library-workspace">
-      <LeftNavigation
-        activeView={activeView}
-        onViewChange={setActiveView}
-        counts={counts}
-        collapsed={navCollapsed}
-        onToggleCollapse={() => setNavCollapsed(!navCollapsed)}
-        onNewStandard={handleNewStandard}
-        onImport={handleImport}
-      />
+    <div className="h-full flex flex-col lg:flex-row bg-[#0A0A0A] overflow-hidden" data-testid="production-library-workspace">
+      {/* Desktop Sidebar - Hidden on mobile */}
+      <div className="hidden lg:block">
+        <LeftNavigation
+          activeView={activeView}
+          onViewChange={setActiveView}
+          counts={counts}
+          collapsed={navCollapsed}
+          onToggleCollapse={() => setNavCollapsed(!navCollapsed)}
+          onNewStandard={handleNewStandard}
+          onImport={handleImport}
+        />
+      </div>
+      
+      {/* Mobile Navigation Drawer */}
+      {mobileNavOpen && (
+        <>
+          <div 
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden" 
+            onClick={() => setMobileNavOpen(false)} 
+          />
+          <div className="fixed inset-y-0 left-0 w-[85%] max-w-[320px] bg-[#111111] z-50 lg:hidden flex flex-col safe-area-inset-left">
+            <div className="p-4 border-b border-neutral-800 flex items-center justify-between min-h-[64px]">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 bg-emerald-500/10 rounded-lg flex items-center justify-center">
+                  <Library className="w-5 h-5 text-emerald-400" strokeWidth={1.5} />
+                </div>
+                <div>
+                  <h1 className="text-base font-medium text-white">Production Library</h1>
+                </div>
+              </div>
+              <button 
+                onClick={() => setMobileNavOpen(false)} 
+                className="w-10 h-10 flex items-center justify-center rounded-lg text-neutral-400 hover:bg-neutral-800 active:bg-neutral-700"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            
+            <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+              {[
+                { id: 'standards', label: 'Production Standards', icon: Library, count: counts.items },
+                { id: 'domains', label: 'Knowledge Domains', icon: Folders, count: counts.domains },
+                { id: 'assemblies', label: 'Assemblies', icon: Layers, count: counts.assemblies },
+                { id: 'categories', label: 'Service Categories', icon: Tag, count: counts.categories },
+              ].map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => { setActiveView(item.id); setMobileNavOpen(false); }}
+                  className={`w-full flex items-center justify-between px-4 py-3.5 rounded-xl transition-colors min-h-[48px] ${
+                    activeView === item.id
+                      ? 'bg-emerald-500/15 text-emerald-400'
+                      : 'text-neutral-300 hover:bg-neutral-800 active:bg-neutral-700'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <item.icon className="w-5 h-5" />
+                    <span className="font-medium text-[15px]">{item.label}</span>
+                  </div>
+                  <span className="text-xs bg-neutral-800 px-2 py-1 rounded-full">{item.count}</span>
+                </button>
+              ))}
+              
+              <div className="border-t border-neutral-800 my-3 pt-3">
+                <button
+                  onClick={() => { handleImport(); setMobileNavOpen(false); }}
+                  className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 min-h-[48px]"
+                >
+                  <Upload className="w-5 h-5" />
+                  <span className="font-medium text-[15px]">Import Library</span>
+                </button>
+              </div>
+            </nav>
+          </div>
+        </>
+      )}
       
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Top Bar */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-800 bg-[#0A0A0A]/95 backdrop-blur-sm flex-shrink-0">
-          <div className="flex items-center gap-4">
+        {/* Top Bar - Mobile Optimized */}
+        <div className="flex items-center justify-between px-4 lg:px-6 py-3 lg:py-4 border-b border-neutral-800 bg-[#0A0A0A]/95 backdrop-blur-sm flex-shrink-0 min-h-[56px] lg:min-h-[64px]">
+          <div className="flex items-center gap-3">
+            {/* Mobile menu button */}
+            <button
+              onClick={() => setMobileNavOpen(true)}
+              className="lg:hidden w-10 h-10 flex items-center justify-center text-neutral-400 hover:text-white hover:bg-neutral-800 rounded-lg -ml-1"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+            
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 bg-emerald-500/10 rounded-lg flex items-center justify-center">
-                <Library className="w-5 h-5 text-emerald-400" strokeWidth={1.5} />
+              <div className="w-8 h-8 lg:w-9 lg:h-9 bg-emerald-500/10 rounded-lg flex items-center justify-center">
+                <Library className="w-4 h-4 lg:w-5 lg:h-5 text-emerald-400" strokeWidth={1.5} />
               </div>
-              <div>
-                <h1 className="text-lg font-medium text-white tracking-tight">Production Library</h1>
-                <p className="text-xs text-neutral-500">Company Knowledge Engine</p>
+              <div className="hidden sm:block">
+                <h1 className="text-base lg:text-lg font-medium text-white tracking-tight">Production Library</h1>
+                <p className="text-xs text-neutral-500 hidden lg:block">Company Knowledge Engine</p>
               </div>
             </div>
           </div>
           
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 lg:gap-3">
             <button
               onClick={handleImport}
-              className="flex items-center gap-2 px-3 py-2 bg-emerald-500/10 border border-emerald-500/30 rounded-lg text-emerald-400 hover:bg-emerald-500/20 hover:border-emerald-500/50 transition-colors"
+              className="hidden sm:flex items-center gap-2 px-3 py-2 bg-emerald-500/10 border border-emerald-500/30 rounded-lg text-emerald-400 hover:bg-emerald-500/20 hover:border-emerald-500/50 transition-colors min-h-[40px]"
               data-testid="header-import-btn"
             >
               <Upload className="w-4 h-4" strokeWidth={1.5} />
-              <span className="text-sm font-medium">Import Library</span>
+              <span className="text-sm font-medium hidden md:inline">Import Library</span>
             </button>
             <button
               onClick={() => setCommandPaletteOpen(true)}
-              className="flex items-center gap-2 px-3 py-2 bg-neutral-900 border border-neutral-800 rounded-lg text-neutral-400 hover:text-white hover:border-neutral-700 transition-colors"
+              className="flex items-center gap-2 px-3 py-2 bg-neutral-900 border border-neutral-800 rounded-lg text-neutral-400 hover:text-white hover:border-neutral-700 transition-colors min-h-[40px]"
               data-testid="open-command-palette"
             >
               <Search className="w-4 h-4" strokeWidth={1.5} />
-              <span className="text-sm hidden sm:inline">Search...</span>
-              <kbd className="hidden sm:flex items-center gap-0.5 px-1.5 py-0.5 bg-neutral-800 border border-neutral-700 rounded text-[10px] font-mono text-neutral-500">
+              <span className="text-sm hidden lg:inline">Search...</span>
+              <kbd className="hidden lg:flex items-center gap-0.5 px-1.5 py-0.5 bg-neutral-800 border border-neutral-700 rounded text-[10px] font-mono text-neutral-500">
                 <Command className="w-3 h-3" />K
               </kbd>
             </button>
-            <button onClick={fetchData} className="p-2 text-neutral-500 hover:text-white hover:bg-neutral-800 rounded-lg transition-colors">
+            <button onClick={fetchData} className="p-2.5 text-neutral-500 hover:text-white hover:bg-neutral-800 rounded-lg transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center">
               <RefreshCw className="w-4 h-4" strokeWidth={1.5} />
-            </button>
-            <button className="p-2 text-neutral-500 hover:text-white hover:bg-neutral-800 rounded-lg transition-colors">
-              <Settings2 className="w-4 h-4" strokeWidth={1.5} />
             </button>
           </div>
         </div>
