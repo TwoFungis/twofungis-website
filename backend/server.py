@@ -139,6 +139,53 @@ async def root():
 async def health_check():
     return {"status": "healthy", "service": "tradeos-api"}
 
+@api_router.get("/debug/env-check")
+async def debug_env_check():
+    """
+    Diagnostic endpoint to verify environment variables are loaded.
+    Only shows presence/format, not actual secret values.
+    """
+    import os
+    
+    def mask_value(key: str, value: str) -> dict:
+        """Return info about env var without exposing secrets"""
+        if not value:
+            return {"status": "MISSING", "value": None}
+        if key in ["SUPABASE_URL", "FRONTEND_URL"]:
+            # URLs are safe to show
+            return {"status": "SET", "value": value}
+        else:
+            # Mask secrets - show length and first/last chars
+            if len(value) > 10:
+                return {"status": "SET", "value": f"{value[:4]}...{value[-4:]}", "length": len(value)}
+            return {"status": "SET", "value": "***", "length": len(value)}
+    
+    env_vars = [
+        "SUPABASE_URL",
+        "SUPABASE_ANON_KEY", 
+        "SUPABASE_SERVICE_KEY",
+        "FRONTEND_URL",
+        "STRIPE_SECRET_KEY",
+        "CORS_ORIGINS"
+    ]
+    
+    result = {
+        "env_file_path": str(ROOT_DIR / '.env'),
+        "env_file_exists": (ROOT_DIR / '.env').exists(),
+        "variables": {}
+    }
+    
+    for var in env_vars:
+        result["variables"][var] = mask_value(var, os.environ.get(var, ""))
+    
+    # Also check config module values
+    result["config_values"] = {
+        "SUPABASE_URL": config.SUPABASE_URL if config.SUPABASE_URL else "EMPTY",
+        "SUPABASE_URL_length": len(config.SUPABASE_URL) if config.SUPABASE_URL else 0
+    }
+    
+    return result
+
 @api_router.get("/status")
 async def get_system_status():
     """
