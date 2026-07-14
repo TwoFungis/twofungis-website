@@ -222,12 +222,14 @@ const EstimateBuilder = ({
                                 <button
                                   onClick={() => saveEditing(item)}
                                   className="px-3 py-1 bg-emerald-500 text-black text-xs font-medium rounded hover:bg-emerald-400 transition-colors"
+                                  data-testid="inline-edit-save-btn"
                                 >
                                   Save
                                 </button>
                                 <button
                                   onClick={cancelEditing}
                                   className="px-3 py-1 text-neutral-400 text-xs hover:text-white transition-colors"
+                                  data-testid="inline-edit-cancel-btn"
                                 >
                                   Cancel
                                 </button>

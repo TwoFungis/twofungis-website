@@ -28,6 +28,125 @@ Build "TradeOS," an end-to-end operating system for Canadian contractors. The ap
 ### Summary
 Established a responsive application framework to make TradeOS feel like a native mobile application. The framework enforces no horizontal scrolling, proper touch targets, and responsive layouts across all modules.
 
+---
+
+## TradeOS Estimate Workbench & Production Library Architecture v1.0 ✅ COMPLETE (July 14, 2026)
+
+### Summary
+Major architectural milestone separating administration (Production Library) from operations (Estimate Workbench). Implements a unified Windows Explorer-style Production Library browser and a 3-panel Estimate Workbench with PDF export capability.
+
+### Phase 1: Production Library Explorer ✅ COMPLETE
+| Feature | Status |
+|---------|--------|
+| Updated sidebar nav under Estimating | ✅ Expandable menu: Workbench, Library, Assemblies, Templates |
+| Windows Explorer-style hierarchy tree | ✅ Domain → Category → Standard |
+| Context menus (right-click/long-press) | ✅ CRUD actions per node type |
+| Search/filter with highlight | ✅ Real-time filtering |
+| Quick add buttons on hover | ✅ Add child items |
+| Mobile full-screen browser modal | ✅ iOS Files-style UX |
+| Lazy loading support | ✅ Expandable folders |
+| 44-48px touch targets | ✅ Mobile-first |
+
+### Phase 2: Estimate Workbench ✅ COMPLETE
+| Feature | Status |
+|---------|--------|
+| Desktop 3-panel layout | ✅ Library Browser, Estimate Builder, Live Summary |
+| Library Browser (left panel) | ✅ Tree navigation with click-to-add |
+| Estimate Builder (center panel) | ✅ Grouped line items with inline editing |
+| Live Summary (right panel) | ✅ Real-time subtotal, tax, total calculations |
+| Mobile specialized layout | ✅ Full-screen library modal, bottom summary drawer |
+| Inline quantity/price editing | ✅ Edit → Save/Cancel flow |
+| Item grouping by domain | ✅ Collapsible groups with subtotals |
+| Remove item functionality | ✅ Trash icon with immediate removal |
+| Clear estimate functionality | ✅ Confirmation dialog |
+| Collapsible panels | ✅ Desktop Library/Summary can be collapsed |
+
+### Phase 3: PDF Export (jsPDF) ✅ COMPLETE
+| Feature | Status |
+|---------|--------|
+| jsPDF implementation (per requirements) | ✅ No html2canvas |
+| TradeOS branded header | ✅ Logo placeholder, estimate number |
+| Company/Client info sections | ✅ FROM/TO layout |
+| Line items table | ✅ Grouped by domain with subtotals |
+| Totals section | ✅ Subtotal, Markup, Tax, Total |
+| Notes section | ✅ Optional notes at bottom |
+| Multi-page support | ✅ Auto-pagination |
+| Works on desktop, tablet, mobile, PWA | ✅ Verified |
+
+### Phase 4: Data Architecture (Snapshot) ✅ COMPLETE
+| Feature | Status |
+|---------|--------|
+| Backend `/api/estimates` routes | ✅ Full CRUD for estimates |
+| Line item snapshot system | ✅ Immutable record of pricing at addition time |
+| Snapshot fields captured | ✅ production_code, production_name, description, prices, captured_at |
+| Historical data protection | ✅ Changing Production Standard never alters historical estimates |
+| Recalculate totals on item change | ✅ Automatic |
+
+### Component Architecture
+```
+/app/frontend/src/components/
+├── ProductionLibrary/
+│   ├── Explorer/
+│   │   ├── ProductionLibraryExplorer.jsx  (Main component)
+│   │   ├── TreeView.jsx                    (Hierarchy tree)
+│   │   ├── TreeNode.jsx                    (Individual nodes)
+│   │   ├── ExplorerToolbar.jsx             (Add/Import/Export buttons)
+│   │   └── Breadcrumbs.jsx                 (Navigation path)
+│   ├── Management/
+│   │   ├── DomainDialog.jsx                (Create/Edit domain)
+│   │   └── CategoryDialog.jsx              (Create/Edit category)
+│   ├── Shared/
+│   │   └── ContextMenu.jsx                 (Right-click menu)
+│   └── index.js
+├── EstimateWorkbench/
+│   ├── EstimateWorkbench.jsx               (Main 3-panel component)
+│   ├── LibraryBrowser.jsx                  (Left panel)
+│   ├── EstimateBuilder.jsx                 (Center panel)
+│   ├── LiveSummary.jsx                     (Right panel)
+│   ├── MobileWorkbench.jsx                 (Mobile-specific layout)
+│   └── index.js
+```
+
+### API Endpoints
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/estimates` | POST | Create new estimate |
+| `/api/estimates` | GET | List estimates (filtered) |
+| `/api/estimates/{id}` | GET | Get estimate with line items |
+| `/api/estimates/{id}` | PUT | Update estimate metadata |
+| `/api/estimates/{id}` | DELETE | Soft delete (status=deleted) |
+| `/api/estimates/{id}/items` | POST | Add line item with snapshot |
+| `/api/estimates/{id}/items/{item_id}` | PUT | Update quantity/price (NOT snapshot) |
+| `/api/estimates/{id}/items/{item_id}` | DELETE | Remove line item |
+
+### Navigation Structure
+```
+Estimating (expandable)
+├── Estimate Workbench   → /app/estimating
+├── Production Library   → /app/estimating/library
+├── Assemblies           → /app/estimating/assemblies (Coming Soon)
+└── Templates            → /app/estimating/templates (Coming Soon)
+```
+
+### Testing Results (Iteration 29-30)
+| Category | Result |
+|----------|--------|
+| Phase 1 (Production Library Explorer) | 11/11 PASS |
+| Phase 2-4 (Estimate Workbench) | 11/11 PASS |
+| Desktop 3-panel layout | ✅ VERIFIED |
+| Mobile specialized layout | ✅ VERIFIED |
+| PDF export (jsPDF) | ✅ Downloads correctly |
+| Inline editing | ✅ Working with calculations |
+| Search/filter | ✅ Working |
+| Context menus | ✅ Working |
+
+### Known Limitations (Not Bugs)
+- Save/Send to Client buttons show "coming soon" toast (backend persistence not wired to frontend yet)
+- Estimates stored in local state (page refresh loses data until backend save is connected)
+- "Multi-Family" and "Multifamily" appear as separate domains (seed data hygiene)
+
+---
+
 ### Mobile Acceptance Criteria ✅
 | Criteria | Status |
 |----------|--------|

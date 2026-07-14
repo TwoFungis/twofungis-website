@@ -25,12 +25,15 @@ import LibraryBrowser from './LibraryBrowser';
 import EstimateBuilder from './EstimateBuilder';
 
 const MobileWorkbench = ({
+  estimateName = 'New Estimate',
+  setEstimateName,
   lineItems = [],
   domains = [],
   categories = [],
   standards = [],
   isLoadingLibrary = false,
   calculations = {},
+  taxRate = 13,
   onAddItem,
   onUpdateItem,
   onRemoveItem,
@@ -52,7 +55,14 @@ const MobileWorkbench = ({
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-neutral-800 bg-neutral-900/50">
         <div>
-          <h1 className="text-lg font-semibold text-white">Estimate Builder</h1>
+          <input
+            type="text"
+            value={estimateName}
+            onChange={(e) => setEstimateName(e.target.value)}
+            className="bg-transparent text-lg font-semibold text-white border-none focus:outline-none focus:ring-1 focus:ring-emerald-500/50 rounded px-1 -ml-1 max-w-[180px]"
+            placeholder="Estimate Name"
+            data-testid="mobile-estimate-name-input"
+          />
           <p className="text-xs text-neutral-500">{lineItems.length} items</p>
         </div>
         
@@ -107,7 +117,7 @@ const MobileWorkbench = ({
               <span className="text-white">{formatCurrency(calculations.subtotal)}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-neutral-400">Tax (13%)</span>
+              <span className="text-neutral-400">Tax ({taxRate}%)</span>
               <span className="text-white">{formatCurrency(calculations.tax)}</span>
             </div>
             <div className="border-t border-neutral-800 pt-3">

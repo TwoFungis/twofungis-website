@@ -247,12 +247,15 @@ const EstimateWorkbench = () => {
   if (isMobile) {
     return (
       <MobileWorkbench
+        estimateName={estimateName}
+        setEstimateName={setEstimateName}
         lineItems={lineItems}
         domains={domains}
         categories={categories}
         standards={standards}
         isLoadingLibrary={isLoadingLibrary}
         calculations={calculations}
+        taxRate={taxRate}
         onAddItem={handleAddItem}
         onUpdateItem={handleUpdateItem}
         onRemoveItem={handleRemoveItem}
