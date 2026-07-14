@@ -243,20 +243,24 @@ const TemplateStep = ({ template, onDownload, downloading, onNext, onBack }) => 
         </div>
         <div className="p-6">
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {columns.map((col, i) => (
-              <div 
-                key={col}
-                className={`flex items-center gap-2 text-sm ${
-                  i < 4 ? 'text-emerald-400' : 'text-zinc-400'
-                }`}
-              >
-                <span className={`w-1.5 h-1.5 rounded-full ${
-                  i < 4 ? 'bg-emerald-500' : 'bg-zinc-600'
-                }`} />
-                {col}
-                {i < 4 && <span className="text-[10px] text-emerald-600">(required)</span>}
-              </div>
-            ))}
+            {columns.map((col, i) => {
+              // Required columns: Production Code (0), Production Name (1), Knowledge Domain (2), Measurement Unit (4)
+              const isRequired = [0, 1, 2, 4].includes(i);
+              return (
+                <div 
+                  key={col}
+                  className={`flex items-center gap-2 text-sm ${
+                    isRequired ? 'text-emerald-400' : 'text-zinc-400'
+                  }`}
+                >
+                  <span className={`w-1.5 h-1.5 rounded-full ${
+                    isRequired ? 'bg-emerald-500' : 'bg-zinc-600'
+                  }`} />
+                  {col}
+                  {isRequired && <span className="text-[10px] text-emerald-600">(required)</span>}
+                </div>
+              );
+            })}
           </div>
           
           <div className="mt-6 p-4 bg-zinc-800/50 rounded-lg">

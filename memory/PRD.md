@@ -23,6 +23,51 @@ Build "TradeOS," an end-to-end operating system for Canadian contractors. The ap
 
 ---
 
+## Import Library Wizard ✅ RESTORED (July 14, 2026)
+
+### Summary
+The Production Library Import Wizard has been fully restored with prominent UI access and verified end-to-end functionality.
+
+### UI Accessibility (RESTORED)
+| Location | Test ID | Status |
+|----------|---------|--------|
+| Header Button | `data-testid="header-import-btn"` | ✅ Visible, clickable |
+| Left Navigation | `data-testid="nav-import-library"` | ✅ Under IMPORT section |
+| Command Palette | Cmd+K → "Import Knowledge" | ✅ Available |
+
+### 5-Step Import Workflow (VERIFIED)
+| Step | Name | Status |
+|------|------|--------|
+| 1 | Initialize | ✅ Auto-detects seeded state, shows domain/category/item counts |
+| 2 | Template | ✅ Shows 13 columns, marks correct 4 as required, 10 valid units |
+| 3 | Upload | ✅ Drag-and-drop zone with `data-testid="file-drop-zone"` |
+| 4 | Validate | ✅ Shows validation passed/failed with detailed errors |
+| 5 | Import | ✅ Commits items, shows success summary |
+
+### Backend Endpoints (VERIFIED)
+| Endpoint | Method | Status |
+|----------|--------|--------|
+| `/api/production-library/seed/status` | GET | ✅ Returns counts |
+| `/api/production-library/seed` | POST | ✅ Initializes library |
+| `/api/production-library/import/template/download` | GET | ✅ Returns 13 columns + units |
+| `/api/production-library/import/validate` | POST | ✅ Validates CSV, returns preview |
+| `/api/production-library/import/commit` | POST | ✅ Creates production items |
+
+### Required CSV Columns
+- Production Code (required)
+- Production Name (required)
+- Knowledge Domain (required)
+- Measurement Unit (required)
+- Service Categories (optional)
+- Production Per Day, Crew Size, Labour Hours, Standard/Premium/Complex Rate, Company Standard, Notes (all optional)
+
+### Testing Results (Iteration 22)
+- Backend: 100% (6/6 tests pass)
+- Frontend: 100% (all 5 steps verified)
+
+---
+
+
 
 ## Production Library E2E Validation ✅ COMPLETE (July 14, 2026)
 
