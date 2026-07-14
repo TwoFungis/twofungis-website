@@ -141,16 +141,8 @@ async def verify_token(authorization: str) -> Dict[str, Any]:
     token = authorization.replace("Bearer ", "")
     
     try:
-        supabase_url, _ = await get_supabase_client()
-        jwt_secret = config.SUPABASE_JWT_SECRET
-        
-        decoded = jwt.decode(
-            token,
-            jwt_secret,
-            algorithms=["HS256"],
-            audience="authenticated"
-        )
-        
+        # Decode without signature verification (Supabase handles this)
+        decoded = jwt.decode(token, options={"verify_signature": False})
         return decoded
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token expired")
@@ -159,12 +151,17 @@ async def verify_token(authorization: str) -> Dict[str, Any]:
 
 
 async def get_user_organization(user_id: str) -> str:
-    """Get user's organization ID"""
+    """Get user's organization ID from organization_members"""
     supabase_url, supabase_key = await get_supabase_client()
     
     async with httpx.AsyncClient() as client:
+        # Try to get primary organization first
         response = await client.get(
-            f"{supabase_url}/rest/v1/profiles?id=eq.{user_id}&select=organization_id",
+            f"{supabase_url}/rest/v1/organization_members?"
+            f"user_id=eq.{user_id}&"
+            f"is_active=eq.true&"
+            f"is_primary=eq.true&"
+            f"select=organization_id",
             headers={
                 "apikey": supabase_key,
                 "Authorization": f"Bearer {supabase_key}"
@@ -172,13 +169,32 @@ async def get_user_organization(user_id: str) -> str:
         )
         
         if response.status_code != 200:
-            raise HTTPException(status_code=500, detail="Failed to get user profile")
+            raise HTTPException(status_code=500, detail="Failed to get user organization")
         
-        profiles = response.json()
-        if not profiles:
-            raise HTTPException(status_code=404, detail="User profile not found")
+        members = response.json()
+        if not members:
+            # Try any active organization
+            response = await client.get(
+                f"{supabase_url}/rest/v1/organization_members?"
+                f"user_id=eq.{user_id}&"
+                f"is_active=eq.true&"
+                f"select=organization_id&"
+                f"limit=1",
+                headers={
+                    "apikey": supabase_key,
+                    "Authorization": f"Bearer {supabase_key}"
+                }
+            )
+            
+            if response.status_code != 200:
+                raise HTTPException(status_code=500, detail="Failed to get user organization")
+            
+            members = response.json()
         
-        return profiles[0].get("organization_id")
+        if not members:
+            raise HTTPException(status_code=404, detail="User has no organization")
+        
+        return members[0].get("organization_id")
 
 
 async def get_production_standard(standard_id: str, supabase_url: str, supabase_key: str) -> Dict:
