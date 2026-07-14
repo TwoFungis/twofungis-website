@@ -1849,7 +1849,10 @@ const ProductionLibraryWorkspace = () => {
   const handleImport = () => setSearchParams({ tab: 'import' });
   const handleCloseImport = () => { setSearchParams({}); fetchData(); };
   const handleNewStandard = () => setShowCreateModal(true);
-  const handleCreateAssembly = () => toast.info('Assemblies coming soon - group related standards together');
+  const handleCreateAssembly = () => {
+    // Assemblies feature shows Coming Soon state in the view
+    // No action needed - the view already shows the Coming Soon message
+  };
   const handleAddToEstimate = (item) => toast.info(`"${item.production_name}" ready for Estimate Builder`);
   
   // Handle standard created
