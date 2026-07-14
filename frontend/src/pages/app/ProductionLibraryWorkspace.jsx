@@ -752,19 +752,20 @@ const CompanyStandardsView = ({
   }
   
   return (
-    <div className="flex-1 flex flex-col min-w-0 p-6">
-      {/* Header */}
+    <div className="flex-1 flex flex-col min-w-0 p-3 lg:p-6 overflow-x-hidden">
+      {/* Header - Mobile Optimized */}
       <div className="space-y-3 mb-4">
-        <div className="flex items-center gap-3">
+        {/* Top Row: Search + Filter */}
+        <div className="flex items-center gap-2 lg:gap-3">
           {/* Search */}
-          <div className="flex-1 relative">
+          <div className="flex-1 relative min-w-0">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" strokeWidth={1.5} />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
-              placeholder="Search by code, name, or description..."
-              className="w-full bg-neutral-900 border border-neutral-800 rounded-lg pl-10 pr-4 py-2.5 text-white placeholder-neutral-500 text-sm focus:outline-none focus:border-emerald-500/50 transition-colors"
+              placeholder="Search..."
+              className="w-full bg-neutral-900 border border-neutral-800 rounded-lg pl-10 pr-4 py-2.5 text-white placeholder-neutral-500 text-sm focus:outline-none focus:border-emerald-500/50 transition-colors min-h-[44px]"
               data-testid="grid-search-input"
             />
           </div>
@@ -772,7 +773,7 @@ const CompanyStandardsView = ({
           {/* Filter Toggle */}
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className={`flex items-center gap-2 px-3 py-2.5 rounded-lg border transition-colors ${
+            className={`flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg border transition-colors min-w-[44px] min-h-[44px] ${
               showFilters || Object.values(filters).some(v => v && v !== 'all' && v !== 'active')
                 ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
                 : 'bg-neutral-900 border-neutral-800 text-neutral-400 hover:text-white'
@@ -780,11 +781,11 @@ const CompanyStandardsView = ({
             data-testid="filter-toggle-btn"
           >
             <Filter className="w-4 h-4" strokeWidth={1.5} />
-            <span className="text-sm">Filters</span>
+            <span className="text-sm hidden sm:inline">Filters</span>
           </button>
           
-          {/* View Mode Toggle */}
-          <div className="flex items-center bg-neutral-900 border border-neutral-800 rounded-lg p-1">
+          {/* View Mode Toggle - Hidden on mobile (always show cards) */}
+          <div className="hidden lg:flex items-center bg-neutral-900 border border-neutral-800 rounded-lg p-1">
             <button
               onClick={() => onViewModeChange('list')}
               className={`p-2 rounded transition-colors ${
@@ -808,259 +809,310 @@ const CompanyStandardsView = ({
           {/* Add Standard Button */}
           <button
             onClick={onNewStandard}
-            className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-black font-medium px-4 py-2.5 rounded-lg transition-all shadow-[0_0_15px_rgba(16,185,129,0.15)]"
+            className="flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-black font-medium px-3 lg:px-4 py-2.5 rounded-lg transition-all shadow-[0_0_15px_rgba(16,185,129,0.15)] min-w-[44px] min-h-[44px]"
             data-testid="add-standard-btn"
           >
             <Plus className="w-4 h-4" strokeWidth={2} />
-            <span>Add Standard</span>
+            <span className="hidden sm:inline">Add Standard</span>
           </button>
         </div>
         
-        {/* Filter Row */}
+        {/* Filter Row - Mobile Optimized */}
         {showFilters && (
-          <div className="flex flex-wrap items-center gap-3 p-3 bg-neutral-900/50 border border-neutral-800 rounded-lg" data-testid="filter-panel">
-            <div className="flex items-center gap-2">
-              <label className="text-xs text-neutral-500 uppercase tracking-wider">Domain</label>
-              <select
-                value={filters.domain || 'all'}
-                onChange={(e) => onFilterChange('domain', e.target.value)}
-                className="bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500/50"
-              >
-                <option value="all">All Domains</option>
-                {domains.map(d => (
-                  <option key={d.id} value={d.id}>{d.name}</option>
-                ))}
-              </select>
+          <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 p-3 bg-neutral-900/50 border border-neutral-800 rounded-lg" data-testid="filter-panel">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+              <div className="flex items-center gap-2">
+                <label className="text-xs text-neutral-500 uppercase tracking-wider min-w-[60px]">Domain</label>
+                <select
+                  value={filters.domain || 'all'}
+                  onChange={(e) => onFilterChange('domain', e.target.value)}
+                  className="flex-1 bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500/50 min-h-[44px]"
+                >
+                  <option value="all">All Domains</option>
+                  {domains.map(d => (
+                    <option key={d.id} value={d.id}>{d.name}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <label className="text-xs text-neutral-500 uppercase tracking-wider min-w-[60px]">Status</label>
+                <select
+                  value={filters.status || 'active'}
+                  onChange={(e) => onFilterChange('status', e.target.value)}
+                  className="flex-1 bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500/50 min-h-[44px]"
+                >
+                  <option value="active">Active</option>
+                  <option value="archived">Archived</option>
+                  <option value="all">All</option>
+                </select>
+              </div>
             </div>
             
-            <div className="flex items-center gap-2">
-              <label className="text-xs text-neutral-500 uppercase tracking-wider">Category</label>
-              <select
-                value={filters.category || 'all'}
-                onChange={(e) => onFilterChange('category', e.target.value)}
-                className="bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500/50"
+            <div className="flex items-center justify-between sm:justify-start sm:gap-4">
+              <label className="flex items-center gap-2 cursor-pointer min-h-[44px]">
+                <input
+                  type="checkbox"
+                  checked={filters.companyStandard || false}
+                  onChange={(e) => onFilterChange('companyStandard', e.target.checked)}
+                  className="w-5 h-5 rounded border-neutral-700 bg-neutral-900 text-emerald-500 focus:ring-emerald-500/20"
+                />
+                <span className="text-sm text-neutral-300">Standards Only</span>
+              </label>
+              
+              <button
+                onClick={() => onFilterChange('clear', null)}
+                className="text-sm text-neutral-500 hover:text-white transition-colors min-h-[44px] px-2"
               >
-                <option value="all">All Categories</option>
-                {categories.map(c => (
-                  <option key={c.id} value={c.id}>{c.name}</option>
-                ))}
-              </select>
+                Clear all
+              </button>
             </div>
-            
-            <div className="flex items-center gap-2">
-              <label className="text-xs text-neutral-500 uppercase tracking-wider">Status</label>
-              <select
-                value={filters.status || 'active'}
-                onChange={(e) => onFilterChange('status', e.target.value)}
-                className="bg-neutral-900 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500/50"
-              >
-                <option value="active">Active</option>
-                <option value="archived">Archived</option>
-                <option value="all">All</option>
-              </select>
-            </div>
-            
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={filters.companyStandard || false}
-                onChange={(e) => onFilterChange('companyStandard', e.target.checked)}
-                className="w-4 h-4 rounded border-neutral-700 bg-neutral-900 text-emerald-500 focus:ring-emerald-500/20"
-              />
-              <span className="text-sm text-neutral-300">Production Standards Only</span>
-            </label>
-            
-            <button
-              onClick={() => onFilterChange('clear', null)}
-              className="ml-auto text-sm text-neutral-500 hover:text-white transition-colors"
-            >
-              Clear all
-            </button>
           </div>
         )}
         
-        {/* Bulk Actions */}
+        {/* Bulk Actions - Mobile Optimized */}
         {selectedItems.size > 0 && (
-          <div className="flex items-center gap-3 p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-lg">
+          <div className="flex flex-wrap items-center gap-2 lg:gap-3 p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-lg">
             <span className="text-sm text-emerald-400 font-medium">{selectedItems.size} selected</span>
-            <div className="h-4 w-px bg-emerald-500/30" />
-            <button onClick={() => onBulkAction('edit')} className="flex items-center gap-1.5 text-sm text-neutral-300 hover:text-white transition-colors">
-              <Edit3 className="w-4 h-4" strokeWidth={1.5} />Edit
-            </button>
-            <button onClick={() => onBulkAction('duplicate')} className="flex items-center gap-1.5 text-sm text-neutral-300 hover:text-white transition-colors">
-              <Copy className="w-4 h-4" strokeWidth={1.5} />Duplicate
-            </button>
-            <button onClick={() => onBulkAction('addToEstimate')} className="flex items-center gap-1.5 text-sm text-emerald-400 hover:text-emerald-300 transition-colors">
-              <ShoppingCart className="w-4 h-4" strokeWidth={1.5} />Add to Estimate
-            </button>
-            <button onClick={() => onBulkAction('archive')} className="flex items-center gap-1.5 text-sm text-neutral-300 hover:text-white transition-colors">
-              <Archive className="w-4 h-4" strokeWidth={1.5} />Archive
-            </button>
+            <div className="hidden sm:block h-4 w-px bg-emerald-500/30" />
+            <div className="flex flex-wrap items-center gap-2">
+              <button onClick={() => onBulkAction('duplicate')} className="flex items-center gap-1.5 text-sm text-neutral-300 hover:text-white transition-colors px-2 py-1.5 rounded-lg hover:bg-white/5 min-h-[36px]">
+                <Copy className="w-4 h-4" strokeWidth={1.5} /><span className="hidden sm:inline">Duplicate</span>
+              </button>
+              <button onClick={() => onBulkAction('addToEstimate')} className="flex items-center gap-1.5 text-sm text-emerald-400 hover:text-emerald-300 transition-colors px-2 py-1.5 rounded-lg hover:bg-emerald-500/10 min-h-[36px]">
+                <ShoppingCart className="w-4 h-4" strokeWidth={1.5} /><span className="hidden sm:inline">Add to Estimate</span>
+              </button>
+              <button onClick={() => onBulkAction('archive')} className="flex items-center gap-1.5 text-sm text-neutral-300 hover:text-white transition-colors px-2 py-1.5 rounded-lg hover:bg-white/5 min-h-[36px]">
+                <Archive className="w-4 h-4" strokeWidth={1.5} /><span className="hidden sm:inline">Archive</span>
+              </button>
+            </div>
             <button onClick={() => onBulkAction('clear')} className="ml-auto text-sm text-neutral-500 hover:text-white transition-colors">
-              Clear selection
+              Clear
             </button>
           </div>
         )}
       </div>
       
-      {/* Items */}
+      {/* Items - Responsive: Cards on Mobile, List/Grid on Desktop */}
       <div className="flex-1 overflow-auto bg-[#111111] border border-neutral-800 rounded-xl">
-        {viewMode === 'list' ? (
-          <div>
-            {/* List Header */}
-            <div className="flex items-center gap-4 px-4 py-2.5 bg-neutral-900/50 border-b border-neutral-800 text-xs uppercase tracking-wider font-medium text-neutral-500 sticky top-0">
-              <div className="w-4">
-                <input
-                  type="checkbox"
-                  checked={selectedItems.size === filteredItems.length && filteredItems.length > 0}
-                  onChange={onSelectAll}
-                  className="w-4 h-4 rounded border-neutral-700 bg-neutral-900 text-emerald-500 focus:ring-emerald-500/20 cursor-pointer"
-                />
-              </div>
-              <button onClick={() => onSortChange({ field: 'production_code', direction: sortConfig.field === 'production_code' && sortConfig.direction === 'asc' ? 'desc' : 'asc' })} className="w-28 flex items-center gap-1 hover:text-neutral-300 transition-colors">
-                Code {sortConfig.field === 'production_code' && (sortConfig.direction === 'asc' ? <SortAsc className="w-3 h-3" /> : <SortDesc className="w-3 h-3" />)}
-              </button>
-              <button onClick={() => onSortChange({ field: 'production_name', direction: sortConfig.field === 'production_name' && sortConfig.direction === 'asc' ? 'desc' : 'asc' })} className="flex-1 flex items-center gap-1 hover:text-neutral-300 transition-colors text-left">
-                Standard Name {sortConfig.field === 'production_name' && (sortConfig.direction === 'asc' ? <SortAsc className="w-3 h-3" /> : <SortDesc className="w-3 h-3" />)}
-              </button>
-              <div className="w-36">Domain</div>
-              <div className="w-16 text-center">Unit</div>
-              <div className="w-24 text-right">Rate</div>
-              <div className="w-20 text-right">Output</div>
-              <div className="w-24 text-center">Usage</div>
-              <div className="w-8" />
-            </div>
-            
-            {/* List Items */}
-            {filteredItems.map((item) => {
-              const mockRelations = generateMockRelationships();
-              return (
-                <div
-                  key={item.id}
-                  className={`group flex items-center gap-4 px-4 py-3.5 border-b border-neutral-800/50 hover:bg-neutral-900/50 transition-colors cursor-pointer ${
-                    selectedItems.has(item.id) ? 'bg-emerald-500/5' : ''
-                  }`}
-                  onClick={() => onOpenItem(item)}
-                  data-testid={`standard-row-${item.id}`}
-                >
-                  <div onClick={(e) => e.stopPropagation()}>
-                    <input
-                      type="checkbox"
-                      checked={selectedItems.has(item.id)}
-                      onChange={() => onSelectItem(item.id)}
-                      className="w-4 h-4 rounded border-neutral-700 bg-neutral-900 text-emerald-500 focus:ring-emerald-500/20 cursor-pointer"
-                    />
+        {/* Mobile Cards View (< lg screens) */}
+        <div className="lg:hidden p-3 space-y-3">
+          {filteredItems.map((item) => {
+            const mockRelations = generateMockRelationships();
+            return (
+              <div
+                key={item.id}
+                className={`bg-neutral-900/50 border rounded-xl p-4 active:bg-neutral-800 transition-colors cursor-pointer ${
+                  selectedItems.has(item.id) ? 'border-emerald-500/50 bg-emerald-500/5' : 'border-neutral-800'
+                }`}
+                onClick={() => onOpenItem(item)}
+                data-testid={`standard-mobile-card-${item.id}`}
+              >
+                {/* Card Header */}
+                <div className="flex items-start justify-between gap-3 mb-3">
+                  <div className="min-w-0 flex-1">
+                    <span className="font-mono text-xs text-emerald-400 block mb-1">{item.production_code}</span>
+                    <h4 className="text-sm font-medium text-white line-clamp-2">{item.production_name}</h4>
                   </div>
-                  
-                  <div className="w-28 flex-shrink-0">
-                    <span className="font-mono text-[13px] text-emerald-400">{item.production_code}</span>
-                  </div>
-                  
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-white truncate">{item.production_name}</span>
-                      {item.is_company_standard && (
-                        <span className="flex-shrink-0 px-1.5 py-0.5 bg-amber-500/10 text-amber-400 text-[10px] font-medium uppercase tracking-wider rounded flex items-center gap-1">
-                          <Star className="w-3 h-3" strokeWidth={2} />
-                          Standard
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  
-                  <div className="w-36 flex-shrink-0">
-                    <span className="text-sm text-neutral-400">{item.knowledge_domains?.name || '-'}</span>
-                  </div>
-                  
-                  <div className="w-16 flex-shrink-0 text-center">
-                    <span className="font-mono text-xs bg-neutral-800 text-neutral-300 px-2 py-1 rounded">
-                      {item.measurement_units?.code || 'EA'}
-                    </span>
-                  </div>
-                  
-                  <div className="w-24 flex-shrink-0 text-right">
-                    {item.standard_rate ? (
-                      <span className="font-mono text-sm text-white">${item.standard_rate.toFixed(2)}</span>
-                    ) : (
-                      <span className="text-sm text-neutral-600">-</span>
-                    )}
-                  </div>
-                  
-                  <div className="w-20 flex-shrink-0 text-right">
-                    {item.production_per_day ? (
-                      <span className="text-sm text-neutral-400">{item.production_per_day}/day</span>
-                    ) : (
-                      <span className="text-sm text-neutral-600">-</span>
-                    )}
-                  </div>
-                  
-                  {/* Usage indicator */}
-                  <div className="w-24 flex-shrink-0 flex items-center justify-center gap-1">
-                    <span className="text-xs text-neutral-500">{mockRelations.assemblies} assemblies</span>
-                  </div>
-                  
-                  <div className="w-8 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
-                    <button className="p-1.5 text-neutral-500 hover:text-white hover:bg-neutral-800 rounded transition-colors">
-                      <MoreHorizontal className="w-4 h-4" strokeWidth={1.5} />
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4">
-            {filteredItems.map((item) => {
-              const mockRelations = generateMockRelationships();
-              return (
-                <div
-                  key={item.id}
-                  className={`group relative bg-[#0A0A0A] border rounded-xl p-4 hover:border-neutral-700 transition-all cursor-pointer ${
-                    selectedItems.has(item.id) ? 'border-emerald-500/50 ring-1 ring-emerald-500/20' : 'border-neutral-800'
-                  }`}
-                  onClick={() => onOpenItem(item)}
-                  data-testid={`standard-card-${item.id}`}
-                >
-                  <div className="absolute top-3 left-3 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
-                    <input
-                      type="checkbox"
-                      checked={selectedItems.has(item.id)}
-                      onChange={() => onSelectItem(item.id)}
-                      className="w-4 h-4 rounded border-neutral-700 bg-neutral-900 text-emerald-500 focus:ring-emerald-500/20 cursor-pointer"
-                    />
-                  </div>
-                  
-                  <div className="flex items-start justify-between mb-3">
-                    <span className="font-mono text-xs text-emerald-400">{item.production_code}</span>
+                  <div className="flex items-center gap-2 flex-shrink-0">
                     {item.is_company_standard && (
                       <Star className="w-4 h-4 text-amber-400" strokeWidth={2} fill="currentColor" />
                     )}
-                  </div>
-                  
-                  <h4 className="text-sm font-medium text-white mb-1 line-clamp-2">{item.production_name}</h4>
-                  
-                  {item.knowledge_domains?.name && (
-                    <div className="mb-3">
-                      <span className="text-xs bg-neutral-800 text-neutral-400 px-2 py-1 rounded">
-                        {item.knowledge_domains.name}
-                      </span>
+                    <div onClick={(e) => e.stopPropagation()}>
+                      <input
+                        type="checkbox"
+                        checked={selectedItems.has(item.id)}
+                        onChange={() => onSelectItem(item.id)}
+                        className="w-5 h-5 rounded border-neutral-700 bg-neutral-900 text-emerald-500 focus:ring-emerald-500/20 cursor-pointer"
+                      />
                     </div>
-                  )}
-                  
-                  <div className="flex items-center gap-3 pt-3 border-t border-neutral-800/50">
-                    <span className="font-mono text-xs bg-neutral-800 text-neutral-300 px-2 py-1 rounded">
-                      {item.measurement_units?.code || 'EA'}
-                    </span>
-                    {item.standard_rate && (
-                      <span className="font-mono text-xs text-white">${item.standard_rate.toFixed(2)}</span>
-                    )}
-                    <span className="text-[10px] text-neutral-600 ml-auto">{mockRelations.assemblies} assemblies</span>
                   </div>
                 </div>
-              );
-            })}
-          </div>
-        )}
+                
+                {/* Card Details */}
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <span className="text-neutral-500 text-xs block">Domain</span>
+                    <span className="text-neutral-300 truncate block">{item.knowledge_domains?.name || '-'}</span>
+                  </div>
+                  <div>
+                    <span className="text-neutral-500 text-xs block">Rate</span>
+                    <span className="text-white font-mono">
+                      {item.standard_rate ? `$${item.standard_rate.toFixed(2)}` : '-'}
+                    </span>
+                  </div>
+                </div>
+                
+                {/* Card Footer */}
+                <div className="flex items-center justify-between mt-3 pt-3 border-t border-neutral-800">
+                  <span className="font-mono text-xs bg-neutral-800 text-neutral-300 px-2 py-1 rounded">
+                    {item.measurement_units?.code || 'EA'}
+                  </span>
+                  <span className="text-xs text-neutral-500">{mockRelations.assemblies} assemblies</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Desktop View (lg+ screens) */}
+        <div className="hidden lg:block">
+          {viewMode === 'list' ? (
+            <div>
+              {/* List Header */}
+              <div className="flex items-center gap-4 px-4 py-2.5 bg-neutral-900/50 border-b border-neutral-800 text-xs uppercase tracking-wider font-medium text-neutral-500 sticky top-0">
+                <div className="w-4">
+                  <input
+                    type="checkbox"
+                    checked={selectedItems.size === filteredItems.length && filteredItems.length > 0}
+                    onChange={onSelectAll}
+                    className="w-4 h-4 rounded border-neutral-700 bg-neutral-900 text-emerald-500 focus:ring-emerald-500/20 cursor-pointer"
+                  />
+                </div>
+                <button onClick={() => onSortChange({ field: 'production_code', direction: sortConfig.field === 'production_code' && sortConfig.direction === 'asc' ? 'desc' : 'asc' })} className="w-28 flex items-center gap-1 hover:text-neutral-300 transition-colors">
+                  Code {sortConfig.field === 'production_code' && (sortConfig.direction === 'asc' ? <SortAsc className="w-3 h-3" /> : <SortDesc className="w-3 h-3" />)}
+                </button>
+                <button onClick={() => onSortChange({ field: 'production_name', direction: sortConfig.field === 'production_name' && sortConfig.direction === 'asc' ? 'desc' : 'asc' })} className="flex-1 flex items-center gap-1 hover:text-neutral-300 transition-colors text-left">
+                  Standard Name {sortConfig.field === 'production_name' && (sortConfig.direction === 'asc' ? <SortAsc className="w-3 h-3" /> : <SortDesc className="w-3 h-3" />)}
+                </button>
+                <div className="w-36">Domain</div>
+                <div className="w-16 text-center">Unit</div>
+                <div className="w-24 text-right">Rate</div>
+                <div className="w-20 text-right">Output</div>
+                <div className="w-24 text-center">Usage</div>
+                <div className="w-8" />
+              </div>
+              
+              {/* List Items */}
+              {filteredItems.map((item) => {
+                const mockRelations = generateMockRelationships();
+                return (
+                  <div
+                    key={item.id}
+                    className={`group flex items-center gap-4 px-4 py-3.5 border-b border-neutral-800/50 hover:bg-neutral-900/50 transition-colors cursor-pointer ${
+                      selectedItems.has(item.id) ? 'bg-emerald-500/5' : ''
+                    }`}
+                    onClick={() => onOpenItem(item)}
+                    data-testid={`standard-row-${item.id}`}
+                  >
+                    <div onClick={(e) => e.stopPropagation()}>
+                      <input
+                        type="checkbox"
+                        checked={selectedItems.has(item.id)}
+                        onChange={() => onSelectItem(item.id)}
+                        className="w-4 h-4 rounded border-neutral-700 bg-neutral-900 text-emerald-500 focus:ring-emerald-500/20 cursor-pointer"
+                      />
+                    </div>
+                    
+                    <div className="w-28 flex-shrink-0">
+                      <span className="font-mono text-[13px] text-emerald-400">{item.production_code}</span>
+                    </div>
+                    
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-white truncate">{item.production_name}</span>
+                        {item.is_company_standard && (
+                          <span className="flex-shrink-0 px-1.5 py-0.5 bg-amber-500/10 text-amber-400 text-[10px] font-medium uppercase tracking-wider rounded flex items-center gap-1">
+                            <Star className="w-3 h-3" strokeWidth={2} />
+                            Standard
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div className="w-36 flex-shrink-0">
+                      <span className="text-sm text-neutral-400">{item.knowledge_domains?.name || '-'}</span>
+                    </div>
+                    
+                    <div className="w-16 flex-shrink-0 text-center">
+                      <span className="font-mono text-xs bg-neutral-800 text-neutral-300 px-2 py-1 rounded">
+                        {item.measurement_units?.code || 'EA'}
+                      </span>
+                    </div>
+                    
+                    <div className="w-24 flex-shrink-0 text-right">
+                      {item.standard_rate ? (
+                        <span className="font-mono text-sm text-white">${item.standard_rate.toFixed(2)}</span>
+                      ) : (
+                        <span className="text-sm text-neutral-600">-</span>
+                      )}
+                    </div>
+                    
+                    <div className="w-20 flex-shrink-0 text-right">
+                      {item.production_per_day ? (
+                        <span className="text-sm text-neutral-400">{item.production_per_day}/day</span>
+                      ) : (
+                        <span className="text-sm text-neutral-600">-</span>
+                      )}
+                    </div>
+                    
+                    <div className="w-24 flex-shrink-0 flex items-center justify-center gap-1">
+                      <span className="text-xs text-neutral-500">{mockRelations.assemblies} assemblies</span>
+                    </div>
+                    
+                    <div className="w-8 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
+                      <button className="p-1.5 text-neutral-500 hover:text-white hover:bg-neutral-800 rounded transition-colors">
+                        <MoreHorizontal className="w-4 h-4" strokeWidth={1.5} />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 p-4">
+              {filteredItems.map((item) => {
+                const mockRelations = generateMockRelationships();
+                return (
+                  <div
+                    key={item.id}
+                    className={`group relative bg-[#0A0A0A] border rounded-xl p-4 hover:border-neutral-700 transition-all cursor-pointer ${
+                      selectedItems.has(item.id) ? 'border-emerald-500/50 ring-1 ring-emerald-500/20' : 'border-neutral-800'
+                    }`}
+                    onClick={() => onOpenItem(item)}
+                    data-testid={`standard-card-${item.id}`}
+                  >
+                    <div className="absolute top-3 left-3 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
+                      <input
+                        type="checkbox"
+                        checked={selectedItems.has(item.id)}
+                        onChange={() => onSelectItem(item.id)}
+                        className="w-4 h-4 rounded border-neutral-700 bg-neutral-900 text-emerald-500 focus:ring-emerald-500/20 cursor-pointer"
+                      />
+                    </div>
+                    
+                    <div className="flex items-start justify-between mb-3">
+                      <span className="font-mono text-xs text-emerald-400">{item.production_code}</span>
+                      {item.is_company_standard && (
+                        <Star className="w-4 h-4 text-amber-400" strokeWidth={2} fill="currentColor" />
+                      )}
+                    </div>
+                    
+                    <h4 className="text-sm font-medium text-white mb-1 line-clamp-2">{item.production_name}</h4>
+                    
+                    {item.knowledge_domains?.name && (
+                      <div className="mb-3">
+                        <span className="text-xs bg-neutral-800 text-neutral-400 px-2 py-1 rounded">
+                          {item.knowledge_domains.name}
+                        </span>
+                      </div>
+                    )}
+                    
+                    <div className="flex items-center gap-3 pt-3 border-t border-neutral-800/50">
+                      <span className="font-mono text-xs bg-neutral-800 text-neutral-300 px-2 py-1 rounded">
+                        {item.measurement_units?.code || 'EA'}
+                      </span>
+                      {item.standard_rate && (
+                        <span className="font-mono text-xs text-white">${item.standard_rate.toFixed(2)}</span>
+                      )}
+                      <span className="text-[10px] text-neutral-600 ml-auto">{mockRelations.assemblies} assemblies</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
         
         {filteredItems.length === 0 && (
           <div className="flex items-center justify-center py-16">

@@ -293,12 +293,12 @@ const SettingsPage = () => {
   const planStatus = getPlanStatus();
 
   return (
-    <div className="space-y-6" data-testid="settings-page">
+    <div className="space-y-6 overflow-x-hidden" data-testid="settings-page">
       {/* Header with Shield */}
       <div className="flex items-center gap-3 mb-2">
         <img src="/shield-icon.png" alt="" className="w-8 h-8 opacity-80" />
-        <div>
-          <h1 className="text-2xl font-bold text-charcoal-800">Settings</h1>
+        <div className="min-w-0">
+          <h1 className="text-xl sm:text-2xl font-bold text-charcoal-800">Settings</h1>
           <p className="text-charcoal-600 text-sm">Manage your account, subscription, and preferences</p>
         </div>
       </div>

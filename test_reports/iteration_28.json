@@ -1,0 +1,74 @@
+{
+  "summary": "TradeOS Mobile Experience v1.0 — re-verified at 390x844 (iPhone 12 Pro) after AppLayout overflow-x-hidden and ProductionLibrary mobile-card fixes. HORIZONTAL SCROLL IS NOW ELIMINATED on all 8 pages tested (Command Center, Projects, Estimating, Settings, Opportunities, Financial, Expenses, Documents — all report document.scrollWidth == clientWidth == 390). Production Library correctly renders 367 mobile cards on <lg and no desktop table is visible. Hamburger menu at [data-testid='mobile-menu-btn'] is 48x48, opens a full-height drawer with backdrop, all drawer nav items are ≥44px. New Project CTA is now 44px. However, TOUCH TARGET SIZE remains a partial failure: several buttons across the app are still under the 44px minimum: Command Center opportunity-row buttons (40px), Production Library workspace hamburger (40x40) + command-palette (40x42), Settings edit-profile-btn (20x46), Upgrade to Pro/Elite buttons (40px), save-labor-rate-btn (32px). Login flow works. Post-login /api/command-center and /api/workspace/context still throw 'Failed to fetch' (pre-existing since iteration_26).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "ProductionLibraryWorkspace workspace hamburger + command palette buttons",
+        "issue": "Workspace's own mobile hamburger is 40x40 and 'open-command-palette' button is 40x42 — both below the 44px minimum touch target requirement. AppLayout hamburger (48x48) is correct.",
+        "selector": "[data-testid='production-library-workspace'] button.lg\\:hidden (line ~2352), [data-testid='open-command-palette']",
+        "priority": "MEDIUM"
+      },
+      {
+        "component": "CommandCenterPage opportunity row buttons",
+        "issue": "All 7 opportunity row buttons ([data-testid='opportunity-row-discovered'|'qualifying'|'tendering'|'submitted'|'negotiation'|'awarded'|'lost']) are 40px tall. Below 44px minimum on mobile.",
+        "selector": "[data-testid^='opportunity-row-']",
+        "priority": "MEDIUM"
+      },
+      {
+        "component": "SettingsPage undersized buttons",
+        "issue": "Multiple buttons under 44px on mobile: [data-testid='edit-profile-btn'] 20x46 (way too short), 'Upgrade to Pro' 40x345, 'Upgrade to Elite' 40x345, [data-testid='save-labor-rate-btn'] 32x48, three icon buttons at 24x48.",
+        "selector": "[data-testid='edit-profile-btn'], upgrade buttons in Settings, save-labor-rate-btn",
+        "priority": "MEDIUM"
+      },
+      {
+        "component": "Projects 'Create Project' inside modal",
+        "issue": "The 'Create Project' primary submit inside the modal reports 40x168 — 40px is under the 44px min touch target on mobile.",
+        "selector": "Modal 'Create Project' submit button (no data-testid found)",
+        "priority": "LOW"
+      },
+      {
+        "component": "brain-submit button",
+        "issue": "[data-testid='brain-submit'] is 32x32 in Company Brain popover — well under 44px min.",
+        "selector": "[data-testid='brain-submit']",
+        "priority": "MEDIUM"
+      }
+    ],
+    "integration_issues": [
+      {
+        "flow": "Post-login workspace bootstrap",
+        "issue": "[AppLayout] Workspace context error: TypeError: Failed to fetch on /api/workspace/context; [CommandCenter] Error: TypeError: Failed to fetch on /api/command-center; [useOrganization] Error: TypeError: Failed to fetch. All console-only, UI still renders. Pre-existing since iteration_26.",
+        "affected_selectors": ["[data-testid='command-center']"]
+      }
+    ],
+    "design_issues": []
+  },
+  "verification_results": {
+    "login_mobile_390x844": "PASS - login page has no horizontal scroll, submit button 292x52",
+    "no_horizontal_scroll_all_pages": "PASS - Command Center, Projects, Estimating, Settings, Opportunities, Financial, Expenses, Documents all show docSW=390 == clientWidth=390. Estimating fix from iteration_27 confirmed working.",
+    "production_library_card_layout_mobile": "PASS - 367 mobile cards rendered via [data-testid^='standard-mobile-card-'], no desktop table visible",
+    "hamburger_opens_and_closes": "PASS - [data-testid='mobile-menu-btn'] is 48x48, opens full-height drawer (390x844), backdrop click closes it",
+    "drawer_slides_from_left": "PASS - drawer positioned at inset-y-0 left-0, visible in screenshot",
+    "drawer_nav_touch_targets": "PASS - all visible nav items ≥ 44px height",
+    "touch_targets_44px_minimum": "PARTIAL FAIL - AppLayout header + drawer PASS; multiple secondary buttons still under 44px (see ui_bugs above). Roughly 20+ interactive elements under-spec across CommandCenter/Settings/Estimating."
+  },
+  "test_report_links": [],
+  "action_items": [
+    "PRIMARY: Enforce min-h-[44px] on all button elements across CommandCenter (opportunity-row-*), Settings (edit-profile-btn, upgrade buttons, save-labor-rate-btn, icon buttons), ProductionLibraryWorkspace (workspace hamburger ~line 2352 w-10 h-10 -> w-11 h-11 or w-12 h-12; open-command-palette same treatment), Company Brain popover (brain-submit), and Projects modal 'Create Project' submit.",
+    "SECONDARY: Consider a global CSS rule in responsive.css scoped to @media (max-width: 1024px) that sets `button:not(.no-touch-min) { min-height: 44px }` to prevent regression on future buttons.",
+    "TERTIARY: Investigate persistent 'Failed to fetch' on /api/command-center and /api/workspace/context that has now been reported for 3 iterations (26, 27, 28). Likely a CORS/preflight or race with Supabase session hydration."
+  ],
+  "critical_code_review_comments": [
+    "ProductionLibraryWorkspace.jsx is still 2433 lines — still >3x the 700-line guideline. Splitting is still overdue.",
+    "The overflow-x-hidden approach on <main> and its inner wrapper (AppLayout.jsx lines 246 + 262) is a valid safety net, but the underlying flex-child min-w-0 issue was NOT fixed structurally at line 204 (<div className='flex-1 flex flex-col min-h-screen'>). Adding 'min-w-0' there is still recommended as a defensive fix so future wide children don't rely on the ancestor's overflow-x-hidden to hide the bug. Currently users may lose scroll access to content that WOULD have overflowed instead of visibly failing — silent clipping is not ideal for tables/reports.",
+    "Touch-target compliance is inconsistent — some spots use min-h-[44px] or min-h-[48px] correctly, others hardcode h-10 (40px) or h-8 (32px). Recommend a shared Button primitive with size='mobile' variant to standardise."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (frontend-only per request)", "frontend": "8/9 features PASS, 1 PARTIAL (touch-target minimum only met on primary CTAs — many secondary buttons still <44px)"},
+  "test_credentials": "inbox@twofungis.ca / TradeOS2024! — working",
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "All 9 review-request items were tested at 390x844. The single previously-blocking horizontal-scroll bug on /app/estimating (iteration_27) is now RESOLVED — Production Library renders 367 mobile cards, docSW==clientWidth==390. The remaining work is purely a touch-target-size audit — enumerate button.getBoundingClientRect() heights and enforce >=44 on mobile. See action_items[0] for the specific selectors that still miss.",
+  "rca of the issue": "Iteration 27 horizontal-scroll on Estimating was caused by (a) missing min-w-0 on AppLayout flex-child + (b) fixed-width list columns totalling ~900px. The main agent fixed it by (1) adding overflow-x-hidden on <main> and its inner div in AppLayout.jsx (lines 246+262) AND (2) implementing a fully separate mobile card view in ProductionLibraryWorkspace.jsx (lg:hidden block at line 899, wrapping 367 [data-testid='standard-mobile-card-*'] cards) and hiding the table with hidden lg:block at line 959. This resolves the visible bug. The still-open touch-target items are independent — they are per-component hardcoded heights (h-10, h-8) that were never migrated to min-h-[44px]."
+}

@@ -311,21 +311,21 @@ const ReportsPage = () => {
   }
 
   return (
-    <div className="space-y-6" data-testid="reports-page">
+    <div className="space-y-4 sm:space-y-6 overflow-x-hidden" data-testid="reports-page">
       {/* Header with Shield */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <img src="/shield-icon.png" alt="" className="w-8 h-8 opacity-80" />
-          <div>
-            <h1 className="text-2xl lg:text-3xl font-bold text-charcoal-800">Reports</h1>
-            <p className="text-charcoal-600">Advanced analytics and KPI tracking</p>
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center gap-3 min-w-0">
+          <img src="/shield-icon.png" alt="" className="w-7 h-7 sm:w-8 sm:h-8 opacity-80 flex-shrink-0" />
+          <div className="min-w-0">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-charcoal-800">Reports</h1>
+            <p className="text-charcoal-600 text-sm sm:text-base">Advanced analytics and KPI tracking</p>
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
           <select
             value={dateRange}
             onChange={(e) => setDateRange(e.target.value)}
-            className="bg-charcoal-800 border border-charcoal-700 rounded-lg px-4 py-2 text-white"
+            className="bg-charcoal-800 border border-charcoal-700 rounded-lg px-4 py-2.5 text-white min-h-[44px]"
             data-testid="date-range-select"
           >
             <option value="month">This Month</option>
@@ -334,28 +334,28 @@ const ReportsPage = () => {
             <option value="all">All Time</option>
           </select>
           <div className="relative group">
-            <button className="bg-steel-500 hover:bg-steel-600 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2">
+            <button className="w-full sm:w-auto bg-steel-500 hover:bg-steel-600 text-white px-4 py-2.5 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 min-h-[44px]">
               <Download className="w-4 h-4" />
               Export PDF
             </button>
             <div className="absolute right-0 mt-2 w-48 bg-charcoal-800 rounded-lg border border-charcoal-700 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
               <button 
                 onClick={() => exportToPDF('Profit & Loss')}
-                className="w-full text-left px-4 py-2 text-gray-300 hover:text-white hover:bg-charcoal-700 rounded-t-lg"
+                className="w-full text-left px-4 py-3 text-gray-300 hover:text-white hover:bg-charcoal-700 rounded-t-lg min-h-[44px]"
                 data-testid="export-pl-btn"
               >
                 Profit & Loss
               </button>
               <button 
                 onClick={() => exportToPDF('Revenue')}
-                className="w-full text-left px-4 py-2 text-gray-300 hover:text-white hover:bg-charcoal-700"
+                className="w-full text-left px-4 py-3 text-gray-300 hover:text-white hover:bg-charcoal-700 min-h-[44px]"
                 data-testid="export-revenue-btn"
               >
                 Revenue Report
               </button>
               <button 
                 onClick={() => exportToPDF('Projects')}
-                className="w-full text-left px-4 py-2 text-gray-300 hover:text-white hover:bg-charcoal-700 rounded-b-lg"
+                className="w-full text-left px-4 py-3 text-gray-300 hover:text-white hover:bg-charcoal-700 rounded-b-lg min-h-[44px]"
                 data-testid="export-projects-btn"
               >
                 Project Summary
@@ -365,8 +365,8 @@ const ReportsPage = () => {
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-2 border-b border-charcoal-700 pb-2">
+      {/* Tabs - Scrollable on mobile */}
+      <div className="flex gap-2 border-b border-charcoal-700 pb-2 overflow-x-auto -mx-3 px-3 sm:mx-0 sm:px-0">
         {[
           { id: 'overview', label: 'Overview', icon: BarChart3 },
           { id: 'revenue', label: 'Revenue', icon: DollarSign },
@@ -376,7 +376,7 @@ const ReportsPage = () => {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+            className={`flex items-center gap-2 px-3 sm:px-4 py-2.5 rounded-lg font-medium transition-colors whitespace-nowrap min-h-[44px] ${
               activeTab === tab.id 
                 ? 'bg-steel-500/20 text-steel-400' 
                 : 'text-gray-400 hover:text-white hover:bg-charcoal-700'
@@ -384,7 +384,7 @@ const ReportsPage = () => {
             data-testid={`tab-${tab.id}`}
           >
             <tab.icon className="w-4 h-4" />
-            {tab.label}
+            <span className="hidden sm:inline">{tab.label}</span>
           </button>
         ))}
       </div>

@@ -134,16 +134,16 @@ function OpportunityHeader({ opportunity, workspaceSummary, onRefresh, session }
   
   return (
     <header className="sticky top-0 z-40 bg-[#0a0a0a] border-b border-[#262626]" data-testid="workspace-header">
-      <div className="max-w-[1600px] mx-auto px-6 lg:px-8">
+      <div className="max-w-[1600px] mx-auto px-3 sm:px-6 lg:px-8">
         {/* Top row */}
         <div className="h-12 flex items-center justify-between">
           <button
             onClick={() => navigate('/app/opportunities')}
-            className="flex items-center gap-2 text-white/50 hover:text-white transition-colors group"
+            className="flex items-center gap-2 text-white/50 hover:text-white transition-colors group min-h-[44px]"
             data-testid="back-btn"
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-            <span className="text-sm">Opportunities</span>
+            <span className="text-sm">Back</span>
           </button>
           
           <div className="relative">
@@ -179,19 +179,19 @@ function OpportunityHeader({ opportunity, workspaceSummary, onRefresh, session }
         </div>
         
         {/* Main header content */}
-        <div className="pb-5">
-          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+        <div className="pb-4 sm:pb-5">
+          <div className="flex flex-col gap-4">
             {/* Left: Identity */}
             <div className="min-w-0">
               <p className="text-xs font-mono uppercase tracking-[0.2em] text-white/40 mb-1" data-testid="opp-ref">
                 {opportunity.reference_number || 'OPP-DRAFT'}
               </p>
-              <h1 className="text-2xl font-semibold tracking-tight text-white truncate mb-2" data-testid="opp-name">
+              <h1 className="text-lg sm:text-2xl font-semibold tracking-tight text-white truncate mb-2" data-testid="opp-name">
                 {opportunity.name}
               </h1>
-              <div className="flex flex-wrap items-center gap-4 text-sm text-white/50">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-sm text-white/50">
                 {opportunity.client_company && (
-                  <span data-testid="opp-client">{opportunity.client_company}</span>
+                  <span className="truncate" data-testid="opp-client">{opportunity.client_company}</span>
                 )}
                 {opportunity.site_city && (
                   <span data-testid="opp-location">{opportunity.site_city}, {opportunity.site_province || 'BC'}</span>
@@ -199,20 +199,20 @@ function OpportunityHeader({ opportunity, workspaceSummary, onRefresh, session }
               </div>
             </div>
             
-            {/* Right: Key metrics */}
-            <div className="flex flex-wrap items-center gap-6">
+            {/* Right: Key metrics - responsive grid */}
+            <div className="flex flex-wrap items-center gap-4 sm:gap-6">
               {/* Value */}
-              <div className="text-right">
+              <div className="text-left sm:text-right">
                 <p className="text-xs font-mono uppercase tracking-[0.15em] text-white/40">Value</p>
-                <p className="text-xl font-mono text-white" data-testid="opp-value">
+                <p className="text-lg sm:text-xl font-mono text-white" data-testid="opp-value">
                   {formatCurrency(opportunity.estimated_value)}
                 </p>
               </div>
               
               {/* Due */}
-              <div className="text-right">
+              <div className="text-left sm:text-right">
                 <p className="text-xs font-mono uppercase tracking-[0.15em] text-white/40">Due</p>
-                <p className={`text-xl font-mono ${isOverdue ? 'text-red-400' : isUrgent ? 'text-amber-400' : 'text-white'}`} data-testid="opp-due">
+                <p className={`text-lg sm:text-xl font-mono ${isOverdue ? 'text-red-400' : isUrgent ? 'text-amber-400' : 'text-white'}`} data-testid="opp-due">
                   {formatDate(opportunity.tender_due_date)}
                 </p>
                 {daysUntilDue !== null && (
@@ -223,10 +223,10 @@ function OpportunityHeader({ opportunity, workspaceSummary, onRefresh, session }
               </div>
               
               {/* Stage badge */}
-              <div className="relative">
+              <div className="relative ml-auto">
                 <button
                   onClick={() => setShowStageMenu(!showStageMenu)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-medium transition-all ${stage.color} ${updating ? 'opacity-50' : 'hover:scale-105'}`}
+                  className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-full border text-sm font-medium transition-all min-h-[44px] ${stage.color} ${updating ? 'opacity-50' : 'hover:scale-105'}`}
                   disabled={updating}
                   data-testid="stage-badge"
                 >

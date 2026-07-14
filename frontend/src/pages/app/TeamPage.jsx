@@ -369,19 +369,19 @@ const TeamPage = () => {
   const isOwner = currentUserRole === 'owner';
   
   return (
-    <div className="min-h-screen bg-zinc-950 text-white p-6">
+    <div className="min-h-screen bg-zinc-950 text-white p-3 sm:p-6 overflow-x-hidden">
       {/* Header */}
       <div className="max-w-4xl mx-auto">
-        <div className="flex items-center gap-4 mb-8">
+        <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
           <button
             onClick={() => navigate('/app/settings')}
-            className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors"
+            className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
             data-testid="back-to-settings"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
-          <div>
-            <h1 className="text-2xl font-bold text-white">Team</h1>
+          <div className="min-w-0">
+            <h1 className="text-xl sm:text-2xl font-bold text-white">Team</h1>
             <p className="text-zinc-400 text-sm">
               Manage your organization members
             </p>
@@ -389,21 +389,21 @@ const TeamPage = () => {
         </div>
         
         {/* Organization Info */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 mb-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-emerald-500/10 border border-emerald-500/30 rounded-xl flex items-center justify-center">
-                <Users className="w-6 h-6 text-emerald-400" />
+        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 sm:p-5 mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-500/10 border border-emerald-500/30 rounded-xl flex items-center justify-center flex-shrink-0">
+                <Users className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400" />
               </div>
-              <div>
-                <h2 className="font-semibold text-white">{organization?.name || 'Organization'}</h2>
+              <div className="min-w-0">
+                <h2 className="font-semibold text-white truncate">{organization?.name || 'Organization'}</h2>
                 <p className="text-sm text-zinc-400">{members.length} team member{members.length !== 1 ? 's' : ''}</p>
               </div>
             </div>
             {isOwner && (
               <button
                 onClick={() => setIsInviteModalOpen(true)}
-                className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-black font-medium px-4 py-2.5 rounded-lg transition-colors"
+                className="flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-black font-medium px-4 py-2.5 rounded-lg transition-colors min-h-[44px] w-full sm:w-auto"
                 data-testid="invite-member-btn"
               >
                 <UserPlus className="w-4 h-4" />
@@ -475,32 +475,32 @@ const TeamPage = () => {
               {members.map((member) => (
                 <div 
                   key={member.id}
-                  className="flex items-center justify-between px-5 py-4 hover:bg-zinc-800/30 transition-colors"
+                  className="flex flex-col sm:flex-row sm:items-center justify-between px-4 sm:px-5 py-4 hover:bg-zinc-800/30 transition-colors gap-3 sm:gap-4"
                   data-testid={`team-member-${member.user_id}`}
                 >
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-zinc-800 border border-zinc-700 rounded-full flex items-center justify-center">
+                  <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                    <div className="w-10 h-10 bg-zinc-800 border border-zinc-700 rounded-full flex items-center justify-center flex-shrink-0">
                       <span className="text-sm font-medium text-zinc-300">
                         {(member.name || member.email || '?').charAt(0).toUpperCase()}
                       </span>
                     </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium text-white">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-medium text-white truncate">
                           {member.name || member.email?.split('@')[0] || 'Unknown'}
                         </span>
                         {member.user_id === user?.id && (
                           <span className="text-xs text-zinc-500">(you)</span>
                         )}
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-zinc-400">
-                        <Mail className="w-3.5 h-3.5" />
-                        {member.email || 'No email'}
+                      <div className="flex items-center gap-2 text-sm text-zinc-400 truncate">
+                        <Mail className="w-3.5 h-3.5 flex-shrink-0" />
+                        <span className="truncate">{member.email || 'No email'}</span>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 sm:gap-3 flex-wrap sm:flex-nowrap ml-[52px] sm:ml-0">
                     <RoleBadge role={member.role} />
                     <StatusBadge isActive={member.is_active} />
                     <MemberActions

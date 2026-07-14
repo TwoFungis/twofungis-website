@@ -248,89 +248,153 @@ const InvoicesPage = () => {
             </button>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-charcoal-700/50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Invoice #</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Client</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase hidden md:table-cell">Project</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Amount</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase hidden sm:table-cell">Due Date</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Status</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-400 uppercase">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-charcoal-700">
-                {filteredInvoices.map((invoice) => {
-                  const config = STATUS_CONFIG[invoice.status] || STATUS_CONFIG.draft;
-                  
-                  return (
-                    <tr key={invoice.id} className="hover:bg-charcoal-700/30 transition-colors">
-                      <td className="px-6 py-4">
-                        <span className="text-white font-mono font-medium">{invoice.invoice_number}</span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
-                          <Building2 className="w-4 h-4 text-gray-500" />
-                          <span className="text-white">{invoice.client_name}</span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-gray-400 hidden md:table-cell">{invoice.project_name || '—'}</td>
-                      <td className="px-6 py-4 text-white font-medium">${invoice.total?.toLocaleString()}</td>
-                      <td className="px-6 py-4 text-gray-400 hidden sm:table-cell">
-                        {invoice.due_date ? new Date(invoice.due_date).toLocaleDateString() : '—'}
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${config.color}`}>
-                          {config.label}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <button 
-                            onClick={() => { setSelectedInvoice(invoice); setShowViewModal(true); }}
-                            className="text-gray-400 hover:text-white p-1" 
-                            title="View"
-                            data-testid={`view-invoice-${invoice.id}`}
-                          >
-                            <Eye className="w-4 h-4" />
-                          </button>
-                          {invoice.status === 'draft' && (
-                            <>
-                              <button 
-                                onClick={() => handleSendInvoice(invoice.id)}
-                                className="bg-steel-500 hover:bg-steel-600 text-white px-3 py-1 rounded text-sm font-medium"
-                                data-testid={`send-invoice-${invoice.id}`}
-                              >
-                                Send
-                              </button>
-                              <button 
-                                onClick={() => handleDeleteInvoice(invoice.id)}
-                                className="text-gray-400 hover:text-risk p-1" 
-                                title="Delete"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </button>
-                            </>
-                          )}
-                          {['sent', 'viewed', 'overdue'].includes(invoice.status) && (
+          <>
+            {/* Mobile Card View */}
+            <div className="md:hidden p-3 space-y-3">
+              {filteredInvoices.map((invoice) => {
+                const config = STATUS_CONFIG[invoice.status] || STATUS_CONFIG.draft;
+                return (
+                  <div 
+                    key={invoice.id} 
+                    className="bg-charcoal-700/50 border border-charcoal-600 rounded-xl p-4 space-y-3"
+                    data-testid={`invoice-mobile-card-${invoice.id}`}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="min-w-0 flex-1">
+                        <span className="text-white font-mono font-medium block">{invoice.invoice_number}</span>
+                        <span className="text-gray-400 text-sm truncate block">{invoice.client_name}</span>
+                      </div>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${config.color}`}>
+                        {config.label}
+                      </span>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-3 text-sm">
+                      <div>
+                        <span className="text-gray-500 text-xs block">Amount</span>
+                        <span className="text-white font-medium">${invoice.total?.toLocaleString()}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-500 text-xs block">Due Date</span>
+                        <span className="text-gray-300">{invoice.due_date ? new Date(invoice.due_date).toLocaleDateString() : '—'}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-2 pt-3 border-t border-charcoal-600">
+                      <button 
+                        onClick={() => { setSelectedInvoice(invoice); setShowViewModal(true); }}
+                        className="flex-1 flex items-center justify-center gap-2 text-gray-400 hover:text-white py-2 rounded-lg hover:bg-charcoal-600 transition-colors min-h-[44px]"
+                      >
+                        <Eye className="w-4 h-4" />
+                        View
+                      </button>
+                      {invoice.status === 'draft' && (
+                        <button 
+                          onClick={() => handleSendInvoice(invoice.id)}
+                          className="flex-1 bg-steel-500 hover:bg-steel-600 text-white py-2 rounded-lg font-medium min-h-[44px]"
+                        >
+                          Send
+                        </button>
+                      )}
+                      {['sent', 'viewed', 'overdue'].includes(invoice.status) && (
+                        <button 
+                          onClick={() => handleMarkPaid(invoice.id)}
+                          className="flex-1 bg-success/20 hover:bg-success/30 text-success py-2 rounded-lg font-medium min-h-[44px]"
+                        >
+                          Mark Paid
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Desktop Table View */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-charcoal-700/50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Invoice #</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Client</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase hidden lg:table-cell">Project</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Amount</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Due Date</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Status</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-400 uppercase">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-charcoal-700">
+                  {filteredInvoices.map((invoice) => {
+                    const config = STATUS_CONFIG[invoice.status] || STATUS_CONFIG.draft;
+                    
+                    return (
+                      <tr key={invoice.id} className="hover:bg-charcoal-700/30 transition-colors">
+                        <td className="px-6 py-4">
+                          <span className="text-white font-mono font-medium">{invoice.invoice_number}</span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-2">
+                            <Building2 className="w-4 h-4 text-gray-500" />
+                            <span className="text-white">{invoice.client_name}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-gray-400 hidden lg:table-cell">{invoice.project_name || '—'}</td>
+                        <td className="px-6 py-4 text-white font-medium">${invoice.total?.toLocaleString()}</td>
+                        <td className="px-6 py-4 text-gray-400">
+                          {invoice.due_date ? new Date(invoice.due_date).toLocaleDateString() : '—'}
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${config.color}`}>
+                            {config.label}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <div className="flex items-center justify-end gap-2">
                             <button 
-                              onClick={() => handleMarkPaid(invoice.id)}
-                              className="bg-success/20 hover:bg-success/30 text-success px-3 py-1 rounded text-sm font-medium"
-                              data-testid={`mark-paid-${invoice.id}`}
+                              onClick={() => { setSelectedInvoice(invoice); setShowViewModal(true); }}
+                              className="text-gray-400 hover:text-white p-1" 
+                              title="View"
+                              data-testid={`view-invoice-${invoice.id}`}
                             >
-                              Mark Paid
+                              <Eye className="w-4 h-4" />
                             </button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                            {invoice.status === 'draft' && (
+                              <>
+                                <button 
+                                  onClick={() => handleSendInvoice(invoice.id)}
+                                  className="bg-steel-500 hover:bg-steel-600 text-white px-3 py-1 rounded text-sm font-medium"
+                                  data-testid={`send-invoice-${invoice.id}`}
+                                >
+                                  Send
+                                </button>
+                                <button 
+                                  onClick={() => handleDeleteInvoice(invoice.id)}
+                                  className="text-gray-400 hover:text-risk p-1" 
+                                  title="Delete"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </>
+                            )}
+                            {['sent', 'viewed', 'overdue'].includes(invoice.status) && (
+                              <button 
+                                onClick={() => handleMarkPaid(invoice.id)}
+                                className="bg-success/20 hover:bg-success/30 text-success px-3 py-1 rounded text-sm font-medium"
+                                data-testid={`mark-paid-${invoice.id}`}
+                              >
+                                Mark Paid
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
 

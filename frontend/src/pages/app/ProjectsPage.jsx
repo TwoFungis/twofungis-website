@@ -169,19 +169,19 @@ const ProjectsPage = () => {
   };
 
   return (
-    <div className="space-y-6" data-testid="projects-page">
+    <div className="space-y-4 sm:space-y-6 overflow-x-hidden" data-testid="projects-page">
       {/* Header with Shield */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <img src="/shield-icon.png" alt="" className="w-8 h-8 opacity-80" />
-          <div>
-            <h1 className="text-2xl lg:text-3xl font-bold text-charcoal-800">Projects</h1>
-            <p className="text-charcoal-600">Manage and track all your active projects</p>
+        <div className="flex items-center gap-3 min-w-0">
+          <img src="/shield-icon.png" alt="" className="w-7 h-7 sm:w-8 sm:h-8 opacity-80 flex-shrink-0" />
+          <div className="min-w-0">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-charcoal-800">Projects</h1>
+            <p className="text-charcoal-600 text-sm sm:text-base">Manage and track all your active projects</p>
           </div>
         </div>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="bg-steel-500 hover:bg-steel-600 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 w-fit"
+          className="bg-steel-500 hover:bg-steel-600 text-white px-4 py-2.5 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 min-h-[44px] w-full sm:w-auto"
           data-testid="new-project-btn"
         >
           <Plus className="w-5 h-5" />
@@ -197,19 +197,19 @@ const ProjectsPage = () => {
       )}
 
       {/* Search & Filter */}
-      <div className="flex gap-4">
-        <div className="flex-1 relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+      <div className="flex gap-2 sm:gap-4">
+        <div className="flex-1 relative min-w-0">
+          <Search className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-4 sm:w-5 h-4 sm:h-5 text-gray-500" />
           <input
             type="text"
             placeholder="Search projects..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-charcoal-800 border border-charcoal-700 rounded-lg pl-12 pr-4 py-3 text-white placeholder-gray-500 focus:border-steel-500 focus:ring-1 focus:ring-steel-500 transition-colors"
+            className="w-full bg-charcoal-800 border border-charcoal-700 rounded-lg pl-10 sm:pl-12 pr-4 py-3 text-white placeholder-gray-500 focus:border-steel-500 focus:ring-1 focus:ring-steel-500 transition-colors min-h-[44px]"
             data-testid="search-projects-input"
           />
         </div>
-        <button className="bg-charcoal-800 border border-charcoal-700 rounded-lg px-4 py-3 text-gray-400 hover:text-white hover:border-charcoal-600 transition-colors">
+        <button className="bg-charcoal-800 border border-charcoal-700 rounded-lg px-3 sm:px-4 py-3 text-gray-400 hover:text-white hover:border-charcoal-600 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center">
           <Filter className="w-5 h-5" />
         </button>
       </div>

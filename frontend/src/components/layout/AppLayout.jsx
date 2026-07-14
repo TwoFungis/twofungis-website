@@ -243,10 +243,10 @@ const AppLayout = () => {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 p-4 lg:p-8 overflow-auto relative bg-black">
-          {/* Large Shield Watermark - Centered Background */}
+        <main className="flex-1 p-3 sm:p-4 lg:p-8 overflow-x-hidden overflow-y-auto relative bg-black">
+          {/* Large Shield Watermark - Centered Background - Hidden on mobile */}
           <div 
-            className="fixed inset-0 pointer-events-none z-0 flex items-center justify-center"
+            className="fixed inset-0 pointer-events-none z-0 hidden lg:flex items-center justify-center"
             style={{ marginLeft: '200px' }}
           >
             <div 
@@ -259,7 +259,7 @@ const AppLayout = () => {
               }}
             />
           </div>
-          <div className="relative z-10">
+          <div className="relative z-10 max-w-full overflow-x-hidden">
             <Outlet />
           </div>
         </main>

@@ -713,37 +713,37 @@ const CommandCenterPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black font-sans" data-testid="tradeos-command-center">
+    <div className="min-h-screen bg-black font-sans overflow-x-hidden" data-testid="tradeos-command-center">
       {/* Header */}
       <header className="sticky top-0 z-40 bg-black/95 backdrop-blur-sm border-b border-zinc-800">
-        <div className="px-4 lg:px-6 py-4">
-          <div className="flex items-center justify-between">
+        <div className="px-3 sm:px-4 lg:px-6 py-3 sm:py-4">
+          <div className="flex items-center justify-between gap-3">
             {/* Left: Title */}
-            <div>
-              <h1 className="text-xl lg:text-2xl font-bold text-white tracking-tight">
+            <div className="min-w-0 flex-1">
+              <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-white tracking-tight truncate">
                 Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 18 ? 'afternoon' : 'evening'}, {userName}
               </h1>
-              <p className="text-xs text-zinc-500 font-mono uppercase tracking-wider mt-0.5">{organizationName}</p>
+              <p className="text-xs text-zinc-500 font-mono uppercase tracking-wider mt-0.5 truncate">{organizationName}</p>
             </div>
             
             {/* Right: Actions */}
-            <div className="flex items-center gap-2 lg:gap-3">
+            <div className="flex items-center gap-2 flex-shrink-0">
               {/* Notifications */}
               <button
                 onClick={() => { closeAllPanels(); setNotificationsOpen(true); }}
-                className="relative p-2 text-zinc-400 hover:text-white transition-colors rounded-lg hover:bg-zinc-800"
+                className="relative p-2.5 text-zinc-400 hover:text-white transition-colors rounded-lg hover:bg-zinc-800 min-w-[44px] min-h-[44px] flex items-center justify-center"
                 data-testid="notifications-bell"
               >
                 <Bell className="w-5 h-5" />
                 {unreadCount > 0 && (
-                  <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
+                  <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
                 )}
               </button>
               
               {/* Quick Add */}
               <button
                 onClick={() => { closeAllPanels(); setQuickAddOpen(true); }}
-                className="flex items-center gap-2 px-3 py-2 bg-emerald-500 hover:bg-emerald-600 text-black font-medium rounded-lg transition-colors"
+                className="flex items-center justify-center gap-2 px-3 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-black font-medium rounded-lg transition-colors min-w-[44px] min-h-[44px]"
                 data-testid="quickadd-btn"
               >
                 <Plus className="w-4 h-4" />
@@ -774,7 +774,7 @@ const CommandCenterPage = () => {
       />
 
       {/* Main Content */}
-      <main className="px-4 lg:px-6 py-6 pb-32 lg:pb-24 space-y-6 max-w-7xl mx-auto">
+      <main className="px-3 sm:px-4 lg:px-6 py-4 sm:py-6 pb-24 space-y-4 sm:space-y-6 max-w-7xl mx-auto overflow-x-hidden">
         {/* Error State */}
         {error && (
           <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 flex items-center gap-3">
