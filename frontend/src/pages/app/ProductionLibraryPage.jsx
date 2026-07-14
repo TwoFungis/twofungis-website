@@ -253,7 +253,7 @@ const ProductionLibraryTab = ({ items, loading, onAddItem, onEditItem }) => {
             {item.is_company_standard && (
               <div className="mt-2">
                 <span className="text-[10px] bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded uppercase font-mono">
-                  Company Standard
+                  Production Standard
                 </span>
               </div>
             )}
@@ -1091,7 +1091,7 @@ const ProductionItemModal = ({ item, knowledgeDomains, measurementUnits, service
                 form.is_company_standard ? 'left-5' : 'left-1'
               }`} />
             </button>
-            <span className="text-sm text-zinc-400">Mark as Company Standard</span>
+            <span className="text-sm text-zinc-400">Mark as Production Standard</span>
           </div>
         </form>
         

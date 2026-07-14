@@ -467,7 +467,7 @@ export default function ProductionItemDetail() {
                   <h1 className="text-xl font-semibold text-white">{currentItem.production_name}</h1>
                   {item.is_company_standard && (
                     <span className="px-2 py-0.5 bg-amber-500/20 text-amber-400 text-[10px] rounded-full flex items-center gap-1">
-                      <Star className="w-3 h-3" /> Company Standard
+                      <Star className="w-3 h-3" /> Production Standard
                     </span>
                   )}
                 </div>
@@ -861,7 +861,7 @@ export default function ProductionItemDetail() {
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-white/60">Company Standard</span>
+                  <span className="text-sm text-white/60">Production Standard</span>
                   <span className={`px-2 py-0.5 text-xs rounded ${item.is_company_standard ? 'bg-amber-500/20 text-amber-400' : 'bg-neutral-700 text-white/50'}`}>
                     {item.is_company_standard ? 'Yes' : 'No'}
                   </span>

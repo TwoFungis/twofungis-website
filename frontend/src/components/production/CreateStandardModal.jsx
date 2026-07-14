@@ -181,7 +181,7 @@ export default function CreateStandardModal({ isOpen, onClose, session, domains,
               <FileText className="w-5 h-5 text-emerald-400" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-white">Create Company Standard</h2>
+              <h2 className="text-lg font-semibold text-white">Create Production Standard</h2>
               <p className="text-xs text-neutral-500">Add to Production Library</p>
             </div>
           </div>
@@ -445,7 +445,7 @@ export default function CreateStandardModal({ isOpen, onClose, session, domains,
             />
           </div>
 
-          {/* Company Standard Toggle */}
+          {/* Production Standard Toggle */}
           <div className="flex items-center gap-3 mb-6">
             <button
               type="button"
@@ -458,7 +458,7 @@ export default function CreateStandardModal({ isOpen, onClose, session, domains,
                 formData.is_company_standard ? 'translate-x-[22px]' : 'translate-x-[2px]'
               }`} />
             </button>
-            <span className="text-sm text-white">Mark as Company Standard</span>
+            <span className="text-sm text-white">Mark as Production Standard</span>
           </div>
         </form>
 

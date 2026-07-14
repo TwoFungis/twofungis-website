@@ -388,7 +388,7 @@ const CommandPalette = ({ isOpen, onClose, items, domains, categories, assemblie
     if (!query.trim()) {
       return {
         actions: [
-          { id: 'create-standard', label: 'Create Company Standard', icon: Plus, shortcut: 'N' },
+          { id: 'create-standard', label: 'Create Production Standard', icon: Plus, shortcut: 'N' },
           { id: 'create-assembly', label: 'Create Assembly', icon: Layers, shortcut: 'A' },
           { id: 'import', label: 'Import Knowledge', icon: Upload, shortcut: 'I' },
         ],
@@ -1705,7 +1705,7 @@ const DetailPanel = ({ item, onClose, domains, categories, onAddToEstimate }) =>
                     <span className="text-sm font-medium text-white">Marked as Standard</span>
                     <span className="text-xs text-neutral-500">v1.2</span>
                   </div>
-                  <p className="text-xs text-neutral-500 mb-1">Designated as company standard</p>
+                  <p className="text-xs text-neutral-500 mb-1">Designated as production standard</p>
                   <span className="text-[10px] text-neutral-600">1 month ago</span>
                 </div>
               </div>
