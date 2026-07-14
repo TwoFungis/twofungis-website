@@ -27,8 +27,9 @@ import {
 
 const LiveSummary = ({
   lineItems = [],
-  taxRate = 13, // Ontario HST default
-  markupPercent = 0,
+  taxRate = 5, // GST default
+  markupPercent = 15,
+  contingencyPercent = 10,
   onExportPDF,
   onSendToClient,
   isCollapsed = false,
@@ -42,18 +43,22 @@ const LiveSummary = ({
     
     const markup = subtotal * (markupPercent / 100);
     const subtotalWithMarkup = subtotal + markup;
-    const tax = subtotalWithMarkup * (taxRate / 100);
-    const total = subtotalWithMarkup + tax;
+    const contingency = subtotalWithMarkup * (contingencyPercent / 100);
+    const subtotalBeforeTax = subtotalWithMarkup + contingency;
+    const tax = subtotalBeforeTax * (taxRate / 100);
+    const total = subtotalBeforeTax + tax;
     
     return {
       subtotal,
       markup,
       subtotalWithMarkup,
+      contingency,
+      subtotalBeforeTax,
       tax,
       total,
       itemCount: lineItems.length
     };
-  }, [lineItems, taxRate, markupPercent]);
+  }, [lineItems, taxRate, markupPercent, contingencyPercent]);
   
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-CA', {
@@ -122,6 +127,17 @@ const LiveSummary = ({
               <span className="text-sm text-neutral-400">Markup ({markupPercent}%)</span>
             </div>
             <span className="text-sm font-medium text-amber-400">+{formatCurrency(calculations.markup)}</span>
+          </div>
+        )}
+        
+        {/* Contingency */}
+        {contingencyPercent > 0 && (
+          <div className="flex items-center justify-between py-2">
+            <div className="flex items-center gap-2">
+              <TrendingUp className="w-3.5 h-3.5 text-blue-400" />
+              <span className="text-sm text-neutral-400">Contingency ({contingencyPercent}%)</span>
+            </div>
+            <span className="text-sm font-medium text-blue-400">+{formatCurrency(calculations.contingency)}</span>
           </div>
         )}
         

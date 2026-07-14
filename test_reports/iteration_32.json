@@ -1,0 +1,75 @@
+{
+  "summary": "Phase 1 (Company Profile & Estimate Header) frontend testing complete. 14/15 review-request features PASS. One BUG found: user-edited estimate number is overwritten by auto-generated number on the FIRST save of a new estimate (only issue). All other flows work: Settings tabs + URL params, Company Profile save to localStorage, Estimate Workbench expandable header editor (Client Info / Project Info / Pricing & Notes / Notes / Clarifications / Internal Notes), LiveSummary shows Markup + Contingency + Tax with correct % labels, new estimates load company profile defaults (markup, contingency, gst, estimator, quote validity → valid_until date auto-calculated, default_terms → clarifications), save persists full metadata (client_info, project_info, company_profile_snapshot, notes, clarifications, internal_notes, pricing_profile, markup_percent, contingency_percent, tax_rate, line_items), reload by ?id={uuid} restores everything except the estimate_number (due to the bug above).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "EstimateWorkbench.jsx saveEstimate() - lines 310-319",
+        "issue": "User-edited estimate number is DISCARDED on the FIRST save of a new estimate. When !currentEstimateId (new estimate), the code unconditionally calls generateEstimateNumber() and overwrites any value the user typed into [data-testid='estimate-number-input']. Repro: create New Estimate → type 'EST-PHASE1-001' → Save → localStorage stores 'EST-2026-XXXX' instead. Per requirement 'Estimate Number (editable)' this must be preserved. Fix: only generate estNumber if !estimateNumber (i.e., estNumber = estimateNumber || generateEstimateNumber()).",
+        "selector": "[data-testid='estimate-number-input']",
+        "priority": "HIGH"
+      }
+    ],
+    "integration_issues": [
+      {
+        "flow": "Post-login workspace bootstrap (carry-over from iteration_26/31)",
+        "issue": "'[CommandCenter] Error: TypeError: Failed to fetch' still shows in console on login. Does NOT affect the Estimate Workbench nor Settings. Not a regression.",
+        "affected_selectors": []
+      }
+    ],
+    "design_issues": [
+      {
+        "screen": "Estimate Workbench header editor (Client Info)",
+        "issues": [
+          "The Client Information sub-fields (address / city / prov / postal / phone / email) do NOT have data-testids — only client-company-input and client-contact-input do. Similarly, most Project Information sub-fields (address, project_id, revision, date, tender_date, valid_until, estimator) lack data-testids. Only project-name-input has one. Recommend adding data-testids to all inputs for stable testing.",
+          "'Estimator' input in Project Information uses placeholder='Estimator' but no data-testid or label — visually ambiguous next to the surrounding date pickers.",
+          "Legacy /api/production-library/items 'labor_price' fallback still causes seeded standards to render '1 × $0.00 = $0.00' rows (carry-over from iteration_31)."
+        ]
+      }
+    ]
+  },
+  "verification_results": {
+    "settings_tabs_with_url_params": "PASS - [data-testid=tab-account] and [data-testid=tab-company] switch content; URL updates via useSearchParams (?tab=company / ?tab=account)",
+    "company_profile_all_fields_present": "PASS - All 21 required inputs found by data-testid: company-name-input, company-legal-name-input, company-address-input, company-city-input, company-province-select, company-postal-input, company-country-select, company-phone-input, company-email-input, company-website-input, gst-number-input, wcb-number-input, gl-insurance-input, business-license-input, default-estimator-input, default-pricing-profile-select, default-quote-validity-input, default-markup-input, default-gst-input, default-contingency-input, default-terms-textarea",
+    "company_profile_save_to_localstorage": "PASS - [data-testid=save-company-profile-btn] persists to key 'tradeos_company_profile' — verified: {name:'TEST Two Fungis Finishing', default_markup:18, default_contingency:12, default_gst_rate:5, default_quote_validity:45, default_estimator:'John Estimator', ...}",
+    "estimate_number_input_visible": "PASS - [data-testid=estimate-number-input] rendered in header",
+    "details_button_expands_editor": "PASS - [data-testid=toggle-header-editor-btn] toggles the expandable panel showing Client Info + Project Info + Pricing & Notes",
+    "client_information_section": "PASS - Client Company + Contact Name + Address + City + Prov + Postal + Phone + Email inputs all rendered",
+    "project_information_section": "PASS - Project Name + Project Address + Project ID + Revision + Date + Valid Until + Tender Date + Estimator inputs all rendered with proper date pickers",
+    "pricing_notes_section": "PASS - [data-testid=pricing-profile-select] (Low/Standard/Premium), [data-testid=markup-input], [data-testid=contingency-input], [data-testid=gst-input] all rendered",
+    "notes_clarifications_internal_notes_textareas": "PASS - [data-testid=notes-textarea] + [data-testid=clarifications-textarea] + [data-testid=internal-notes-textarea] all rendered (internal notes styled amber to visually distinguish)",
+    "livesummary_shows_markup_contingency_tax": "PASS - Summary panel renders 'Markup (18%) +$X.XX', 'Contingency (12%) +$X.XX', 'Tax (5%) $X.XX' with correct % interpolation matching current header state",
+    "new_estimate_loads_company_defaults": "PASS - After [data-testid=new-estimate-btn]: markup=15 (from default_markup), contingency=10 (from default_contingency), gst=5 (from default_gst_rate), estimator='John Estimator' (from default_estimator), valid_until auto-calculated (today + default_quote_validity days = 30d → 2026-08-13), clarifications populated from default_terms ('Test terms')",
+    "save_persists_all_metadata": "PASS (except estimate_number bug) - Saved to localStorage.tradeos_estimates[]: client_info {company, contact_name, address, city, province, postal_code, phone, email}, project_info {name, address, project_id, revision, date, tender_date, valid_until, estimator}, company_profile_snapshot (full copy), notes, clarifications, internal_notes, pricing_profile, markup_percent, contingency_percent, tax_rate, line_items with snapshots — all round-tripped correctly",
+    "reopen_restores_all_fields": "PASS (except estimate_number) - Navigating to /app/estimating?id={uuid} restored: name, client_company, client_contact, project_name, notes, clarifications, internal_notes, markup, contingency, gst, and 2 line_items. estimate_number displays the AUTO-GENERATED value from save time (not the user-entered one) — same bug root cause",
+    "user_edited_estimate_number_persistence": "FAIL - BUG: User typed 'EST-PHASE1-002' in [data-testid=estimate-number-input] → saved → localStorage shows 'EST-2026-9M5M' (auto-generated). The code at EstimateWorkbench.jsx:316 always regenerates estNumber when !currentEstimateId, ignoring user input"
+  },
+  "test_report_links": [],
+  "action_items": [
+    "HIGH: Fix EstimateWorkbench.jsx line 310-319 saveEstimate() — preserve user-entered estimate number. Change `estNumber = generateEstimateNumber()` to `estNumber = estimateNumber || generateEstimateNumber()` inside the if(!estimateId) block. This will honor the user's edit while still auto-generating when empty.",
+    "MEDIUM: Add data-testid attributes to all Client Info sub-fields (address, city, province, postal_code, phone, email) and all Project Info sub-fields (address, project_id, revision, date, tender_date, valid_until, estimator) for stable e2e coverage. Currently only company/contact/name have testids.",
+    "LOW: Add label + data-testid to the Estimator input inside Project Information (currently only placeholder='Estimator')",
+    "LOW (carry-over): LibraryBrowser direct-standard rows still lack data-testid (per iteration_31).",
+    "LOW (carry-over): estimatePdfGenerator.js still prints hardcoded 'Page 1 of N' on every page (per iteration_31).",
+    "LOW (carry-over): Send-to-Client button still toast.info stub."
+  ],
+  "critical_code_review_comments": [
+    "EstimateWorkbench.jsx: `let estNumber = estimateNumber;` is immediately overwritten inside the if-block for new estimates, wasting the initial assignment and — more importantly — silently discarding the user's edit. Recommend: `estNumber = estimateNumber && estimateNumber.trim() ? estimateNumber : generateEstimateNumber();` (with a nullish/empty guard).",
+    "EstimateWorkbench.jsx line 62: COMPANY_PROFILE_KEY is duplicated in both EstimateWorkbench.jsx and CompanyProfile.jsx. Export a single constant from a shared module (or use the exported getCompanyProfile from CompanyProfile.jsx directly). Same for loadCompanyProfile function — duplication increases drift risk.",
+    "CompanyProfile.jsx: default_terms is a very long multiline template literal (bullet list). Fine, but consider extracting to a separate constants file for consistency with settings/branding.",
+    "CompanyProfile.jsx: no email/URL/phone validation on save — invalid emails or malformed websites silently persist. Add lightweight regex validation before saveCompanyProfile().",
+    "SettingsPage.jsx: importing CompanyProfile then rendering it inside a large monolithic 1092-line file — recommend continuing extraction (AccountTab.jsx, etc.) since file exceeds 700 lines threshold.",
+    "EstimateWorkbench.jsx: file is now 1179 lines — Phase 1 additions pushed it well past the 700-line guideline. Consider extracting <HeaderEditor/> (~320 lines of JSX) and <EstimateSelector/> dropdown into their own components.",
+    "EstimateWorkbench.jsx: `useEffect(..., [fetchLibraryData, fetchEstimates, searchParams, loadEstimate])` will re-run loadEstimate every time searchParams changes — a save-triggered setSearchParams({id}) will reset the just-loaded estimate. Verified working today but the dependency array is fragile.",
+    "LiveSummary.jsx duplicates the calculations useMemo from parent; pass `calculations` down as a prop to keep single source of truth (also flagged in iteration_31).",
+    "EstimateWorkbench.jsx uses browser confirm() in createNewEstimate + handleClearEstimate — carry-over from iteration_31."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (frontend-only per request)", "frontend": "14/15 review-request features PASS (1 HIGH bug on estimate number persistence)"},
+  "test_credentials": "inbox@twofungis.ca / TradeOS2024! (Two Fungis Finishing, Lifetime Elite) — working",
+  "seed_data_creation": "1) tradeos_company_profile localStorage entry created via UI Save. 2) Two 'TEST Phase1 …' estimates saved into tradeos_estimates localStorage with full metadata. Both cleared between reruns via new estimate + save cycle. No production DB writes.",
+  "retest_needed": true,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Phase 1 features are 93% done. The ONLY blocking bug is EstimateWorkbench.jsx:316 overwriting user-entered estimate_number on first save. All 21 Company Profile fields and 15+ header-editor fields have proper data-testids listed above. The header editor is behind [data-testid=toggle-header-editor-btn] and must be clicked before header inputs are queryable. Client Info sub-fields (address/city/prov/postal/phone/email) and Project Info sub-fields (address/project_id/revision/date/tender_date/valid_until/estimator) do NOT yet have data-testids — use placeholder-based selectors for now. localStorage keys: tradeos_company_profile (single object), tradeos_estimates (array of objects with company_profile_snapshot). Screenshots at /app/.screenshots/phase1_final.png, phase1_reload_final.png. Company profile snapshot capture works: it copies the profile at save time into estimate.company_profile_snapshot for historical accuracy.",
+  "rca of the issue": "Estimate number persistence bug: EstimateWorkbench.jsx saveEstimate() at lines 310-319 initializes `estNumber = estimateNumber` then, inside `if (!estimateId)` (i.e., first save of a new estimate), unconditionally overrides `estNumber = generateEstimateNumber()`. Since the estimate_number input state is only bound to estimateNumber (which the user typed), that value is lost. Repro: 1) Open Estimate Workbench 2) Click Open → New Estimate 3) Type 'MY-CUSTOM-001' in [data-testid=estimate-number-input] 4) Add ≥1 line item 5) Click Save 6) localStorage.tradeos_estimates[0].estimate_number reads 'EST-YYYY-XXXX', not 'MY-CUSTOM-001'. Fix: `estNumber = (estimateNumber && estimateNumber.trim()) ? estimateNumber : generateEstimateNumber();`"
+}

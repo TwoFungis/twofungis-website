@@ -2,23 +2,28 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { 
   User, CreditCard, Bell, Shield, Check, Loader2, Crown, FileText, Save, X, 
-  Clock, Edit2, Eye, EyeOff, AlertTriangle, Trash2, DollarSign, RefreshCw, Smartphone, Download
+  Clock, Edit2, Eye, EyeOff, AlertTriangle, Trash2, DollarSign, RefreshCw, Smartphone, Download,
+  Building2
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
 import ServiceWorkerUpdateService from '../../services/ServiceWorkerUpdateService';
 import PWAInstallService from '../../services/PWAInstallService';
+import CompanyProfile from '../../components/settings/CompanyProfile';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 const SettingsPage = () => {
   const { profile, user, updateProfile, signOut, markSetupComplete } = useAuthStore();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [paymentMessage, setPaymentMessage] = useState(null);
   const [isUpgrading, setIsUpgrading] = useState(false);
   const [upgradingPlan, setUpgradingPlan] = useState(null);
+  
+  // Settings tab state
+  const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'account');
   
   // Profile editing
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -291,6 +296,18 @@ const SettingsPage = () => {
   };
 
   const planStatus = getPlanStatus();
+  
+  // Handle tab change
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    setSearchParams({ tab });
+  };
+  
+  // Tab definitions
+  const tabs = [
+    { id: 'account', label: 'Account', icon: User },
+    { id: 'company', label: 'Company Profile', icon: Building2 }
+  ];
 
   return (
     <div className="space-y-6 overflow-x-hidden" data-testid="settings-page">
@@ -299,10 +316,37 @@ const SettingsPage = () => {
         <img src="/shield-icon.png" alt="" className="w-8 h-8 opacity-80" />
         <div className="min-w-0">
           <h1 className="text-xl sm:text-2xl font-bold text-charcoal-800">Settings</h1>
-          <p className="text-charcoal-600 text-sm">Manage your account, subscription, and preferences</p>
+          <p className="text-charcoal-600 text-sm">Manage your account, subscription, and company profile</p>
         </div>
       </div>
-
+      
+      {/* Tabs Navigation */}
+      <div className="flex gap-1 border-b border-charcoal-700 pb-0 mb-6">
+        {tabs.map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => handleTabChange(tab.id)}
+            className={`flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors border-b-2 -mb-[1px] ${
+              activeTab === tab.id
+                ? 'text-white border-emerald-500'
+                : 'text-charcoal-400 border-transparent hover:text-white hover:border-charcoal-600'
+            }`}
+            data-testid={`tab-${tab.id}`}
+          >
+            <tab.icon className="w-4 h-4" />
+            {tab.label}
+          </button>
+        ))}
+      </div>
+      
+      {/* Company Profile Tab */}
+      {activeTab === 'company' && (
+        <CompanyProfile />
+      )}
+      
+      {/* Account Tab Content */}
+      {activeTab === 'account' && (
+        <>
       {/* Payment Messages */}
       {paymentMessage && (
         <div className={`p-4 rounded-lg flex items-center justify-between ${
@@ -894,7 +938,7 @@ const SettingsPage = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-white font-medium">Check for Updates</p>
-              <p className="text-gray-400 text-sm">Make sure you're running the latest version</p>
+              <p className="text-gray-400 text-sm">Make sure you are running the latest version</p>
             </div>
             <button
               onClick={async () => {
@@ -1038,6 +1082,8 @@ const SettingsPage = () => {
             </div>
           </div>
         </div>
+      )}
+        </>
       )}
     </div>
   );
