@@ -122,6 +122,13 @@ const NAV_SECTIONS = [
     ]
   },
   {
+    id: 'import',
+    label: 'Import',
+    items: [
+      { id: 'import-library', label: 'Import Library', icon: Upload, count: null, highlight: true },
+    ]
+  },
+  {
     id: 'history',
     label: 'History',
     items: [
@@ -194,8 +201,8 @@ const generateMockRelationships = () => ({
 // ============================================
 // LEFT NAVIGATION
 // ============================================
-const LeftNavigation = ({ activeView, onViewChange, counts, collapsed, onToggleCollapse, onNewStandard }) => {
-  const [expandedSections, setExpandedSections] = useState(['knowledge', 'organization']);
+const LeftNavigation = ({ activeView, onViewChange, counts, collapsed, onToggleCollapse, onNewStandard, onImport }) => {
+  const [expandedSections, setExpandedSections] = useState(['knowledge', 'organization', 'import']);
   
   const toggleSection = (sectionId) => {
     setExpandedSections(prev => 
@@ -287,6 +294,22 @@ const LeftNavigation = ({ activeView, onViewChange, counts, collapsed, onToggleC
                     const isActive = activeView === item.id;
                     const count = counts?.[item.id] ?? null;
                     
+                    // Special handling for Import Library
+                    if (item.id === 'import-library') {
+                      return (
+                        <button
+                          key={item.id}
+                          onClick={onImport}
+                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-all text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 border-l-2 border-emerald-500/50"
+                          data-testid={`nav-${item.id}`}
+                        >
+                          <Icon className="w-4 h-4 text-emerald-400" strokeWidth={1.5} />
+                          <span className="flex-1 text-left font-medium">{item.label}</span>
+                          <ChevronRight className="w-4 h-4 text-emerald-500" strokeWidth={1.5} />
+                        </button>
+                      );
+                    }
+                    
                     return (
                       <button
                         key={item.id}
@@ -318,7 +341,15 @@ const LeftNavigation = ({ activeView, onViewChange, counts, collapsed, onToggleC
       </div>
       
       {/* Quick Actions */}
-      <div className="p-3 border-t border-neutral-800">
+      <div className="p-3 border-t border-neutral-800 space-y-2">
+        <button
+          onClick={onImport}
+          className="w-full flex items-center justify-center gap-2 bg-neutral-800 hover:bg-neutral-700 text-white font-medium px-4 py-2.5 rounded-lg transition-all border border-neutral-700"
+          data-testid="import-library-btn"
+        >
+          <Upload className="w-4 h-4" strokeWidth={2} />
+          <span>Import Library</span>
+        </button>
         <button
           onClick={onNewStandard}
           className="w-full flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-black font-medium px-4 py-2.5 rounded-lg transition-all shadow-[0_0_15px_rgba(16,185,129,0.15)]"
@@ -2080,6 +2111,7 @@ const ProductionLibraryWorkspace = () => {
         collapsed={navCollapsed}
         onToggleCollapse={() => setNavCollapsed(!navCollapsed)}
         onNewStandard={handleNewStandard}
+        onImport={handleImport}
       />
       
       <div className="flex-1 flex flex-col min-w-0">
@@ -2098,6 +2130,14 @@ const ProductionLibraryWorkspace = () => {
           </div>
           
           <div className="flex items-center gap-3">
+            <button
+              onClick={handleImport}
+              className="flex items-center gap-2 px-3 py-2 bg-emerald-500/10 border border-emerald-500/30 rounded-lg text-emerald-400 hover:bg-emerald-500/20 hover:border-emerald-500/50 transition-colors"
+              data-testid="header-import-btn"
+            >
+              <Upload className="w-4 h-4" strokeWidth={1.5} />
+              <span className="text-sm font-medium">Import Library</span>
+            </button>
             <button
               onClick={() => setCommandPaletteOpen(true)}
               className="flex items-center gap-2 px-3 py-2 bg-neutral-900 border border-neutral-800 rounded-lg text-neutral-400 hover:text-white hover:border-neutral-700 transition-colors"

@@ -1,0 +1,65 @@
+{
+  "summary": "Import Library Wizard fully verified end-to-end. Backend: 6/6 new pytest tests pass covering seed/status, template download (13 columns), validate (valid+invalid CSVs), and full commit workflow (validate -> commit -> GET /items persistence). Frontend: complete 5-step wizard flow driven via Playwright (login -> Production Library -> header Import Library button -> Step1 Initialize (already seeded, Continue) -> Step2 Template (13 columns + all 10 valid units) -> Step3 Upload (drop zone + file input) -> Step4 Preview (Validation Passed) -> Step5 Import (Production Library Ready, 1 item Created). Both header-import-btn and nav-import-library are visible and clickable.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "ImportWizard TemplateStep", "issue": "First 4 columns are hard-coded as (required) via `i < 4` check. This marks 'Service Categories' as (required) even though the backend treats it as OPTIONAL (only Production Code, Production Name, Knowledge Domain, Measurement Unit are required). Should mark columns 0,1,2,4 as required instead of 0-3.", "selector": "ImportWizard.jsx line 246-259 - `{i < 4 && <span...(required)}`", "priority": "MEDIUM"}
+    ],
+    "integration_issues": [
+      {"flow": "Initial page load (all /app/* routes)", "issue": "Transient console errors on first paint: '[useOrganization] Error: TypeError: Failed to fetch', '[AppLayout] Workspace context error: TypeError: Failed to fetch', 'Error fetching profile: TypeError: Failed to fetch'. Same race condition tracked since iteration_19. Non-blocking - data loads on retry. Persists after Service Worker 'Controller changed, reloading' event.", "affected_selectors": ["N/A"]}
+    ],
+    "design_issues": []
+  },
+  "verification_results": {
+    "header_import_btn_visible": "PASS - data-testid=header-import-btn visible with text 'Import Library'",
+    "nav_import_library_visible": "PASS - data-testid=nav-import-library visible in left sidebar",
+    "click_opens_wizard": "PASS - Clicking header Import Library navigates to ?tab=import and renders wizard",
+    "step1_initialize_seeded": "PASS - Step 1 shows 'Production Library Initialized' green card and 'Continue' button (data-testid=continue-to-template-btn) since library already seeded",
+    "step2_template_columns": "PASS - Step 2 shows all 13 template columns: Production Code, Production Name, Knowledge Domain, Service Categories, Measurement Unit, Production Per Day, Crew Size, Labour Hours, Standard Rate, Premium Rate, Complex Rate, Company Standard, Notes",
+    "step2_valid_units": "PASS - All 10 measurement units shown as chips: EA, LF, SF, LS, DAY, HR, SET, KIT, PAIR, COST",
+    "step3_drop_zone": "PASS - data-testid=file-drop-zone visible; hidden file input accepts CSV",
+    "step4_validation": "PASS - Uploading valid CSV shows 'Validation Passed' header, Proceed to Import button visible",
+    "step5_import_success": "PASS - After clicking Proceed to Import, 'Production Library Ready' shown with Import Summary '1 Production Items / 1 Created / 0 Updated / 0 Errors'",
+    "backend_seed_status": "PASS - GET /api/production-library/seed/status returns success:true, is_seeded:true, counts.knowledge_domains>=1, service_categories>=1, production_items int",
+    "backend_template_download": "PASS - GET /api/production-library/import/template/download returns 13 columns matching exact list, csv_content prefixed by header, 10 valid_measurement_units, 3 example_rows",
+    "backend_validate_valid": "PASS - POST /import/validate with valid CSV -> validation_passed=true, valid_rows=1, preview populated",
+    "backend_validate_invalid": "PASS - POST /import/validate with bad domain+unit -> error_rows=1, errors contain 'Knowledge Domain' and 'Measurement Unit', each error has row/column/issue/recommended_fix",
+    "backend_commit_workflow": "PASS - POST /import/commit creates rows; subsequent GET /items?search=<code> finds the imported production_codes (persistence verified)",
+    "backend_commit_auth_required": "PASS - Unauthenticated POST /import/commit returns 401/403/422"
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_import_wizard_e2e.py",
+    "/app/backend/tests/test_production_library_import.py",
+    "/app/test_reports/pytest/import_wizard_e2e_results.xml"
+  ],
+  "action_items": [
+    "MEDIUM: Fix ImportWizard.jsx TemplateStep required-column marker. 'Service Categories' (column index 3) is marked (required) but is actually optional per backend. Change condition from `i < 4` to `[0,1,2,4].includes(i)` (Production Code, Production Name, Knowledge Domain, Measurement Unit).",
+    "OPTIONAL (carry-over from iterations 19-21): Fix transient 'Failed to fetch' race on first paint of /app/* routes (useOrganization + AppLayout workspace-context + Supabase profile). Non-blocking but noisy.",
+    "OPTIONAL (carry-over): Split ProductionLibraryWorkspace.jsx (2201 lines) and production_library.py (1980 lines) - both exceed the 700-line guideline.",
+    "OPTIONAL cleanup: This iteration created TEST-WF-<ts>-A/B and TEST-IMP-<ts>-A production items via the commit endpoint. They will accumulate on repeated CI runs; consider a teardown fixture."
+  ],
+  "critical_code_review_comments": [
+    "ImportWizard.jsx line 246-259: hard-coded `i < 4` for required marker is fragile — will silently drift if column order changes. Should be a whitelist of required column names.",
+    "production_library.py commit endpoint (line ~1369): re-parses CSV a second time (validation already parsed once). Consider caching the validated payload server-side keyed by a token, or accept validated JSON directly, to avoid double-parse and eliminate the risk of validation/commit divergence.",
+    "commit endpoint iterates POST /production_items rows one by one via Supabase REST — no batched insert. Slow for larger CSVs; also every insert triggers a separate POST + subsequent POST to production_item_service_categories per category. Consider batch insert.",
+    "ImportWizard.jsx handleImport (line 989) posts the CSV file again to /commit even though validation already succeeded. Same file is uploaded twice per import — inefficient but functional.",
+    "validate endpoint returns validated_items at top level (~1362) but commit ignores that data and re-derives everything — schema drift risk.",
+    "Service Worker 'Controller changed, reloading...' at first paint causes the app to reload, which then triggers the 'Failed to fetch' race. Root cause likely SW cache invalidation on first mount."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_import_wizard_e2e.py (new)"
+  ],
+  "success_rate": {
+    "backend": "100% (6/6 e2e tests pass; 21/21 previous production_library tests still pass)",
+    "frontend": "95% (all 5 wizard steps work end-to-end; one minor UI bug: 'Service Categories' incorrectly marked as required in Step 2 template preview)"
+  },
+  "test_credentials": "inbox@twofungis.ca / TradeOS2024! - working",
+  "seed_data_creation": "Created 3 production items (TEST-WF-<ts>-A, TEST-WF-<ts>-B, TEST-UI-<ts>-A) via the /import/commit endpoint and the UI wizard. Also TEST-IMP-<ts>-A was validated but not committed. These persist in Supabase for org 'Two Fungis Finishing'.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Import Library Wizard fully operational E2E. Header (data-testid=header-import-btn) and left-nav (data-testid=nav-import-library) both open the wizard by setting ?tab=import. The 5-step flow is: Initialize (auto-detects seeded state) -> Template (13 columns + 10 units) -> Upload (data-testid=file-drop-zone) -> Preview (data-testid=proceed-to-import-btn if valid) -> ImportStep (Production Library Ready). Backend /api/production-library/import/{validate,commit,template/download} + /seed/status all return correct data. Only pending nit: TemplateStep marks columns 0-3 as required, but column 3 ('Service Categories') is optional. Also the first-paint 'Failed to fetch' race error persists from iteration_19 across multiple iterations. Test CSVs are generated on the fly in /app/backend/tests/test_import_wizard_e2e.py so each run creates fresh TEST- prefixed items.",
+  "rca of the issue": "N/A - no blocking issues. Minor UI bug (Service Categories mis-marked as required) is a straightforward index-based check in ImportWizard.jsx TemplateStep."
+}
