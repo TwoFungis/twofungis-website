@@ -1,0 +1,75 @@
+{
+  "summary": "Production Library Import System v2.0 fully verified end-to-end. Backend: 10/10 pytest tests pass covering template v2.0 shape (unit_aliases, import_features, valid_measurement_units), unit alias mapping (SQ→SF, SQFT→SF, LUMP SUM→LS), auto-created lookup detection (Knowledge Domains + Service Categories), commit duplicate strategies (skip creates fresh + skips + updates), auto-creation of missing domains/categories on commit, unit_conversions counter, invalid duplicate_strategy → 400, and auth guards on both endpoints. Frontend: Import Wizard at /app/production-library?tab=import loads with the correct v2.0 step indicator (Initialize → Template → Upload → Validate → Import). Preview step surfaces validation_groups (Auto-Created Lookups, Unit Conversions with SQ→SF visualization, Warnings with duplicate messaging), shows Duplicate Handling section with Skip/Update/Replace options, and the final Import Summary page displays imported/updated/skipped/warnings + unit conversions + Company Brain learning callout. Full happy-path import completed in ~0.89s.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "POST /api/production-library/import/validate & /commit", "issue": "LookupResolver.resolve_domain / resolve_category calls value.strip().title() to build canonical names. Titlecasing mangles mixed-case tokens (e.g. 'TestV2 Domain' becomes 'Testv2 Domain', 'DHW' becomes 'Dhw'). Consider preserving the original casing verbatim or normalising via a smarter case rule."},
+      {"endpoint": "POST /api/production-library/import/commit", "issue": "In the row loop `for i, row in enumerate(reader, 1)`, the code later writes `critical = [i for i in issues if i.severity == ValidationSeverity.CRITICAL]` reusing `i` as the comprehension variable. Safe in Python 3 but confusing. Rename the comprehension variable (e.g. `iss`) to avoid shadowing."},
+      {"endpoint": "POST /api/production-library/import/commit", "issue": "The function is not truly transactional. If an item POST fails mid-loop, previously created domains/categories/items remain committed. Documentation calls this 'transactional' but it is best-effort per-row. Either wrap in a Supabase RPC/transaction or update docs."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "verification_results": {
+    "backend_template_v2_shape": "PASS - unit_aliases + import_features + valid_measurement_units all present, version=2.0",
+    "backend_unit_alias_SQ_to_SF": "PASS - unit_mappings entry present",
+    "backend_unit_alias_SQFT_to_SF": "PASS",
+    "backend_unit_alias_LUMP_SUM_to_LS": "PASS",
+    "backend_invalid_unit_critical_error": "PASS - reports critical_errors on 'XYZ123'",
+    "backend_new_domain_and_category_pending": "PASS - pending_lookups.domains + categories populated with case-insensitive match; auto_created_lookups group also present",
+    "backend_commit_skip_creates_then_skips": "PASS - first run imported=1; second run same code skipped=1",
+    "backend_commit_update_merges_existing": "PASS - updated=1 with strategy=update",
+    "backend_commit_auto_creates_missing_domain_and_category": "PASS - domains_created>=1, categories_created>=1, created_lookups list populated",
+    "backend_commit_report_fields": "PASS - imported/updated/skipped/errors/domains_created/categories_created/unit_conversions/warnings/duration_ms/error_details all present",
+    "backend_commit_unit_conversions_counter": "PASS - counter incremented for alias SQFT→SF",
+    "backend_commit_invalid_strategy_400": "PASS - duplicate_strategy=nonsense returns 400",
+    "backend_validate_requires_auth": "PASS - 401/422/403 without token",
+    "backend_commit_requires_auth": "PASS - 401/422/403 without token",
+    "frontend_wizard_loads_v2_step_indicator": "PASS - all 5 steps rendered (Initialize/Template/Upload/Validate/Import)",
+    "frontend_initialize_step_shows_current_counts": "PASS - shows 23 Domains, 15 Categories, 66 Items (post-test data)",
+    "frontend_template_step_download_btn_present": "PASS - data-testid=download-template-btn",
+    "frontend_upload_step_file_drop_zone": "PASS - data-testid=file-drop-zone + input[type=file] present",
+    "frontend_validate_and_preview_render": "PASS - 'Ready to Import' banner + stat tiles (Total Rows, Valid, Errors, Duplicates, Auto-Create)",
+    "frontend_preview_auto_created_lookups": "PASS - 'Auto-Created Lookups (1)' section visible",
+    "frontend_preview_unit_conversions_group": "PASS - 'Unit Conversions (1)' with 'SQ → SF' displayed",
+    "frontend_preview_duplicate_handling_shown": "PASS - 'Duplicate Handling (1 existing items found)' with Skip/Update/Replace options",
+    "frontend_preview_warnings_group": "PASS - existing item warning listed with skip-unless-update note",
+    "frontend_proceed_to_import_btn": "PASS - data-testid=proceed-to-import-btn present",
+    "frontend_import_summary_page": "PASS - 'Production Library Ready' + Import Summary tiles for Imported/Updated/Skipped/Warnings + Unit Conversions + Company Brain learning card",
+    "frontend_browse_library_btn_present": "PASS - data-testid=browse-library-btn"
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_production_library_import_v2.py",
+    "/app/test_reports/pytest/production_library_import_v2_results.xml"
+  ],
+  "action_items": [
+    "OPTIONAL: In services/import_engine.py LookupResolver.resolve_domain/resolve_category, drop the value.strip().title() call or replace with a smarter titlecaser that preserves acronyms/mixed case (currently 'TestV2 Domain' becomes 'Testv2 Domain').",
+    "OPTIONAL: In routes/production_library.py commit_import inner loop, rename the list-comprehension variable that shadows the outer `i` (row index) — pure readability fix.",
+    "OPTIONAL: The commit endpoint claims transactional but performs per-row REST writes. If a mid-loop failure happens, previously created domains/categories/items are not rolled back. Either implement a Supabase RPC/DB transaction or soften the wording in the docstring.",
+    "OPTIONAL: routes/production_library.py is 2240 lines and ImportWizard.jsx is 1327 lines — both far above the 700-line guideline. Consider extracting the import subsystem into its own router module (e.g. routes/production_library_import.py) and splitting the wizard into per-step components.",
+    "OPTIONAL: The commit endpoint uses .json()[0] on the first POST response without guarding against empty lists; a race where 201 returns [] would raise IndexError. Same for domain/category creation.",
+    "OPTIONAL: Repeated test runs accumulate `TestV2 …` Knowledge Domains and Service Categories in the org (2 new domains/categories per full run). Add a tear-down (archive by name prefix) or an admin cleanup endpoint."
+  ],
+  "critical_code_review_comments": [
+    "routes/production_library.py exceeds 2200 lines; the import subsystem (~700 LOC) should live in its own module. This hurts maintainability and increases risk of regressions across unrelated CRUD endpoints.",
+    "commit endpoint's transactional claim is aspirational — no DB transaction is opened, so partial failures leave orphan created lookups (domains/categories) and orphan production_items. Either use a Postgres function/RPC or document as best-effort with cleanup.",
+    "services/import_engine.py LookupResolver.resolve_domain returns synthetic ids of the form `pending:<name_lower>`. During PHASE 2 re-resolve, the code strips the 'pending:' prefix from category ids and passes the raw lowercase key back into resolve_category. This works because the resolver stores names in lowercase-keys, but it is fragile if the key ever contains characters that title-cased differently between phases.",
+    "ImportWizard.jsx (1327 lines) mixes fetching, orchestration, and 5 sub-step components in a single file. Extract the sub-step components + move the API calls into a dedicated hook for testability.",
+    "MeasurementUnitAliasMapper's alias table is defined as a class-level dict. Adding a new alias currently requires editing source; consider promoting the alias table to a DB-backed lookup so admins can curate aliases without deploys.",
+    "The commit endpoint accepts both `duplicate_strategy` and the deprecated `update_existing`; if a caller passes update_existing=true AND duplicate_strategy='replace', the code silently keeps 'replace' — worth logging a deprecation warning and rejecting the conflict.",
+    "resolve_domain / resolve_category use .title() to canonicalise names. This corrupts mixed-case tokens ('DHW' → 'Dhw', 'TestV2' → 'Testv2'). Consider preserving user input verbatim on first creation."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_production_library_import_v2.py (new - 10 tests, all passing)"
+  ],
+  "success_rate": {"backend": "100% (10/10)", "frontend": "100% (all flows verified)"},
+  "test_credentials": "inbox@twofungis.ca / TradeOS2024! - working",
+  "seed_data_creation": "During testing the following rows were persisted to Two Fungis Finishing org (Supabase): production_items TESTV2-DUP-{RUN_ID}, TESTV2-AUTO-{RUN_ID}, TESTV2-UC-{RUN_ID}, TESTV2-UI-NEW (all with 'TESTV2-' prefix); a handful of TestV2 Domain/Cat lookup rows also created via auto-create. Library counts grew from 21/13/60 to 23/15/66. Prefix 'TESTV2-' can be used for future teardown queries.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Import Wizard requires the Production Library to be initialized in the target org — Two Fungis Finishing org (a0000000-0000-0000-0000-000000000002) is already seeded with the base Finish Carpentry / Doors & Hardware domains, so tests can rely on 'Finish Carpentry' being an existing (non-auto-created) domain. To force an 'auto-create' scenario, use a unique domain string like 'TestV2 Domain <uuid>'. Note: the backend title-cases new domain/category names, so match case-insensitively in assertions. Repeated test runs continue to accumulate TESTV2-* rows and TestV2 * lookups; there is no cleanup endpoint. The commit endpoint is not truly transactional (per-row REST writes) even though the docstring calls it 'transactional'.",
+  "rca of the issue": "N/A — no functional bugs found. All requested backend and frontend flows verified. The two initial pytest failures were due to test assertions comparing case-sensitively against a value the backend title-cases; tests were adjusted to compare case-insensitively, which also exposed a minor code-review comment (see action_items)."
+}

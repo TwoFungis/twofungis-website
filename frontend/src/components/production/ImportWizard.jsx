@@ -448,70 +448,92 @@ const UploadStep = ({ onFileSelect, uploading, selectedFile, onNext, onBack }) =
 };
 
 // ============================================
-// STEP 4 & 5: PREVIEW & VALIDATION
+// STEP 4 & 5: PREVIEW & VALIDATION (v2.0)
 // ============================================
-const PreviewStep = ({ validationResults, onBack, onNext, onReupload }) => {
+const PreviewStep = ({ validationResults, onBack, onNext, onReupload, duplicateStrategy, setDuplicateStrategy }) => {
   const [showAllErrors, setShowAllErrors] = useState(false);
   const [showAllWarnings, setShowAllWarnings] = useState(false);
+  const [showAutoCreated, setShowAutoCreated] = useState(false);
+  const [showUnitMappings, setShowUnitMappings] = useState(false);
   
   const results = validationResults?.results || {};
-  const errors = results.errors || [];
-  const warnings = results.warnings || [];
-  const preview = results.preview || [];
+  const validationGroups = validationResults?.validation_groups || {};
+  const pendingLookups = validationResults?.pending_lookups || {};
+  
+  // Use validation groups from v2.0 API, fall back to flat lists
+  const errors = validationGroups.critical_errors || validationResults?.errors || [];
+  const warnings = validationGroups.warnings || validationResults?.warnings || [];
+  const autoCreated = validationGroups.auto_created_lookups || [];
+  const unitMappings = validationGroups.unit_mappings || [];
+  const preview = validationResults?.preview || results.preview || [];
+  
   const canImport = validationResults?.can_import;
   const validationPassed = validationResults?.validation_passed;
+  const duplicatesFound = results.duplicates_found || validationResults?.duplicate_codes?.length || 0;
   
   const displayedErrors = showAllErrors ? errors : errors.slice(0, 5);
   const displayedWarnings = showAllWarnings ? warnings : warnings.slice(0, 3);
+  const displayedAutoCreated = showAutoCreated ? autoCreated : autoCreated.slice(0, 5);
+  const displayedUnitMappings = showUnitMappings ? unitMappings : unitMappings.slice(0, 3);
   
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <div className="text-center max-w-2xl mx-auto">
-        <div className={`w-16 h-16 ${validationPassed ? 'bg-emerald-500/20' : 'bg-amber-500/20'} rounded-2xl flex items-center justify-center mx-auto mb-6`}>
+        <div className={`w-16 h-16 ${validationPassed ? 'bg-emerald-500/20' : errors.length > 0 ? 'bg-red-500/20' : 'bg-amber-500/20'} rounded-2xl flex items-center justify-center mx-auto mb-6`}>
           {validationPassed ? (
             <CheckCircle2 className="w-8 h-8 text-emerald-400" />
+          ) : errors.length > 0 ? (
+            <AlertCircle className="w-8 h-8 text-red-400" />
           ) : (
             <AlertTriangle className="w-8 h-8 text-amber-400" />
           )}
         </div>
         <h2 className="text-2xl font-bold text-white mb-3">
-          {validationPassed ? 'Validation Passed' : 'Validation Report'}
+          {validationPassed ? 'Ready to Import' : errors.length > 0 ? 'Validation Errors' : 'Validation Complete'}
         </h2>
         <p className="text-zinc-400">
           {validationPassed 
-            ? 'Your file is ready to import. Review the preview below.'
-            : `Found ${errors.length} error${errors.length !== 1 ? 's' : ''} that need to be fixed before importing.`
+            ? 'Your file passed validation. Review the import preview below.'
+            : errors.length > 0
+              ? `Found ${errors.length} critical error${errors.length !== 1 ? 's' : ''} that must be fixed.`
+              : 'Review the validation results and configure import options.'
           }
         </p>
       </div>
       
       {/* Summary Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
-        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 text-center">
-          <div className="text-2xl font-bold text-white">{results.total_rows || 0}</div>
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3 max-w-4xl mx-auto">
+        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3 text-center">
+          <div className="text-xl font-bold text-white">{results.total_rows || 0}</div>
           <div className="text-xs text-zinc-500">Total Rows</div>
         </div>
-        <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-4 text-center">
-          <div className="text-2xl font-bold text-emerald-400">{results.valid_rows || 0}</div>
+        <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-3 text-center">
+          <div className="text-xl font-bold text-emerald-400">{results.valid_rows || 0}</div>
           <div className="text-xs text-emerald-600">Valid</div>
         </div>
-        <div className={`rounded-lg p-4 text-center ${errors.length > 0 ? 'bg-red-500/10 border border-red-500/30' : 'bg-zinc-900 border border-zinc-800'}`}>
-          <div className={`text-2xl font-bold ${errors.length > 0 ? 'text-red-400' : 'text-zinc-500'}`}>{results.error_rows || 0}</div>
+        <div className={`rounded-lg p-3 text-center ${errors.length > 0 ? 'bg-red-500/10 border border-red-500/30' : 'bg-zinc-900 border border-zinc-800'}`}>
+          <div className={`text-xl font-bold ${errors.length > 0 ? 'text-red-400' : 'text-zinc-500'}`}>{results.error_rows || 0}</div>
           <div className={`text-xs ${errors.length > 0 ? 'text-red-600' : 'text-zinc-500'}`}>Errors</div>
         </div>
-        <div className={`rounded-lg p-4 text-center ${warnings.length > 0 ? 'bg-amber-500/10 border border-amber-500/30' : 'bg-zinc-900 border border-zinc-800'}`}>
-          <div className={`text-2xl font-bold ${warnings.length > 0 ? 'text-amber-400' : 'text-zinc-500'}`}>{results.warning_rows || 0}</div>
-          <div className={`text-xs ${warnings.length > 0 ? 'text-amber-600' : 'text-zinc-500'}`}>Warnings</div>
+        <div className={`rounded-lg p-3 text-center ${duplicatesFound > 0 ? 'bg-blue-500/10 border border-blue-500/30' : 'bg-zinc-900 border border-zinc-800'}`}>
+          <div className={`text-xl font-bold ${duplicatesFound > 0 ? 'text-blue-400' : 'text-zinc-500'}`}>{duplicatesFound}</div>
+          <div className={`text-xs ${duplicatesFound > 0 ? 'text-blue-600' : 'text-zinc-500'}`}>Duplicates</div>
+        </div>
+        <div className={`rounded-lg p-3 text-center ${autoCreated.length > 0 ? 'bg-purple-500/10 border border-purple-500/30' : 'bg-zinc-900 border border-zinc-800'}`}>
+          <div className={`text-xl font-bold ${autoCreated.length > 0 ? 'text-purple-400' : 'text-zinc-500'}`}>
+            {(pendingLookups.domains?.length || 0) + (pendingLookups.categories?.length || 0)}
+          </div>
+          <div className={`text-xs ${autoCreated.length > 0 ? 'text-purple-600' : 'text-zinc-500'}`}>Auto-Create</div>
         </div>
       </div>
       
-      {/* Errors Section */}
+      {/* Critical Errors Section */}
       {errors.length > 0 && (
         <div className="bg-red-500/5 border border-red-500/20 rounded-xl overflow-hidden max-w-4xl mx-auto">
           <div className="bg-red-500/10 px-6 py-4 border-b border-red-500/20 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <AlertCircle className="w-5 h-5 text-red-400" />
-              <h3 className="font-semibold text-red-400">Errors ({errors.length})</h3>
+              <h3 className="font-semibold text-red-400">Critical Errors ({errors.length})</h3>
             </div>
             <span className="text-xs text-red-400">Must be fixed before import</span>
           </div>
@@ -552,6 +574,75 @@ const PreviewStep = ({ validationResults, onBack, onNext, onReupload }) => {
         </div>
       )}
       
+      {/* Auto-Created Lookups Section */}
+      {autoCreated.length > 0 && (
+        <div className="bg-purple-500/5 border border-purple-500/20 rounded-xl overflow-hidden max-w-4xl mx-auto">
+          <div className="bg-purple-500/10 px-6 py-4 border-b border-purple-500/20 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-purple-400" />
+              <h3 className="font-semibold text-purple-400">Auto-Created Lookups ({autoCreated.length})</h3>
+            </div>
+            <span className="text-xs text-purple-400">Will be created automatically</span>
+          </div>
+          {pendingLookups.domains?.length > 0 && (
+            <div className="px-6 py-3 border-b border-purple-500/10">
+              <div className="text-xs text-zinc-400 mb-2">Knowledge Domains to be created:</div>
+              <div className="flex flex-wrap gap-2">
+                {pendingLookups.domains.map((d, i) => (
+                  <span key={i} className="px-2 py-1 bg-purple-500/20 text-purple-300 rounded text-xs">
+                    {d.name}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+          {pendingLookups.categories?.length > 0 && (
+            <div className="px-6 py-3">
+              <div className="text-xs text-zinc-400 mb-2">Service Categories to be created:</div>
+              <div className="flex flex-wrap gap-2">
+                {pendingLookups.categories.map((c, i) => (
+                  <span key={i} className="px-2 py-1 bg-purple-500/20 text-purple-300 rounded text-xs">
+                    {c.name}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+      
+      {/* Unit Mappings Section */}
+      {unitMappings.length > 0 && (
+        <div className="bg-blue-500/5 border border-blue-500/20 rounded-xl overflow-hidden max-w-4xl mx-auto">
+          <div className="bg-blue-500/10 px-6 py-4 border-b border-blue-500/20 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Zap className="w-5 h-5 text-blue-400" />
+              <h3 className="font-semibold text-blue-400">Unit Conversions ({unitMappings.length})</h3>
+            </div>
+            <span className="text-xs text-blue-400">Aliases automatically mapped</span>
+          </div>
+          <div className="px-6 py-3">
+            <div className="flex flex-wrap gap-3">
+              {displayedUnitMappings.map((m, i) => (
+                <div key={i} className="flex items-center gap-2 text-sm">
+                  <span className="text-zinc-400 font-mono">{m.original_unit}</span>
+                  <ArrowRight className="w-4 h-4 text-blue-400" />
+                  <span className="text-blue-300 font-mono font-medium">{m.mapped_to}</span>
+                </div>
+              ))}
+              {unitMappings.length > 3 && !showUnitMappings && (
+                <button
+                  onClick={() => setShowUnitMappings(true)}
+                  className="text-xs text-blue-400 hover:underline"
+                >
+                  +{unitMappings.length - 3} more
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+      
       {/* Warnings Section */}
       {warnings.length > 0 && (
         <div className="bg-amber-500/5 border border-amber-500/20 rounded-xl overflow-hidden max-w-4xl mx-auto">
@@ -560,7 +651,7 @@ const PreviewStep = ({ validationResults, onBack, onNext, onReupload }) => {
               <AlertTriangle className="w-5 h-5 text-amber-400" />
               <h3 className="font-semibold text-amber-400">Warnings ({warnings.length})</h3>
             </div>
-            <span className="text-xs text-amber-400">Import will proceed with warnings</span>
+            <span className="text-xs text-amber-400">Import will proceed</span>
           </div>
           <div className="divide-y divide-amber-500/10">
             {displayedWarnings.map((warning, i) => (
@@ -575,7 +666,7 @@ const PreviewStep = ({ validationResults, onBack, onNext, onReupload }) => {
                     </div>
                     <p className="text-sm text-amber-300">{warning.issue}</p>
                     <p className="text-xs text-zinc-500 mt-1">
-                      <span className="text-emerald-500">Suggestion:</span> {warning.recommended_fix}
+                      <span className="text-emerald-500">Note:</span> {warning.recommended_fix}
                     </p>
                   </div>
                 </div>
@@ -591,6 +682,51 @@ const PreviewStep = ({ validationResults, onBack, onNext, onReupload }) => {
               <ChevronDown className={`w-4 h-4 transition-transform ${showAllWarnings ? 'rotate-180' : ''}`} />
             </button>
           )}
+        </div>
+      )}
+      
+      {/* Duplicate Handling Options */}
+      {duplicatesFound > 0 && canImport && (
+        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 max-w-4xl mx-auto">
+          <h3 className="font-semibold text-white mb-4 flex items-center gap-2">
+            <Layers className="w-5 h-5 text-blue-400" />
+            Duplicate Handling ({duplicatesFound} existing items found)
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <button
+              onClick={() => setDuplicateStrategy('skip')}
+              className={`p-4 rounded-lg border transition-all text-left ${
+                duplicateStrategy === 'skip'
+                  ? 'border-emerald-500 bg-emerald-500/10'
+                  : 'border-zinc-700 hover:border-zinc-600'
+              }`}
+            >
+              <div className="font-medium text-white mb-1">Skip Existing</div>
+              <div className="text-xs text-zinc-400">Keep existing items unchanged, only import new ones</div>
+            </button>
+            <button
+              onClick={() => setDuplicateStrategy('update')}
+              className={`p-4 rounded-lg border transition-all text-left ${
+                duplicateStrategy === 'update'
+                  ? 'border-emerald-500 bg-emerald-500/10'
+                  : 'border-zinc-700 hover:border-zinc-600'
+              }`}
+            >
+              <div className="font-medium text-white mb-1">Update Existing</div>
+              <div className="text-xs text-zinc-400">Merge new data into existing items</div>
+            </button>
+            <button
+              onClick={() => setDuplicateStrategy('replace')}
+              className={`p-4 rounded-lg border transition-all text-left ${
+                duplicateStrategy === 'replace'
+                  ? 'border-emerald-500 bg-emerald-500/10'
+                  : 'border-zinc-700 hover:border-zinc-600'
+              }`}
+            >
+              <div className="font-medium text-white mb-1">Replace Existing</div>
+              <div className="text-xs text-zinc-400">Completely replace existing items with CSV data</div>
+            </button>
+          </div>
         </div>
       )}
       
@@ -610,6 +746,7 @@ const PreviewStep = ({ validationResults, onBack, onNext, onReupload }) => {
                   <th className="text-left px-4 py-3 text-zinc-400 font-medium">Domain</th>
                   <th className="text-left px-4 py-3 text-zinc-400 font-medium">Unit</th>
                   <th className="text-right px-4 py-3 text-zinc-400 font-medium">Std Rate</th>
+                  <th className="text-center px-4 py-3 text-zinc-400 font-medium">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-800">
@@ -624,7 +761,14 @@ const PreviewStep = ({ validationResults, onBack, onNext, onReupload }) => {
                       <span className="font-mono text-xs bg-zinc-800 px-2 py-1 rounded">{item.measurement_unit}</span>
                     </td>
                     <td className="px-4 py-3 text-right text-white">
-                      {item.standard_rate ? `$${item.standard_rate.toFixed(2)}` : '-'}
+                      {item.standard_rate ? `$${Number(item.standard_rate).toFixed(2)}` : '-'}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      {item.is_duplicate ? (
+                        <span className="text-xs px-2 py-0.5 bg-blue-500/20 text-blue-400 rounded">Exists</span>
+                      ) : (
+                        <span className="text-xs px-2 py-0.5 bg-emerald-500/20 text-emerald-400 rounded">New</span>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -647,7 +791,7 @@ const PreviewStep = ({ validationResults, onBack, onNext, onReupload }) => {
           <ArrowLeft className="w-5 h-5" />
           Back
         </button>
-        {!validationPassed && (
+        {errors.length > 0 && (
           <button
             onClick={onReupload}
             className="bg-amber-500 hover:bg-amber-600 text-black font-semibold px-6 py-3 rounded-lg transition-all flex items-center gap-2"
@@ -662,7 +806,7 @@ const PreviewStep = ({ validationResults, onBack, onNext, onReupload }) => {
             className="bg-emerald-500 hover:bg-emerald-600 text-black font-semibold px-8 py-3 rounded-lg transition-all flex items-center gap-2"
             data-testid="proceed-to-import-btn"
           >
-            {validationPassed ? 'Import Production Items' : 'Import Valid Items Only'}
+            {errors.length === 0 ? 'Import Production Items' : 'Import Valid Items Only'}
             <ArrowRight className="w-5 h-5" />
           </button>
         )}
@@ -672,11 +816,12 @@ const PreviewStep = ({ validationResults, onBack, onNext, onReupload }) => {
 };
 
 // ============================================
-// STEP 6 & 7: IMPORT & SUMMARY
+// STEP 6 & 7: IMPORT & SUMMARY (v2.0)
 // ============================================
 const ImportStep = ({ importing, importResults, onBrowseLibrary, onCreateAssembly, onStartOver }) => {
   const results = importResults?.results || {};
-  const totalImported = (results.created || 0) + (results.updated || 0);
+  const createdLookups = importResults?.created_lookups || [];
+  const totalImported = (results.imported || results.created || 0) + (results.updated || 0);
   
   if (importing) {
     return (
@@ -692,8 +837,8 @@ const ImportStep = ({ importing, importResults, onBrowseLibrary, onCreateAssembl
         </div>
         <div className="flex items-center justify-center gap-2">
           <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-          <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse delay-100" />
-          <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse delay-200" />
+          <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" style={{ animationDelay: '100ms' }} />
+          <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" style={{ animationDelay: '200ms' }} />
         </div>
       </div>
     );
@@ -712,41 +857,87 @@ const ImportStep = ({ importing, importResults, onBrowseLibrary, onCreateAssembl
         <p className="text-zinc-400 text-lg">
           You&apos;ve successfully imported your company&apos;s production knowledge into TradeOS.
         </p>
+        {results.duration_ms && (
+          <p className="text-xs text-zinc-500 mt-2">
+            Completed in {(results.duration_ms / 1000).toFixed(2)}s
+          </p>
+        )}
       </div>
       
-      {/* Import Summary */}
-      <div className="bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border border-emerald-500/30 rounded-2xl p-8 max-w-2xl mx-auto">
+      {/* Import Summary - Enhanced v2.0 */}
+      <div className="bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 border border-emerald-500/30 rounded-2xl p-8 max-w-3xl mx-auto">
         <h3 className="text-lg font-semibold text-emerald-400 mb-6 text-center">Import Summary</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <div className="text-center">
-            <div className="w-14 h-14 bg-emerald-500/20 rounded-xl flex items-center justify-center mx-auto mb-3">
-              <Library className="w-7 h-7 text-emerald-400" />
+            <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center mx-auto mb-2">
+              <Library className="w-6 h-6 text-emerald-400" />
             </div>
-            <div className="text-3xl font-bold text-white">{totalImported}</div>
-            <div className="text-xs text-zinc-500">Production Items</div>
+            <div className="text-2xl font-bold text-white">{results.imported || results.created || 0}</div>
+            <div className="text-xs text-zinc-500">Imported</div>
           </div>
           <div className="text-center">
-            <div className="w-14 h-14 bg-blue-500/20 rounded-xl flex items-center justify-center mx-auto mb-3">
-              <Layers className="w-7 h-7 text-blue-400" />
+            <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center mx-auto mb-2">
+              <RefreshCw className="w-6 h-6 text-blue-400" />
             </div>
-            <div className="text-3xl font-bold text-white">{results.created || 0}</div>
-            <div className="text-xs text-zinc-500">Created</div>
-          </div>
-          <div className="text-center">
-            <div className="w-14 h-14 bg-amber-500/20 rounded-xl flex items-center justify-center mx-auto mb-3">
-              <RefreshCw className="w-7 h-7 text-amber-400" />
-            </div>
-            <div className="text-3xl font-bold text-white">{results.updated || 0}</div>
+            <div className="text-2xl font-bold text-white">{results.updated || 0}</div>
             <div className="text-xs text-zinc-500">Updated</div>
           </div>
           <div className="text-center">
-            <div className="w-14 h-14 bg-red-500/20 rounded-xl flex items-center justify-center mx-auto mb-3">
-              <AlertCircle className="w-7 h-7 text-red-400" />
+            <div className="w-12 h-12 bg-zinc-700/50 rounded-xl flex items-center justify-center mx-auto mb-2">
+              <X className="w-6 h-6 text-zinc-400" />
             </div>
-            <div className="text-3xl font-bold text-white">{results.errors || 0}</div>
-            <div className="text-xs text-zinc-500">Errors</div>
+            <div className="text-2xl font-bold text-white">{results.skipped || 0}</div>
+            <div className="text-xs text-zinc-500">Skipped</div>
+          </div>
+          <div className="text-center">
+            <div className="w-12 h-12 bg-amber-500/20 rounded-xl flex items-center justify-center mx-auto mb-2">
+              <AlertTriangle className="w-6 h-6 text-amber-400" />
+            </div>
+            <div className="text-2xl font-bold text-white">{results.warnings || 0}</div>
+            <div className="text-xs text-zinc-500">Warnings</div>
           </div>
         </div>
+        
+        {/* Created Lookups */}
+        {(results.domains_created > 0 || results.categories_created > 0 || results.unit_conversions > 0) && (
+          <div className="border-t border-emerald-500/20 pt-4 mt-4">
+            <div className="text-xs text-zinc-400 mb-3 text-center">Automatic Processing</div>
+            <div className="grid grid-cols-3 gap-4 text-center">
+              {results.domains_created > 0 && (
+                <div>
+                  <div className="text-lg font-bold text-purple-400">{results.domains_created}</div>
+                  <div className="text-xs text-zinc-500">Domains Created</div>
+                </div>
+              )}
+              {results.categories_created > 0 && (
+                <div>
+                  <div className="text-lg font-bold text-purple-400">{results.categories_created}</div>
+                  <div className="text-xs text-zinc-500">Categories Created</div>
+                </div>
+              )}
+              {results.unit_conversions > 0 && (
+                <div>
+                  <div className="text-lg font-bold text-blue-400">{results.unit_conversions}</div>
+                  <div className="text-xs text-zinc-500">Unit Conversions</div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+        
+        {/* Created Lookups Details */}
+        {createdLookups.length > 0 && (
+          <div className="border-t border-emerald-500/20 pt-4 mt-4">
+            <div className="text-xs text-zinc-400 mb-2">Created Lookup Values:</div>
+            <div className="flex flex-wrap gap-2">
+              {createdLookups.map((l, i) => (
+                <span key={i} className="px-2 py-1 bg-purple-500/20 text-purple-300 rounded text-xs">
+                  {l.type === 'knowledge_domain' ? '🏷️' : '📁'} {l.name}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
       
       {/* AI Insight */}
@@ -804,6 +995,7 @@ const ImportWizard = ({ onComplete, onClose }) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [validationResults, setValidationResults] = useState(null);
   const [importResults, setImportResults] = useState(null);
+  const [duplicateStrategy, setDuplicateStrategy] = useState('skip');
   
   // Loading states
   const [checkingStatus, setCheckingStatus] = useState(true);
@@ -1001,7 +1193,8 @@ const ImportWizard = ({ onComplete, onClose }) => {
       const formData = new FormData();
       formData.append('file', selectedFile);
       
-      const response = await fetch(`${API_URL}/api/production-library/import/commit?update_existing=false`, {
+      // Use the v2.0 duplicate_strategy parameter
+      const response = await fetch(`${API_URL}/api/production-library/import/commit?duplicate_strategy=${duplicateStrategy}`, {
         method: 'POST',
         headers: { 'Authorization': headers.Authorization },
         body: formData
@@ -1108,6 +1301,8 @@ const ImportWizard = ({ onComplete, onClose }) => {
               setValidationResults(null);
               setCurrentStep(2);
             }}
+            duplicateStrategy={duplicateStrategy}
+            setDuplicateStrategy={setDuplicateStrategy}
           />
         )}
         
