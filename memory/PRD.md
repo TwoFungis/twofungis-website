@@ -128,22 +128,31 @@ Estimating (expandable)
 └── Templates            → /app/estimating/templates (Coming Soon)
 ```
 
-### Testing Results (Iteration 29-30)
+### Testing Results (Iterations 29-31)
 | Category | Result |
 |----------|--------|
 | Phase 1 (Production Library Explorer) | 11/11 PASS |
 | Phase 2-4 (Estimate Workbench) | 11/11 PASS |
+| Final Regression (Save/Open/PDF/Refresh) | 13/13 PASS |
 | Desktop 3-panel layout | ✅ VERIFIED |
 | Mobile specialized layout | ✅ VERIFIED |
 | PDF export (jsPDF) | ✅ Downloads correctly |
 | Inline editing | ✅ Working with calculations |
 | Search/filter | ✅ Working |
 | Context menus | ✅ Working |
+| Save/Load persistence | ✅ localStorage working |
+| Hard refresh persistence | ✅ URL params restore estimate |
+
+### Persistence Architecture
+- **Current**: localStorage (browser-based, 5MB limit, ~1000 estimates)
+- **Future**: Backend `/api/estimates` routes ready (Supabase tables need provisioning)
+- URL params (`?id={uuid}`) preserve estimate selection across refreshes
 
 ### Known Limitations (Not Bugs)
-- Save/Send to Client buttons show "coming soon" toast (backend persistence not wired to frontend yet)
-- Estimates stored in local state (page refresh loses data until backend save is connected)
+- "Send to Client" button shows "coming soon" toast (email integration not wired)
+- Estimates stored in localStorage (sync across devices requires backend tables)
 - "Multi-Family" and "Multifamily" appear as separate domains (seed data hygiene)
+- Production standards have $0 prices (edit inline to test calculations)
 
 ---
 
