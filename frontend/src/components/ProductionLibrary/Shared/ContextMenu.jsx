@@ -130,6 +130,8 @@ const ContextMenu = ({
   return (
     <div
       ref={menuRef}
+      role="menu"
+      aria-label={`${nodeType} actions`}
       className="fixed z-50 min-w-[200px] bg-neutral-900 border border-neutral-700 rounded-xl shadow-2xl py-1 overflow-hidden"
       style={{ top: position.y, left: position.x }}
       data-testid="context-menu"
@@ -148,7 +150,7 @@ const ContextMenu = ({
       <div className="py-1">
         {menuItems.map((item, index) => {
           if (item.type === 'divider') {
-            return <div key={index} className="border-t border-neutral-800 my-1" />;
+            return <div key={index} className="border-t border-neutral-800 my-1" role="separator" />;
           }
           
           const Icon = item.icon;
@@ -156,6 +158,7 @@ const ContextMenu = ({
           return (
             <button
               key={item.id}
+              role="menuitem"
               onClick={() => handleAction(item.id)}
               className={`
                 w-full flex items-center gap-3 px-3 py-2 text-sm transition-colors min-h-[40px]

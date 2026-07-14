@@ -1,0 +1,105 @@
+{
+  "summary": "Phase 2-4 Estimate Workbench frontend testing PASSED on desktop (1920x1080) and mobile (390x844). All 11 review-request features verified: 3-panel desktop layout renders (Library Browser + Estimate Builder + Live Summary), Library shows 24 domains from Production Library, clicking standards adds them to Estimate (with click-to-increment), multi-item grouping by domain with subtotals works, Live Summary shows item count/subtotal/tax(13%)/total in real time, mobile view auto-switches at <1024px and shows a + button that opens a full-screen library modal with Back + Done Adding footer, PDF export triggers jsPDF download on both desktop and mobile (verified filename 'New Estimate_2026-07-14.pdf' downloaded), inline edit updates qty/price (5 x $100 -> $500 subtotal + $65 tax = $565 total confirmed), Remove item works (3 -> 2 items), Clear estimate resets to empty state after confirm dialog.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "MobileWorkbench.jsx (line 110)",
+        "issue": "Tax label is hardcoded as 'Tax (13%)' instead of interpolating the taxRate prop (as done on desktop LiveSummary). If taxRate ever changes it will render incorrectly on mobile.",
+        "selector": "MobileWorkbench mobile bottom summary",
+        "priority": "LOW"
+      },
+      {
+        "component": "MobileWorkbench.jsx header",
+        "issue": "Mobile view shows static title 'Estimate Builder' and does not expose the estimate-name input, whereas the desktop header allows renaming the estimate via [data-testid=\"estimate-name-input\"]. Mobile users cannot rename their estimate.",
+        "selector": "[data-testid=\"mobile-workbench\"] > div:first-child h1",
+        "priority": "MEDIUM"
+      },
+      {
+        "component": "Mobile 'Done Adding' button count",
+        "issue": "The button label 'Done Adding (N items)' occasionally lags one render behind (showed '(0 items)' immediately after adding one item; count updates on next render). Minor visual glitch — data is correct.",
+        "selector": "button:has-text(\"Done Adding\")",
+        "priority": "LOW"
+      },
+      {
+        "component": "EstimateBuilder.jsx inline edit Save/Cancel",
+        "issue": "Inline edit Save/Cancel buttons have no data-testid. Header 'Save' button also has text 'Save' which caused ambiguous selectors. Add e.g. data-testid=\"edit-save-btn\"/\"edit-cancel-btn\" for reliable automated testing.",
+        "selector": "EstimateBuilder inline edit form",
+        "priority": "LOW"
+      },
+      {
+        "component": "LibraryBrowser directStandards rows",
+        "issue": "Direct-standard rows (rendered when a standard has no service_category_ids) have NO data-testid, unlike category standards which have [data-testid=\"library-item-${id}\"]. This creates inconsistent selectors for tests. Also observed grouping duplication: 'Multi-Family' and 'Multifamily' appear as two separate domain folders — likely seed-data hygiene, not code.",
+        "selector": "LibraryBrowser.jsx lines 293-315",
+        "priority": "LOW"
+      }
+    ],
+    "integration_issues": [
+      {
+        "flow": "Post-login workspace bootstrap",
+        "issue": "Pre-existing console errors persist since iteration_26: '[AppLayout] Workspace context error: TypeError: Failed to fetch', '[useOrganization] Error: TypeError: Failed to fetch', '[CommandCenter] Error: TypeError: Failed to fetch'. These do NOT affect the Estimate Workbench (library API succeeds and returns 24 domains + 114 items). Unchanged carry-over — not a Phase 2-4 regression.",
+        "affected_selectors": []
+      }
+    ],
+    "design_issues": [
+      {
+        "screen": "Estimate Workbench (desktop)",
+        "issues": [
+          "All seeded standards have $0.00 unit prices (as noted in review request) — visually the Estimate list is dominated by '1 × $0.00 = $0.00' rows and the Summary shows Total $0.00 unless the user manually edits prices. Once edited, calcs are correct (verified $500 subtotal → $565 total). Consider adding a subtle placeholder/hint on rows with zero price prompting the user to click Edit.",
+          "Save button in the top header (data-testid=save-estimate-btn) currently only fires toast.info('Save functionality coming soon') — feature is intentionally not implemented (Phase 4 backend snapshot save not wired). Button should either be disabled, hidden, or labelled 'Coming soon' to avoid user confusion.",
+          "'Send to Client' button in LiveSummary also only fires toast.info('Send to client coming soon') — same UX gap."
+        ]
+      },
+      {
+        "screen": "LibraryBrowser tree",
+        "issues": [
+          "Seeded domain list contains both 'Multi-Family' and 'Multifamily' — appears to be a data-hygiene duplicate that should be de-duplicated at the seed level."
+        ]
+      }
+    ]
+  },
+  "verification_results": {
+    "desktop_3_panel_layout": "PASS - [data-testid=estimate-workbench] renders library-browser + estimate-builder + live-summary side by side",
+    "library_shows_domains_and_standards": "PASS - 24 domain folders visible; expanding Commercial reveals 113 clickable standards with code badges (C001..)",
+    "click_standard_adds_to_estimate": "PASS - clicking Hollow Metal Door creates a [data-testid^=line-item-] row and updates summary count to 1",
+    "grouped_by_domain_with_subtotals": "PASS - group header 'Commercial (2) $500.00' shows subtotal for the domain after edit",
+    "live_summary_totals": "PASS - subtotal $500.00, tax(13%) $65.00, total $565.00 all update in real time",
+    "mobile_layout_with_plus_button": "PASS - at 390x844 [data-testid=mobile-workbench] renders and [data-testid=mobile-open-library-btn] is visible in header",
+    "mobile_full_screen_library_modal": "PASS - clicking + opens full-screen modal with Back + Done Adding footer",
+    "export_pdf_desktop": "PASS - jsPDF download triggered: 'New Estimate_2026-07-14.pdf'",
+    "export_pdf_mobile": "PASS - mobile Export PDF button also downloads the PDF",
+    "inline_edit_qty_price": "PASS - qty=5 price=100 saved, subtotal updated from $0 -> $500, total -> $565",
+    "remove_item": "PASS - 3 items -> 2 items after clicking Trash icon",
+    "clear_estimate": "PASS - clear-estimate-btn with confirm accept resets to [data-testid=estimate-builder-empty]"
+  },
+  "test_report_links": [],
+  "action_items": [
+    "MEDIUM: Expose the estimate-name input in MobileWorkbench so mobile users can rename the estimate (currently static 'Estimate Builder' string).",
+    "MEDIUM: Wire the top-right 'Save' button to the real backend (or disable/hide/label 'Coming soon') — currently only fires an info toast.",
+    "MEDIUM: Wire 'Send to Client' button (same as above).",
+    "LOW: MobileWorkbench.jsx line 110 — interpolate taxRate instead of hardcoded 'Tax (13%)'.",
+    "LOW: Add data-testid to inline edit Save/Cancel buttons in EstimateBuilder to disambiguate from header Save button.",
+    "LOW: Add data-testid to LibraryBrowser directStandards rows (currently only nested-category standards have library-item-${id} testid).",
+    "LOW: De-duplicate 'Multi-Family' vs 'Multifamily' at the seed data level.",
+    "LOW/CARRY-OVER: Pre-existing [AppLayout]/useOrganization/[CommandCenter] 'Failed to fetch' console errors persist since iteration_26 — unrelated to Phase 2-4."
+  ],
+  "critical_code_review_comments": [
+    "EstimateWorkbench.jsx: `calculations` are recomputed both in EstimateWorkbench.jsx and again in LiveSummary.jsx (identical useMemo). LiveSummary should accept `calculations` as a prop from the parent (which is already passed to MobileWorkbench) to keep a single source of truth and avoid drift.",
+    "EstimateWorkbench.jsx handleClearEstimate uses window.confirm — for a modern SPA prefer the existing shadcn AlertDialog / sonner-style confirmation to match the rest of the app UI (also blocks playwright unless a dialog handler is registered).",
+    "EstimateWorkbench.jsx line 231-234: `handleSendToClient` and the header Save both only toast 'coming soon'. Ship these behind a feature flag or hide the buttons entirely to avoid user confusion — currently they look active but do nothing.",
+    "EstimateBuilder.jsx: onReorderItems prop is passed but no drag-and-drop wire-up implemented (GripVertical is decorative only). Either remove the drag handle or wire up a DnD library (e.g., @dnd-kit) to fulfil the 'drag-and-drop reordering' comment in the file header.",
+    "LibraryBrowser.jsx directStandards render block (lines 293-315) is a near-duplicate of the category-standards render block (lines 260-285). Extract a shared <StandardRow /> subcomponent with a data-testid so both branches remain in sync and testable.",
+    "estimatePdfGenerator.js line 399: footer prints 'Page 1 of N' on every page — page number is hard-coded to '1'. On multi-page estimates each page will incorrectly say 'Page 1 of 3'. Iterate over doc.getNumberOfPages() and setPage(i) to stamp each page's real number.",
+    "MobileWorkbench.jsx line 110: hardcoded 'Tax (13%)' — should interpolate the taxRate prop like LiveSummary does.",
+    "MobileWorkbench.jsx does not expose the estimate-name input, taxRate/markup controls, or the Clear button — mobile users can add items and export PDF but cannot rename or reconfigure the estimate.",
+    "EstimateWorkbench.jsx state (lineItems, estimateName, tax, markup) is purely local — a page refresh loses the estimate entirely. Backend snapshot save (Phase 4) is not yet wired; document this as WIP in the UI so users don't lose work."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (frontend-only per request)", "frontend": "11/11 review-request features PASS"},
+  "test_credentials": "inbox@twofungis.ca / TradeOS2024! — working",
+  "seed_data_creation": "None (used existing production library — 24 domains / 114 standards, all with $0 prices as noted).",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Phase 2-4 Estimate Workbench is fully functional on both desktop and mobile. Save + Send-to-Client are intentional 'coming soon' stubs (toast only) — backend snapshot persistence not wired yet. Data-testids added: estimate-workbench, library-browser, library-browser-search, library-item-${id} (nested-category only, NOT directStandards), estimate-builder, estimate-builder-empty, line-item-${id}, edit-quantity-input, edit-price-input, live-summary, export-pdf-btn, send-to-client-btn, save-estimate-btn, clear-estimate-btn, estimate-name-input, mobile-workbench, mobile-open-library-btn. Screenshots at /app/.screenshots/workbench_desktop.png, wb_with_items.png, wb_edit_remove_final.png, mobile_wb_initial.png, mobile_wb_library.png, mobile_wb_summary.png. Pre-existing 'Failed to fetch' console errors on /api/workspace/context + /api/command-center + useOrganization continue to appear on login — do NOT re-flag as a Phase 2-4 regression.",
+  "rca of the issue": "N/A - no new blocking issues discovered in Phase 2-4 scope. Non-blocking gaps documented above."
+}

@@ -94,6 +94,7 @@ from routes.command_center import router as command_center_router
 from routes.production_library import router as production_library_router
 from routes.production_library_hierarchy import router as production_library_hierarchy_router
 from routes.production_library_seed import router as production_library_seed_router
+from routes.estimates import router as estimates_router
 
 # Import centralized config (env already loaded at top, but config provides lazy access)
 from config import config
@@ -315,6 +316,9 @@ app.include_router(command_center_router)
 app.include_router(production_library_router)
 app.include_router(production_library_hierarchy_router)
 app.include_router(production_library_seed_router)
+
+# Include Estimates routes (Estimate Workbench - Phase 4 Snapshot Architecture)
+app.include_router(estimates_router)
 
 app.add_middleware(
     CORSMiddleware,

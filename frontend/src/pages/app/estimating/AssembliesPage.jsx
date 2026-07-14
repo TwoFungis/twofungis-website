@@ -50,7 +50,7 @@ const AssembliesPage = () => {
             Assembly Workflow
           </h3>
           <div className="space-y-2 text-sm text-neutral-400 text-left">
-            <p>1. Create an Assembly (e.g., "Door Installation - Single")</p>
+            <p>1. Create an Assembly (e.g., &quot;Door Installation - Single&quot;)</p>
             <p>2. Add Production Standards from your library</p>
             <p>3. Set default quantities for each standard</p>
             <p>4. Use the assembly in estimates - one click adds all items</p>
