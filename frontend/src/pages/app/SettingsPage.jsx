@@ -317,6 +317,34 @@ const SettingsPage = () => {
         </div>
       )}
 
+      {/* Organization & Team Section */}
+      <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6">
+        <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-4">
+          <User className="w-5 h-5 text-steel-400" />
+          Organization
+        </h2>
+        <div className="space-y-3">
+          <button
+            onClick={() => window.location.href = '/app/settings/team'}
+            className="w-full flex items-center justify-between p-4 bg-charcoal-700 hover:bg-charcoal-600 rounded-lg border border-charcoal-600 transition-colors"
+            data-testid="team-settings-link"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-steel-500/10 rounded-lg flex items-center justify-center">
+                <User className="w-5 h-5 text-steel-400" />
+              </div>
+              <div className="text-left">
+                <div className="font-medium text-white">Team Management</div>
+                <div className="text-sm text-charcoal-400">Invite members, manage roles</div>
+              </div>
+            </div>
+            <svg className="w-5 h-5 text-charcoal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
       {/* Profile Section */}
       <div className="bg-charcoal-800 rounded-xl border border-charcoal-700 p-6">
         <div className="flex items-center justify-between mb-4">

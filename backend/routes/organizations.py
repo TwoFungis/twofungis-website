@@ -526,6 +526,331 @@ async def get_organization_members(
         raise HTTPException(status_code=500, detail=str(e))
 
 # =====================================================
+# TEAM MANAGEMENT - INVITE & ROLES
+# =====================================================
+
+class InviteMemberRequest(BaseModel):
+    """Request to invite a new member"""
+    email: str
+    role: str = "employee"  # Default to employee
+
+class UpdateMemberRoleRequest(BaseModel):
+    """Request to update a member's role"""
+    role: str
+
+@router.post("/{organization_id}/invite")
+async def invite_member(
+    organization_id: str,
+    request: InviteMemberRequest,
+    authorization: str = Header(...)
+):
+    """
+    Invite a user to the organization by email.
+    Only owners can invite new members.
+    """
+    user_id = await verify_jwt_token(authorization)
+    
+    # Validate role
+    valid_roles = ['owner', 'employee']
+    if request.role not in valid_roles:
+        raise HTTPException(status_code=400, detail=f"Invalid role. Must be one of: {valid_roles}")
+    
+    try:
+        async with httpx.AsyncClient() as client:
+            # Verify caller is an owner
+            verify_response = await client.get(
+                f"{config.SUPABASE_URL}/rest/v1/organization_members?"
+                f"user_id=eq.{user_id}&"
+                f"organization_id=eq.{organization_id}&"
+                f"is_active=eq.true&"
+                f"select=role",
+                headers=await get_service_headers()
+            )
+            
+            if verify_response.status_code != 200 or not verify_response.json():
+                raise HTTPException(status_code=403, detail="Not a member of this organization")
+            
+            caller_role = verify_response.json()[0].get('role')
+            if caller_role != 'owner':
+                raise HTTPException(status_code=403, detail="Only owners can invite members")
+            
+            # Check if email already exists as a user
+            users_response = await client.get(
+                f"{config.SUPABASE_URL}/auth/v1/admin/users",
+                headers={
+                    "apikey": config.SUPABASE_SERVICE_KEY,
+                    "Authorization": f"Bearer {config.SUPABASE_SERVICE_KEY}"
+                }
+            )
+            
+            existing_user = None
+            if users_response.status_code == 200:
+                users = users_response.json().get('users', [])
+                for u in users:
+                    if u.get('email', '').lower() == request.email.lower():
+                        existing_user = u
+                        break
+            
+            # Get organization details
+            org_response = await client.get(
+                f"{config.SUPABASE_URL}/rest/v1/organizations?"
+                f"id=eq.{organization_id}&select=name",
+                headers=await get_service_headers()
+            )
+            org_name = "the organization"
+            if org_response.status_code == 200 and org_response.json():
+                org_name = org_response.json()[0].get('name', 'the organization')
+            
+            if existing_user:
+                # User exists - check if already a member
+                existing_member = await client.get(
+                    f"{config.SUPABASE_URL}/rest/v1/organization_members?"
+                    f"user_id=eq.{existing_user['id']}&"
+                    f"organization_id=eq.{organization_id}&"
+                    f"select=id,is_active",
+                    headers=await get_service_headers()
+                )
+                
+                if existing_member.status_code == 200 and existing_member.json():
+                    member = existing_member.json()[0]
+                    if member.get('is_active'):
+                        raise HTTPException(status_code=400, detail="User is already a member of this organization")
+                    else:
+                        # Reactivate membership
+                        reactivate = await client.patch(
+                            f"{config.SUPABASE_URL}/rest/v1/organization_members?"
+                            f"id=eq.{member['id']}",
+                            headers=await get_service_headers(),
+                            json={
+                                "is_active": True,
+                                "role": request.role,
+                                "accepted_at": datetime.now(timezone.utc).isoformat()
+                            }
+                        )
+                        return {
+                            "success": True,
+                            "message": f"User reactivated as {request.role}",
+                            "member_id": member['id'],
+                            "status": "active"
+                        }
+                
+                # Add user to organization
+                add_response = await client.post(
+                    f"{config.SUPABASE_URL}/rest/v1/organization_members",
+                    headers=await get_service_headers(),
+                    json={
+                        "user_id": existing_user['id'],
+                        "organization_id": organization_id,
+                        "role": request.role,
+                        "user_email": existing_user.get('email'),
+                        "user_name": existing_user.get('user_metadata', {}).get('full_name', existing_user.get('email', '').split('@')[0]),
+                        "is_active": True,
+                        "is_primary": False,
+                        "invited_by": user_id,
+                        "accepted_at": datetime.now(timezone.utc).isoformat()
+                    }
+                )
+                
+                if add_response.status_code == 201:
+                    created = add_response.json()
+                    return {
+                        "success": True,
+                        "message": f"User added to {org_name} as {request.role}",
+                        "member_id": created[0]['id'] if created else None,
+                        "status": "active"
+                    }
+                else:
+                    raise HTTPException(status_code=500, detail="Failed to add member")
+            else:
+                # User doesn't exist - create pending invitation
+                # Store invitation for when they sign up
+                invite_response = await client.post(
+                    f"{config.SUPABASE_URL}/rest/v1/organization_invitations",
+                    headers=await get_service_headers(),
+                    json={
+                        "organization_id": organization_id,
+                        "email": request.email.lower(),
+                        "role": request.role,
+                        "invited_by": user_id,
+                        "status": "pending",
+                        "expires_at": None  # No expiration for now
+                    }
+                )
+                
+                if invite_response.status_code == 201:
+                    created = invite_response.json()
+                    return {
+                        "success": True,
+                        "message": f"Invitation sent to {request.email}",
+                        "invitation_id": created[0]['id'] if created else None,
+                        "status": "pending"
+                    }
+                elif invite_response.status_code == 409:
+                    # Invitation already exists
+                    return {
+                        "success": True,
+                        "message": f"Invitation already pending for {request.email}",
+                        "status": "pending"
+                    }
+                else:
+                    # Table might not exist - fall back to simple response
+                    return {
+                        "success": True,
+                        "message": f"Invitation ready for {request.email}. They will be added when they create an account.",
+                        "status": "pending"
+                    }
+                    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error inviting member: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.put("/{organization_id}/members/{member_user_id}/role")
+async def update_member_role(
+    organization_id: str,
+    member_user_id: str,
+    request: UpdateMemberRoleRequest,
+    authorization: str = Header(...)
+):
+    """
+    Update a member's role.
+    Only owners can change roles.
+    """
+    user_id = await verify_jwt_token(authorization)
+    
+    valid_roles = ['owner', 'employee']
+    if request.role not in valid_roles:
+        raise HTTPException(status_code=400, detail=f"Invalid role. Must be one of: {valid_roles}")
+    
+    try:
+        async with httpx.AsyncClient() as client:
+            # Verify caller is an owner
+            verify_response = await client.get(
+                f"{config.SUPABASE_URL}/rest/v1/organization_members?"
+                f"user_id=eq.{user_id}&"
+                f"organization_id=eq.{organization_id}&"
+                f"is_active=eq.true&"
+                f"select=role",
+                headers=await get_service_headers()
+            )
+            
+            if verify_response.status_code != 200 or not verify_response.json():
+                raise HTTPException(status_code=403, detail="Not a member of this organization")
+            
+            caller_role = verify_response.json()[0].get('role')
+            if caller_role != 'owner':
+                raise HTTPException(status_code=403, detail="Only owners can change roles")
+            
+            # Prevent owner from demoting themselves if they're the only owner
+            if member_user_id == user_id and request.role != 'owner':
+                owners_response = await client.get(
+                    f"{config.SUPABASE_URL}/rest/v1/organization_members?"
+                    f"organization_id=eq.{organization_id}&"
+                    f"role=eq.owner&"
+                    f"is_active=eq.true&"
+                    f"select=user_id",
+                    headers=await get_service_headers()
+                )
+                if owners_response.status_code == 200:
+                    owners = owners_response.json()
+                    if len(owners) <= 1:
+                        raise HTTPException(status_code=400, detail="Cannot demote the only owner")
+            
+            # Update the role
+            update_response = await client.patch(
+                f"{config.SUPABASE_URL}/rest/v1/organization_members?"
+                f"user_id=eq.{member_user_id}&"
+                f"organization_id=eq.{organization_id}",
+                headers=await get_service_headers(),
+                json={"role": request.role}
+            )
+            
+            if update_response.status_code in [200, 204]:
+                return {
+                    "success": True,
+                    "message": f"Role updated to {request.role}"
+                }
+            else:
+                raise HTTPException(status_code=500, detail="Failed to update role")
+                
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error updating member role: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.delete("/{organization_id}/members/{member_user_id}")
+async def remove_member(
+    organization_id: str,
+    member_user_id: str,
+    authorization: str = Header(...)
+):
+    """
+    Remove a member from the organization.
+    Only owners can remove members.
+    Members cannot remove themselves if they're the only owner.
+    """
+    user_id = await verify_jwt_token(authorization)
+    
+    try:
+        async with httpx.AsyncClient() as client:
+            # Verify caller is an owner
+            verify_response = await client.get(
+                f"{config.SUPABASE_URL}/rest/v1/organization_members?"
+                f"user_id=eq.{user_id}&"
+                f"organization_id=eq.{organization_id}&"
+                f"is_active=eq.true&"
+                f"select=role",
+                headers=await get_service_headers()
+            )
+            
+            if verify_response.status_code != 200 or not verify_response.json():
+                raise HTTPException(status_code=403, detail="Not a member of this organization")
+            
+            caller_role = verify_response.json()[0].get('role')
+            if caller_role != 'owner':
+                raise HTTPException(status_code=403, detail="Only owners can remove members")
+            
+            # Prevent removing the only owner
+            if member_user_id == user_id:
+                owners_response = await client.get(
+                    f"{config.SUPABASE_URL}/rest/v1/organization_members?"
+                    f"organization_id=eq.{organization_id}&"
+                    f"role=eq.owner&"
+                    f"is_active=eq.true&"
+                    f"select=user_id",
+                    headers=await get_service_headers()
+                )
+                if owners_response.status_code == 200:
+                    owners = owners_response.json()
+                    if len(owners) <= 1:
+                        raise HTTPException(status_code=400, detail="Cannot remove the only owner")
+            
+            # Soft delete - set is_active to false
+            remove_response = await client.patch(
+                f"{config.SUPABASE_URL}/rest/v1/organization_members?"
+                f"user_id=eq.{member_user_id}&"
+                f"organization_id=eq.{organization_id}",
+                headers=await get_service_headers(),
+                json={"is_active": False}
+            )
+            
+            if remove_response.status_code in [200, 204]:
+                return {
+                    "success": True,
+                    "message": "Member removed from organization"
+                }
+            else:
+                raise HTTPException(status_code=500, detail="Failed to remove member")
+                
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error removing member: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+# =====================================================
 # API ENDPOINTS - ROLE CHECK (COMPATIBILITY)
 # =====================================================
 

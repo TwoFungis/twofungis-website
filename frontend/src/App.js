@@ -28,6 +28,7 @@ import ProductionItemDetail from './pages/app/ProductionItemDetail';
 import ChangeOrdersPage from './pages/app/ChangeOrdersPage';
 import ReportsPage from './pages/app/ReportsPage';
 import SettingsPage from './pages/app/SettingsPage';
+import TeamPage from './pages/app/TeamPage';
 import ProfilePage from './pages/app/ProfilePage';
 import MilestonesPage from './pages/app/MilestonesPage';
 import InvoicesPage from './pages/app/InvoicesPage';
@@ -177,6 +178,7 @@ function App() {
             {/* System */}
             <Route path="integrations" element={<IntegrationsPage />} />
             <Route path="settings" element={<SettingsPage />} />
+            <Route path="settings/team" element={<TeamPage />} />
             <Route path="profile" element={<ProfilePage />} />
             
             {/* Legacy route redirects - these existed before, redirect to Command Center */}
