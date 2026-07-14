@@ -110,6 +110,91 @@ When Beau edits a Production Library item:
 ### Summary
 The Production Library Import Wizard has been fully restored with prominent UI access and verified end-to-end functionality.
 
+---
+
+## Production Library Import System v2.0 ✅ COMPLETE (July 14, 2026)
+
+### Summary
+Intelligent import engine with auto-create lookups, unit alias mapping, duplicate handling, and comprehensive import reports. The CSV is the source of truth - the importer adapts the database to the library.
+
+### Key Features
+| Feature | Status |
+|---------|--------|
+| Intelligent Validation | ✅ Separates critical errors from auto-fixable issues |
+| Auto-Create Domains | ✅ Missing Knowledge Domains created automatically |
+| Auto-Create Categories | ✅ Missing Service Categories created automatically |
+| Unit Alias Mapping | ✅ SQ→SF, SQFT→SF, LUMP SUM→LS, etc. |
+| Duplicate Handling | ✅ Skip/Update/Replace strategies |
+| Import Preview | ✅ Shows items, lookups, conversions before commit |
+| Import Report | ✅ Detailed summary with duration_ms |
+| Case Preservation | ✅ Original casing preserved for new lookups |
+
+### Validation Groups
+The v2.0 validation returns 4 distinct groups:
+1. **Critical Errors** - Block import (required fields, invalid units)
+2. **Auto-Created Lookups** - Domains/Categories to be created
+3. **Unit Mappings** - Alias conversions applied
+4. **Warnings** - Non-blocking issues (rate hierarchy, duplicates)
+
+### Unit Alias Table
+| Standard Unit | Aliases |
+|---------------|---------|
+| EA | EACH, UNIT, PC, PIECE, QTY |
+| LF | LIN FT, LINEAR FT, LINEAL FT, FT |
+| SF | SQ FT, SQFT, SQ, SQUARE FT, FT² |
+| LS | LUMP SUM, LUMPSUM, LOT, ALLOW |
+| HR | HOUR, HOURS, HRS |
+| DAY | DAYS, PER DAY |
+| CY | CUBIC YD, CUBIC YARD, YD³ |
+| GAL | GALLON, GALLONS |
+| TON | TONS |
+| BF | BOARD FT, BOARD FEET |
+
+### Duplicate Strategies
+| Strategy | Behavior |
+|----------|----------|
+| `skip` (default) | Skip rows where production_code exists |
+| `update` | Merge new values into existing items |
+| `replace` | Replace existing items entirely |
+
+### API Endpoints (v2.0)
+| Endpoint | Method | Status |
+|----------|--------|--------|
+| `/api/production-library/import/template/download` | GET | ✅ Returns v2.0 template with aliases |
+| `/api/production-library/import/validate` | POST | ✅ Returns validation_groups + preview |
+| `/api/production-library/import/commit?duplicate_strategy=skip` | POST | ✅ Transactional import |
+
+### Import Report Fields
+```json
+{
+  "imported": 5,
+  "updated": 2,
+  "skipped": 1,
+  "errors": 0,
+  "domains_created": 1,
+  "categories_created": 2,
+  "unit_conversions": 3,
+  "warnings": 1,
+  "duration_ms": 890,
+  "created_lookups": [...]
+}
+```
+
+### Testing Results (Iteration 25)
+- **Backend: 100% (10/10 tests pass)**
+- **Frontend: 100% (all flows verified)**
+
+### Architecture
+- `/app/backend/services/import_engine.py` - Reusable import framework
+  - `MeasurementUnitAliasMapper` - Centralized alias table
+  - `LookupResolver` - Case-insensitive lookup with auto-create
+  - `ProductionLibraryValidator` - Row validation with issue grouping
+  - `DuplicateStrategy` - Enum for skip/update/replace
+- `/app/backend/routes/production_library.py` - Import endpoints
+- `/app/frontend/src/components/production/ImportWizard.jsx` - UI wizard
+
+---
+
 ### UI Accessibility (RESTORED)
 | Location | Test ID | Status |
 |----------|---------|--------|

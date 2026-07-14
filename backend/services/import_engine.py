@@ -289,8 +289,8 @@ class LookupResolver:
         
         # Auto-create if enabled
         if auto_create:
-            # Generate a code from the name
-            canonical_name = value.strip().title()
+            # Preserve user's original casing (just strip whitespace)
+            canonical_name = value.strip()
             code = self._generate_code(canonical_name)
             
             self._pending_domains[value_lower] = {
@@ -325,7 +325,8 @@ class LookupResolver:
         
         # Auto-create if enabled
         if auto_create:
-            canonical_name = value.strip().title()
+            # Preserve user's original casing (just strip whitespace)
+            canonical_name = value.strip()
             code = self._generate_code(canonical_name)
             
             self._pending_categories[value_lower] = {
