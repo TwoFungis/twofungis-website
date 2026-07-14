@@ -109,6 +109,32 @@ body > #root {
   @apply grid grid-cols-2 gap-3;
 }
 
+/* ============================================
+ * MOBILE TOUCH TARGET ENFORCEMENT
+ * Ensures all interactive elements meet 44px minimum
+ * ============================================ */
+@media (max-width: 1023px) {
+  /* Primary action buttons */
+  button[data-testid]:not(.no-touch-min),
+  a[data-testid]:not(.no-touch-min) {
+    min-height: 44px;
+  }
+  
+  /* Form inputs */
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea {
+    min-height: 44px;
+  }
+  
+  /* Checkbox and radio touch wrapper */
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-width: 20px;
+    min-height: 20px;
+  }
+}
+
 /* Responsive workspace container */
 .workspace-container {
   @apply w-full max-w-full overflow-x-hidden;

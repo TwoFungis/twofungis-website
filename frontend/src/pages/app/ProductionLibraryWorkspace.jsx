@@ -2346,10 +2346,10 @@ const ProductionLibraryWorkspace = () => {
         {/* Top Bar - Mobile Optimized */}
         <div className="flex items-center justify-between px-4 lg:px-6 py-3 lg:py-4 border-b border-neutral-800 bg-[#0A0A0A]/95 backdrop-blur-sm flex-shrink-0 min-h-[56px] lg:min-h-[64px]">
           <div className="flex items-center gap-3">
-            {/* Mobile menu button */}
+            {/* Mobile menu button - 44px touch target */}
             <button
               onClick={() => setMobileNavOpen(true)}
-              className="lg:hidden w-10 h-10 flex items-center justify-center text-neutral-400 hover:text-white hover:bg-neutral-800 rounded-lg -ml-1"
+              className="lg:hidden w-11 h-11 flex items-center justify-center text-neutral-400 hover:text-white hover:bg-neutral-800 rounded-lg -ml-1"
             >
               <Menu className="w-5 h-5" />
             </button>
@@ -2376,7 +2376,7 @@ const ProductionLibraryWorkspace = () => {
             </button>
             <button
               onClick={() => setCommandPaletteOpen(true)}
-              className="flex items-center gap-2 px-3 py-2 bg-neutral-900 border border-neutral-800 rounded-lg text-neutral-400 hover:text-white hover:border-neutral-700 transition-colors min-h-[40px]"
+              className="flex items-center gap-2 px-3 py-2 bg-neutral-900 border border-neutral-800 rounded-lg text-neutral-400 hover:text-white hover:border-neutral-700 transition-colors min-h-[44px]"
               data-testid="open-command-palette"
             >
               <Search className="w-4 h-4" strokeWidth={1.5} />

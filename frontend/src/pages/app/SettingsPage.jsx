@@ -355,7 +355,7 @@ const SettingsPage = () => {
           {!isEditingProfile && (
             <button
               onClick={() => setIsEditingProfile(true)}
-              className="text-steel-400 hover:text-steel-300 text-sm font-medium flex items-center gap-1"
+              className="text-steel-400 hover:text-steel-300 text-sm font-medium flex items-center gap-1 min-h-[44px] px-3 py-2 rounded-lg hover:bg-steel-500/10 transition-colors"
               data-testid="edit-profile-btn"
             >
               <Edit2 className="w-4 h-4" />
@@ -752,7 +752,7 @@ const SettingsPage = () => {
             <button
               onClick={handleSaveLaborRate}
               disabled={!laborRate}
-              className="bg-steel-500 hover:bg-steel-600 disabled:opacity-50 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+              className="bg-steel-500 hover:bg-steel-600 disabled:opacity-50 text-white px-4 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2 min-h-[44px]"
               data-testid="save-labor-rate-btn"
             >
               {laborRateSaved ? (

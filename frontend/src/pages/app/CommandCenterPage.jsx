@@ -466,10 +466,10 @@ const CompanyBrainCard = ({ insights, onAskBrain }) => {
           <button
             type="submit"
             disabled={!inputValue.trim()}
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-zinc-500 hover:text-emerald-400 disabled:opacity-30 disabled:hover:text-zinc-500 transition-colors"
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-2.5 text-zinc-500 hover:text-emerald-400 disabled:opacity-30 disabled:hover:text-zinc-500 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
             data-testid="brain-submit"
           >
-            <Send className="w-4 h-4" />
+            <Send className="w-5 h-5" />
           </button>
         </form>
       </div>
