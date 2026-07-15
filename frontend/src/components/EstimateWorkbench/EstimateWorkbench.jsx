@@ -464,10 +464,17 @@ const EstimateWorkbench = () => {
               },
               body: JSON.stringify({
                 name: estimateName,
-                description: JSON.stringify(extendedMetadata),
                 tax_rate: taxRate,
                 markup_percent: markupPercent,
-                notes: notes
+                contingency_percent: contingencyPercent,
+                pricing_profile: pricingProfile,
+                notes: notes,
+                // Extended metadata (v1.1.2)
+                client_info: clientInfo,
+                project_info: projectInfo,
+                company_profile_snapshot: profileSnapshot,
+                clarifications: clarifications,
+                internal_notes: internalNotes
               })
             });
             
@@ -515,10 +522,17 @@ const EstimateWorkbench = () => {
               },
               body: JSON.stringify({
                 name: estimateName,
-                description: JSON.stringify(extendedMetadata),
                 tax_rate: taxRate,
                 markup_percent: markupPercent,
-                notes: notes
+                contingency_percent: contingencyPercent,
+                pricing_profile: pricingProfile,
+                notes: notes,
+                // Extended metadata (v1.1.2)
+                client_info: clientInfo,
+                project_info: projectInfo,
+                company_profile_snapshot: profileSnapshot,
+                clarifications: clarifications,
+                internal_notes: internalNotes
               })
             });
             

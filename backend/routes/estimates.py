@@ -82,8 +82,16 @@ class EstimateCreate(BaseModel):
     description: Optional[str] = None
     tax_rate: float = 13.0  # Default HST
     markup_percent: float = 0
+    contingency_percent: float = 0  # v1.1.2 Platform Parity
+    pricing_profile: str = "Standard"  # Low, Standard, Premium
     valid_until: Optional[datetime] = None
     notes: Optional[str] = None
+    # Extended metadata (v1.1.2)
+    client_info: Optional[dict] = None
+    project_info: Optional[dict] = None
+    company_profile_snapshot: Optional[dict] = None
+    clarifications: Optional[str] = None
+    internal_notes: Optional[str] = None
 
 
 class EstimateUpdate(BaseModel):
@@ -92,9 +100,17 @@ class EstimateUpdate(BaseModel):
     description: Optional[str] = None
     tax_rate: Optional[float] = None
     markup_percent: Optional[float] = None
+    contingency_percent: Optional[float] = None  # v1.1.2
+    pricing_profile: Optional[str] = None  # v1.1.2
     valid_until: Optional[datetime] = None
     notes: Optional[str] = None
     status: Optional[str] = None
+    # Extended metadata (v1.1.2)
+    client_info: Optional[dict] = None
+    project_info: Optional[dict] = None
+    company_profile_snapshot: Optional[dict] = None
+    clarifications: Optional[str] = None
+    internal_notes: Optional[str] = None
 
 
 class Estimate(BaseModel):
@@ -109,11 +125,20 @@ class Estimate(BaseModel):
     description: Optional[str] = None
     tax_rate: float = 13.0
     markup_percent: float = 0
+    contingency_percent: float = 0  # v1.1.2
+    pricing_profile: str = "Standard"  # v1.1.2
     valid_until: Optional[datetime] = None
     notes: Optional[str] = None
+    # Extended metadata (v1.1.2)
+    client_info: Optional[dict] = None
+    project_info: Optional[dict] = None
+    company_profile_snapshot: Optional[dict] = None
+    clarifications: Optional[str] = None
+    internal_notes: Optional[str] = None
     # Calculated totals
     subtotal: float = 0
     markup_amount: float = 0
+    contingency_amount: float = 0  # v1.1.2
     tax_amount: float = 0
     total: float = 0
     item_count: int = 0

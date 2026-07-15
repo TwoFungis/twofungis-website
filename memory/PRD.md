@@ -144,15 +144,86 @@ Estimating (expandable)
 | Hard refresh persistence | ✅ URL params restore estimate |
 
 ### Persistence Architecture
-- **Current**: localStorage (browser-based, 5MB limit, ~1000 estimates)
-- **Future**: Backend `/api/estimates` routes ready (Supabase tables need provisioning)
+- **Current**: localStorage (browser-based, 5MB limit, ~1000 estimates) with Supabase API fallback
+- **Future**: Backend `/api/estimates` routes ready with Supabase integration - requires table migration
 - URL params (`?id={uuid}`) preserve estimate selection across refreshes
+- Sync status indicator shows "Local" (localStorage) or "Synced" (Supabase)
 
 ### Known Limitations (Not Bugs)
 - "Send to Client" button shows "coming soon" toast (email integration not wired)
 - Estimates stored in localStorage (sync across devices requires backend tables)
 - "Multi-Family" and "Multifamily" appear as separate domains (seed data hygiene)
 - Production standards have $0 prices (edit inline to test calculations)
+
+---
+
+## TradeOS v1.1.2 - Platform Synchronization & Mobile Parity ✅ COMPLETE (July 15, 2026)
+
+### Summary
+Platform-wide unification ensuring Desktop, Mobile Browser, and Installed PWA all render the exact same application, workflow, and data. Implements full UI parity between devices and prepares for cross-device data synchronization via Supabase.
+
+### Phase 1: Platform UI Parity ✅ COMPLETE
+| Feature | Status |
+|---------|--------|
+| MobileWorkbench receives all Desktop props | ✅ 25+ props passed for full parity |
+| Company Logo display on mobile | ✅ Shows in header (or Calculator fallback) |
+| Client Information editing on mobile | ✅ Full Details Editor modal |
+| Project Information editing on mobile | ✅ Full Details Editor modal |
+| Pricing Configuration on mobile | ✅ Profile, Tax, Markup, Contingency |
+| Clarifications & Internal Notes on mobile | ✅ Full text fields |
+| Mobile Summary with Markup/Contingency breakdown | ✅ Expandable bottom sheet |
+| Production Library scrolling on mobile | ✅ Full-screen modal with proper scroll |
+| Sync status indicator (Desktop + Mobile) | ✅ Cloud/CloudOff icons |
+
+### Phase 2: Shared Data (Supabase) ✅ COMPLETE
+| Feature | Status |
+|---------|--------|
+| EstimateWorkbench uses backend API | ✅ fetch() calls to /api/estimates |
+| localStorage fallback when API unavailable | ✅ Graceful degradation |
+| Backend models support extended metadata | ✅ contingency_percent, pricing_profile, client_info, project_info, etc. |
+| SQL migration script created | ✅ /app/database/migrations/001_estimates_tables.sql |
+| Sync status transitions | ✅ synced → syncing → offline |
+
+### Phase 3: Cross-Device Validation ⏳ PENDING (Requires Supabase Tables)
+| Feature | Status |
+|---------|--------|
+| Edit on Desktop, refresh Mobile | ⏳ Requires table migration |
+| Edit on Mobile, refresh Desktop | ⏳ Requires table migration |
+| Same estimate data on all devices | ⏳ Requires table migration |
+
+### Testing Results (Iteration 35)
+| Category | Result |
+|----------|--------|
+| Desktop 3-panel layout | ✅ PASS |
+| Desktop sync indicator | ✅ PASS (shows "Local") |
+| Mobile workbench full-screen | ✅ PASS |
+| Mobile company logo/fallback | ✅ PASS |
+| Mobile sync indicator | ✅ PASS (CloudOff icon) |
+| Mobile Details Editor (all sections) | ✅ PASS |
+| Mobile summary with markup/contingency | ✅ PASS |
+| Production Library scroll mobile | ✅ PASS |
+| Backend auth guards | ✅ PASS (401 without auth) |
+| Frontend features | 16/16 PASS |
+
+### Service Worker Update
+- Version bumped to `v2.2.0`
+- Forces cache refresh on all devices
+- Ensures new mobile UI is rendered
+
+### Database Migration Required
+To enable cross-device synchronization (Phase 3), run the following migration in Supabase SQL Editor:
+```sql
+-- See /app/database/migrations/001_estimates_tables.sql for full script
+-- Creates: public.estimates, public.estimate_line_items with RLS policies
+```
+
+### Key Files Modified
+| File | Changes |
+|------|---------|
+| MobileWorkbench.jsx | Added 15+ new props for UI parity, Details Editor modal |
+| EstimateWorkbench.jsx | API-first save/load with localStorage fallback, sync status |
+| estimates.py (backend) | Extended models with contingency_percent, pricing_profile, client_info, etc. |
+| sw.js | Bumped to v2.2.0 |
 
 ---
 
