@@ -94,7 +94,7 @@ from routes.command_center import router as command_center_router
 from routes.production_library import router as production_library_router
 from routes.production_library_hierarchy import router as production_library_hierarchy_router
 from routes.production_library_seed import router as production_library_seed_router
-from routes.estimates import router as estimates_router
+from routes.estimates_v2 import router as estimates_router  # v1.1.2: Unified with quotes table
 
 # Import centralized config (env already loaded at top, but config provides lazy access)
 from config import config

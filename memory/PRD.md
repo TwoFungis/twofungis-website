@@ -162,6 +162,21 @@ Estimating (expandable)
 ### Summary
 Platform-wide unification ensuring Desktop, Mobile Browser, and Installed PWA all render the exact same application, workflow, and data. Implements full UI parity between devices and prepares for cross-device data synchronization via Supabase.
 
+### ⚠️ CRITICAL ARCHITECTURAL DECISION (July 15, 2026)
+The Estimate Workbench integrates with the EXISTING `quotes` and `quote_line_items` tables instead of creating separate `estimates` tables. This ensures:
+- **Single source of truth** for commercial pricing
+- **No duplicate business entities** (Estimate = Quote with status='draft')
+- **Organization-scoped data isolation** via `organization_members`
+- **Compatible with existing production schema**
+
+### Backend Refactor
+| Change | Details |
+|--------|---------|
+| estimates.py → estimates_v2.py | Complete rewrite to use `quotes` table |
+| Entity mapping | Estimate = Quote (status='draft'), Line Item = quote_line_item |
+| Auth model | Uses `organization_members` (NOT `public.users` which doesn't exist) |
+| RLS | Organization-based access through membership |
+
 ### Phase 1: Platform UI Parity ✅ COMPLETE
 | Feature | Status |
 |---------|--------|
@@ -181,15 +196,16 @@ Platform-wide unification ensuring Desktop, Mobile Browser, and Installed PWA al
 | EstimateWorkbench uses backend API | ✅ fetch() calls to /api/estimates |
 | localStorage fallback when API unavailable | ✅ Graceful degradation |
 | Backend models support extended metadata | ✅ contingency_percent, pricing_profile, client_info, project_info, etc. |
-| SQL migration script created | ✅ /app/database/migrations/001_estimates_tables.sql |
+| SQL migration script created | ✅ /app/database/migrations/002_quotes_extension.sql |
 | Sync status transitions | ✅ synced → syncing → offline |
+| Unified with quotes table | ✅ No duplicate entities |
 
-### Phase 3: Cross-Device Validation ⏳ PENDING (Requires Supabase Tables)
+### Phase 3: Cross-Device Validation ⏳ PENDING (Requires Migration)
 | Feature | Status |
 |---------|--------|
-| Edit on Desktop, refresh Mobile | ⏳ Requires table migration |
-| Edit on Mobile, refresh Desktop | ⏳ Requires table migration |
-| Same estimate data on all devices | ⏳ Requires table migration |
+| Edit on Desktop, refresh Mobile | ⏳ Requires migration 002_quotes_extension.sql |
+| Edit on Mobile, refresh Desktop | ⏳ Requires migration |
+| Same estimate data on all devices | ⏳ Requires migration |
 
 ### Testing Results (Iteration 35)
 | Category | Result |
@@ -211,19 +227,25 @@ Platform-wide unification ensuring Desktop, Mobile Browser, and Installed PWA al
 - Ensures new mobile UI is rendered
 
 ### Database Migration Required
-To enable cross-device synchronization (Phase 3), run the following migration in Supabase SQL Editor:
-```sql
--- See /app/database/migrations/001_estimates_tables.sql for full script
--- Creates: public.estimates, public.estimate_line_items with RLS policies
+To enable cross-device synchronization (Phase 3), run this migration in Supabase SQL Editor:
 ```
+File: /app/database/migrations/002_quotes_extension.sql
+```
+This migration:
+- Adds organization_id to quotes table
+- Adds v1.1.2 pricing fields (markup_percent, contingency_percent, pricing_profile)
+- Adds extended metadata fields (client_info, project_info, clarifications, etc.)
+- Adds snapshot JSONB to quote_line_items
+- Updates RLS policies for organization-based access
+- Is idempotent and safe for production
 
-### Key Files Modified
-| File | Changes |
+### Key Files
+| File | Purpose |
 |------|---------|
-| MobileWorkbench.jsx | Added 15+ new props for UI parity, Details Editor modal |
-| EstimateWorkbench.jsx | API-first save/load with localStorage fallback, sync status |
-| estimates.py (backend) | Extended models with contingency_percent, pricing_profile, client_info, etc. |
-| sw.js | Bumped to v2.2.0 |
+| /app/backend/routes/estimates_v2.py | Backend API using quotes table |
+| /app/database/migrations/002_quotes_extension.sql | Production-safe migration |
+| /app/frontend/src/components/EstimateWorkbench/MobileWorkbench.jsx | Mobile UI parity |
+| /app/frontend/src/components/EstimateWorkbench/EstimateWorkbench.jsx | API integration |
 
 ---
 
