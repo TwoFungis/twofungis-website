@@ -156,87 +156,101 @@ Estimating (expandable)
 
 ---
 
-## Estimate Workbench v1.1 - Professional Estimate Refinement 🔄 IN PROGRESS
+## Estimate Workbench v1.1 - Professional Estimate Refinement ✅ COMPLETE (July 15, 2026)
 
 ### Summary
-Elevating the functional Estimate Workbench into a professional commercial estimating system suitable for direct submission to clients. This refines the existing architecture without redesigning the UI.
+Elevating the functional Estimate Workbench into a professional commercial estimating system suitable for direct submission to clients. All 6 phases completed and tested.
 
-### Phase 1: Company Profile & Estimate Header ✅ COMPLETE (July 14, 2026)
+### Phase 1: Production Library Pricing Engine ✅ COMPLETE
 | Feature | Status |
 |---------|--------|
-| Company Profile settings page | ✅ New tab under Settings |
-| Company Info fields (Name, Legal Name, Address, City, Province, Postal Code, Country, Phone, Email, Website) | ✅ All 10 fields |
-| Business Info fields (GST Number, WCB Number, GL Insurance, Business License) | ✅ All 4 fields |
-| Estimating Defaults (Estimator, Pricing Profile, Quote Validity, Markup %, GST %, Contingency %, Terms) | ✅ All 7 fields |
-| Company Logo upload/change/remove | ✅ Base64 storage |
-| localStorage persistence for Company Profile | ✅ `tradeos_company_profile` key |
-| Client Information section in workbench header | ✅ Client Company, Contact, Address, City, Province, Postal, Phone, Email |
-| Project Information section in workbench header | ✅ Name, Address, Project ID, Estimate Number (editable), Revision, Date, Valid Until, Tender Date, Estimator |
-| Pricing & Notes section in workbench header | ✅ Profile dropdown, Markup, Contingency, GST inputs |
-| Notes, Clarifications, Internal Notes textareas | ✅ Internal notes styled amber for visibility |
-| Expandable header editor (Details button) | ✅ Toggle visibility |
-| New estimate loads company defaults | ✅ Auto-populates GST, Markup, Contingency, Estimator, Terms, Valid Until |
-| Editable Estimate Number preserved on save | ✅ User input not overwritten |
-| Save persists all new metadata | ✅ Company snapshot, client, project, notes, pricing |
-| Load restores all metadata exactly | ✅ Full round-trip verified |
-| Contingency calculation in LiveSummary | ✅ Shows Markup + Contingency + Tax |
-| Build passes CI (no ESLint warnings) | ✅ `craco build` clean |
+| Production Standards store Unit, Low Rate, Standard Rate, Premium Rate | ✅ From Production Library |
+| Auto-populate Unit from measurement_units.code | ✅ SF, EA, LF etc. |
+| Auto-populate Unit Price based on Pricing Profile (Low/Standard/Premium) | ✅ Switches correctly |
+| Immutable pricing snapshot stored at time of add | ✅ snapshot object with all rates |
+| Manual Unit Price overrides tracked | ✅ unit_price_override field + amber indicator |
+| Pricing Profile consistency (Builder, Summary, PDF) | ✅ All show correct profile |
+| Production Library is single source of truth | ✅ No duplicate pricing logic |
 
-### Phase 2: Pricing Profile Integration 🔜 PENDING
+### Phase 2: Production Library Usability ✅ COMPLETE
 | Feature | Status |
 |---------|--------|
-| Auto-populate Low/Standard/Premium rates from Production Library | ⏳ |
-| Markup, GST, Contingency calculations | ⏳ |
-| Default values (GST 5%, Contingency 10%, Markup user-defined) | ⏳ |
+| Independent scrolling for Library panel | ✅ overscroll-contain + scrollbarGutter |
+| Preserve scroll position after adding items | ✅ scrollContainerRef + requestAnimationFrame |
+| Full folder visibility | ✅ All domains accessible |
+| Responsive behavior | ✅ Desktop/mobile verified |
 
-### Phase 3: Production Library Scrolling & Usability 🔜 PENDING
+### Phase 3: Professional Estimate Layout ✅ COMPLETE
 | Feature | Status |
 |---------|--------|
-| Independent scrolling for each panel | ⏳ |
-| Preserve scroll position on navigation | ⏳ |
-| Usability polish | ⏳ |
+| Company Info from Company Profile | ✅ Logo, Name, Address, GST, WCB, GL |
+| Client Information section | ✅ Company, Contact, Address, Phone, Email |
+| Project Information section | ✅ Name, Address, ID, Estimate #, Revision, Dates, Estimator |
+| Pricing section | ✅ Profile, Markup, Contingency, GST |
+| EstimateBuilder 8-column table | ✅ #, Production Item, Scope, Notes, Qty, Unit, Unit Price, Line Total |
+| Domain grouping with subtotals | ✅ Collapsible groups |
 
-### Phase 4: Professional PDF Generation 🔜 PENDING
+### Phase 4: Clarifications & Notes ✅ COMPLETE
 | Feature | Status |
 |---------|--------|
-| Company branding (logo, name, address) | ⏳ |
-| Client/Project info on PDF | ⏳ |
-| Pricing Summary (Subtotal, Markup, Contingency, Tax, Total) | ⏳ |
-| Clarifications section | ⏳ |
-| Signature line | ⏳ |
-| Page numbers | ⏳ |
+| Clarifications (printed on PDF) | ✅ Separate textarea |
+| Internal Notes (not printed) | ✅ Amber styling, persists with estimate |
 
-### Phase 5: Final Polish & Regression 🔜 PENDING
+### Phase 5: Professional PDF ✅ COMPLETE
 | Feature | Status |
 |---------|--------|
-| Full regression testing | ⏳ |
-| Edge case handling | ⏳ |
-| Performance optimization | ⏳ |
+| Company Logo + Information | ✅ Full header block |
+| Client Information (TO) | ✅ Company, Attn, Address, Phone, Email |
+| Project Information + Estimate Header | ✅ Name, Address, Pricing Profile badge, Prepared by |
+| Line Items table (8 columns) | ✅ Grouped by domain with subtotals |
+| Pricing Summary | ✅ Subtotal, Markup %, Contingency %, GST %, Total |
+| Notes section | ✅ Client visible notes |
+| Clarifications & Qualifications | ✅ Printed on PDF |
+| Terms & Conditions | ✅ From company profile defaults |
+| Signature Area | ✅ Signature, Date, Print Name, Title |
+| Page Numbers | ✅ Page N of M on all pages |
 
-### Testing Results (Iteration 32)
-| Test | Result |
-|------|--------|
-| Settings tabs with URL params | ✅ PASS |
-| Company Profile all 21 fields present | ✅ PASS |
-| Company Profile save to localStorage | ✅ PASS |
-| Estimate number input visible | ✅ PASS |
-| Details button expands editor | ✅ PASS |
-| Client Information section | ✅ PASS |
-| Project Information section | ✅ PASS |
-| Pricing & Notes section | ✅ PASS |
-| Notes/Clarifications/Internal Notes | ✅ PASS |
-| LiveSummary shows Markup+Contingency+Tax | ✅ PASS |
-| New estimate loads company defaults | ✅ PASS |
-| Save persists all metadata | ✅ PASS |
-| Reopen restores all fields | ✅ PASS |
-| User-edited estimate number persistence | ✅ PASS (bug fixed) |
+### Phase 6: Save & Restore Validation ✅ COMPLETE
+| Feature | Status |
+|---------|--------|
+| Company Profile snapshot saved | ✅ Full company_profile_snapshot |
+| Client Information saved | ✅ client_info object |
+| Project Information saved | ✅ project_info object |
+| Estimate Number preserved | ✅ User-editable, not auto-overwritten |
+| Pricing Profile saved | ✅ pricing_profile + pricing_profile_at_add per item |
+| Markup/Contingency/GST saved | ✅ All percentages |
+| Line Items with snapshots | ✅ snapshot with all pricing tiers |
+| Manual price overrides saved | ✅ unit_price_override field |
+| Notes/Clarifications/Internal Notes | ✅ All persisted |
+| Exact restoration on reload | ✅ URL params + localStorage |
 
-### Component Files Modified
+### Testing Results (Iteration 33)
+| Category | Result |
+|----------|--------|
+| Production Library Pricing Engine | 15/15 PASS |
+| Auto-populate Unit + Unit Price | ✅ Verified |
+| Pricing Profile switching | ✅ New items get correct tier |
+| Immutable snapshot | ✅ Existing items unchanged |
+| Manual override tracking | ✅ Amber indicator shown |
+| Summary calculations | ✅ Math verified (Markup 15% + Cont 10% + Tax 5%) |
+| Save/Load round-trip | ✅ All fields restored |
+| PDF export | ✅ 2-page professional layout |
+| Build status | ✅ Zero ESLint warnings |
+
+### Files Modified
 | File | Changes |
 |------|---------|
-| `/app/frontend/src/components/settings/CompanyProfile.jsx` | Complete Company Profile form with all fields per spec |
-| `/app/frontend/src/pages/app/SettingsPage.jsx` | Added Company Profile tab with URL param switching |
-| `/app/frontend/src/components/EstimateWorkbench/EstimateWorkbench.jsx` | Expandable header editor, client/project info, notes, enhanced save/load |
+| `EstimateWorkbench.jsx` | Pricing engine, enhanced save/load, PDF metadata |
+| `EstimateBuilder.jsx` | 8-column professional table, scope/notes fields |
+| `LibraryBrowser.jsx` | Scroll position preservation |
+| `LiveSummary.jsx` | Pricing Profile badge, contingency calculation |
+| `estimatePdfGenerator.js` | Complete redesign - professional commercial layout |
+| `CompanyProfile.jsx` | Full company profile settings |
+| `SettingsPage.jsx` | Company Profile tab |
+
+---
+
+## Upcoming Work (Post Estimate Workbench v1.1)
 | `/app/frontend/src/components/EstimateWorkbench/LiveSummary.jsx` | Added contingency calculation |
 
 ---

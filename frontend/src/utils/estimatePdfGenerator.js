@@ -96,7 +96,7 @@ export const generateEstimatePDF = ({
   // Helper to check page break
   const checkPageBreak = (requiredHeight) => {
     if (yPos + requiredHeight > PAGE.height - PAGE.marginBottom - 15) {
-      addFooter();
+      // Don't add footer during page break - all footers added at the end
       doc.addPage();
       pageNumber++;
       yPos = PAGE.marginTop;
@@ -105,19 +105,7 @@ export const generateEstimatePDF = ({
     return false;
   };
   
-  // Add footer to current page
-  const addFooter = () => {
-    const footerY = PAGE.height - 10;
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8);
-    doc.setTextColor(...COLORS.muted);
-    
-    // Company name on left
-    doc.text(companyProfile.name || 'TradeOS', PAGE.marginLeft, footerY);
-    
-    // Page number on right
-    doc.text(`Page ${pageNumber}`, PAGE.width - PAGE.marginRight, footerY, { align: 'right' });
-  };
+  // Footer will be added at the end after all pages are generated
 
   // ============================================
   // HEADER SECTION - Company Logo & Title
