@@ -368,7 +368,7 @@ export default function ProductionItemDetail() {
         const data = await response.json();
         toast.success(data.message || 'Item duplicated');
         // Navigate to the new item
-        navigate(`/app/production-library/items/${data.item.id}`);
+        navigate(`/app/estimating/library/items/${data.item.id}`);
       } else {
         const error = await response.json();
         toast.error(error.detail || 'Failed to duplicate');
@@ -434,7 +434,7 @@ export default function ProductionItemDetail() {
           <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
           <h2 className="text-lg font-medium text-white">Item Not Found</h2>
           <button
-            onClick={() => navigate('/app/production-library')}
+            onClick={() => navigate('/app/estimating/library')}
             className="mt-4 px-4 py-2 bg-neutral-800 text-white rounded-lg hover:bg-neutral-700 transition-colors"
           >
             Back to Library
@@ -457,7 +457,7 @@ export default function ProductionItemDetail() {
             {/* Back + Title */}
             <div className="flex items-center gap-4">
               <button
-                onClick={() => navigate('/app/production-library')}
+                onClick={() => navigate('/app/estimating/library')}
                 className="p-2 text-white/50 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
               >
                 <ArrowLeft className="w-5 h-5" />

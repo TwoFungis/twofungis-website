@@ -158,6 +158,32 @@ Estimating (expandable)
 
 ## Estimate Workbench v1.1 - Professional Estimate Refinement ✅ COMPLETE (July 15, 2026)
 
+### v1.1.1 Release Blocker Fixes ✅ COMPLETE (July 15, 2026)
+| Bug | Status | Fix |
+|-----|--------|-----|
+| Estimate Builder horizontal scrolling | ✅ | overflow-auto, sticky header, min-w-[700px] |
+| Delete Domain not working | ✅ | Added permanent delete endpoints + context menu handler |
+| Delete Category not working | ✅ | Added permanent delete endpoints + context menu handler |
+| Add Standard regression | ✅ | Pass isOpen, session, domains, units props to modal |
+| Back button legacy navigation | ✅ | All navigate() calls use /app/estimating/library |
+| Company Logo in header | ✅ | Shows logo from Company Profile in estimate header |
+| Mobile showing legacy UI | ✅ | Bumped SW to v2.1.0, fixed routing |
+| Mobile scrolling | ✅ | overscroll-contain, -webkit-overflow-scrolling-touch |
+| Legacy route audit | ✅ | All /app/production-library routes redirect to /app/estimating/library |
+
+### Testing Results (Iteration 34)
+| Category | Result |
+|----------|--------|
+| Frontend features | 12/12 PASS |
+| Backend tests | 5/5 PASS |
+| Horizontal scroll | ✅ Verified at multiple viewports |
+| Add Standard modal | ✅ Opens with all fields |
+| Delete Domain/Category | ✅ Context menu + API working |
+| Back navigation | ✅ Goes to /app/estimating/library |
+| Company logo | ✅ Shows in header and PDF |
+| Mobile Production Library | ✅ New Explorer, not legacy |
+| Mobile scrolling | ✅ overscroll-contain verified |
+
 ### Summary
 Elevating the functional Estimate Workbench into a professional commercial estimating system suitable for direct submission to clients. All 6 phases completed and tested.
 

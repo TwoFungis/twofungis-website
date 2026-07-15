@@ -2037,7 +2037,7 @@ const ProductionLibraryWorkspace = () => {
   
   const handleOpenItem = (item) => {
     // Navigate to the detail page instead of opening a panel
-    navigate(`/app/production-library/items/${item.id}`);
+    navigate(`/app/estimating/library/items/${item.id}`);
   };
   const handleImport = () => setSearchParams({ tab: 'import' });
   const handleCloseImport = () => { setSearchParams({}); fetchData(); };

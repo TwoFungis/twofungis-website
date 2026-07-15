@@ -237,7 +237,7 @@ const ProductionLibraryExplorer = () => {
           setEditingCategory(node);
           setShowCategoryDialog(true);
         } else if (contextMenu.nodeType === 'standard') {
-          navigate(`/app/production-library/items/${node.id}?edit=true`);
+          navigate(`/app/estimating/library/items/${node.id}?edit=true`);
         }
         break;
         
