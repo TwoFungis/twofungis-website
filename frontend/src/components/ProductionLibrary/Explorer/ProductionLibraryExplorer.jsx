@@ -89,6 +89,10 @@ const ProductionLibraryExplorer = () => {
   // Mobile state
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   
+  // Session & units state for CreateStandardModal
+  const [session, setSession] = useState(null);
+  const [units, setUnits] = useState([]);
+  
   // Check for import tab in URL
   useEffect(() => {
     if (searchParams.get('tab') === 'import') {
@@ -100,8 +104,9 @@ const ProductionLibraryExplorer = () => {
   const fetchData = useCallback(async () => {
     setIsLoading(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token;
+      const { data: { session: currentSession } } = await supabase.auth.getSession();
+      const token = currentSession?.access_token;
+      setSession(currentSession);
       
       if (!token) {
         toast.error('Please log in to continue');
@@ -114,10 +119,11 @@ const ProductionLibraryExplorer = () => {
       };
       
       // Fetch all data in parallel
-      const [domainsRes, categoriesRes, itemsRes] = await Promise.all([
+      const [domainsRes, categoriesRes, itemsRes, unitsRes] = await Promise.all([
         fetch(`${API_URL}/api/production-library/domains`, { headers }),
         fetch(`${API_URL}/api/production-library/service-categories`, { headers }),
-        fetch(`${API_URL}/api/production-library/items?limit=1000`, { headers })
+        fetch(`${API_URL}/api/production-library/items?limit=1000`, { headers }),
+        fetch(`${API_URL}/api/production-library/measurement-units`, { headers })
       ]);
       
       if (domainsRes.ok) {
@@ -133,6 +139,11 @@ const ProductionLibraryExplorer = () => {
       if (itemsRes.ok) {
         const data = await itemsRes.json();
         setStandards(data.items || []);
+      }
+      
+      if (unitsRes.ok) {
+        const data = await unitsRes.json();
+        setUnits(data.units || []);
       }
     } catch (error) {
       console.error('Error fetching library data:', error);
@@ -166,7 +177,7 @@ const ProductionLibraryExplorer = () => {
     // Update breadcrumb path
     if (type === 'standard') {
       // Navigate to detail page
-      navigate(`/app/production-library/items/${node.id}`);
+      navigate(`/app/estimating/library/items/${node.id}`);
     }
   }, [navigate]);
   
@@ -214,7 +225,7 @@ const ProductionLibraryExplorer = () => {
         
       case 'view':
         if (contextMenu.nodeType === 'standard') {
-          navigate(`/app/production-library/items/${node.id}`);
+          navigate(`/app/estimating/library/items/${node.id}`);
         }
         break;
         
@@ -315,8 +326,42 @@ const ProductionLibraryExplorer = () => {
               toast.error('Failed to delete');
             }
           }
-        } else {
-          toast.info('Archive instead of delete to preserve history');
+        } else if (contextMenu.nodeType === 'domain') {
+          if (confirm(`Permanently delete domain "${node.name}" and all its contents? This cannot be undone.`)) {
+            try {
+              const res = await fetch(
+                `${API_URL}/api/production-library/domains/${node.id}/permanent`,
+                { method: 'DELETE', headers }
+              );
+              if (res.ok) {
+                toast.success('Domain deleted');
+                fetchData();
+              } else {
+                const data = await res.json();
+                toast.error(data.detail || 'Failed to delete domain');
+              }
+            } catch (error) {
+              toast.error('Failed to delete domain');
+            }
+          }
+        } else if (contextMenu.nodeType === 'category') {
+          if (confirm(`Permanently delete category "${node.name}" and all its standards? This cannot be undone.`)) {
+            try {
+              const res = await fetch(
+                `${API_URL}/api/production-library/service-categories/${node.id}/permanent`,
+                { method: 'DELETE', headers }
+              );
+              if (res.ok) {
+                toast.success('Category deleted');
+                fetchData();
+              } else {
+                const data = await res.json();
+                toast.error(data.detail || 'Failed to delete category');
+              }
+            } catch (error) {
+              toast.error('Failed to delete category');
+            }
+          }
         }
         break;
         
@@ -765,10 +810,14 @@ const ProductionLibraryExplorer = () => {
       
       {showStandardModal && (
         <CreateStandardModal
+          isOpen={showStandardModal}
           onClose={() => {
             setShowStandardModal(false);
             setParentForNew(null);
           }}
+          session={session}
+          domains={domains}
+          units={units}
           onCreated={handleStandardCreated}
           preSelectedDomain={parentForNew?.type === 'domain' ? parentForNew : null}
           preSelectedCategory={parentForNew?.type === 'category' ? parentForNew : null}

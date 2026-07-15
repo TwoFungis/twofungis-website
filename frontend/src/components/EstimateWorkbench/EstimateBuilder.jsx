@@ -110,7 +110,7 @@ const EstimateBuilder = ({
   return (
     <div className="flex-1 flex flex-col overflow-hidden" data-testid="estimate-builder">
       {/* Header */}
-      <div className="px-4 py-3 border-b border-neutral-800 flex items-center justify-between bg-neutral-900/30">
+      <div className="px-4 py-3 border-b border-neutral-800 flex items-center justify-between bg-neutral-900/30 flex-shrink-0">
         <div className="flex items-center gap-3">
           <Package className="w-5 h-5 text-emerald-400" />
           <h2 className="text-base font-medium text-white">Estimate Items</h2>
@@ -119,21 +119,23 @@ const EstimateBuilder = ({
         </div>
       </div>
       
-      {/* Table Header */}
-      <div className="hidden md:grid grid-cols-[40px_1fr_120px_120px_60px_70px_90px_100px_40px] gap-2 px-4 py-2 border-b border-neutral-800 bg-neutral-900/50 text-[10px] uppercase tracking-wider text-neutral-500 font-medium">
-        <div>#</div>
-        <div>Production Item</div>
-        <div>Scope</div>
-        <div>Notes</div>
-        <div className="text-right">Qty</div>
-        <div>Unit</div>
-        <div className="text-right">Unit Price</div>
-        <div className="text-right">Line Total</div>
-        <div></div>
-      </div>
-      
-      {/* Line Items - Independent scrolling container */}
-      <div className="flex-1 overflow-y-auto overscroll-contain" style={{ scrollbarGutter: 'stable' }}>
+      {/* Scrollable table container - handles both horizontal and vertical scrolling */}
+      <div className="flex-1 overflow-auto overscroll-contain" style={{ scrollbarGutter: 'stable' }}>
+        {/* Table Header - sticky at top */}
+        <div className="hidden md:grid grid-cols-[40px_minmax(150px,1fr)_100px_100px_60px_60px_85px_90px_40px] gap-2 px-4 py-2 border-b border-neutral-800 bg-neutral-900/50 text-[10px] uppercase tracking-wider text-neutral-500 font-medium sticky top-0 z-10 min-w-[700px]">
+          <div>#</div>
+          <div>Production Item</div>
+          <div>Scope</div>
+          <div>Notes</div>
+          <div className="text-right">Qty</div>
+          <div>Unit</div>
+          <div className="text-right">Rate</div>
+          <div className="text-right">Amount</div>
+          <div></div>
+        </div>
+        
+        {/* Line Items */}
+        <div className="min-w-[700px] md:min-w-0">
         {Object.entries(groupedItems).map(([groupKey, items]) => {
           const isExpanded = expandedGroups.has(groupKey) || expandedGroups.has('all');
           const groupTotal = items.reduce((sum, item) => sum + (item.quantity * item.unit_price), 0);
@@ -176,7 +178,7 @@ const EstimateBuilder = ({
                         data-testid={`line-item-${item.id}`}
                       >
                         {/* Desktop Row */}
-                        <div className="hidden md:grid grid-cols-[40px_1fr_120px_120px_60px_70px_90px_100px_40px] gap-2 px-4 py-2.5 items-center">
+                        <div className="hidden md:grid grid-cols-[40px_minmax(150px,1fr)_100px_100px_60px_60px_85px_90px_40px] gap-2 px-4 py-2.5 items-center">
                           {/* Line # */}
                           <div className="text-xs text-neutral-500 font-mono">{item.lineNumber}</div>
                           
@@ -385,6 +387,7 @@ const EstimateBuilder = ({
             </div>
           );
         })}
+        </div>
       </div>
     </div>
   );

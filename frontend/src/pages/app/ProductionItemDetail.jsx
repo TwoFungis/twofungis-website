@@ -219,7 +219,7 @@ export default function ProductionItemDetail() {
         setEditedItem(data.item);
       } else {
         toast.error('Item not found');
-        navigate('/app/production-library');
+        navigate('/app/estimating/library');
         return;
       }
 
@@ -323,7 +323,7 @@ export default function ProductionItemDetail() {
 
       if (response.ok) {
         toast.success('Production item archived');
-        navigate('/app/production-library');
+        navigate('/app/estimating/library');
       }
     } catch (error) {
       console.error('Archive error:', error);
@@ -393,7 +393,7 @@ export default function ProductionItemDetail() {
 
       if (response.ok) {
         toast.success('Production item permanently deleted');
-        navigate('/app/production-library');
+        navigate('/app/estimating/library');
       } else {
         const error = await response.json();
         toast.error(error.detail || 'Cannot delete this item');

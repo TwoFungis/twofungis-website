@@ -671,9 +671,19 @@ const EstimateWorkbench = () => {
         {/* Main Header Row */}
         <div className="flex items-center justify-between p-4">
           <div className="flex items-center gap-4">
-            <div className="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center">
-              <Calculator className="w-5 h-5 text-emerald-400" strokeWidth={1.5} />
-            </div>
+            {/* Company Logo or Calculator Icon */}
+            {companyProfileSnapshot?.logo || loadCompanyProfile()?.logo ? (
+              <img 
+                src={companyProfileSnapshot?.logo || loadCompanyProfile()?.logo} 
+                alt="Company Logo" 
+                className="w-10 h-10 object-contain rounded-lg"
+                data-testid="header-company-logo"
+              />
+            ) : (
+              <div className="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center">
+                <Calculator className="w-5 h-5 text-emerald-400" strokeWidth={1.5} />
+              </div>
+            )}
             <div>
               <div className="flex items-center gap-2">
                 <input

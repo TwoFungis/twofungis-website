@@ -341,6 +341,67 @@ async def delete_knowledge_domain(
         logger.error(f"Error deleting domain: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.delete("/domains/{domain_id}/permanent")
+async def permanently_delete_domain(
+    domain_id: str,
+    authorization: str = Header(...)
+):
+    """Permanently delete a knowledge domain and all its contents"""
+    context = await verify_token_and_get_org(authorization)
+    org_id = context['organization_id']
+    
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            # First, get all categories in this domain
+            cat_response = await client.get(
+                f"{config.SUPABASE_URL}/rest/v1/service_categories?"
+                f"knowledge_domain_id=eq.{domain_id}&organization_id=eq.{org_id}",
+                headers=await get_service_headers()
+            )
+            
+            if cat_response.status_code == 200:
+                categories = cat_response.json()
+                
+                # Delete all items in those categories
+                for cat in categories:
+                    await client.delete(
+                        f"{config.SUPABASE_URL}/rest/v1/production_items?"
+                        f"service_category_id=eq.{cat['id']}&organization_id=eq.{org_id}",
+                        headers=await get_service_headers()
+                    )
+                
+                # Delete all categories
+                await client.delete(
+                    f"{config.SUPABASE_URL}/rest/v1/service_categories?"
+                    f"knowledge_domain_id=eq.{domain_id}&organization_id=eq.{org_id}",
+                    headers=await get_service_headers()
+                )
+            
+            # Delete all items directly in this domain (no category)
+            await client.delete(
+                f"{config.SUPABASE_URL}/rest/v1/production_items?"
+                f"knowledge_domain_id=eq.{domain_id}&organization_id=eq.{org_id}",
+                headers=await get_service_headers()
+            )
+            
+            # Finally, delete the domain itself
+            response = await client.delete(
+                f"{config.SUPABASE_URL}/rest/v1/knowledge_domains?"
+                f"id=eq.{domain_id}&organization_id=eq.{org_id}",
+                headers=await get_service_headers()
+            )
+            
+            if response.status_code in [200, 204]:
+                return {"success": True, "message": "Domain permanently deleted"}
+            else:
+                raise HTTPException(status_code=response.status_code, detail="Failed to delete domain")
+                
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error permanently deleting domain: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 # =====================================================
 # SERVICE CATEGORIES (Level 2)
 # =====================================================
@@ -442,6 +503,42 @@ async def delete_service_category(
         raise
     except Exception as e:
         logger.error(f"Error deleting service category: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.delete("/service-categories/{category_id}/permanent")
+async def permanently_delete_category(
+    category_id: str,
+    authorization: str = Header(...)
+):
+    """Permanently delete a service category and all its items"""
+    context = await verify_token_and_get_org(authorization)
+    org_id = context['organization_id']
+    
+    try:
+        async with httpx.AsyncClient(timeout=20.0) as client:
+            # Delete all items in this category
+            await client.delete(
+                f"{config.SUPABASE_URL}/rest/v1/production_items?"
+                f"service_category_id=eq.{category_id}&organization_id=eq.{org_id}",
+                headers=await get_service_headers()
+            )
+            
+            # Delete the category itself
+            response = await client.delete(
+                f"{config.SUPABASE_URL}/rest/v1/service_categories?"
+                f"id=eq.{category_id}&organization_id=eq.{org_id}",
+                headers=await get_service_headers()
+            )
+            
+            if response.status_code in [200, 204]:
+                return {"success": True, "message": "Category permanently deleted"}
+            else:
+                raise HTTPException(status_code=response.status_code, detail="Failed to delete category")
+                
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error permanently deleting category: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 # =====================================================

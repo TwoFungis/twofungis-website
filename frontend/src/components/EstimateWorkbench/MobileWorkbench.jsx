@@ -37,7 +37,10 @@ const MobileWorkbench = ({
   standards = [],
   isLoadingLibrary = false,
   calculations = {},
-  taxRate = 13,
+  taxRate = 5,
+  markupPercent = 15,
+  contingencyPercent = 10,
+  pricingProfile = 'Standard',
   onAddItem,
   onUpdateItem,
   onRemoveItem,
@@ -118,11 +121,12 @@ const MobileWorkbench = ({
       </div>
       
       {/* Main Content - Estimate Items */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto overscroll-contain -webkit-overflow-scrolling-touch">
         <EstimateBuilder
           lineItems={lineItems}
           onUpdateItem={onUpdateItem}
           onRemoveItem={onRemoveItem}
+          pricingProfile={pricingProfile}
           isEditing={true}
         />
       </div>

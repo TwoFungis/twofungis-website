@@ -168,13 +168,14 @@ function App() {
             <Route path="estimating" element={<EstimateWorkbenchPage />} />
             <Route path="estimating/workbench" element={<EstimateWorkbenchPage />} />
             <Route path="estimating/library" element={<EstimatingLibraryPage />} />
+            <Route path="estimating/library/items/:itemId" element={<ProductionItemDetail />} />
             <Route path="estimating/assemblies" element={<AssembliesPage />} />
             <Route path="estimating/templates" element={<TemplatesPage />} />
             
-            {/* Legacy Production Library Routes (backwards compatibility) */}
-            <Route path="production-library" element={<ProductionLibraryWorkspace />} />
+            {/* Legacy Production Library Routes - Redirect to new location */}
+            <Route path="production-library" element={<Navigate to="/app/estimating/library" replace />} />
             <Route path="production-library/items/:itemId" element={<ProductionItemDetail />} />
-            <Route path="production-library/import" element={<ProductionLibraryPage />} />
+            <Route path="production-library/import" element={<Navigate to="/app/estimating/library?tab=import" replace />} />
             
             {/* Financial */}
             <Route path="invoices" element={<InvoicesPage />} />

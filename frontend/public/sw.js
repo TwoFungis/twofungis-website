@@ -10,7 +10,7 @@
  */
 
 // Dynamic version based on build - will be replaced during build
-const CACHE_VERSION = 'v2.0.0';
+const CACHE_VERSION = 'v2.1.0';
 const CACHE_NAME = `tradeos-${CACHE_VERSION}`;
 const BUILD_TIMESTAMP = new Date().toISOString();
 
