@@ -1,5 +1,7 @@
 /**
- * TradeOS Service Worker v2.0
+ * TradeOS Service Worker v2.2.0
+ * 
+ * v1.1.2 Platform Parity Release
  * 
  * Features:
  * - Automatic update detection on new deployments
@@ -10,7 +12,7 @@
  */
 
 // Dynamic version based on build - will be replaced during build
-const CACHE_VERSION = 'v2.1.0';
+const CACHE_VERSION = 'v2.2.0';
 const CACHE_NAME = `tradeos-${CACHE_VERSION}`;
 const BUILD_TIMESTAMP = new Date().toISOString();
 

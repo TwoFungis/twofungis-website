@@ -2,18 +2,20 @@
  * EstimateWorkbench.jsx - Main Estimate Workbench Component
  * ==========================================================
  * 
- * Phase 2-4 of the Estimate Workbench Architecture.
- * Persistence: Uses localStorage for estimates (backend tables not yet provisioned).
+ * TRADEOS v1.1.2 - Platform Synchronization Release
+ * 
+ * Persistence: Supabase (primary) with localStorage fallback
  * 
  * Desktop: 3-panel layout
  * - Left: Library Browser
  * - Center: Estimate Builder
  * - Right: Live Summary
  * 
- * Mobile: Full-screen approach
+ * Mobile: Full-screen approach (FULL PARITY)
  * - Primary: Estimate list
  * - Library: Full-screen modal
  * - Summary: Bottom drawer
+ * - Details: Full-screen editor
  */
 
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
@@ -51,12 +53,14 @@ import {
   Calendar,
   Hash,
   Settings2,
-  StickyNote
+  StickyNote,
+  Cloud,
+  CloudOff
 } from 'lucide-react';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
-// LocalStorage keys
+// LocalStorage keys (fallback only)
 const STORAGE_KEY = 'tradeos_estimates';
 const CURRENT_ESTIMATE_KEY = 'tradeos_current_estimate';
 const COMPANY_PROFILE_KEY = 'tradeos_company_profile';
@@ -96,7 +100,7 @@ const defaultProjectInfo = {
   estimator: ''
 };
 
-// LocalStorage helpers for estimate persistence
+// LocalStorage helpers (FALLBACK ONLY - used when API fails)
 const loadEstimatesFromStorage = () => {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
@@ -174,6 +178,9 @@ const EstimateWorkbench = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
   const [showEstimateSelector, setShowEstimateSelector] = useState(false);
   
+  // Sync status indicator
+  const [syncStatus, setSyncStatus] = useState('synced'); // 'synced', 'syncing', 'offline'
+  
   // Get auth token helper
   const getAuthToken = useCallback(async () => {
     const { data: { session } } = await supabase.auth.getSession();
@@ -233,18 +240,122 @@ const EstimateWorkbench = () => {
     }
   }, [getAuthToken]);
   
-  // Fetch saved estimates list from localStorage
-  const fetchEstimates = useCallback(() => {
+  // Fetch saved estimates list from Supabase API (with localStorage fallback)
+  const fetchEstimates = useCallback(async () => {
     setIsLoadingEstimates(true);
-    const estimates = loadEstimatesFromStorage();
-    setSavedEstimates(estimates);
-    setIsLoadingEstimates(false);
-  }, []);
+    try {
+      const token = await getAuthToken();
+      
+      if (!token) {
+        // Fallback to localStorage if not authenticated
+        const estimates = loadEstimatesFromStorage();
+        setSavedEstimates(estimates);
+        setSyncStatus('offline');
+        setIsLoadingEstimates(false);
+        return;
+      }
+      
+      const response = await fetch(`${API_URL}/api/estimates?limit=100`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setSavedEstimates(data.estimates || []);
+        setSyncStatus('synced');
+        // Also cache in localStorage for offline access
+        saveEstimatesToStorage(data.estimates || []);
+      } else if (response.status === 500) {
+        // Database tables may not exist yet - use localStorage
+        console.warn('Estimates API returned 500, falling back to localStorage');
+        const estimates = loadEstimatesFromStorage();
+        setSavedEstimates(estimates);
+        setSyncStatus('offline');
+      } else {
+        throw new Error('Failed to fetch estimates');
+      }
+    } catch (error) {
+      console.error('Error fetching estimates:', error);
+      // Fallback to localStorage
+      const estimates = loadEstimatesFromStorage();
+      setSavedEstimates(estimates);
+      setSyncStatus('offline');
+    } finally {
+      setIsLoadingEstimates(false);
+    }
+  }, [getAuthToken]);
   
-  // Load a specific estimate from localStorage
-  const loadEstimate = useCallback((estimateId) => {
+  // Load a specific estimate from Supabase API (with localStorage fallback)
+  const loadEstimate = useCallback(async (estimateId) => {
     setIsLoading(true);
     try {
+      const token = await getAuthToken();
+      
+      if (token) {
+        // Try loading from API first
+        const response = await fetch(`${API_URL}/api/estimates/${estimateId}?include_items=true`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (response.ok) {
+          const estimate = await response.json();
+          
+          // Set estimate metadata from API response
+          setCurrentEstimateId(estimate.id);
+          setEstimateNumber(estimate.estimate_number);
+          setEstimateName(estimate.name);
+          setTaxRate(estimate.tax_rate ?? 5);
+          setMarkupPercent(estimate.markup_percent ?? 15);
+          setContingencyPercent(estimate.contingency_percent ?? 10);
+          setPricingProfile(estimate.pricing_profile || 'Standard');
+          
+          // Transform API line items to frontend format
+          const transformedLineItems = (estimate.line_items || []).map(item => ({
+            id: item.id,
+            standard_id: item.standard_id,
+            production_code: item.snapshot?.production_code || '',
+            production_name: item.snapshot?.production_name || '',
+            description: item.snapshot?.description || '',
+            scope: item.notes || '',
+            notes: item.notes || '',
+            unit: item.snapshot?.unit_of_measure || 'EA',
+            unit_price: item.unit_price || 0,
+            unit_price_override: item.unit_price_override,
+            quantity: item.quantity || 1,
+            domain_name: item.domain_name || 'Other',
+            domain_id: item.domain_id,
+            snapshot: item.snapshot
+          }));
+          setLineItems(transformedLineItems);
+          
+          // Restore extended metadata (stored in description/notes JSON or separate fields)
+          setClientInfo(estimate.client_info || defaultClientInfo);
+          setProjectInfo(estimate.project_info || defaultProjectInfo);
+          setCompanyProfileSnapshot(estimate.company_profile_snapshot || null);
+          setNotes(estimate.notes || '');
+          setClarifications(estimate.clarifications || '');
+          setInternalNotes(estimate.internal_notes || '');
+          
+          setHasUnsavedChanges(false);
+          setShowEstimateSelector(false);
+          setSyncStatus('synced');
+          
+          // Update URL
+          setSearchParams({ id: estimateId });
+          
+          toast.success(`Loaded: ${estimate.name}`);
+          setIsLoading(false);
+          return;
+        }
+      }
+      
+      // Fallback to localStorage
       const estimates = loadEstimatesFromStorage();
       const estimate = estimates.find(e => e.id === estimateId);
       
@@ -254,7 +365,7 @@ const EstimateWorkbench = () => {
         return;
       }
       
-      // Set estimate metadata
+      // Set estimate metadata from localStorage
       setCurrentEstimateId(estimate.id);
       setEstimateNumber(estimate.estimate_number);
       setEstimateName(estimate.name);
@@ -274,6 +385,7 @@ const EstimateWorkbench = () => {
       
       setHasUnsavedChanges(false);
       setShowEstimateSelector(false);
+      setSyncStatus('offline');
       
       // Update URL
       setSearchParams({ id: estimateId });
@@ -285,18 +397,20 @@ const EstimateWorkbench = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [setSearchParams]);
+  }, [getAuthToken, setSearchParams]);
   
-  // Save estimate to localStorage
-  const saveEstimate = useCallback(() => {
+  // Save estimate to Supabase API (with localStorage fallback)
+  const saveEstimate = useCallback(async () => {
     if (lineItems.length === 0) {
       toast.error('Add items before saving');
       return;
     }
     
     setIsSaving(true);
+    setSyncStatus('syncing');
+    
     try {
-      const estimates = loadEstimatesFromStorage();
+      const token = await getAuthToken();
       
       // Calculate totals with contingency
       const subtotal = lineItems.reduce((sum, item) => sum + (item.quantity * item.unit_price), 0);
@@ -314,15 +428,118 @@ const EstimateWorkbench = () => {
         // Create new estimate - preserve user-edited estimate number if provided
         estimateId = uuidv4();
         estNumber = (estimateNumber && estimateNumber.trim()) ? estimateNumber : generateEstimateNumber();
-        setCurrentEstimateId(estimateId);
-        setEstimateNumber(estNumber);
       }
       
       // Capture current company profile as snapshot
       const currentCompanyProfile = loadCompanyProfile();
+      const profileSnapshot = companyProfileSnapshot || currentCompanyProfile;
       if (!companyProfileSnapshot && currentCompanyProfile) {
         setCompanyProfileSnapshot(currentCompanyProfile);
       }
+      
+      // Prepare extended metadata as JSON (stored in estimate description)
+      const extendedMetadata = {
+        client_info: clientInfo,
+        project_info: projectInfo,
+        company_profile_snapshot: profileSnapshot,
+        pricing_profile: pricingProfile,
+        markup_percent: markupPercent,
+        contingency_percent: contingencyPercent,
+        clarifications,
+        internal_notes: internalNotes
+      };
+      
+      // Try to save to backend API
+      if (token) {
+        try {
+          let apiEstimateId = currentEstimateId;
+          
+          if (!currentEstimateId) {
+            // Create new estimate via API
+            const createResponse = await fetch(`${API_URL}/api/estimates`, {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                name: estimateName,
+                description: JSON.stringify(extendedMetadata),
+                tax_rate: taxRate,
+                markup_percent: markupPercent,
+                notes: notes
+              })
+            });
+            
+            if (createResponse.ok) {
+              const createdEstimate = await createResponse.json();
+              apiEstimateId = createdEstimate.id;
+              estNumber = createdEstimate.estimate_number;
+              setCurrentEstimateId(apiEstimateId);
+              setEstimateNumber(estNumber);
+              
+              // Add line items to the estimate
+              for (const item of lineItems) {
+                await fetch(`${API_URL}/api/estimates/${apiEstimateId}/items`, {
+                  method: 'POST',
+                  headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                    standard_id: item.standard_id,
+                    quantity: item.quantity,
+                    unit_price_override: item.unit_price_override,
+                    notes: item.scope || item.notes
+                  })
+                });
+              }
+              
+              setSyncStatus('synced');
+              setHasUnsavedChanges(false);
+              setSearchParams({ id: apiEstimateId });
+              toast.success('Estimate saved to cloud!');
+              
+              // Refresh estimates list
+              await fetchEstimates();
+              setIsSaving(false);
+              return;
+            }
+          } else {
+            // Update existing estimate via API
+            const updateResponse = await fetch(`${API_URL}/api/estimates/${currentEstimateId}`, {
+              method: 'PUT',
+              headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                name: estimateName,
+                description: JSON.stringify(extendedMetadata),
+                tax_rate: taxRate,
+                markup_percent: markupPercent,
+                notes: notes
+              })
+            });
+            
+            if (updateResponse.ok) {
+              setSyncStatus('synced');
+              setHasUnsavedChanges(false);
+              toast.success('Estimate synced to cloud!');
+              
+              // Refresh estimates list
+              await fetchEstimates();
+              setIsSaving(false);
+              return;
+            }
+          }
+        } catch (apiError) {
+          console.warn('API save failed, falling back to localStorage:', apiError);
+        }
+      }
+      
+      // Fallback to localStorage
+      const estimates = loadEstimatesFromStorage();
       
       const estimateData = {
         id: estimateId,
@@ -345,7 +562,7 @@ const EstimateWorkbench = () => {
         // Client & Project Info (Phase 1)
         client_info: clientInfo,
         project_info: projectInfo,
-        company_profile_snapshot: companyProfileSnapshot || currentCompanyProfile,
+        company_profile_snapshot: profileSnapshot,
         // Notes
         notes,
         clarifications,
@@ -366,19 +583,23 @@ const EstimateWorkbench = () => {
       // Save to localStorage
       saveEstimatesToStorage(estimates);
       setSavedEstimates(estimates);
+      setCurrentEstimateId(estimateId);
+      setEstimateNumber(estNumber);
       setHasUnsavedChanges(false);
+      setSyncStatus('offline');
       
       // Update URL
       setSearchParams({ id: estimateId });
       
-      toast.success('Estimate saved!');
+      toast.success('Estimate saved locally');
     } catch (error) {
       console.error('Error saving estimate:', error);
       toast.error('Failed to save estimate');
+      setSyncStatus('offline');
     } finally {
       setIsSaving(false);
     }
-  }, [currentEstimateId, estimateNumber, estimateName, lineItems, taxRate, markupPercent, contingencyPercent, pricingProfile, clientInfo, projectInfo, companyProfileSnapshot, notes, clarifications, internalNotes, setSearchParams]);
+  }, [currentEstimateId, estimateNumber, estimateName, lineItems, taxRate, markupPercent, contingencyPercent, pricingProfile, clientInfo, projectInfo, companyProfileSnapshot, notes, clarifications, internalNotes, setSearchParams, getAuthToken, fetchEstimates]);
   
   // Create new estimate with company defaults
   const createNewEstimate = useCallback(() => {
@@ -631,34 +852,79 @@ const EstimateWorkbench = () => {
     toast.success('Items cleared');
   }, [lineItems.length]);
   
-  // Mobile view
+  // Mobile view - Full PARITY with Desktop
   if (isMobile) {
     return (
       <MobileWorkbench
+        // Estimate Identity
         estimateName={estimateName}
         setEstimateName={(name) => {
           setEstimateName(name);
           setHasUnsavedChanges(true);
         }}
+        estimateNumber={estimateNumber}
+        setEstimateNumber={(num) => {
+          setEstimateNumber(num);
+          setHasUnsavedChanges(true);
+        }}
+        currentEstimateId={currentEstimateId}
+        
+        // Line Items & Library
         lineItems={lineItems}
         domains={domains}
         categories={categories}
         standards={standards}
         isLoadingLibrary={isLoadingLibrary}
+        
+        // Calculations
         calculations={calculations}
+        
+        // Pricing Configuration (PARITY)
         taxRate={taxRate}
+        setTaxRate={setTaxRate}
+        markupPercent={markupPercent}
+        setMarkupPercent={setMarkupPercent}
+        contingencyPercent={contingencyPercent}
+        setContingencyPercent={setContingencyPercent}
+        pricingProfile={pricingProfile}
+        setPricingProfile={setPricingProfile}
+        
+        // Client & Project Info (PARITY)
+        clientInfo={clientInfo}
+        setClientInfo={setClientInfo}
+        projectInfo={projectInfo}
+        setProjectInfo={setProjectInfo}
+        
+        // Company Profile (PARITY - for logo)
+        companyProfileSnapshot={companyProfileSnapshot || loadCompanyProfile()}
+        
+        // Notes (PARITY)
+        notes={notes}
+        setNotes={setNotes}
+        clarifications={clarifications}
+        setClarifications={setClarifications}
+        internalNotes={internalNotes}
+        setInternalNotes={setInternalNotes}
+        
+        // Actions
         onAddItem={handleAddItem}
         onUpdateItem={handleUpdateItem}
         onRemoveItem={handleRemoveItem}
         onExportPDF={handleExportPDF}
         onSave={saveEstimate}
+        
+        // State
         isSaving={isSaving}
         hasUnsavedChanges={hasUnsavedChanges}
-        currentEstimateId={currentEstimateId}
-        estimateNumber={estimateNumber}
         savedEstimates={savedEstimates}
         onLoadEstimate={loadEstimate}
         onNewEstimate={createNewEstimate}
+        
+        // Sync Status (PARITY)
+        syncStatus={syncStatus}
+        
+        // Track changes
+        onMarkUnsaved={() => setHasUnsavedChanges(true)}
       />
     );
   }
@@ -722,6 +988,26 @@ const EstimateWorkbench = () => {
                     <span>•</span>
                     <span className="text-neutral-400">{clientInfo.company}</span>
                   </>
+                )}
+                {/* Sync Status Indicator */}
+                <span>•</span>
+                {syncStatus === 'synced' && (
+                  <span className="flex items-center gap-1 text-emerald-400" title="Synced to cloud">
+                    <Cloud className="w-3 h-3" />
+                    <span>Synced</span>
+                  </span>
+                )}
+                {syncStatus === 'syncing' && (
+                  <span className="flex items-center gap-1 text-blue-400" title="Syncing...">
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                    <span>Syncing</span>
+                  </span>
+                )}
+                {syncStatus === 'offline' && (
+                  <span className="flex items-center gap-1 text-amber-400" title="Saved locally">
+                    <CloudOff className="w-3 h-3" />
+                    <span>Local</span>
+                  </span>
                 )}
               </div>
             </div>
