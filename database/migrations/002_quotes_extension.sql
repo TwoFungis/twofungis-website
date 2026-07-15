@@ -13,7 +13,6 @@
 -- =====================================================
 
 -- Add organization_id for proper multi-tenant isolation
--- (Currently quotes only has user_id)
 ALTER TABLE public.quotes 
     ADD COLUMN IF NOT EXISTS organization_id UUID;
 
@@ -24,7 +23,7 @@ ALTER TABLE public.quotes
     ADD COLUMN IF NOT EXISTS pricing_profile VARCHAR(20) DEFAULT 'Standard',
     ADD COLUMN IF NOT EXISTS tax_rate DECIMAL(5,2) DEFAULT 5.00;
 
--- Add extended metadata columns (replaces storing in description JSON)
+-- Add extended metadata columns
 ALTER TABLE public.quotes 
     ADD COLUMN IF NOT EXISTS client_info JSONB,
     ADD COLUMN IF NOT EXISTS project_info JSONB,
@@ -54,7 +53,7 @@ BEGIN
     END IF;
 END $$;
 
--- Backfill organization_id from user's primary organization
+-- Backfill organization_id from user primary organization
 UPDATE public.quotes q
 SET organization_id = (
     SELECT om.organization_id 
@@ -70,24 +69,19 @@ WHERE q.organization_id IS NULL;
 -- EXTEND QUOTE_LINE_ITEMS TABLE
 -- =====================================================
 
--- Add domain reference for grouping
 ALTER TABLE public.quote_line_items 
     ADD COLUMN IF NOT EXISTS domain_id UUID,
     ADD COLUMN IF NOT EXISTS domain_name VARCHAR(100);
 
--- Add production library reference
 ALTER TABLE public.quote_line_items 
     ADD COLUMN IF NOT EXISTS standard_id UUID;
 
--- Add unit price override tracking
 ALTER TABLE public.quote_line_items 
     ADD COLUMN IF NOT EXISTS unit_price_override DECIMAL(12,2);
 
--- Add pricing snapshot (immutable record of pricing at add time)
 ALTER TABLE public.quote_line_items 
     ADD COLUMN IF NOT EXISTS snapshot JSONB;
 
--- Add created_at if not exists
 ALTER TABLE public.quote_line_items 
     ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW();
 
@@ -111,25 +105,21 @@ CREATE INDEX IF NOT EXISTS idx_quote_line_items_standard
 -- ROW LEVEL SECURITY POLICY UPDATES
 -- =====================================================
 
--- Enable RLS if not already enabled
 ALTER TABLE public.quotes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.quote_line_items ENABLE ROW LEVEL SECURITY;
 
--- Drop existing policies if they exist (idempotent)
+-- Drop existing policies
 DROP POLICY IF EXISTS "Users can view own quotes" ON public.quotes;
 DROP POLICY IF EXISTS "Users can create own quotes" ON public.quotes;
 DROP POLICY IF EXISTS "Users can update own quotes" ON public.quotes;
 DROP POLICY IF EXISTS "Users can delete own quotes" ON public.quotes;
+DROP POLICY IF EXISTS quotes_org_select ON public.quotes;
+DROP POLICY IF EXISTS quotes_org_insert ON public.quotes;
+DROP POLICY IF EXISTS quotes_org_update ON public.quotes;
+DROP POLICY IF EXISTS quotes_org_delete ON public.quotes;
 
-DROP POLICY IF EXISTS "quotes_org_select" ON public.quotes;
-DROP POLICY IF EXISTS "quotes_org_insert" ON public.quotes;
-DROP POLICY IF EXISTS "quotes_org_update" ON public.quotes;
-DROP POLICY IF EXISTS "quotes_org_delete" ON public.quotes;
-
--- Create new organization-scoped policies
--- Note: Uses user_id directly OR organization_id through organization_members
-
-CREATE POLICY "quotes_org_select" ON public.quotes
+-- Create organization-scoped policies for quotes
+CREATE POLICY quotes_org_select ON public.quotes
     FOR SELECT USING (
         user_id = auth.uid()
         OR organization_id IN (
@@ -138,7 +128,7 @@ CREATE POLICY "quotes_org_select" ON public.quotes
         )
     );
 
-CREATE POLICY "quotes_org_insert" ON public.quotes
+CREATE POLICY quotes_org_insert ON public.quotes
     FOR INSERT WITH CHECK (
         user_id = auth.uid()
         OR organization_id IN (
@@ -147,7 +137,7 @@ CREATE POLICY "quotes_org_insert" ON public.quotes
         )
     );
 
-CREATE POLICY "quotes_org_update" ON public.quotes
+CREATE POLICY quotes_org_update ON public.quotes
     FOR UPDATE USING (
         user_id = auth.uid()
         OR organization_id IN (
@@ -156,7 +146,7 @@ CREATE POLICY "quotes_org_update" ON public.quotes
         )
     );
 
-CREATE POLICY "quotes_org_delete" ON public.quotes
+CREATE POLICY quotes_org_delete ON public.quotes
     FOR DELETE USING (
         user_id = auth.uid()
         OR organization_id IN (
@@ -165,18 +155,18 @@ CREATE POLICY "quotes_org_delete" ON public.quotes
         )
     );
 
--- Line items inherit quote access through foreign key
+-- Drop existing line item policies
 DROP POLICY IF EXISTS "Users can view own quote items" ON public.quote_line_items;
 DROP POLICY IF EXISTS "Users can create own quote items" ON public.quote_line_items;
 DROP POLICY IF EXISTS "Users can update own quote items" ON public.quote_line_items;
 DROP POLICY IF EXISTS "Users can delete own quote items" ON public.quote_line_items;
+DROP POLICY IF EXISTS quote_items_inherit_access ON public.quote_line_items;
+DROP POLICY IF EXISTS quote_items_inherit_insert ON public.quote_line_items;
+DROP POLICY IF EXISTS quote_items_inherit_update ON public.quote_line_items;
+DROP POLICY IF EXISTS quote_items_inherit_delete ON public.quote_line_items;
 
-DROP POLICY IF EXISTS "quote_items_inherit_access" ON public.quote_line_items;
-DROP POLICY IF EXISTS "quote_items_inherit_insert" ON public.quote_line_items;
-DROP POLICY IF EXISTS "quote_items_inherit_update" ON public.quote_line_items;
-DROP POLICY IF EXISTS "quote_items_inherit_delete" ON public.quote_line_items;
-
-CREATE POLICY "quote_items_inherit_access" ON public.quote_line_items
+-- Create policies for line items
+CREATE POLICY quote_items_inherit_access ON public.quote_line_items
     FOR SELECT USING (
         quote_id IN (SELECT id FROM public.quotes WHERE 
             user_id = auth.uid() OR organization_id IN (
@@ -186,7 +176,7 @@ CREATE POLICY "quote_items_inherit_access" ON public.quote_line_items
         )
     );
 
-CREATE POLICY "quote_items_inherit_insert" ON public.quote_line_items
+CREATE POLICY quote_items_inherit_insert ON public.quote_line_items
     FOR INSERT WITH CHECK (
         quote_id IN (SELECT id FROM public.quotes WHERE 
             user_id = auth.uid() OR organization_id IN (
@@ -196,7 +186,7 @@ CREATE POLICY "quote_items_inherit_insert" ON public.quote_line_items
         )
     );
 
-CREATE POLICY "quote_items_inherit_update" ON public.quote_line_items
+CREATE POLICY quote_items_inherit_update ON public.quote_line_items
     FOR UPDATE USING (
         quote_id IN (SELECT id FROM public.quotes WHERE 
             user_id = auth.uid() OR organization_id IN (
@@ -206,7 +196,7 @@ CREATE POLICY "quote_items_inherit_update" ON public.quote_line_items
         )
     );
 
-CREATE POLICY "quote_items_inherit_delete" ON public.quote_line_items
+CREATE POLICY quote_items_inherit_delete ON public.quote_line_items
     FOR DELETE USING (
         quote_id IN (SELECT id FROM public.quotes WHERE 
             user_id = auth.uid() OR organization_id IN (
@@ -235,20 +225,10 @@ CREATE TRIGGER quotes_updated_at_trigger
     EXECUTE FUNCTION update_quotes_updated_at();
 
 -- =====================================================
--- VERIFICATION QUERIES
+-- VERIFICATION QUERIES (run after migration)
 -- =====================================================
--- Run these to verify the migration:
+-- SELECT column_name, data_type FROM information_schema.columns 
+-- WHERE table_name = 'quotes' ORDER BY ordinal_position;
 --
--- SELECT column_name, data_type, column_default 
--- FROM information_schema.columns 
--- WHERE table_name = 'quotes' 
--- ORDER BY ordinal_position;
---
--- SELECT column_name, data_type, column_default 
--- FROM information_schema.columns 
--- WHERE table_name = 'quote_line_items' 
--- ORDER BY ordinal_position;
---
--- SELECT policyname, cmd, qual 
--- FROM pg_policies 
+-- SELECT policyname, cmd FROM pg_policies 
 -- WHERE tablename IN ('quotes', 'quote_line_items');
