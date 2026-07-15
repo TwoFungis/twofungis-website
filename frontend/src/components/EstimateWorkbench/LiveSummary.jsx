@@ -30,6 +30,7 @@ const LiveSummary = ({
   taxRate = 5, // GST default
   markupPercent = 15,
   contingencyPercent = 10,
+  pricingProfile = 'Standard',
   onExportPDF,
   onSendToClient,
   isCollapsed = false,
@@ -105,6 +106,18 @@ const LiveSummary = ({
       
       {/* Calculations */}
       <div className="flex-1 p-4 space-y-4">
+        {/* Pricing Profile Badge */}
+        <div className="flex items-center justify-between py-2">
+          <span className="text-sm text-neutral-400">Pricing Profile</span>
+          <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+            pricingProfile === 'Premium' ? 'bg-purple-500/10 text-purple-400' :
+            pricingProfile === 'Low' ? 'bg-blue-500/10 text-blue-400' :
+            'bg-emerald-500/10 text-emerald-400'
+          }`}>
+            {pricingProfile}
+          </span>
+        </div>
+        
         {/* Item Count */}
         <div className="flex items-center justify-between py-2">
           <span className="text-sm text-neutral-400">Items</span>

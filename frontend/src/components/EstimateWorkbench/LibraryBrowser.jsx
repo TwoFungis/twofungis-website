@@ -9,10 +9,11 @@
  * - Collapsible tree navigation
  * - Search/filter
  * - Click to add to estimate
- * - Drag-and-drop to estimate builder
+ * - Scroll position preservation after adding items
+ * - Independent scrolling from other panels
  */
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useRef } from 'react';
 import {
   Library,
   Search,
@@ -37,6 +38,9 @@ const LibraryBrowser = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedDomains, setExpandedDomains] = useState(new Set());
   const [expandedCategories, setExpandedCategories] = useState(new Set());
+  
+  // Ref for scroll position preservation
+  const scrollContainerRef = useRef(null);
   
   // Build hierarchical structure
   const treeData = useMemo(() => {
@@ -143,7 +147,17 @@ const LibraryBrowser = ({
   };
   
   const handleAddStandard = (standard) => {
+    // Preserve scroll position before adding
+    const scrollTop = scrollContainerRef.current?.scrollTop || 0;
+    
     onAddToEstimate?.(standard);
+    
+    // Restore scroll position after React re-render
+    requestAnimationFrame(() => {
+      if (scrollContainerRef.current) {
+        scrollContainerRef.current.scrollTop = scrollTop;
+      }
+    });
   };
   
   if (isCollapsed) {
@@ -191,8 +205,12 @@ const LibraryBrowser = ({
         </div>
       </div>
       
-      {/* Tree */}
-      <div className="flex-1 overflow-y-auto p-2">
+      {/* Tree - Independent scrolling container */}
+      <div 
+        ref={scrollContainerRef}
+        className="flex-1 overflow-y-auto overscroll-contain p-2"
+        style={{ scrollbarGutter: 'stable' }}
+      >
         {isLoading ? (
           <div className="flex items-center justify-center py-8">
             <div className="w-6 h-6 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin" />

@@ -463,25 +463,61 @@ const EstimateWorkbench = () => {
     } else {
       const domain = domains.find(d => d.id === standard.knowledge_domain_id);
       
+      // Get unit from measurement_units relation or fallback
+      const unit = standard.measurement_units?.code || standard.unit_of_measure || standard.unit || 'EA';
+      
+      // Get pricing from Production Library based on selected Pricing Profile
+      // Production Library stores: low_labour_rate, standard_rate, premium_labour_rate/premium_rate
+      let selectedRate = 0;
+      switch (pricingProfile) {
+        case 'Low':
+          selectedRate = standard.low_labour_rate || standard.standard_rate || 0;
+          break;
+        case 'Premium':
+          selectedRate = standard.premium_labour_rate || standard.premium_rate || standard.standard_rate || 0;
+          break;
+        case 'Standard':
+        default:
+          selectedRate = standard.standard_rate || standard.low_labour_rate || 0;
+          break;
+      }
+      
+      // Fallback to legacy price fields if no rates set
+      if (selectedRate === 0) {
+        selectedRate = standard.price_per_unit || standard.labor_price || 0;
+      }
+      
       const newItem = {
         id: uuidv4(),
         standard_id: standard.id,
         production_code: standard.production_code,
         production_name: standard.production_name,
         description: standard.description,
-        unit: standard.unit_of_measure || standard.unit || 'ea',
-        unit_price: standard.price_per_unit || standard.labor_price || 0,
+        scope: '', // User-editable scope description
+        notes: '', // User-editable notes
+        unit: unit,
+        unit_price: selectedRate,
+        unit_price_override: null, // Tracks if user manually overrode price
         quantity: 1,
         domain_name: domain?.name || 'Other',
         domain_id: standard.knowledge_domain_id,
+        pricing_profile_at_add: pricingProfile, // Track which profile was used
+        // Immutable snapshot of all pricing data at time of addition
         snapshot: {
           production_code: standard.production_code,
           production_name: standard.production_name,
           description: standard.description,
-          unit_of_measure: standard.unit_of_measure || 'ea',
-          price_per_unit: standard.price_per_unit || standard.labor_price || 0,
-          material_price: standard.material_price || 0,
-          labor_price: standard.labor_price || 0,
+          unit: unit,
+          // All pricing tiers captured (Production Library is single source of truth)
+          low_rate: standard.low_labour_rate || 0,
+          standard_rate: standard.standard_rate || 0,
+          premium_rate: standard.premium_labour_rate || standard.premium_rate || 0,
+          complex_rate: standard.complex_rate || 0,
+          // Legacy fields for compatibility
+          price_per_unit: standard.price_per_unit || 0,
+          material_price: standard.material_price || standard.material_rate || 0,
+          labor_price: standard.labor_price || standard.standard_rate || 0,
+          // Timestamp for audit trail
           captured_at: new Date().toISOString()
         }
       };
@@ -490,13 +526,21 @@ const EstimateWorkbench = () => {
       toast.success(`Added ${standard.production_name}`);
     }
     setHasUnsavedChanges(true);
-  }, [lineItems, domains]);
+  }, [lineItems, domains, pricingProfile]);
   
-  // Update line item
+  // Update line item (tracks manual price overrides)
   const handleUpdateItem = useCallback((itemId, updates) => {
-    setLineItems(prev => prev.map(item => 
-      item.id === itemId ? { ...item, ...updates } : item
-    ));
+    setLineItems(prev => prev.map(item => {
+      if (item.id !== itemId) return item;
+      
+      // Track if user manually changed the unit_price
+      let updatedItem = { ...item, ...updates };
+      if (updates.unit_price !== undefined && updates.unit_price !== item.unit_price) {
+        updatedItem.unit_price_override = updates.unit_price;
+      }
+      
+      return updatedItem;
+    }));
     setHasUnsavedChanges(true);
     toast.success('Item updated');
   }, []);
@@ -538,7 +582,7 @@ const EstimateWorkbench = () => {
     };
   }, [lineItems, taxRate, markupPercent, contingencyPercent]);
   
-  // Export PDF
+  // Export PDF with all professional metadata
   const handleExportPDF = useCallback(() => {
     if (lineItems.length === 0) {
       toast.error('Add items to the estimate before exporting');
@@ -546,21 +590,23 @@ const EstimateWorkbench = () => {
     }
     
     try {
+      // Use company profile snapshot if saved, otherwise load current profile
+      const company = companyProfileSnapshot || loadCompanyProfile() || {};
+      
       const fileName = downloadEstimatePDF({
         estimateName,
         estimateNumber,
         lineItems,
         calculations,
+        companyProfile: company,
+        clientInfo,
+        projectInfo,
+        pricingProfile,
         taxRate,
         markupPercent,
-        company: {
-          name: 'Two Fungis Finishing',
-          address: '',
-          phone: '',
-          email: ''
-        },
-        client: null,
-        notes: ''
+        contingencyPercent,
+        notes,
+        clarifications
       });
       
       toast.success(`PDF exported: ${fileName}`);
@@ -568,7 +614,7 @@ const EstimateWorkbench = () => {
       console.error('PDF export error:', error);
       toast.error('Failed to export PDF');
     }
-  }, [estimateName, estimateNumber, lineItems, calculations, taxRate, markupPercent]);
+  }, [estimateName, estimateNumber, lineItems, calculations, companyProfileSnapshot, clientInfo, projectInfo, pricingProfile, taxRate, markupPercent, contingencyPercent, notes, clarifications]);
   
   // Send to client (placeholder)
   const handleSendToClient = useCallback(() => {
@@ -1139,6 +1185,7 @@ const EstimateWorkbench = () => {
           onUpdateItem={handleUpdateItem}
           onRemoveItem={handleRemoveItem}
           onReorderItems={handleReorderItems}
+          pricingProfile={pricingProfile}
           isEditing={true}
         />
         
@@ -1148,6 +1195,7 @@ const EstimateWorkbench = () => {
           taxRate={taxRate}
           markupPercent={markupPercent}
           contingencyPercent={contingencyPercent}
+          pricingProfile={pricingProfile}
           onExportPDF={handleExportPDF}
           onSendToClient={handleSendToClient}
           isCollapsed={isSummaryCollapsed}
