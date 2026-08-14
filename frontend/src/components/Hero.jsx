@@ -27,14 +27,14 @@ const Hero = () => {
           </div>
 
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-6" style={{ fontFamily: 'Bebas Neue, sans-serif' }}>
-            Premium Quality <span className="text-red-600">Finish Carpentry</span>
+            Specializing in <span className="text-red-600">Finishing and Completions.</span>
           </h1>
 
           <p className="text-lg sm:text-xl text-gray-200 mb-4 max-w-3xl mx-auto leading-relaxed" style={{ fontFamily: 'Open Sans, sans-serif' }}>
             Two Fungis Finishing is a British Columbia finishing contractor supporting general contractors, developers, construction managers and homeowners across the province. Finish carpentry, architectural millwork, doors &amp; hardware, deficiency completion and interior finishing — delivered with clear communication, careful scope review, and workmanship we stand behind.
           </p>
           <p className="text-sm text-gray-400 mb-8 max-w-2xl mx-auto italic" style={{ fontFamily: 'Open Sans, sans-serif' }}>
-            Committed to raising the standard of finish carpentry — and the client experience that comes with it.
+            From finish carpentry through punch-list and closeout — organized, communicative, and seen through to completion.
           </p>
 
           {/* CTA Buttons */}
