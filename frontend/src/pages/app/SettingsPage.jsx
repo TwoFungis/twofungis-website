@@ -586,7 +586,7 @@ const SettingsPage = () => {
               <h3 className="text-lg font-bold text-white">Pro</h3>
               <p className="text-gray-400 text-sm mb-2">For growing trades getting organized.</p>
               <p className="text-2xl font-bold text-white mb-4">
-                $29<span className="text-sm text-gray-400">/month</span>
+                $69<span className="text-sm text-gray-400">/month</span>
               </p>
               <ul className="space-y-2 text-sm text-gray-300 mb-4">
                 <li className="flex items-center gap-2"><Check className="w-4 h-4 text-success" /> Unlimited projects</li>
@@ -622,7 +622,7 @@ const SettingsPage = () => {
               </div>
               <p className="text-gray-400 text-sm mb-2">For contractors running serious operations.</p>
               <p className="text-2xl font-bold text-white mb-4">
-                $59<span className="text-sm text-gray-400">/month</span>
+                $99<span className="text-sm text-gray-400">/month</span>
               </p>
               <ul className="space-y-2 text-sm text-gray-300 mb-4">
                 <li className="flex items-center gap-2"><Check className="w-4 h-4 text-success" /> Everything in Pro</li>

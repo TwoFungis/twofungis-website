@@ -291,7 +291,7 @@ async def get_plans():
         "PRO": {
             "name": "Pro",
             "tagline": "For growing trades getting organized.",
-            "price": 39,
+            "price": 69,
             "currency": "CAD",
             "interval": "month",
             "mode": "subscription",
@@ -307,7 +307,7 @@ async def get_plans():
         "ELITE": {
             "name": "Elite",
             "tagline": "Built for contractors running serious operations.",
-            "price": 59,
+            "price": 99,
             "currency": "CAD",
             "interval": "month",
             "mode": "subscription",

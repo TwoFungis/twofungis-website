@@ -89,7 +89,7 @@ const TrialExpiredModal = () => {
             <div className="border border-charcoal-600 rounded-lg p-4">
               <h4 className="font-bold text-white mb-1">Pro</h4>
               <p className="text-2xl font-bold text-steel-400 mb-2">
-                $49<span className="text-sm text-gray-500">/mo</span>
+                $69<span className="text-sm text-gray-500">/mo</span>
               </p>
               <p className="text-xs text-gray-500">Perfect for growing trades</p>
             </div>

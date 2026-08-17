@@ -141,7 +141,7 @@ const LandingPage = () => {
   const plans = [
     {
       name: 'Pro',
-      price: '$39',
+      price: '$69',
       period: '/month',
       description: 'For growing contractors getting organized.',
       features: [
@@ -156,7 +156,7 @@ const LandingPage = () => {
     },
     {
       name: 'Elite',
-      price: '$79',
+      price: '$99',
       period: '/month',
       description: 'For established contractors scaling up.',
       popular: true,
