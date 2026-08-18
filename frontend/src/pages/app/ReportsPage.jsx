@@ -8,6 +8,7 @@ import { useAuthStore } from '../../store/authStore';
 import { supabase } from '../../lib/supabase';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
+import PRICING from '../../config/pricingConfig';
 
 const ReportsPage = () => {
   const { profile, user } = useAuthStore();
@@ -295,7 +296,7 @@ const ReportsPage = () => {
             className="inline-block bg-steel-500 hover:bg-steel-600 text-white px-6 py-3 rounded-lg font-medium transition-colors"
             data-testid="upgrade-to-elite-btn"
           >
-            Upgrade to Elite - $99/mo
+            Upgrade to Elite - {PRICING.plans.ELITE.displayPrice}/mo
           </a>
         </div>
       </div>

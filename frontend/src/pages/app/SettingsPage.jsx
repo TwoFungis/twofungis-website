@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import ServiceWorkerUpdateService from '../../services/ServiceWorkerUpdateService';
 import PWAInstallService from '../../services/PWAInstallService';
 import CompanyProfile from '../../components/settings/CompanyProfile';
+import PRICING from '../../config/pricingConfig';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -583,10 +584,10 @@ const SettingsPage = () => {
             <div className={`rounded-lg border p-4 ${
               profile?.subscription_tier === 'pro' ? 'border-steel-500 bg-steel-500/10' : 'border-charcoal-600'
             }`}>
-              <h3 className="text-lg font-bold text-white">Pro</h3>
-              <p className="text-gray-400 text-sm mb-2">For growing trades getting organized.</p>
+              <h3 className="text-lg font-bold text-white">{PRICING.plans.PRO.name}</h3>
+              <p className="text-gray-400 text-sm mb-2">{PRICING.plans.PRO.description}</p>
               <p className="text-2xl font-bold text-white mb-4">
-                $69<span className="text-sm text-gray-400">/month</span>
+                {PRICING.plans.PRO.displayPrice}<span className="text-sm text-gray-400">{PRICING.plans.PRO.period}</span>
               </p>
               <ul className="space-y-2 text-sm text-gray-300 mb-4">
                 <li className="flex items-center gap-2"><Check className="w-4 h-4 text-success" /> Unlimited projects</li>
@@ -617,12 +618,12 @@ const SettingsPage = () => {
               profile?.subscription_tier === 'elite' ? 'border-purple-500 bg-purple-500/10' : 'border-charcoal-600'
             }`}>
               <div className="flex items-center gap-2 mb-1">
-                <h3 className="text-lg font-bold text-white">Elite</h3>
+                <h3 className="text-lg font-bold text-white">{PRICING.plans.ELITE.name}</h3>
                 <Crown className="w-4 h-4 text-warning" />
               </div>
-              <p className="text-gray-400 text-sm mb-2">For contractors running serious operations.</p>
+              <p className="text-gray-400 text-sm mb-2">{PRICING.plans.ELITE.description}</p>
               <p className="text-2xl font-bold text-white mb-4">
-                $99<span className="text-sm text-gray-400">/month</span>
+                {PRICING.plans.ELITE.displayPrice}<span className="text-sm text-gray-400">{PRICING.plans.ELITE.period}</span>
               </p>
               <ul className="space-y-2 text-sm text-gray-300 mb-4">
                 <li className="flex items-center gap-2"><Check className="w-4 h-4 text-success" /> Everything in Pro</li>

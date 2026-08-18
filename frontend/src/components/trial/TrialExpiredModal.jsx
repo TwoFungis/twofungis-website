@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Lock, Crown, Zap, Check, X } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
+import PRICING from '../../config/pricingConfig';
 
 const TrialExpiredModal = () => {
   const { profile } = useAuthStore();
@@ -56,7 +57,7 @@ const TrialExpiredModal = () => {
               <div>
                 <p className="text-white font-medium">Your data is safe!</p>
                 <p className="text-sm text-gray-400">
-                  All your projects, invoices, and expenses are preserved. They'll be waiting for you when you upgrade.
+                  All your projects, invoices, and expenses are preserved. They&apos;ll be waiting for you when you upgrade.
                 </p>
               </div>
             </div>
@@ -87,19 +88,19 @@ const TrialExpiredModal = () => {
           {/* Plans */}
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div className="border border-charcoal-600 rounded-lg p-4">
-              <h4 className="font-bold text-white mb-1">Pro</h4>
+              <h4 className="font-bold text-white mb-1">{PRICING.plans.PRO.name}</h4>
               <p className="text-2xl font-bold text-steel-400 mb-2">
-                $69<span className="text-sm text-gray-500">/mo</span>
+                {PRICING.plans.PRO.displayPrice}<span className="text-sm text-gray-500">/mo</span>
               </p>
               <p className="text-xs text-gray-500">Perfect for growing trades</p>
             </div>
             <div className="border border-purple-500/50 rounded-lg p-4 bg-purple-500/5">
               <div className="flex items-center gap-1 mb-1">
-                <h4 className="font-bold text-white">Elite</h4>
+                <h4 className="font-bold text-white">{PRICING.plans.ELITE.name}</h4>
                 <Crown className="w-4 h-4 text-warning" />
               </div>
               <p className="text-2xl font-bold text-purple-400 mb-2">
-                $99<span className="text-sm text-gray-500">/mo</span>
+                {PRICING.plans.ELITE.displayPrice}<span className="text-sm text-gray-500">/mo</span>
               </p>
               <p className="text-xs text-gray-500">For serious operations</p>
             </div>

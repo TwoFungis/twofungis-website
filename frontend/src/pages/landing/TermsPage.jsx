@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Building2, ArrowLeft } from 'lucide-react';
+import PRICING from '../../config/pricingConfig';
 
 const TermsPage = () => {
   return (
@@ -51,8 +52,8 @@ const TermsPage = () => {
             <h2 className="text-2xl font-semibold text-white mt-8 mb-4">4. Subscription and Billing</h2>
             <p>TradeOS offers the following subscription plans:</p>
             <ul className="list-disc pl-6 space-y-2">
-              <li><strong>Pro Plan:</strong> $69/month - Core features for managing projects</li>
-              <li><strong>Elite Plan:</strong> $99/month - Advanced reporting and priority support</li>
+              <li><strong>Pro Plan:</strong> {PRICING.plans.PRO.displayPrice}/month - Core features for managing projects</li>
+              <li><strong>Elite Plan:</strong> {PRICING.plans.ELITE.displayPrice}/month - Advanced reporting and priority support</li>
             </ul>
             <p className="mt-4">All plans include a 30-day free trial. Subscriptions auto-renew monthly unless cancelled. You may cancel at any time from your account settings.</p>
           </section>

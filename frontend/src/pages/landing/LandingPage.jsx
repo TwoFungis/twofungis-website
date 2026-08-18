@@ -28,6 +28,7 @@ import PWAInstallModal from '../../components/app/PWAInstallModal';
 import PWAInstallService from '../../services/PWAInstallService';
 import PrivateBetaModal from '../../components/beta/PrivateBetaModal';
 import { BETA_CONFIG } from '../../config/betaConfig';
+import PRICING from '../../config/pricingConfig';
 
 // Background images
 const IMAGES = {
@@ -174,37 +175,22 @@ const LandingPage = () => {
     }
   ];
 
+  // Plans from centralized pricing config
   const plans = [
     {
-      name: 'Pro',
-      price: '$69',
-      period: '/month',
-      description: 'For growing contractors getting organized.',
-      features: [
-        'Unlimited projects',
-        'Estimating & invoicing',
-        'Expense tracking',
-        'Milestone management',
-        'Document vault (5GB)',
-        'Basic reporting',
-        'Email support'
-      ]
+      name: PRICING.plans.PRO.name,
+      price: PRICING.plans.PRO.displayPrice,
+      period: PRICING.plans.PRO.period,
+      description: PRICING.plans.PRO.description,
+      features: PRICING.plans.PRO.features
     },
     {
-      name: 'Elite',
-      price: '$99',
-      period: '/month',
-      description: 'For established contractors scaling up.',
-      popular: true,
-      features: [
-        'Everything in Pro',
-        'Company Brain AI',
-        'Advanced analytics',
-        'Document vault (50GB)',
-        'Team management',
-        'Priority support',
-        'API access'
-      ]
+      name: PRICING.plans.ELITE.name,
+      price: PRICING.plans.ELITE.displayPrice,
+      period: PRICING.plans.ELITE.period,
+      description: PRICING.plans.ELITE.description,
+      popular: PRICING.plans.ELITE.popular,
+      features: PRICING.plans.ELITE.features
     }
   ];
 
