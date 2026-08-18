@@ -21,6 +21,8 @@ logger = logging.getLogger(__name__)
 # CONFIGURATION
 # =============================================================================
 
+# Private Beta Mode - disable public checkout when true
+PRIVATE_BETA_MODE = os.environ.get('PRIVATE_BETA_MODE', 'true').lower() == 'true'
 
 # Stripe Price IDs
 STRIPE_PRICE_IDS = {
@@ -355,6 +357,13 @@ async def get_lifetime_seats_endpoint():
 @router.post("/create-checkout-session", response_model=CreateCheckoutResponse)
 async def create_checkout_session(request: CreateCheckoutRequest):
     """Create a Stripe checkout session for subscription or one-time payment"""
+    
+    # === PRIVATE BETA MODE CHECK ===
+    if PRIVATE_BETA_MODE:
+        raise HTTPException(
+            status_code=403, 
+            detail="TradeOS is currently in private beta. Public subscriptions are not yet available."
+        )
     
     if not config.STRIPE_SECRET_KEY:
         raise HTTPException(status_code=500, detail="Stripe not configured")

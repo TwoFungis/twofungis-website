@@ -5,6 +5,8 @@ import { useAuthStore } from '../../store/authStore';
 import { LogoLink } from '../../components/ui/Logo';
 import PWAInstallModal from '../../components/app/PWAInstallModal';
 import PWAInstallService from '../../services/PWAInstallService';
+import { BETA_CONFIG } from '../../config/betaConfig';
+import PrivateBetaModal from '../../components/beta/PrivateBetaModal';
 
 // Google icon component
 const GoogleIcon = () => (
@@ -31,6 +33,7 @@ const GoogleIcon = () => (
 const SignUpPage = () => {
   const [searchParams] = useSearchParams();
   const selectedPlan = searchParams.get('plan') || 'pro';
+  const navigate = useNavigate();
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -42,13 +45,41 @@ const SignUpPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [showPWAModal, setShowPWAModal] = useState(false);
-  const { signUp } = useAuthStore();
-  const navigate = useNavigate();
+  const [showBetaModal, setShowBetaModal] = useState(false);
+  const { signUp, user } = useAuthStore();
+
+  // Redirect to landing if in private beta mode (unless already logged in)
+  useEffect(() => {
+    if (BETA_CONFIG.enabled && !BETA_CONFIG.allowPublicRegistration && !user) {
+      setShowBetaModal(true);
+    }
+  }, [user]);
 
   // Initialize PWA service
   useEffect(() => {
     PWAInstallService.init();
   }, []);
+
+  const handleBetaModalClose = () => {
+    setShowBetaModal(false);
+    navigate('/');
+  };
+
+  const handleDeveloperAccess = () => {
+    setShowBetaModal(false);
+    navigate('/login');
+  };
+
+  // Block registration in private beta mode
+  if (BETA_CONFIG.enabled && !BETA_CONFIG.allowPublicRegistration && !user) {
+    return (
+      <PrivateBetaModal 
+        isOpen={true}
+        onClose={handleBetaModalClose}
+        onDeveloperAccess={handleDeveloperAccess}
+      />
+    );
+  }
 
   const handleGoogleSignUp = () => {
     setIsGoogleLoading(true);

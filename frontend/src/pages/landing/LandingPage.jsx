@@ -20,11 +20,14 @@ import {
   Star,
   Download,
   Zap,
-  ExternalLink
+  ExternalLink,
+  AlertTriangle
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import PWAInstallModal from '../../components/app/PWAInstallModal';
 import PWAInstallService from '../../services/PWAInstallService';
+import PrivateBetaModal from '../../components/beta/PrivateBetaModal';
+import { BETA_CONFIG } from '../../config/betaConfig';
 
 // Background images
 const IMAGES = {
@@ -37,6 +40,7 @@ const LandingPage = () => {
   const { user } = useAuthStore();
   const navigate = useNavigate();
   const [showPWAModal, setShowPWAModal] = useState(false);
+  const [showBetaModal, setShowBetaModal] = useState(false);
   const [isAppInstalled, setIsAppInstalled] = useState(false);
 
   // Check if app is already installed
@@ -55,14 +59,32 @@ const LandingPage = () => {
     return unsubscribe;
   }, []);
 
+  // Handle public access attempts - show beta modal if in private beta
+  const handlePublicAccessClick = (e) => {
+    if (BETA_CONFIG.enabled && !user) {
+      e.preventDefault();
+      setShowBetaModal(true);
+      return true;
+    }
+    return false;
+  };
+
   const handleCTAClick = (e) => {
+    if (handlePublicAccessClick(e)) return;
+    
     if (user) {
       e.preventDefault();
       setShowPWAModal(true);
     }
   };
 
-  const handleDownloadClick = () => {
+  const handleDownloadClick = (e) => {
+    if (BETA_CONFIG.enabled && !user) {
+      e?.preventDefault?.();
+      setShowBetaModal(true);
+      return;
+    }
+    
     if (isAppInstalled) {
       // If already installed, navigate to the app
       navigate('/app/command-center');
@@ -71,8 +93,22 @@ const LandingPage = () => {
     }
   };
 
+  const handleLoginClick = (e) => {
+    // Login is always allowed for developers
+    // No beta modal for login
+  };
+
   const handlePWAModalClose = () => {
     setShowPWAModal(false);
+  };
+
+  const handleBetaModalClose = () => {
+    setShowBetaModal(false);
+  };
+
+  const handleDeveloperAccess = () => {
+    setShowBetaModal(false);
+    navigate('/login');
   };
 
   const features = [
@@ -207,14 +243,13 @@ const LandingPage = () => {
               <a href="#pricing" className="text-gray-400 hover:text-white transition-colors text-sm font-medium">Pricing</a>
               <a href="#testimonials" className="text-gray-400 hover:text-white transition-colors text-sm font-medium">Reviews</a>
               <Link to="/login" className="text-gray-400 hover:text-white transition-colors text-sm font-medium">Login</Link>
-              <Link 
-                to="/signup" 
+              <button 
                 onClick={handleCTAClick}
                 className="bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white px-5 py-2.5 rounded-lg font-medium transition-all hover:shadow-lg hover:shadow-emerald-500/25 flex items-center gap-2"
                 data-testid="get-started-btn"
               >
-                Get Started Free
-              </Link>
+                {BETA_CONFIG.enabled ? 'Preview' : 'Get Started Free'}
+              </button>
               <button 
                 onClick={handleDownloadClick}
                 className="bg-white/5 hover:bg-white/10 text-white px-5 py-2.5 rounded-lg font-medium transition-all border border-white/10 hover:border-white/20 flex items-center gap-2"
@@ -228,20 +263,19 @@ const LandingPage = () => {
                 ) : (
                   <>
                     <Download className="w-4 h-4" />
-                    Download App
+                    {BETA_CONFIG.enabled ? 'Preview' : 'Download'}
                   </>
                 )}
               </button>
             </nav>
             <div className="md:hidden flex items-center gap-2">
               <Link to="/login" className="text-gray-400 hover:text-white px-3 py-2 text-sm">Login</Link>
-              <Link 
-                to="/signup" 
+              <button 
                 onClick={handleCTAClick}
                 className="bg-gradient-to-r from-emerald-600 to-emerald-500 text-white px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-1.5"
               >
-                Get Started
-              </Link>
+                {BETA_CONFIG.enabled ? 'Preview' : 'Get Started'}
+              </button>
               <button 
                 onClick={handleDownloadClick}
                 className="bg-white/5 text-white p-2 rounded-lg border border-white/10"
@@ -304,15 +338,14 @@ const LandingPage = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link 
-              to="/signup" 
+            <button 
               onClick={handleCTAClick}
               className="group bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all hover:shadow-xl hover:shadow-emerald-500/30 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98]"
               data-testid="hero-cta-btn"
             >
-              Get Started Free
+              {BETA_CONFIG.enabled ? 'Preview TradeOS' : 'Get Started Free'}
               <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </Link>
+            </button>
             <button 
               onClick={handleDownloadClick}
               className="bg-white/5 hover:bg-white/10 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all border border-white/10 hover:border-white/20 flex items-center justify-center gap-2"
@@ -326,14 +359,14 @@ const LandingPage = () => {
               ) : (
                 <>
                   <Download className="w-5 h-5" />
-                  Download App
+                  {BETA_CONFIG.enabled ? 'Learn More' : 'Download App'}
                 </>
               )}
             </button>
           </div>
           
           <p className="text-gray-500 text-sm mt-6">
-            No credit card required. Free 14-day trial.
+            {BETA_CONFIG.enabled ? 'Private beta. Public launch coming soon.' : 'No credit card required. Free 14-day trial.'}
           </p>
           
           <div className="flex flex-wrap items-center justify-center gap-8 mt-12 text-sm text-gray-400">
@@ -398,12 +431,12 @@ const LandingPage = () => {
                   and strategic business intelligence — all in one powerful dashboard.
                 </p>
               </div>
-              <Link 
-                to="/signup"
+              <button 
+                onClick={handleCTAClick}
                 className="flex-shrink-0 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 px-6 py-3 rounded-lg font-medium transition-colors"
               >
                 Learn More
-              </Link>
+              </button>
             </div>
           </div>
         </div>
@@ -420,6 +453,16 @@ const LandingPage = () => {
             <p className="text-gray-400">
               No per-user fees. No hidden costs. Just straightforward pricing.
             </p>
+            
+            {/* Private Beta Notice */}
+            {BETA_CONFIG.pricingPreviewMode && (
+              <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/30 rounded-lg">
+                <AlertTriangle className="w-4 h-4 text-amber-400" />
+                <span className="text-amber-400 text-sm font-medium">
+                  Public Subscriptions Opening Soon — TradeOS is currently in private beta. Pricing is displayed for preview purposes.
+                </span>
+              </div>
+            )}
           </div>
           
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
@@ -451,18 +494,18 @@ const LandingPage = () => {
                     </li>
                   ))}
                 </ul>
-                <Link
-                  to="/signup"
+                <button
                   onClick={handleCTAClick}
                   className={`block w-full py-3 rounded-lg font-semibold text-center transition-all flex items-center justify-center gap-2 ${
                     plan.popular
                       ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white shadow-lg shadow-emerald-500/20'
                       : 'bg-[#1a1a1a] hover:bg-[#222222] text-white border border-[#2a2a2a]'
                   }`}
+                  data-testid={`pricing-${plan.name.toLowerCase()}-btn`}
                 >
                   <Download className="w-4 h-4" />
-                  Get Started Free
-                </Link>
+                  {BETA_CONFIG.pricingPreviewMode ? 'Preview TradeOS' : 'Get Started Free'}
+                </button>
               </div>
             ))}
           </div>
@@ -518,23 +561,25 @@ const LandingPage = () => {
         <div className="relative max-w-3xl mx-auto text-center">
           <img src="/shield-icon.png" alt="" className="w-16 h-16 mx-auto mb-6 opacity-20" />
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-            Ready to Run Your Business Like a Pro?
+            {BETA_CONFIG.enabled ? 'Something Powerful is Being Built' : 'Ready to Run Your Business Like a Pro?'}
           </h2>
           <p className="text-gray-300 text-lg mb-8">
-            Join hundreds of Canadian contractors who&apos;ve switched to TradeOS. 
-            Start your free trial today — no credit card required.
+            {BETA_CONFIG.enabled 
+              ? 'TradeOS is in active development. Join the launch list to be first in line when we go live.'
+              : "Join hundreds of Canadian contractors who've switched to TradeOS. Start your free trial today — no credit card required."
+            }
           </p>
-          <Link
-            to="/signup"
+          <button
             onClick={handleCTAClick}
             className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all hover:shadow-xl hover:shadow-emerald-500/30 hover:scale-[1.02] active:scale-[0.98]"
+            data-testid="cta-get-started-btn"
           >
             <Download className="w-5 h-5" />
-            Get Started Free
+            {BETA_CONFIG.enabled ? 'Preview TradeOS' : 'Get Started Free'}
             <ChevronRight className="w-5 h-5" />
-          </Link>
+          </button>
           <p className="text-gray-500 text-sm mt-4">
-            No credit card required. Full access to all features.
+            {BETA_CONFIG.enabled ? 'Private beta. Public launch coming soon.' : 'No credit card required. Full access to all features.'}
           </p>
         </div>
       </section>
@@ -563,6 +608,13 @@ const LandingPage = () => {
       </footer>
 
       <PWAInstallModal isOpen={showPWAModal} onClose={handlePWAModalClose} />
+      
+      {/* Private Beta Modal */}
+      <PrivateBetaModal 
+        isOpen={showBetaModal} 
+        onClose={handleBetaModalClose}
+        onDeveloperAccess={handleDeveloperAccess}
+      />
     </div>
   );
 };
